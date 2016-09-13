@@ -1,0 +1,569 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F014E87B-5F9A-47B1-A557-04A74A8EF57D}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>Restore_Point_Creator.My.MyApplication</StartupObject>
+    <RootNamespace>Restore_Point_Creator</RootNamespace>
+    <AssemblyName>Restore Point Creator</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>WindowsForms</MyType>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>Restore Point Creator.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>Restore Point Creator.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\RestorePoint_noBackground_2.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Win32.TaskScheduler, Version=2.5.14.0, Culture=neutral, PublicKeyToken=0d013ddd5178a2ae, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Microsoft.Win32.TaskScheduler.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationFramework" />
+    <Reference Include="SmoothProgressBar, Version=1.0.5617.18178, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\SmoothProgressBar.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Windows.Forms" />
+    <Import Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="IWshRuntimeLibrary">
+      <Guid>{F935DC20-1CF0-11D0-ADB9-00C04FD58A0B}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="WbemScripting">
+      <Guid>{565783C6-CB41-11D1-8B02-00600806D9B6}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>2</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="Classes and Modules\Exported Log Class.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\apis.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\checksum.vb" />
+    <Compile Include="Classes and Modules\enums.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\eventLogFunctions.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\http.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\osVersionInfo.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\privilegeChecks.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\registryStuff.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\support.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\supportClasses.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\taskStuff.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\vss.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\wait.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\wmi.vb" />
+    <Compile Include="Classes and Modules\HTTPHelper.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\miniDump.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\startupFunctions.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\power.vb" />
+    <Compile Include="Windows\Command Line Arguments.Designer.vb">
+      <DependentUpon>Command Line Arguments.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Command Line Arguments.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Confirm Restore Point Deletion.Designer.vb">
+      <DependentUpon>Confirm Restore Point Deletion.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Confirm Restore Point Deletion.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Reserved Space for System Drive.Designer.vb">
+      <DependentUpon>Reserved Space for System Drive.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Reserved Space for System Drive.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Round Restore Point Age in Days.Designer.vb">
+      <DependentUpon>Round Restore Point Age in Days.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Round Restore Point Age in Days.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Search Event Log.Designer.vb">
+      <DependentUpon>Search Event Log.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Search Event Log.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Update Message.Designer.vb">
+      <DependentUpon>Update Message.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Update Message.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Change Log.Designer.vb">
+      <DependentUpon>Change Log.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Change Log.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Check for Updates Every.Designer.vb">
+      <DependentUpon>Check for Updates Every.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Check for Updates Every.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Configure Proxy.Designer.vb">
+      <DependentUpon>Configure Proxy.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Configure Proxy.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Create Restore Point at User Logon.Designer.vb">
+      <DependentUpon>Create Restore Point at User Logon.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Create Restore Point at User Logon.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Custom Named Restore Point.Designer.vb">
+      <DependentUpon>Custom Named Restore Point.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Custom Named Restore Point.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Delete Old System Restore Points Dialog.Designer.vb">
+      <DependentUpon>Delete Old System Restore Points Dialog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Delete Old System Restore Points Dialog.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Disk Space Usage.Designer.vb">
+      <DependentUpon>Disk Space Usage.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Disk Space Usage.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\EventLog.designer.vb">
+      <DependentUpon>EventLog.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\EventLog.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Global Application Crash Handler.designer.vb">
+      <DependentUpon>Global Application Crash Handler.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Global Application Crash Handler.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Keep X Amount of Restore Points.Designer.vb">
+      <DependentUpon>Keep X Amount of Restore Points.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Keep X Amount of Restore Points.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Main Form.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Main Form.Designer.vb">
+      <DependentUpon>Main Form.vb</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Manage System Restore Storage Space.Designer.vb">
+      <DependentUpon>Manage System Restore Storage Space.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Manage System Restore Storage Space.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Manually Submit Crash Details.Designer.vb">
+      <DependentUpon>Manually Submit Crash Details.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Manually Submit Crash Details.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Mount Volume Shadow Copy.Designer.vb">
+      <DependentUpon>Mount Volume Shadow Copy.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Mount Volume Shadow Copy.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Official Contact Form.Designer.vb">
+      <DependentUpon>Official Contact Form.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Official Contact Form.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Please Wait.Designer.vb">
+      <DependentUpon>Please Wait.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Please Wait.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Set Custom Restore Point Name for Scheduled Restore Points.Designer.vb">
+      <DependentUpon>Set Custom Restore Point Name for Scheduled Restore Points.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Set Custom Restore Point Name for Scheduled Restore Points.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Set Default Custom Restore Point Name.Designer.vb">
+      <DependentUpon>Set Default Custom Restore Point Name.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Set Default Custom Restore Point Name.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Task Scheduler.Designer.vb">
+      <DependentUpon>Task Scheduler.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Task Scheduler.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Classes and Modules\Functions Namespace\editBCDStore.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\PSLib.vb" />
+    <Compile Include="Classes and Modules\Extensions.vb" />
+    <Compile Include="Classes and Modules\Global Variables.vb" />
+    <Compile Include="Classes and Modules\IniFileVb.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\listViewSorter.vb" />
+    <Compile Include="Classes and Modules\MyApp.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\NativeMethod.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Confirm Restore Point Deletion.resx">
+      <DependentUpon>Confirm Restore Point Deletion.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Create Restore Point at User Logon.resx">
+      <DependentUpon>Create Restore Point at User Logon.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Disk Space Usage.resx">
+      <DependentUpon>Disk Space Usage.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\EventLog.resx">
+      <DependentUpon>EventLog.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Global Application Crash Handler.resx">
+      <DependentUpon>Global Application Crash Handler.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Main Form.resx">
+      <DependentUpon>Main Form.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Manage System Restore Storage Space.resx">
+      <DependentUpon>Manage System Restore Storage Space.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Manually Submit Crash Details.resx">
+      <DependentUpon>Manually Submit Crash Details.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Mount Volume Shadow Copy.resx">
+      <DependentUpon>Mount Volume Shadow Copy.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Command Line Arguments.resx">
+      <DependentUpon>Command Line Arguments.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Official Contact Form.resx">
+      <DependentUpon>Official Contact Form.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Please Wait.resx">
+      <DependentUpon>Please Wait.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Reserved Space for System Drive.resx">
+      <DependentUpon>Reserved Space for System Drive.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Round Restore Point Age in Days.resx">
+      <DependentUpon>Round Restore Point Age in Days.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Search Event Log.resx">
+      <DependentUpon>Search Event Log.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Set Default Custom Restore Point Name.resx">
+      <DependentUpon>Set Default Custom Restore Point Name.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Task Scheduler.resx">
+      <DependentUpon>Task Scheduler.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Update Message.resx">
+      <DependentUpon>Update Message.vb</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="My Project\app.manifest" />
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="Resources\1_drive_restore.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\arrow_down.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\backup_and_restore.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\chronometer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\color_wheel.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\contact.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\create.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\default.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\delete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\disk_space.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\edit_clear.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\errorIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\folder_explore.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\font.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\gear.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\green_dollar.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\increase.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\info_blue.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\informationIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\lock.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\login.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\movies.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\mycomputer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\network.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\next.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\notifications.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\plug.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\question.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\refresh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\removeBig.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\removeSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\RestorePoint_noBackground_2.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\settings.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\text_block.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tools.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\view.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\warningIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\website.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\z_file_font.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="FodyWeavers.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <None Include="Resources\reboot.png" />
+    <None Include="Resources\terminal.png" />
+    <None Include="Resources\keyboard.png" />
+    <None Include="Resources\calculator.png" />
+    <None Include="Resources\system_question.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <Import Project="packages\Fody.1.28.3\build\Fody.targets" Condition="Exists('packages\Fody.1.28.3\build\Fody.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\Fody.1.28.3\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Fody.1.28.3\build\Fody.targets'))" />
+  </Target>
+  <PropertyGroup>
+    <PostBuildEvent>del "$(TargetDir)*.xml"</PostBuildEvent>
+  </PropertyGroup>
+  <UsingTask TaskName="CosturaCleanup" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" TaskFactory="CodeTaskFactory">
+    <ParameterGroup>
+      <Config Output="false" Required="true" ParameterType="Microsoft.Build.Framework.ITaskItem" />
+      <Files Output="false" Required="true" ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
+    </ParameterGroup>
+    <Task Evaluate="true">
+      <Reference xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Include="System.Xml" />
+      <Reference xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Include="System.Xml.Linq" />
+      <Using xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Namespace="System" />
+      <Using xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Namespace="System.IO" />
+      <Using xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Namespace="System.Xml.Linq" />
+      <Code xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Type="Fragment" Language="cs"><![CDATA[
+var config = XElement.Load(Config.ItemSpec).Elements("Costura").FirstOrDefault();
+
+if (config == null) return true;
+
+var excludedAssemblies = new List<string>();
+var attribute = config.Attribute("ExcludeAssemblies");
+if (attribute != null)
+    foreach (var item in attribute.Value.Split('|').Select(x => x.Trim()).Where(x => x != string.Empty))
+        excludedAssemblies.Add(item);
+var element = config.Element("ExcludeAssemblies");
+if (element != null)
+    foreach (var item in element.Value.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Where(x => x != string.Empty))
+        excludedAssemblies.Add(item);
+
+var filesToCleanup = Files.Select(f => f.ItemSpec).Where(f => !excludedAssemblies.Contains(Path.GetFileNameWithoutExtension(f), StringComparer.InvariantCultureIgnoreCase));
+
+foreach (var item in filesToCleanup)
+  File.Delete(item);
+]]></Code>
+    </Task>
+  </UsingTask>
+  <Target Name="CleanReferenceCopyLocalPaths" AfterTargets="AfterBuild;NonWinFodyTarget">
+    <CosturaCleanup Config="FodyWeavers.xml" Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

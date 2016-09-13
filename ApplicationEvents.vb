@@ -1,0 +1,590 @@
+﻿Imports System.Text.RegularExpressions
+Imports Microsoft.Win32.TaskScheduler
+Imports Microsoft.Win32
+
+Namespace My
+    ' The following events are available for MyApplication:
+    '
+    ' Startup: Raised when the application starts, before the startup form is created.
+    ' Shutdown: Raised after all application forms are closed.  This event is not raised if the application terminates abnormally.
+    ' UnhandledException: Raised if the application encounters an unhandled exception.
+    ' StartupNextInstance: Raised when launching a single-instance application and the application is already active.
+    ' NetworkAvailabilityChanged: Raised when the network connection is connected or disconnected.
+    Partial Friend Class MyApplication
+        'Private pathToDeleteLogFile As String = System.IO.Path.Combine(New System.IO.FileInfo(Process.GetCurrentProcess.MainModule.FileName).DirectoryName, "Restore Point Delete Log File.log")
+        Private pleaseWaitInstance As Please_Wait
+
+        Private Sub MyApplication_Startup(sender As Object, e As ApplicationServices.StartupEventArgs) Handles Me.Startup
+            Functions.startupFunctions.validateSettings()
+
+            Dim commandLineArgument As String
+            Dim boolNoTask As Boolean = False ' Create a Boolean data type variable.
+
+            If Environment.OSVersion.ToString.Contains("5.1") = True Or Environment.OSVersion.ToString.Contains("5.2") = True Then
+                Functions.startupFunctions.downloadWindowsXPVersion()
+            End If
+
+            If Functions.osVersionInfo.isThisAServerOS() = True Then
+                MsgBox("You are running a Server edition of Microsoft Windows. System Restore Point Creator doesn't function on server operating systems." & vbCrLf & vbCrLf & "This application will now close.", MsgBoxStyle.Critical, "System Restore Point Creator -- Application Error")
+                Process.GetCurrentProcess.Kill()
+            End If
+
+            If IO.File.Exists("portable.mode") = True Or IO.File.Exists("portablemode.txt") = True Then
+                globalVariables.boolPortableMode = True
+                boolNoTask = True
+            End If
+
+            ' This is to test the crash submission code. Make sure this block is commented out before compiling for public release.
+            'Try
+            '    Throw New IO.FileLoadException()
+            'Catch ex As Exception
+            '    exceptionHandler.manuallyLoadCrashWindow(ex)
+            'End Try
+            ' This is to test the crash submission code. Make sure this block is commented out before compiling for public release.
+
+            ' We're going to store the result of the Functions.areWeAnAdministrator() call in this Boolean variable for later use in this code block.
+            Dim boolAreWeAnAdministrator As Boolean = Functions.privilegeChecks.areWeAnAdministrator()
+
+            ' We're going to store the result of the Functions.support.areWeInSafeMode() call in this Boolean variable for later use in this code block.
+            Dim boolAreWeInSafeMode As Boolean = Functions.support.areWeInSafeMode()
+
+            ' This checks to see if our Registry Key doesn't exist. If it doesn't exist, we need to create it.
+            If Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey) Is Nothing Then
+                ' OK, it doesn't exist so we have to create it.
+
+                ' But first, we need to check if we are running with an Administrator user rights token.
+                If boolAreWeAnAdministrator = True Then
+                    ' OK, we're running as an Administrator so we can continue to create our Registry Key.
+
+                    Try
+                        ' First we open the SOFTWARE key in HKEY_LOCAL_MACHINE and then create a subkey in the SOFTWARE key.
+                        Registry.LocalMachine.OpenSubKey("SOFTWARE", True).CreateSubKey(globalVariables.registryValues.strKeyInsideSoftware)
+
+                        ' Now we check to make sure that the our Registry key has been created.
+                        If Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey) Is Nothing Then
+                            ' It hasn't so we give the user a message stating that something went wrong.
+                            Functions.startupFunctions.giveMessageToUserAboutNotBeingAbleToCreateRegistrySubKey()
+
+                            ' And now we close the program.
+                            e.Cancel = True
+                            Exit Sub
+                        End If
+                    Catch ex As Exception
+                        ' Something really went wrong so we give the user a message stating that something went wrong.
+                        Functions.startupFunctions.giveMessageToUserAboutNotBeingAbleToCreateRegistrySubKey()
+
+                        ' And now we close the program.
+                        e.Cancel = True
+                        Exit Sub
+                    End Try
+                Else
+                    ' We're not running as an Administrator so we have to relaunch this program while triggering a UAC prompt. The next
+                    ' time this program runs we will be running as an Administrator so the above code will run instead of this branch.
+                    Functions.support.reRunWithAdminUserRights()
+                End If
+            End If
+
+            ' This code is for running parts of the program that don't necessarily need Admin privs.
+            If My.Application.CommandLineArgs.Count = 1 Then
+                commandLineArgument = My.Application.CommandLineArgs(0).ToLower.Trim
+
+                If commandLineArgument.stringCompare("-viewchangelog") Then
+                    Dim changeLog As New Change_Log
+                    changeLog.ShowDialog()
+                    e.Cancel = True
+                    Exit Sub
+                ElseIf commandLineArgument.stringCompare("-eventlog") Then
+                    Dim eventLogForm As New eventLogForm
+                    eventLogForm.ShowDialog()
+                    e.Cancel = True
+                    Exit Sub
+                End If
+            End If
+
+            ' This code checks to see if the current version is a beta or Release Candidate and if the user's update channel is already set to beta mode.
+            ' If the user's update channel isn't set to beta mode we then set it for the user here.
+            If (globalVariables.version.boolBeta = True Or globalVariables.version.boolReleaseCandidate = True) And My.Settings.updateChannel <> globalVariables.updateChannels.beta Then
+                My.Settings.updateChannel = globalVariables.updateChannels.beta ' Changes the update channel to beta.
+            End If
+
+            ' Checks to see if the update channel is set to stable, if a debug symbols file exists, and we are an Admin.
+            If My.Settings.updateChannel = globalVariables.updateChannels.stable And IO.File.Exists(globalVariables.pdbFileNameInZIP) = True And boolAreWeAnAdministrator = True Then
+                ' Yes, it does exist so we try to delete it.
+                Try
+                    IO.File.Delete(globalVariables.pdbFileNameInZIP)
+                Catch ex As Exception
+                    ' If something goes wrong, we don't care; we handle it silently.
+                End Try
+            End If
+
+            'GlobalVariables.notask() Registry.LocalMachine.OpenSubKey(globalVariables.registry.strProgramRegistryKey, True).GetValue("No Task", "True")
+
+            Dim executablePathPathInfo As New IO.FileInfo(Windows.Forms.Application.ExecutablePath)
+            'Dim executablePathPathInfo As New System.IO.FileInfo(Process.GetCurrentProcess.MainModule.FileName)
+            'MsgBox(executablePathPathInfo.FullName)
+
+#If DEBUG Then
+            If Debugger.IsAttached = True And boolAreWeAnAdministrator = False Then
+                MsgBox("You must restart Microsoft Visual Studio with Administrator privileges. Debugging will now stop.", MsgBoxStyle.Critical, "Debug Mode Enabled")
+                e.Cancel = True
+                Exit Sub
+            End If
+#End If
+            ' Reads a special Registry entry from the Registry that instructs the program to not run with the Task Wrapper.
+            If Boolean.TryParse(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey).GetValue("No Task", "False"), boolNoTask) Then
+                ' Checks to see if the Registry value was True and if we aren't an Admin.
+                If boolNoTask = True And boolAreWeAnAdministrator = False Then
+                    Functions.support.reRunWithAdminUserRights() ' OK, we relaunch the process with full Administrator privileges with a UAC prompt.
+                End If
+            Else
+                ' This is in case we couldn't parse what came from the Registry.
+                boolNoTask = False
+            End If
+
+            ' Checks to see if we are in Safe Mode and if the No Task setting is set to False.  Both conditions have to be False for this code block to run.
+            If boolAreWeInSafeMode = False And boolNoTask = False Then
+                If Functions.privilegeChecks.IsUserInAdminGroup() = True Then
+                    ' This code creates the subfolder in the task scheduler for our runtime tasks.
+
+                    ' Checks to see if the Task Folder doesn't exist.
+                    If Functions.taskStuff.doesTaskFolderExist() = False Then
+                        ' If we aren't an Administrator, we relaunch this program as an admin.
+                        If boolAreWeAnAdministrator = False Then
+                            Functions.support.reRunWithAdminUserRights()
+                        ElseIf boolAreWeAnAdministrator = True Then ' Yes, we are an Admin, so we go ahead and create the Task folder.
+                            Try
+                                Dim taskService As New TaskService
+                                taskService.RootFolder.CreateFolder(globalVariables.taskFolder)
+                                taskService.Dispose()
+                                taskService = Nothing
+                            Catch ex As UnauthorizedAccessException
+                                ' If something goes wrong, we're just going to bypass the whole task engine entirely on this system.
+                                'Registry.LocalMachine.OpenSubKey(globalVariables.registry.strProgramRegistryKey, True).SetValue("No Task", "True", RegistryValueKind.String)
+                                Functions.support.reRunWithAdminUserRights()
+                            Catch ex2 As Runtime.InteropServices.COMException
+                                ' If something goes wrong, we're just going to bypass the whole task engine entirely on this system.
+                                Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue("No Task", "True", RegistryValueKind.String)
+                                Functions.support.reRunWithAdminUserRights()
+                            End Try
+                        End If
+                    End If
+
+                    If boolAreWeAnAdministrator = True And My.Application.CommandLineArgs.Count = 1 Then
+                        'Dim task As TaskScheduler.Task
+
+                        commandLineArgument = My.Application.CommandLineArgs(0).ToLower.Trim
+
+                        If commandLineArgument = "-createtasks" Then
+                            Functions.taskStuff.createRunTimeTasksSubRoutine()
+                            Process.GetCurrentProcess.Kill()
+                        ElseIf commandLineArgument = "-update" Or commandLineArgument = "-updatewithoutuninstallinfoupdate" Then
+                            Functions.startupFunctions.performApplicationUpdate(commandLineArgument)
+                            e.Cancel = True
+                            Exit Sub
+                        ElseIf commandLineArgument = "-fixruntimetasks" Then
+                            Functions.startupFunctions.repairRuntimeTasks()
+
+                            e.Cancel = True
+                            Exit Sub
+                        ElseIf commandLineArgument = "-deletealltasks" Then
+                            Functions.startupFunctions.deleteAllTasks()
+                        End If
+                    End If
+
+                    Functions.taskStuff.runProgramUsingTaskWrapper()
+                Else
+                    Functions.support.reRunWithAdminUserRights()
+                End If
+            End If
+
+            Try
+                ' Ordinarily on Windows Vista and newer this code should not be needed but we have it in there to check if we do indeed have Administrator user rights.
+                If boolAreWeAnAdministrator = False Then
+                    Functions.support.reRunWithAdminUserRights()
+                End If
+
+                'Dim wmiCheckingThread As New Threading.Thread(AddressOf wmiCheckingProcess)
+                'wmiCheckingThread.Name = "System Event Log Checking for WMI Errors Thread"
+                'wmiCheckingThread.Priority = Threading.ThreadPriority.Highest
+                'wmiCheckingThread.Start()
+
+                Boolean.TryParse(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Keep X Amount of Restore Points", "False"), globalVariables.KeepXAmountOfRestorePoints)
+
+                If globalVariables.KeepXAmountOfRestorePoints = True Then
+                    Short.TryParse(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Keep X Amount of Restore Points Value", "-10"), globalVariables.KeepXAmountofRestorePointsValue)
+                End If
+
+                If Boolean.TryParse(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Enable System Logging", "True"), globalVariables.boolLogToSystemLog) = False Then
+                    globalVariables.boolLogToSystemLog = True
+                End If
+
+                If Boolean.TryParse(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Log Program Loads and Exits to Event Log", "True"), globalVariables.boolLogLoadsAndExitsToEventLog) = False Then
+                    globalVariables.boolLogLoadsAndExitsToEventLog = True
+                End If
+
+                If My.Settings.UpdateRequired = True Then
+                    My.Settings.Upgrade()
+                    My.Settings.UpdateRequired = False
+                End If
+
+                exceptionHandler.loadExceptionHandler()
+
+                If My.Application.CommandLineArgs IsNot Nothing Then
+                    If My.Application.CommandLineArgs.Count >= 1 Then
+                        commandLineArgument = My.Application.CommandLineArgs(0).ToLower.Trim
+
+                        Select Case commandLineArgument
+                            Case "-createrestorepoint"
+                                Functions.startupFunctions.giveSafeModeErrorMessage(boolAreWeInSafeMode)
+                                Functions.eventLogFunctions.writeToSystemEventLog("Activated JumpList Task.", EventLogEntryType.Information)
+
+                                Dim strRestorePointName As String = "System Checkpoint made by System Restore Point Creator"
+
+                                If My.Application.CommandLineArgs.Count = 2 Then
+                                    If My.Application.CommandLineArgs(1).ToLower.Trim.StartsWith("-name=") Then
+                                        strRestorePointName = Regex.Replace(My.Application.CommandLineArgs(1).Trim, "-name=", "", RegexOptions.IgnoreCase)
+                                    End If
+                                End If
+
+                                Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", True)
+
+                                ' This is a special way of making a thread in which you can pass parameters to the sub-routine that you're running as a separate thread.
+                                Dim creatingThread As New Threading.Thread(Sub()
+                                                                               Functions.startupFunctions.createSystemRestorePoint(True, strRestorePointName)
+                                                                           End Sub)
+                                creatingThread.Name = "Restore Point Creating Thread"
+                                creatingThread.Start()
+
+                                'createSystemRestorePoint(True)
+                                e.Cancel = True
+                                Exit Sub
+                            Case "-createrestorepointcustomname"
+                                Functions.startupFunctions.giveSafeModeErrorMessage(boolAreWeInSafeMode)
+                                Functions.eventLogFunctions.writeToSystemEventLog("Activated JumpList Task.", EventLogEntryType.Information)
+
+                                Dim Custom_Named_Restore_Point_Instance As Custom_Named_Restore_Point
+                                Custom_Named_Restore_Point_Instance = New Custom_Named_Restore_Point
+                                Custom_Named_Restore_Point_Instance.StartPosition = FormStartPosition.CenterScreen
+                                Custom_Named_Restore_Point_Instance.ShowDialog()
+
+                                Dim restorePointName As String
+
+                                If Custom_Named_Restore_Point_Instance.createRestorePoint = False Then
+                                    MsgBox("Restore Point not created.", MsgBoxStyle.Information, "Restore Point Creator") ' Gives the user some feedback.
+                                    e.Cancel = True
+                                    Exit Sub
+                                Else
+                                    restorePointName = Custom_Named_Restore_Point_Instance.restorePointName
+                                End If
+
+                                Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", True)
+
+                                ' This is a special way of making a thread in which you can pass parameters to the sub-routine that you're running as a separate thread.
+                                Dim creatingThread As New Threading.Thread(Sub()
+                                                                               Functions.startupFunctions.createSystemRestorePoint(True, restorePointName)
+                                                                           End Sub)
+                                creatingThread.Name = "Restore Point Creating Thread"
+                                creatingThread.Start()
+
+                                e.Cancel = True
+                                Exit Sub
+                            Case "-createscheduledrestorepoint"
+                                Dim restorePointNameForScheduledTasks As String = globalVariables.strDefaultNameForScheduledTasks
+                                Dim boolExtendedLoggingForScheduledTasks As Boolean = True
+                                Dim oldNewestRestorePointID As Integer
+
+                                Dim registryObject As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+
+                                If registryObject IsNot Nothing Then
+                                    restorePointNameForScheduledTasks = registryObject.GetValue("Custom Name for Scheduled Restore Points", globalVariables.strDefaultNameForScheduledTasks)
+
+                                    If Boolean.TryParse(registryObject.GetValue("Extended Logging For Scheduled Tasks", "True"), boolExtendedLoggingForScheduledTasks) Then
+                                        boolExtendedLoggingForScheduledTasks = boolExtendedLoggingForScheduledTasks
+                                    Else
+                                        boolExtendedLoggingForScheduledTasks = True
+                                    End If
+
+                                    registryObject.Close()
+                                    registryObject.Dispose()
+                                End If
+
+                                If boolExtendedLoggingForScheduledTasks = True Then
+                                    Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Starting scheduled restore point job. Task running as user {0}. There are currently {1} system restore point(s) on this system.", Environment.UserName, Functions.wmi.getNumberOfRestorePoints()), EventLogEntryType.Information)
+                                Else
+                                    Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Starting scheduled restore point job. Task running as user {0}.", Environment.UserName), EventLogEntryType.Information)
+                                End If
+
+                                Functions.startupFunctions.writeLastRunFile()
+
+                                If boolExtendedLoggingForScheduledTasks = True Then oldNewestRestorePointID = Functions.wmi.getNewestSystemRestorePointID()
+
+                                Functions.support.createScheduledSystemRestorePoint(restorePointNameForScheduledTasks)
+
+                                If boolExtendedLoggingForScheduledTasks = True Then
+                                    ' We wait here with this loop until the system's has the restore point created.
+                                    While oldNewestRestorePointID = Functions.wmi.getNewestSystemRestorePointID()
+                                        ' Does nothing, just loops and sleeps for half a second.
+                                        Threading.Thread.Sleep(500)
+                                    End While
+                                End If
+
+                                If boolExtendedLoggingForScheduledTasks = True Then Functions.support.writeSystemRestorePointsToApplicationLogs()
+
+                                Dim boolValueFromRegistryAsString As String = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Delete Old Restore Points", "False").Trim
+                                Dim boolValueFromRegistry As Boolean
+
+                                ' This checks if we have valid data from the Registry value.  It attempts to parse it and passes the value of the parses data to boolValueFromRegistry.
+                                If Boolean.TryParse(boolValueFromRegistryAsString, boolValueFromRegistry) = True Then
+                                    ' OK, we do have valid data, let's continue.
+                                    If boolValueFromRegistryAsString = True Then
+                                        Functions.startupFunctions.deleteOldRestorePoints()
+                                    End If
+                                End If
+
+                                If globalVariables.KeepXAmountOfRestorePoints = True Then
+                                    Functions.wmi.doDeletingOfXNumberOfRestorePoints(globalVariables.KeepXAmountofRestorePointsValue)
+                                End If
+
+                                Functions.eventLogFunctions.writeToSystemEventLog("Scheduled restore point job complete.", EventLogEntryType.Information)
+
+                                e.Cancel = True
+                                Exit Sub
+                            Case "-restoretopoint"
+                                ' The first thing we do is disable Safe Mode boot so the user doesn't get trapped in Safe Mode.
+                                Functions.registryStuff.removeSafeModeBoot(True)
+
+                                ' Now let's delete that Registry setting that tells the program that a Safe Mode boot was set up.
+                                If Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey) IsNot Nothing Then
+                                    Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Safe Mode Boot Set", False)
+                                End If
+
+                                ' We try and parse the value in the Registry.
+                                If Integer.TryParse(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Preselected Restore Point for Restore in Safe Mode", 0), Functions.startupFunctions.preSelectedRestorePointID) Then
+                                    ' We need to remove the registry keys from the registry, we no longer need them.
+                                    Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Preselected Restore Point for Restore in Safe Mode", False)
+                                    Registry.LocalMachine.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\RunOnce", True).DeleteValue("*Restore To Restore Point", False)
+
+                                    ' OK, what we have is an Interger. Great. Let's do some work with it.
+
+                                    If Functions.startupFunctions.preSelectedRestorePointID = 0 Then
+                                        MsgBox("Something went wrong, we don't have a valid restore point to restore to. The program will execute as normal from now on.", MsgBoxStyle.Information, "Restore Point Creator")
+                                    Else
+                                        Functions.wait.createPleaseWaitWindow("Beginning the Restore Process... Please wait.", True)
+
+                                        Functions.startupFunctions.isMyRestoreThreadRunning = True
+
+                                        Dim thread As New Threading.Thread(AddressOf Functions.startupFunctions.restoreSystemRestorePoint)
+                                        thread.Name = "Restore System Restore Point Thread"
+                                        thread.Priority = Threading.ThreadPriority.Normal
+                                        thread.Start()
+
+                                        While Functions.startupFunctions.isMyRestoreThreadRunning = True
+                                            Threading.Thread.Sleep(1000)
+                                        End While
+                                    End If
+                                Else
+                                    ' We need to remove the registry keys from the registry, we no longer need them.
+                                    Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Preselected Restore Point for Restore in Safe Mode", False)
+                                    Registry.LocalMachine.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\RunOnce", True).DeleteValue("*Restore To Restore Point", False)
+
+                                    ' Nope, we don't have an Integer. Let's stop things right here.
+                                    MsgBox("Something went wrong, we don't have a valid restore point to restore to. The program will execute as normal from now on.", MsgBoxStyle.Information, "Restore Point Creator")
+                                End If
+
+                                e.Cancel = True
+                                Exit Sub
+                            Case "-deleteoldrestorepoints"
+                                Functions.startupFunctions.deleteOldRestorePoints()
+                                e.Cancel = True
+                                Exit Sub
+                            Case "-prefscleanup"
+                                Functions.startupFunctions.prefsCleanup()
+                        End Select
+                    Else
+                        Functions.registryStuff.removeSafeModeBoot()
+                    End If
+                Else
+                    Functions.registryStuff.removeSafeModeBoot()
+                End If
+
+                If (Functions.osVersionInfo.isThisWindows10() = True Or Functions.osVersionInfo.isThisWindows8x() = True) And boolAreWeAnAdministrator = True And Functions.support.areWeInSafeMode() = False Then
+                    Functions.taskStuff.disableBuiltInRestorePointTask()
+                End If
+            Catch ex As Exception
+                Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
+                exceptionHandler.manuallyLoadCrashWindow(ex, "Application Startup Routine" & vbCrLf & vbCrLf & ex.Message, ex.StackTrace, ex.GetType)
+            End Try
+
+            If boolAreWeAnAdministrator = True Then
+                Functions.taskStuff.updateScheduledRestorePointCreationTaskWithEverySetting()
+                Functions.taskStuff.setMultiRunForTask()
+            End If
+        End Sub
+
+        Private Sub MyApplication_UnhandledException(sender As Object, e As ApplicationServices.UnhandledExceptionEventArgs) Handles Me.UnhandledException
+            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
+
+            Dim result As Boolean = exceptionHandler.handleCrashWithAnErrorOrRedirectUserInstead(e.Exception)
+            If result = True Then exceptionHandler.manuallyLoadCrashWindow(e.Exception, e.Exception.Message, e.Exception.StackTrace, e.Exception.GetType)
+        End Sub
+
+        Protected Overrides Sub Finalize()
+            MyBase.Finalize()
+        End Sub
+
+        Private Sub MyApplication_Shutdown(sender As Object, e As EventArgs) Handles Me.Shutdown
+            If IO.Directory.Exists(globalVariables.shadowCopyMountFolder) Then IO.Directory.Delete(globalVariables.shadowCopyMountFolder)
+        End Sub
+
+        'Sub checkSystemServiceAndSetProperStartupMode(serviceName As String, defaultServiceStartupMode As ServiceStartMode)
+        '    Try
+        '        Dim serviceStatus As String = getServiceStatus(serviceName)
+
+        '        If serviceStatus = "0x00000000" Or serviceStatus = "0x00000001" Then
+        '            MsgBox("The WMI or Windows Management Instrumentation interface appears to be broken on your system.  The WMI is heavily used in this program to interact with several low-level system functions and must be repaired before going forth." & vbCrLf & vbCrLf & "Please go to http://bit.ly/winrepairaio and download the Windows Repair (All In One) tool and run the tool to repair your system.", MsgBoxStyle.Critical, "Restore Point Creator")
+        '            Process.Start("http://bit.ly/winrepairaio")
+        '            Process.GetCurrentProcess.Kill()
+        '        ElseIf serviceStatus = "0x00000002" Then
+        '            MsgBox("Your system services are severely broken, please go to http://bit.ly/winrepairaio and download the Windows Repair (All In One) tool and run the tool to repair your system.  If this doesn't work, you will need to reinstall your operating system.", MsgBoxStyle.Critical, "Restore Point Creator")
+        '            Process.Start("http://bit.ly/winrepairaio")
+        '            Process.GetCurrentProcess.Kill()
+        '        ElseIf serviceStatus = "Auto" Then
+        '            serviceStatus = "Automatic"
+        '        End If
+
+        '        If serviceStatus <> defaultServiceStartupMode.ToString Then
+        '            setServiceStatus(serviceName, defaultServiceStartupMode)
+
+        '            If defaultServiceStartupMode = ServiceStartMode.Automatic Then
+        '                Dim myController As New ServiceController(serviceName)
+
+        '                If myController.Status <> ServiceControllerStatus.Running Then
+        '                    myController.Start()
+        '                End If
+
+        '                myController.Dispose()
+        '                myController = Nothing
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        MsgBox("Your system services are severely broken, please go to http://bit.ly/winrepairaio and download the Windows Repair (All In One) tool and run the tool to repair your system.  If this doesn't work, you will need to reinstall your operating system.", MsgBoxStyle.Critical, "Restore Point Creator")
+        '        Process.Start("http://bit.ly/winrepairaio")
+        '        Process.GetCurrentProcess.Kill()
+        '    End Try
+        'End Sub
+
+        'Function getServiceStatus(serviceBaseName As String) As String
+        '    Try
+        '        Dim startMode As String
+        '        Dim managementObject As New ManagementObject("root\CIMV2", String.Format("Win32_Service.Name='{0}'", serviceBaseName), Nothing)
+
+        '        Try
+        '            startMode = managementObject.GetPropertyValue("StartMode")
+        '            managementObject.Dispose()
+        '        Catch ex As ManagementException
+        '            startMode = "0x00000002"
+        '        End Try
+
+        '        Return startMode
+
+        '        'Dim managementPath As New ManagementPath("Win32_Service='VSS'")
+        '        'Dim managementObject As New ManagementObject
+        '        'managementObject.Path = managementPath
+        '        'Dim startMode As String = managementObject("StartMode")
+        '        'managementObject.Dispose()
+        '        'Return startMode
+
+        '        'Dim startMode As String
+        '        'Dim searcher As New ManagementObjectSearcher("root\CIMV2", "SELECT * FROM Win32_Service")
+
+        '        'For Each queryObj As ManagementObject In searcher.Get()
+        '        '    If queryObj("Name") = serviceName Or queryObj("Caption") = serviceName Then
+        '        '        startMode = queryObj("StartMode")
+        '        '        searcher.Dispose()
+        '        '        queryObj.Dispose()
+
+        '        '        Return startMode
+        '        '    End If
+        '        'Next
+
+        '        'searcher.Dispose()
+        '        'Return "System Service Not Found"
+        '    Catch err As Exception ' ManagementException
+        '        If Regex.IsMatch(err.Message, "System\.Management\.ManagementScope\.InitializeGuts", RegexOptions.IgnoreCase) Then
+        '            Return "0x00000000"
+        '        End If
+
+        '        Return "0x00000001"
+        '    End Try
+        'End Function
+
+        'Sub setServiceStatus(serviceBaseName As String, startMode As ServiceStartMode)
+        '    Try
+        '        Dim classInstance As New ManagementObject("root\CIMV2", String.Format("Win32_Service.Name='{0}'", serviceBaseName), Nothing)
+        '        Dim inParams As ManagementBaseObject = classInstance.GetMethodParameters("ChangeStartMode")
+        '        inParams("StartMode") = startMode.ToString
+        '        classInstance.InvokeMethod("ChangeStartMode", inParams, Nothing)
+        '    Catch err As Exception ' ManagementException
+        '        'debug.writeline("Error setting System Service Startup Mode.")
+        '    End Try
+        'End Sub
+
+        'Sub wmiCheckingProcess()
+        '    Try
+        '        Dim i As Short = 0
+        '        Dim stopWatch As New Stopwatch()
+        '        stopWatch.Start()
+
+        '        'debug.writeline("Beginning of System Event Log Scanning.")
+
+        '        Dim eventLogs() As EventLog = System.Diagnostics.EventLog.GetEventLogs()
+
+        '        For Each eventLog As System.Diagnostics.EventLog In eventLogs
+        '            If eventLog.Log = "System" Then
+        '                For Each eventLogEntry As EventLogEntry In eventLog.Entries
+        '                    i += 1
+        '                    If i >= 250 Then
+        '                        stopWatch.Stop()
+        '                        'debug.writeline("Finished scanning System Event Log.  Scanning of event log took " & stopWatch.ElapsedMilliseconds & " ms.")
+        '                        Exit Sub
+        '                    ElseIf eventLogEntry.InstanceId = 1090 And Regex.IsMatch(eventLogEntry.Message, "an attempt to connect to WMI failed", RegexOptions.IgnoreCase) Then
+        '                        MsgBox("The WMI or Windows Management Instrumentation interface appears to be broken on your system.  The WMI is heavily used in this program to interact with several low-level system functions and must be repaired before going forth." & vbCrLf & vbCrLf & "Please go to http://bit.ly/winrepairaio and download the Windows Repair (All In One) tool and run the tool to repair your system.", MsgBoxStyle.Critical, "Restore Point Creator")
+        '                        Process.Start("http://bit.ly/winrepairaio")
+        '                        Process.GetCurrentProcess.Kill()
+        '                    End If
+        '                Next
+        '            End If
+        '        Next
+
+        '        stopWatch.Stop()
+        '        'debug.writeline("Finished scanning System Event Log.  Scanning of event log took " & stopWatch.ElapsedMilliseconds & " ms.")
+        '    Catch ex As Threading.ThreadAbortException
+        '        ' Does nothing
+        '    Catch ex2 As Exception
+        '        ' Does nothing
+        '    End Try
+        'End Sub
+
+        'Sub decompressDLLs()
+        '    Dim executingAssembly As Reflection.Assembly = Reflection.Assembly.GetExecutingAssembly()
+        '    Dim decompressionStream As DeflateStream
+        '    Dim fileStream As IO.FileStream
+        '    Dim embeddedDLLName As String
+
+        '    For Each resourceName As String In executingAssembly.GetManifestResourceNames()
+        '        If resourceName.ToLower.EndsWith(".zip") = True Then
+        '            embeddedDLLName = resourceName.ToLower.Replace(".zip", "").Replace("costura.", "")
+
+        '            decompressionStream = New DeflateStream(executingAssembly.GetManifestResourceStream(resourceName), CompressionMode.Decompress)
+        '            fileStream = New IO.FileStream(embeddedDLLName, IO.FileMode.Create)
+        '            decompressionStream.CopyTo(fileStream)
+
+        '            fileStream.Close()
+        '            fileStream.Dispose()
+        '            decompressionStream.Close()
+        '            decompressionStream.Dispose()
+        '        End If
+        '    Next
+        'End Sub
+    End Class
+End Namespace

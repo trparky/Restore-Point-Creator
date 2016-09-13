@@ -1,0 +1,198 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="My" GeneratedClassName="MySettings" UseMySettingsClassName="true">
+  <Profiles />
+  <Settings>
+    <Setting Name="ProgramExecutionsSinceLastUpdateCheck" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="CheckForUpdates" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="closeAfterCreatingRestorePoint" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="confirmRestorePointDeletions" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="firstRun" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="windowSize" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">536, 603</Value>
+    </Setting>
+    <Setting Name="diskUsageWindowSize" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">682, 221</Value>
+    </Setting>
+    <Setting Name="dontBugTheUserAboutPuttingTheEXEFileSomewhereSafe" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="column1Size" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">27</Value>
+    </Setting>
+    <Setting Name="column2Size" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">191</Value>
+    </Setting>
+    <Setting Name="column3Size" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">140</Value>
+    </Setting>
+    <Setting Name="column4Size" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">125</Value>
+    </Setting>
+    <Setting Name="boolDontBugMeAboutMovingEXE" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="deleteOldRestorePoints2" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="maxDaysManualDelete" Type="System.Int16" Scope="User">
+      <Value Profile="(Default)">-1</Value>
+    </Setting>
+    <Setting Name="boolLogDeletedRestorePoints" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="barColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">SeaGreen</Value>
+    </Setting>
+    <Setting Name="UpdateRequired" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="logFileViewerWindowSize" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">743, 396</Value>
+    </Setting>
+    <Setting Name="debug" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="customColors2" Type="System.Collections.Specialized.StringCollection" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="updateChannel" Type="System.String" Scope="User">
+      <Value Profile="(Default)">stable</Value>
+    </Setting>
+    <Setting Name="lastUpdateTime" Type="System.DateTime" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="checkForUpdatesEveryInDays" Type="System.Int16" Scope="User">
+      <Value Profile="(Default)">7</Value>
+    </Setting>
+    <Setting Name="ShowMessageBoxAfterSuccessfulCreationOfRestorePoint" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ShowMessageBoxAfterSuccessfulDeletionOfRestorePoints" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="checkSystemDrivesForFullShadowStorage" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="notificationType" Type="System.String" Scope="User">
+      <Value Profile="(Default)">bal</Value>
+    </Setting>
+    <Setting Name="allowDeleteOfAllRestorePoints" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="eventLogColumn1Size" Type="System.Int16" Scope="User">
+      <Value Profile="(Default)">70</Value>
+    </Setting>
+    <Setting Name="eventLogColumn2Size" Type="System.Int16" Scope="User">
+      <Value Profile="(Default)">130</Value>
+    </Setting>
+    <Setting Name="eventLogColumn3Size" Type="System.Int16" Scope="User">
+      <Value Profile="(Default)">60</Value>
+    </Setting>
+    <Setting Name="eventLogWindowSize" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">876, 371</Value>
+    </Setting>
+    <Setting Name="eventLogColumn4Size" Type="System.Int16" Scope="User">
+      <Value Profile="(Default)">138</Value>
+    </Setting>
+    <Setting Name="eventLogSplitDistance" Type="System.Int16" Scope="User">
+      <Value Profile="(Default)">418</Value>
+    </Setting>
+    <Setting Name="useSSL" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ShowFullDisksAsRed" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="useHTTPProxy" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="useSystemProxyConfig" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="proxyAddress" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="proxyPort" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="proxyUser" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="proxyPass" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="askToUpgrade" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="boolAskMeToSubmitIfViewingAnExceptionEntry" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="updateMessageDialogSize" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">788, 334</Value>
+    </Setting>
+    <Setting Name="showPartialBetaChangeLogs" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="column5Size" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">71</Value>
+    </Setting>
+    <Setting Name="restorePointListColumnOrder" Type="System.Collections.Specialized.StringCollection" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="roundRestorePointAgeNumber" Type="System.Int16" Scope="User">
+      <Value Profile="(Default)">2</Value>
+    </Setting>
+    <Setting Name="sortingColumn" Type="System.Int16" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="sortingOrder" Type="System.Int16" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="eventLogSortingColumn" Type="System.Int16" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="eventLogSortingOrder" Type="System.Int16" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="mainWindowPosition" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">0, 0</Value>
+    </Setting>
+    <Setting Name="onlyGiveMeRCs" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="askBeforeCreatingRestorePoint" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="mountVolumeShadowCopyWindowPosition" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">0, 0</Value>
+    </Setting>
+    <Setting Name="DeleteOldSystemRestorePointsWindowLocation" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">0, 0</Value>
+    </Setting>
+    <Setting Name="DiskSpaceUsageWindowLocation" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">0, 0</Value>
+    </Setting>
+    <Setting Name="ManageSystemRestoreStorageSpaceWindowLocation" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">0, 0</Value>
+    </Setting>
+    <Setting Name="TaskSchedulerWindowLocation" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">0, 0</Value>
+    </Setting>
+    <Setting Name="eventLogFormWindowLocation" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">0, 0</Value>
+    </Setting>
+    <Setting Name="boolFirstRun" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
