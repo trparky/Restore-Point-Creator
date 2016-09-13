@@ -11,7 +11,6 @@ Public Class Form1
 #Region "--== Program-Wide Variables ==--"
     Private boolDoneLoading As Boolean = False
     Private boolShowDonationMessage As Boolean = True
-    'Private boolDoneLoadingRestorePoints As Boolean = True
 
     Private newestSystemRestoreID As Integer
     Private m_SortingColumn As ColumnHeader
@@ -67,7 +66,6 @@ Public Class Form1
 
                             ' We parse out the EXE's path out of the combined path with the argument.
                             matches = Regex.Match(valueInRegistry, "((?:""|'){0,1}[A-Za-z]:\\.*\.(?:bat|bin|cmd|com|cpl|exe|gadget|inf1|ins|inx|isu|job|jse|lnk|msc|msi|msp|mst|paf|pif|ps1|reg|rgs|sct|shb|shs|u3p|vb|vbe|vbs|vbscript|ws|wsf)(?:""|'){0,1} {0,1})(.*)", RegexOptions.IgnoreCase)
-                            ' matches = Regex.Match(valueInRegistry, "(""{0,1}[A-Za-z]:\\.*\.(?:bat|bin|cmd|com|cpl|exe|gadget|inf1|ins|inx|isu|job|jse|lnk|msc|msi|msp|mst|paf|pif|ps1|reg|rgs|sct|shb|shs|u3p|vb|vbe|vbs|vbscript|ws|wsf)""{0,1} )(.*)", RegexOptions.IgnoreCase)
 
                             If matches IsNot Nothing Then
                                 ' Now we make sure that the file exists.
@@ -81,8 +79,6 @@ Public Class Form1
                                         registryKey.Close()
                                         registryKey.Dispose()
                                     End If
-                                Else
-                                    ''debug.writeline("""My Computer"" right-click context menu item 1 EXE path is valid.")
                                 End If
                             End If
 
@@ -104,7 +100,6 @@ Public Class Form1
 
                             ' We parse out the EXE's path out of the combined path with the argument.
                             matches = Regex.Match(valueInRegistry, "((?:""|'){0,1}[A-Za-z]:\\.*\.(?:bat|bin|cmd|com|cpl|exe|gadget|inf1|ins|inx|isu|job|jse|lnk|msc|msi|msp|mst|paf|pif|ps1|reg|rgs|sct|shb|shs|u3p|vb|vbe|vbs|vbscript|ws|wsf)(?:""|'){0,1} {0,1})(.*)", RegexOptions.IgnoreCase)
-                            ' matches = Regex.Match(valueInRegistry, "(""{0,1}[A-Za-z]:\\.*\.(?:bat|bin|cmd|com|cpl|exe|gadget|inf1|ins|inx|isu|job|jse|lnk|msc|msi|msp|mst|paf|pif|ps1|reg|rgs|sct|shb|shs|u3p|vb|vbe|vbs|vbscript|ws|wsf)""{0,1} )(.*)", RegexOptions.IgnoreCase)
 
                             If matches IsNot Nothing Then
                                 ' Now we make sure that the file exists.
@@ -118,8 +113,6 @@ Public Class Form1
                                         registryKey.Close()
                                         registryKey.Dispose()
                                     End If
-                                Else
-                                    ''debug.writeline("""My Computer"" right-click context menu item 2 EXE path is valid.")
                                 End If
                             End If
 
@@ -143,7 +136,6 @@ Public Class Form1
 
                             ' We parse out the EXE's path out of the combined path with the argument.
                             matches = Regex.Match(valueInRegistry, "((?:""|'){0,1}[A-Za-z]:\\.*\.(?:bat|bin|cmd|com|cpl|exe|gadget|inf1|ins|inx|isu|job|jse|lnk|msc|msi|msp|mst|paf|pif|ps1|reg|rgs|sct|shb|shs|u3p|vb|vbe|vbs|vbscript|ws|wsf)(?:""|'){0,1} {0,1})(.*)", RegexOptions.IgnoreCase)
-                            ' matches = Regex.Match(valueInRegistry, "(""{0,1}[A-Za-z]:\\.*\.(?:bat|bin|cmd|com|cpl|exe|gadget|inf1|ins|inx|isu|job|jse|lnk|msc|msi|msp|mst|paf|pif|ps1|reg|rgs|sct|shb|shs|u3p|vb|vbe|vbs|vbscript|ws|wsf)""{0,1})", RegexOptions.IgnoreCase)
 
                             If matches IsNot Nothing Then
                                 ' Now we make sure that the file exists.
@@ -157,8 +149,6 @@ Public Class Form1
                                         registryKey.Close()
                                         registryKey.Dispose()
                                     End If
-                                Else
-                                    ''debug.writeline("""My Computer"" right-click context menu item 3 EXE path is valid.")
                                 End If
                             End If
 
@@ -732,7 +722,6 @@ Public Class Form1
 
             ' Get all System Restore Points from the Windows Management System and puts then in the systemRestorePoints variable.
             Dim systemRestorePoints As New ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
-            'Dim oldNumberOfRestorePoints As Integer = systemRestorePoints.Get().Count
             Dim oldNewestRestorePointID As Integer = Functions.wmi.getNewestSystemRestorePointID()
 
             result = Functions.wmi.createRestorePoint(stringRestorePointName, Functions.support.RestoreType.WindowsType, sequenceNumber)
@@ -1151,8 +1140,6 @@ Public Class Form1
                 End If
             Catch ex As Exception
                 Functions.eventLogFunctions.writeCrashToEventLog(ex)
-                ' Ok, we crashed but who cares.  We give an error message.
-                'MsgBox("Error while checking for new version.", MsgBoxStyle.Information, Me.Text)
             Finally
                 userInitiatedCheckForUpdatesThread = Nothing
                 toolStripCheckForUpdates.Enabled = True
@@ -1348,14 +1335,11 @@ updateCode:
         Dim listOfRestorePoints As New List(Of ListViewItem)
         Dim restorePointCreationDate As Date
         Dim restorePointAge As Double
-        'Dim systemRestorePointClass As New SystemRestorePointCreator.Classes.SystemRestore
 
-        'debug.writeline("restorePointDateData.Count = " & restorePointDateData.Count)
         ' We need to check if we have
         If restorePointDateData.Count() <> 0 Then
             restorePointDateData.Clear()
         End If
-        'debug.writeline("restorePointDateData.Count = " & restorePointDateData.Count)
 
         Try
             btnRefreshRestorePoints.Text = "Abort Refreshing System Restore Points"
@@ -1393,17 +1377,6 @@ updateCode:
                                 systemRestoreIDs.Add(Integer.Parse(restorePointDetails("SequenceNumber")))
 
                                 listViewItem.SubItems.Add(restorePointDetails("Description").ToString)
-
-                                ' Prevents a rare crash when loading System Restore Points that don't have a description.
-                                ' Normally this shouldn't happen at all but if it does, this prevents the program from
-                                ' crashing.  It essentially prevents a Null Reference Exception in a cleaner way.
-                                'If (systemRestorePoint("Description") Is Nothing) Then
-                                '    ' Yep, we have that weird situation.  Let's handle it by filling the description in with something.
-                                '    itemAdd.SubItems.Add("(None specified, this is weird!")
-                                'Else
-                                '    ' Things are normal, we don't have to do anything special.  We only have to take the description and put it in the list as normal.
-                                '    itemAdd.SubItems.Add(systemRestorePoint("Description").ToString)
-                                'End If
 
                                 If restorePointDetails("CreationTime").ToString.Trim <> "" Then
                                     restorePointCreationDate = Functions.support.parseSystemRestorePointCreationDate(restorePointDetails("CreationTime"))
@@ -1477,14 +1450,7 @@ updateCode:
         Catch ex6 As ObjectDisposedException
             Functions.eventLogFunctions.writeCrashToEventLog(ex6)
 
-            'If systemRestorePointsManagementObjectSearcher IsNot Nothing Then
-            '    systemRestorePointsManagementObjectSearcher.Dispose()
-            '    systemRestorePointsManagementObjectSearcher = Nothing
-            'End If
-
             Functions.wait.closePleaseWaitWindow()
-
-            'startSystemRestorePointListLoadSubroutine()
 
             Exit Sub
         Catch ex5 As UnauthorizedAccessException
@@ -1499,11 +1465,6 @@ updateCode:
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex2, ex2.Message, ex2.StackTrace, ex2.GetType)
         Finally
-            'If systemRestorePointsManagementObjectSearcher IsNot Nothing Then
-            '    systemRestorePointsManagementObjectSearcher.Dispose()
-            '    systemRestorePointsManagementObjectSearcher = Nothing
-            'End If
-
             Functions.wait.closePleaseWaitWindow()
 
             systemRestorePointsList.Enabled = True
@@ -2358,17 +2319,6 @@ updateCode:
         End If
     End Sub
 
-    'Private Sub systemRestorePointsList_ItemChecked(sender As Object, e As ItemCheckedEventArgs) Handles systemRestorePointsList.ItemChecked
-    '    Dim checkedItems As ListView.CheckedListViewItemCollection = systemRestorePointsList.CheckedItems
-
-    '    For Each item In checkedItems
-    '        If My.Settings.savedRestorePointIDs.Contains(item.SubItems(0).Text) = False Then
-    '            My.Settings.savedRestorePointIDs.Add(item.SubItems(0).Text)
-    '            My.Settings.Save()
-    '        End If
-    '    Next
-    'End Sub
-
     Private Sub ListView2_KeyUp(sender As Object, e As KeyEventArgs) Handles systemRestorePointsList.KeyUp
         If e.KeyCode = Keys.Delete Then
             btnDeleteRestorePoint.PerformClick()
@@ -2377,29 +2327,6 @@ updateCode:
 #End Region
 
 #Region "--== Button Click Event Code ==--"
-    'Private Sub btnDeleteOldRestorePoints_Click(sender As Object, e As EventArgs) Handles btnDeleteOldRestorePoints.Click
-    '    If My.Settings.maxDaysManualDelete = -1 = False Then
-    '        doDeleteOldSystemRestorePoint(My.Settings.maxDaysManualDelete)
-    '    Else
-    '        Dim frmDeleteOldSystemRestorePointsInstance = New frmDeleteOldSystemRestorePoints
-    '        frmDeleteOldSystemRestorePointsInstance.StartPosition = FormStartPosition.CenterParent
-    '        frmDeleteOldSystemRestorePointsInstance.ShowDialog()
-
-    '        frmDeleteOldSystemRestorePointsInstance.Dispose()
-    '        frmDeleteOldSystemRestorePointsInstance = Nothing
-
-    '        'If frmDeleteOldSystemRestorePointsInstance Is Nothing Then
-    '        '    frmDeleteOldSystemRestorePointsInstance = New frmDeleteOldSystemRestorePoints
-    '        '    frmDeleteOldSystemRestorePointsInstance.Icon = Me.Icon
-    '        '    frmDeleteOldSystemRestorePointsInstance.StartPosition = FormStartPosition.CenterParent
-    '        '    'frmDeleteOldSystemRestorePointsInstance.Location = New Point(Me.Location.X + Me.Width / 2 - frmDeleteOldSystemRestorePointsInstance.Width / 2, Me.Location.Y + Me.Height / 2 - frmDeleteOldSystemRestorePointsInstance.Height / 2)
-    '        '    frmDeleteOldSystemRestorePointsInstance.ShowDialog()
-    '        'Else
-    '        '    frmDeleteOldSystemRestorePointsInstance.BringToFront()
-    '        'End If
-    '    End If
-    'End Sub
-
     Private Sub stripDelete_Click(sender As Object, e As EventArgs) Handles stripDelete.Click
         btnDeleteRestorePoint.PerformClick()
     End Sub
@@ -2605,7 +2532,6 @@ updateCode:
         If (globalVariables.windows.frmDiskSpaceUsageWindow Is Nothing) Then
             globalVariables.windows.frmDiskSpaceUsageWindow = New Disk_Space_Usage
             globalVariables.windows.frmDiskSpaceUsageWindow.StartPosition = FormStartPosition.CenterScreen
-            'globalVariables.windowInstances.frmDiskSpaceUsageWindow.Icon = Me.Icon
             globalVariables.windows.frmDiskSpaceUsageWindow.Show()
             globalVariables.windows.frmDiskSpaceUsageWindow.Location = My.Settings.DiskSpaceUsageWindowLocation
         Else
@@ -2617,7 +2543,6 @@ updateCode:
         If (globalVariables.windows.frmManageSystemRestoreStorageSpace Is Nothing) Then
             globalVariables.windows.frmManageSystemRestoreStorageSpace = New frmManageSystemRestoreStorageSpace
             globalVariables.windows.frmManageSystemRestoreStorageSpace.StartPosition = FormStartPosition.CenterScreen
-            'globalVariables.windowInstances.frmManageSystemRestoreStorageSpace.Icon = Me.Icon
             globalVariables.windows.frmManageSystemRestoreStorageSpace.Show()
             globalVariables.windows.frmManageSystemRestoreStorageSpace.Location = My.Settings.ManageSystemRestoreStorageSpaceWindowLocation
         Else
@@ -2629,7 +2554,6 @@ updateCode:
         If (globalVariables.windows.frmTaskScheduler Is Nothing) Then
             globalVariables.windows.frmTaskScheduler = New frmTaskScheduler
             globalVariables.windows.frmTaskScheduler.StartPosition = FormStartPosition.CenterScreen
-            'globalVariables.windowInstances.frmTaskScheduler.Icon = Me.Icon
             globalVariables.windows.frmTaskScheduler.Show()
             globalVariables.windows.frmTaskScheduler.Location = My.Settings.TaskSchedulerWindowLocation
         Else
@@ -2797,7 +2721,6 @@ updateCode:
     Sub deleteAllRestorePointsThread()
         ' Declares some variables.
         Dim systemRestorePoints As ManagementObjectSearcher
-        'Dim systemRestorePointClass As New SystemRestorePointCreator.Classes.SystemRestore
         Dim numberOfOldRestorePointsDeleted As Short = 0
         Dim dateTime As DateTime
 
@@ -2832,19 +2755,8 @@ updateCode:
 
                         If toolStripLogRestorePointDeletions.Checked Then
                             numberOfOldRestorePointsDeleted += 1
-                            'regexMatches = GlobalVariables.regexRestorePointCreationTimeParser.Match(systemRestorePoint("CreationTime").ToString)
 
                             If systemRestorePoint("CreationTime").ToString.Trim <> "" Then
-                                '' Gets the values out of the Regular Expression Matches object.
-                                'With regexMatches
-                                '    year = Integer.Parse(.Groups("year").Value)
-                                '    month = Integer.Parse(.Groups("month").Value)
-                                '    day = Integer.Parse(.Groups("day").Value)
-                                '    second = Integer.Parse(.Groups("second").Value)
-                                '    minute = Integer.Parse(.Groups("minute").Value)
-                                '    hour = Integer.Parse(.Groups("hour").Value)
-                                'End With
-
                                 dateTime = Functions.support.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime"))
 
                                 If toolStripLogRestorePointDeletions.Checked Then
@@ -2857,15 +2769,14 @@ updateCode:
 
                         Functions.support.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber").ToString))
                     End If
-                    ' systemRestorePoint(GlobalVariables.systemRestorePointDataType.SequenceNumber.ToString).ToString
 
                     systemRestorePoint.Dispose()
                     systemRestorePoint = Nothing
                 Next
 
                 While oldNumberOfRestorePoints = systemRestorePoints.Get().Count
-                    Threading.Thread.Sleep(500)
                     ' Does nothing, just loops.
+                    Threading.Thread.Sleep(500)
                 End While
 
                 Functions.wait.closePleaseWaitWindow()
@@ -2897,19 +2808,10 @@ updateCode:
                 txtRestorePointDescription.Enabled = True
             End If
 
-            'If systemRestorePoints IsNot Nothing Then
-            '    systemRestorePoints.Dispose()
-            '    systemRestorePoints = Nothing
-            'End If
-
             loadRestorePointsFromSystemIntoList()
             systemRestorePointsList.Enabled = True
             toolStripDeleteAllRestorePoints.Enabled = True
             enableFormElements()
-
-            ' Cleans up some memory.
-            'systemRestoreIDs = Nothing
-            'systemRestorePointClass = Nothing
         End Try
     End Sub
 
@@ -2956,7 +2858,7 @@ updateCode:
 
     Private Sub toolStripDonate_Click(sender As Object, e As EventArgs) Handles toolStripDonate.Click
         doTheGrayingOfTheRestorePointNameTextBox()
-        Dim registryShowDonationMessageValue As String = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey).GetValue("Show Donation Message", "True").ToString.Trim
+        Dim registryShowDonationMessageValue As String = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey).GetValue("Show Donation Message", "True").ToString.Trim
         Dim boolRegistryShowDonationMessageValue As Boolean
 
         If registryShowDonationMessageValue.ToLower = "true" Or registryShowDonationMessageValue.ToLower = "false" Then
@@ -2999,16 +2901,6 @@ updateCode:
 
             frmDeleteOldSystemRestorePointsInstance.Dispose()
             frmDeleteOldSystemRestorePointsInstance = Nothing
-
-            'If frmDeleteOldSystemRestorePointsInstance Is Nothing Then
-            '    frmDeleteOldSystemRestorePointsInstance = New frmDeleteOldSystemRestorePoints
-            '    frmDeleteOldSystemRestorePointsInstance.Icon = Me.Icon
-            '    frmDeleteOldSystemRestorePointsInstance.StartPosition = FormStartPosition.CenterParent
-            '    'frmDeleteOldSystemRestorePointsInstance.Location = New Point(Me.Location.X + Me.Width / 2 - frmDeleteOldSystemRestorePointsInstance.Width / 2, Me.Location.Y + Me.Height / 2 - frmDeleteOldSystemRestorePointsInstance.Height / 2)
-            '    frmDeleteOldSystemRestorePointsInstance.ShowDialog()
-            'Else
-            '    frmDeleteOldSystemRestorePointsInstance.BringToFront()
-            'End If
         End If
     End Sub
 
@@ -3276,24 +3168,6 @@ updateCode:
         End Try
     End Sub
 
-    'Private Sub toolUtilities_Click(sender As Object, e As EventArgs) Handles toolUtilities.Click, OptionsToolStripMenuItem.Click, toolStripAbout.Click
-    '    doTheGrayingOfTheRestorePointNameTextBox()
-    'End Sub
-
-    'Private Sub changeMessageTypeMenuItems()
-    '    If My.Settings.notificationType = GlobalVariables.notificationTypeBalloon Then
-    '        BalloonToolStripMenuItem.Checked = True
-    '        MessageBoxToolStripMenuItem.Checked = False
-    '        'MessageBoxToolStripMenuItem.Text = "Message Box"
-    '        'BalloonToolStripMenuItem.Text = "Balloon/Notification Center Popup (Enabled)"
-    '    Else
-    '        BalloonToolStripMenuItem.Checked = False
-    '        MessageBoxToolStripMenuItem.Checked = True
-    '        'MessageBoxToolStripMenuItem.Text = "Message Box (Enabled)"
-    '        'BalloonToolStripMenuItem.Text = "Balloon/Notification Center Popup"
-    '    End If
-    'End Sub
-
     Private Sub MessageBoxToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles MessageBoxToolStripMenuItem.Click
         BalloonToolStripMenuItem.Checked = False
         My.Settings.notificationType = globalVariables.notificationTypeMessageBox
@@ -3364,7 +3238,6 @@ updateCode:
         If (globalVariables.windows.frmChangeLog Is Nothing) Then
             globalVariables.windows.frmChangeLog = New Change_Log
             globalVariables.windows.frmChangeLog.StartPosition = FormStartPosition.CenterParent
-            'globalVariables.windowInstances.frmChangeLog.Icon = Me.Icon
             globalVariables.windows.frmChangeLog.Show()
         Else
             globalVariables.windows.frmChangeLog.BringToFront()
@@ -3794,7 +3667,6 @@ updateCode:
                 loadRestorePointListColumnOrder()
 
                 MsgBox("Backup configuration file restoration complete.", MsgBoxStyle.Information, Me.Text)
-                'Functions.reRunWithAdminUserRights()
             End If
         End If
     End Sub
@@ -3803,7 +3675,6 @@ updateCode:
         If (globalVariables.windows.mountVolumeShadowCopy Is Nothing) Then
             globalVariables.windows.mountVolumeShadowCopy = New Mount_Volume_Shadow_Copy
             globalVariables.windows.mountVolumeShadowCopy.StartPosition = FormStartPosition.CenterScreen
-            'globalVariables.windowInstances.mountVolumeShadowCopy.Icon = Me.Icon
             globalVariables.windows.mountVolumeShadowCopy.Show()
             globalVariables.windows.mountVolumeShadowCopy.Location = My.Settings.mountVolumeShadowCopyWindowPosition
         Else
@@ -3837,7 +3708,6 @@ updateCode:
         If (globalVariables.windows.configureProxy Is Nothing) Then
             globalVariables.windows.configureProxy = New Configure_Proxy
             globalVariables.windows.configureProxy.StartPosition = FormStartPosition.CenterParent
-            'globalVariables.windowInstances.configureProxy.Icon = Me.Icon
             globalVariables.windows.configureProxy.Show()
         Else
             globalVariables.windows.configureProxy.BringToFront()
@@ -3872,7 +3742,6 @@ updateCode:
         If (globalVariables.windows.officialContactForm Is Nothing) Then
             globalVariables.windows.officialContactForm = New Official_Contact_Form
             globalVariables.windows.officialContactForm.StartPosition = FormStartPosition.CenterParent
-            'globalVariables.windowInstances.officialContactForm.Icon = Me.Icon
             globalVariables.windows.officialContactForm.Show()
         Else
             globalVariables.windows.officialContactForm.BringToFront()
@@ -4042,36 +3911,4 @@ updateCode:
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
         End Try
     End Sub
-
-    'Private Sub systemRestorePointsList_ColumnReordered(sender As Object, e As ColumnReorderedEventArgs) Handles systemRestorePointsList.ColumnReordered
-    '    saveRestorePointListColumnOrder()
-    'End Sub
-
-    'Private Sub btnOptimizeRuntime_Click(sender As Object, e As EventArgs) Handles btnOptimizeRuntime.Click
-    '    MsgBox(Application.ExecutablePath)
-    '    Exit Sub
-
-    '    Try
-    '        ' Prepare to start the program with Administrative privilages using a special invocation that will trigger a UAC prompt.
-    '        Dim psi As New ProcessStartInfo
-    '        psi.Verb = "runas"
-    '        psi.UseShellExecute = True
-    '        psi.FileName = IO.Path.Combine(Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "ngen.exe")
-    '        psi.Arguments = """" & Application.ExecutablePath & """"
-    '        psi.WindowStyle = ProcessWindowStyle.Minimized
-
-    '        Dim proc As Process = Process.Start(psi)
-
-    '        proc.WaitForExit()
-
-    '        Dim versionParts As String() = Application.ProductVersion.Split(".")
-    '        Dim currentBuild As Integer = versionParts(2)
-    '        My.Settings.BuildOfLastRunTimeOptimization = currentBuild
-    '        versionParts = Nothing : currentBuild = Nothing
-
-    '        btnOptimizeRuntime.Visible = False
-    '    Catch ex As ComponentModel.Win32Exception
-    '        MsgBox("There was an error while launching the elevated process.", MsgBoxStyle.Critical, Me.Text)
-    '    End Try
-    'End Sub
 End Class
