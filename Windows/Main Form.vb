@@ -2131,61 +2131,6 @@ updateCode:
         End If
     End Sub
 
-    Private Sub newFileDeleterThreadSub()
-        Dim strFoundFile As String = New IO.FileInfo(Application.ExecutablePath & ".new.exe").Name
-
-        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-            Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Found file named {0}{1}{0}. Now searching for any processes that have parent executables files of {0}{1}{0}.", Chr(34), strFoundFile))
-        End If
-
-        Functions.support.searchForProcessAndKillIt(Application.ExecutablePath & ".new.exe", True)
-
-        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-            Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Now attempting to delete {0}{1}{0}.", Chr(34), strFoundFile))
-        End If
-
-        Try
-            IO.File.Delete(Application.ExecutablePath & ".new.exe")
-
-            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deletion of {0}{1}{0} was successful.", Chr(34), strFoundFile))
-            End If
-        Catch ex As Exception
-            Functions.APIs.MoveFileEx(Application.ExecutablePath & ".new.exe", vbNullString, 4)
-
-            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deletion of {0}{1}{0} was unsuccessful, scheduling it to be deleted at next system reboot.", Chr(34), strFoundFile))
-            End If
-        End Try
-    End Sub
-
-    Private Sub updaterDeleterThreadSub()
-        Functions.support.searchForProcessAndKillIt("updater.exe", False)
-        Functions.support.searchForProcessAndKillIt("updater.exe", False)
-        Threading.Thread.Sleep(250) ' We're going to sleep to give the system some time to kill the process.
-        Functions.support.deleteFileWithNoException("updater.exe")
-    End Sub
-
-    Private Sub checkRestorePointSpaceThreadSub()
-        Try
-            checkRestorePointSpaceThreadThreadKiller.Enabled = True
-            Functions.vss.checkSystemDrivesForFullShadowStorage()
-            checkRestorePointSpaceThread = Nothing
-            checkRestorePointSpaceThreadThreadKiller.Enabled = False
-        Catch ex As Threading.ThreadAbortException
-        End Try
-    End Sub
-
-    Private Sub checkForAndEnableSystemRestoreIfNeededSub()
-        Try
-            checkForAndEnableSystemRestoreIfNeededThreadKiller.Enabled = True
-            Functions.vss.checkForAndEnableSystemRestoreIfNeeded()
-            checkForAndEnableSystemRestoreIfNeeded = Nothing
-            checkForAndEnableSystemRestoreIfNeededThreadKiller.Enabled = False
-        Catch ex As Threading.ThreadAbortException
-        End Try
-    End Sub
-
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Control.CheckForIllegalCrossThreadCalls = False
 
@@ -2201,7 +2146,12 @@ updateCode:
             If globalVariables.boolLogLoadsAndExitsToEventLog = True Then Functions.eventLogFunctions.writeToSystemEventLog("The user " & Environment.UserName & " started the program.", EventLogEntryType.Information)
 
             If IO.File.Exists("updater.exe") = True Then
-                Dim updaterDeleterThread As New Threading.Thread(AddressOf updaterDeleterThreadSub)
+                Dim updaterDeleterThread As New Threading.Thread(Sub()
+                                                                     Functions.support.searchForProcessAndKillIt("updater.exe", False)
+                                                                     Functions.support.searchForProcessAndKillIt("updater.exe", False)
+                                                                     Threading.Thread.Sleep(250) ' We're going to sleep to give the system some time to kill the process.
+                                                                     Functions.support.deleteFileWithNoException("updater.exe")
+                                                                 End Sub)
                 updaterDeleterThread.Name = "Legacy Updater File Deletion Thread"
                 updaterDeleterThread.Start()
             End If
@@ -2248,7 +2198,33 @@ updateCode:
             'loadIcons()
 
             If IO.File.Exists(Application.ExecutablePath & ".new.exe") = True Then
-                Dim newFileDeleterThread As New Threading.Thread(AddressOf newFileDeleterThreadSub)
+                Dim newFileDeleterThread As New Threading.Thread(Sub()
+                                                                     Dim strFoundFile As String = New IO.FileInfo(Application.ExecutablePath & ".new.exe").Name
+
+                                                                     If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                                                                         Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Found file named {0}{1}{0}. Now searching for any processes that have parent executables files of {0}{1}{0}.", Chr(34), strFoundFile))
+                                                                     End If
+
+                                                                     Functions.support.searchForProcessAndKillIt(Application.ExecutablePath & ".new.exe", True)
+
+                                                                     If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                                                                         Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Now attempting to delete {0}{1}{0}.", Chr(34), strFoundFile))
+                                                                     End If
+
+                                                                     Try
+                                                                         IO.File.Delete(Application.ExecutablePath & ".new.exe")
+
+                                                                         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                                                                             Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deletion of {0}{1}{0} was successful.", Chr(34), strFoundFile))
+                                                                         End If
+                                                                     Catch ex As Exception
+                                                                         Functions.APIs.MoveFileEx(Application.ExecutablePath & ".new.exe", vbNullString, 4)
+
+                                                                         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                                                                             Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deletion of {0}{1}{0} was unsuccessful, scheduling it to be deleted at next system reboot.", Chr(34), strFoundFile))
+                                                                         End If
+                                                                     End Try
+                                                                 End Sub)
                 newFileDeleterThread.Name = "New Application File Deletion Thread"
                 newFileDeleterThread.Start()
             End If
@@ -2263,7 +2239,15 @@ updateCode:
             End If
 
             If My.Settings.checkSystemDrivesForFullShadowStorage = True Then
-                checkRestorePointSpaceThread = New Threading.Thread(AddressOf checkRestorePointSpaceThreadSub)
+                checkRestorePointSpaceThread = New Threading.Thread(Sub()
+                                                                        Try
+                                                                            checkRestorePointSpaceThreadThreadKiller.Enabled = True
+                                                                            Functions.vss.checkSystemDrivesForFullShadowStorage()
+                                                                            checkRestorePointSpaceThread = Nothing
+                                                                            checkRestorePointSpaceThreadThreadKiller.Enabled = False
+                                                                        Catch ex As Threading.ThreadAbortException
+                                                                        End Try
+                                                                    End Sub)
                 checkRestorePointSpaceThread.Name = "Restore Point Storage Status Checking Thread"
                 checkRestorePointSpaceThread.Priority = Threading.ThreadPriority.Lowest
                 checkRestorePointSpaceThread.Start()
@@ -2275,7 +2259,15 @@ updateCode:
                 Me.Text &= String.Format(" (Release Candidate {0})", globalVariables.version.shortReleaseCandidateVersion)
             End If
 
-            checkForAndEnableSystemRestoreIfNeeded = New Threading.Thread(AddressOf checkForAndEnableSystemRestoreIfNeededSub)
+            checkForAndEnableSystemRestoreIfNeeded = New Threading.Thread(Sub()
+                                                                              Try
+                                                                                  checkForAndEnableSystemRestoreIfNeededThreadKiller.Enabled = True
+                                                                                  Functions.vss.checkForAndEnableSystemRestoreIfNeeded()
+                                                                                  checkForAndEnableSystemRestoreIfNeeded = Nothing
+                                                                                  checkForAndEnableSystemRestoreIfNeededThreadKiller.Enabled = False
+                                                                              Catch ex As Threading.ThreadAbortException
+                                                                              End Try
+                                                                          End Sub)
             checkForAndEnableSystemRestoreIfNeeded.Name = "Check For and Enable System Restore if Needed Thread"
             checkForAndEnableSystemRestoreIfNeeded.Start()
             checkForAndEnableSystemRestoreIfNeededThreadKiller.Enabled = True
