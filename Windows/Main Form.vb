@@ -1958,19 +1958,21 @@ updateCode:
         Threading.Thread.Sleep(750)
         Functions.wait.createPleaseWaitWindow("Loading Restore Points... Please Wait.")
 
-        startSystemRestorePointListLoadThread = New Threading.Thread(Sub()
-                                                                         Try
-                                                                             startSystemRestorePointListLoadThreadKiller.Enabled = True
-                                                                             loadRestorePointsFromSystemIntoList()
-                                                                             startSystemRestorePointListLoadThread = Nothing
-                                                                             startSystemRestorePointListLoadThreadKiller.Enabled = False
-                                                                         Catch ex As Threading.ThreadAbortException
-                                                                         End Try
-                                                                     End Sub)
+        startSystemRestorePointListLoadThread = New Threading.Thread(AddressOf startSystemRestorePointListLoadThreadSub)
         startSystemRestorePointListLoadThread.Name = "Start System Restore Point List Load Thread Thread"
         startSystemRestorePointListLoadThread.Start()
 
         Functions.wait.openPleaseWaitWindow(Me)
+    End Sub
+
+    Sub startSystemRestorePointListLoadThreadSub()
+        Try
+            startSystemRestorePointListLoadThreadKiller.Enabled = True
+            loadRestorePointsFromSystemIntoList()
+            startSystemRestorePointListLoadThread = Nothing
+            startSystemRestorePointListLoadThreadKiller.Enabled = False
+        Catch ex As Threading.ThreadAbortException
+        End Try
     End Sub
 
     Sub interfaceTooSmallSettingCheckFormLoadSubRoutine()
@@ -3480,6 +3482,70 @@ updateCode:
         End If
     End Sub
 
+    Private Sub switchToDebugBuildDownloadThreadSub()
+        Try
+            Dim memoryStream As New IO.MemoryStream()
+
+            If Functions.http.downloadFile(globalVariables.webURLs.updateBranch.debug.strProgramZIP, memoryStream) = False Then
+                Functions.wait.closePleaseWaitWindow()
+                MsgBox("There was an error while downloading required files, please check the Event Log for more details.", MsgBoxStyle.Critical, Me.Text)
+
+                memoryStream.Close()
+                memoryStream.Dispose()
+                memoryStream = Nothing
+
+                Exit Sub
+            End If
+
+            If Functions.checksum.verifyChecksum(globalVariables.webURLs.updateBranch.debug.strProgramZIPSHA2, memoryStream, True) = False Then
+                memoryStream.Close()
+                memoryStream.Dispose()
+                memoryStream = Nothing
+
+                Exit Sub
+            End If
+
+            Dim strNewApplicationFileNameFullName As String = New IO.FileInfo(Application.ExecutablePath).FullName & ".new.exe"
+
+            memoryStream.Position = 0
+            Dim zipFileObject As New ZipFile(memoryStream)
+
+            If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.programFileNameInZIP, strNewApplicationFileNameFullName) = False Then
+                MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, Me.Text)
+
+                zipFileObject.Close()
+                memoryStream.Close()
+                memoryStream.Dispose()
+                memoryStream = Nothing
+                Exit Sub
+            End If
+
+            If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.pdbFileNameInZIP, globalVariables.pdbFileNameInZIP & ".new") = False Then
+                MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, Me.Text)
+
+                zipFileObject.Close()
+                memoryStream.Close()
+                memoryStream.Dispose()
+                memoryStream = Nothing
+                Exit Sub
+            End If
+
+            zipFileObject.Close()
+            memoryStream.Close()
+            memoryStream.Dispose()
+            memoryStream = Nothing
+
+            If IO.File.Exists(strNewApplicationFileNameFullName) = True Then
+                Process.Start(New ProcessStartInfo With {.FileName = strNewApplicationFileNameFullName, .Arguments = "-updatewithoutuninstallinfoupdate", .Verb = "runas"})
+                Process.GetCurrentProcess.Kill()
+            Else
+                MsgBox("Something went wrong during the download, update process aborted.", MsgBoxStyle.Critical, Me.Text)
+            End If
+        Catch ex As Exception
+            exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
+        End Try
+    End Sub
+
     Private Sub SwitchToDebugBuildToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SwitchToDebugBuildToolStripMenuItem.Click
         If globalVariables.version.boolDebugBuild = True Then
             Exit Sub
@@ -3490,70 +3556,7 @@ updateCode:
         If msgBoxResult = MsgBoxResult.Yes Then
             Functions.wait.createPleaseWaitWindow("Downloading Debug Build... Please Wait.", True)
 
-            Dim downloadThread As New Threading.Thread(Sub()
-                                                           Try
-                                                               Dim memoryStream As New IO.MemoryStream()
-
-                                                               If Functions.http.downloadFile(globalVariables.webURLs.updateBranch.debug.strProgramZIP, memoryStream) = False Then
-                                                                   Functions.wait.closePleaseWaitWindow()
-                                                                   MsgBox("There was an error while downloading required files, please check the Event Log for more details.", MsgBoxStyle.Critical, Me.Text)
-
-                                                                   memoryStream.Close()
-                                                                   memoryStream.Dispose()
-                                                                   memoryStream = Nothing
-
-                                                                   Exit Sub
-                                                               End If
-
-                                                               If Functions.checksum.verifyChecksum(globalVariables.webURLs.updateBranch.debug.strProgramZIPSHA2, memoryStream, True) = False Then
-                                                                   memoryStream.Close()
-                                                                   memoryStream.Dispose()
-                                                                   memoryStream = Nothing
-
-                                                                   Exit Sub
-                                                               End If
-
-                                                               Dim strNewApplicationFileNameFullName As String = New IO.FileInfo(Application.ExecutablePath).FullName & ".new.exe"
-
-                                                               memoryStream.Position = 0
-                                                               Dim zipFileObject As New ZipFile(memoryStream)
-
-                                                               If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.programFileNameInZIP, strNewApplicationFileNameFullName) = False Then
-                                                                   MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, Me.Text)
-
-                                                                   zipFileObject.Close()
-                                                                   memoryStream.Close()
-                                                                   memoryStream.Dispose()
-                                                                   memoryStream = Nothing
-                                                                   Exit Sub
-                                                               End If
-
-                                                               If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.pdbFileNameInZIP, globalVariables.pdbFileNameInZIP & ".new") = False Then
-                                                                   MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, Me.Text)
-
-                                                                   zipFileObject.Close()
-                                                                   memoryStream.Close()
-                                                                   memoryStream.Dispose()
-                                                                   memoryStream = Nothing
-                                                                   Exit Sub
-                                                               End If
-
-                                                               zipFileObject.Close()
-                                                               memoryStream.Close()
-                                                               memoryStream.Dispose()
-                                                               memoryStream = Nothing
-
-                                                               If IO.File.Exists(strNewApplicationFileNameFullName) = True Then
-                                                                   Process.Start(New ProcessStartInfo With {.FileName = strNewApplicationFileNameFullName, .Arguments = "-updatewithoutuninstallinfoupdate", .Verb = "runas"})
-                                                                   Process.GetCurrentProcess.Kill()
-                                                               Else
-                                                                   MsgBox("Something went wrong during the download, update process aborted.", MsgBoxStyle.Critical, Me.Text)
-                                                               End If
-                                                           Catch ex As Exception
-                                                               exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
-                                                           End Try
-                                                       End Sub)
-
+            Dim downloadThread As New Threading.Thread(AddressOf switchToDebugBuildDownloadThreadSub)
             downloadThread.Name = "Debug Build Download Thread"
             downloadThread.Start()
         End If
