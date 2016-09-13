@@ -1974,10 +1974,6 @@ updateCode:
     End Sub
 
     Sub interfaceTooSmallSettingCheckFormLoadSubRoutine()
-        'If Environment.OSVersion.ToString.Contains("6.2") = False And Environment.OSVersion.ToString.Contains("6.3") = False And Functions.isThisWindows10() = False Then
-        'InterfaceTooSmallToolStripMenuItem.Visible = False
-        'Else
-
         Try
             Dim registryKeyWeAreWorkingWith As RegistryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers", False)
 
@@ -2063,27 +2059,6 @@ updateCode:
         End Try
     End Sub
 
-    'Sub addRPLifeIntervalValue()
-    '    Try
-    '        If Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore") IsNot Nothing Then
-    '            Dim regKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore", True)
-
-    '            Dim value As Object = regKey.GetValue("RPLifeInterval", Nothing)
-
-    '            If value = Nothing Then
-    '                regKey.SetValue("RPLifeInterval", 7776000, RegistryValueKind.DWord)
-    '            ElseIf value <> 7776000 Then
-    '                regKey.SetValue("RPLifeInterval", 7776000, RegistryValueKind.DWord)
-    '            End If
-
-    '            regKey.Close()
-    '            regKey.Dispose()
-    '        End If
-    '    Catch ex As Exception
-    '        Functions.eventLogFunctions.writeCrashToEventLog(ex)
-    '    End Try
-    'End Sub
-
     Private Sub addShortCutForEventLogToUsersStartMenu()
         ' Checks to see if this application's executable is in a safe place, in this case... Program Files.
         If Application.ExecutablePath.caseInsensitiveContains("program files") = True Then
@@ -2136,10 +2111,6 @@ updateCode:
             ToolStripMenuItemPrivateForTom.Visible = True
         End If
 
-        'If openUpdateDialog(Update_Message.versionUpdateType.betaVersionUpdate) = Update_Message.userResponse.doTheUpdate Then
-        '    MsgBox("do the update")
-        'End If
-
         Try
             If globalVariables.boolLogLoadsAndExitsToEventLog = True Then Functions.eventLogFunctions.writeToSystemEventLog("The user " & Environment.UserName & " started the program.", EventLogEntryType.Information)
 
@@ -2156,7 +2127,6 @@ updateCode:
 
             interfaceTooSmallSettingCheckFormLoadSubRoutine()
 
-            'Me.Icon = My.Resources.RestorePoint_noBackground_2
             toolStripHeader.Image = My.Resources.RestorePoint_noBackground_2.ToBitmap
             NotifyIcon1.Icon = My.Resources.RestorePoint_noBackground_2
 
@@ -2175,7 +2145,6 @@ updateCode:
             End If
 
             deleteRPLifeIntervalValue()
-            'addRPLifeIntervalValue()
 
             If Functions.osVersionInfo.isThisWindows10 = True Or Functions.osVersionInfo.isThisWindows8x() = True Then
                 addRPGlobalInterval()
@@ -2193,7 +2162,6 @@ updateCode:
             showDonationNotice()
             loadRestorePointListColumnOrder()
             applySavedSorting()
-            'loadIcons()
 
             If IO.File.Exists(Application.ExecutablePath & ".new.exe") = True Then
                 Dim newFileDeleterThread As New Threading.Thread(Sub()
