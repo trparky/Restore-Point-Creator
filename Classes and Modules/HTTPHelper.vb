@@ -668,7 +668,7 @@ Public Class httpHelper
 
             Dim webResponse As Net.WebResponse = httpWebRequest.GetResponse() ' We now get the web response.
 
-            If fileDownloadURL.ToLower.StartsWith("https://") = True Then
+            If fileDownloadURL.StartsWith("https://", StringComparison.OrdinalIgnoreCase) = True Then
                 sslCertificate = New X509Certificates.X509Certificate2(httpWebRequest.ServicePoint.Certificate)
             Else
                 sslCertificate = Nothing
@@ -805,7 +805,7 @@ Public Class httpHelper
 
             Dim webResponse As Net.WebResponse = httpWebRequest.GetResponse() ' We now get the web response.
 
-            If fileDownloadURL.ToLower.StartsWith("https://") = True Then
+            If fileDownloadURL.StartsWith("https://", StringComparison.OrdinalIgnoreCase) = True Then
                 sslCertificate = New X509Certificates.X509Certificate2(httpWebRequest.ServicePoint.Certificate)
             Else
                 sslCertificate = Nothing
@@ -939,7 +939,7 @@ Public Class httpHelper
 
             Dim httpWebResponse As Net.WebResponse = httpWebRequest.GetResponse()
 
-            If url.ToLower.StartsWith("https://") = True Then
+            If url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) = True Then
                 sslCertificate = New X509Certificates.X509Certificate2(httpWebRequest.ServicePoint.Certificate)
             Else
                 sslCertificate = Nothing
@@ -1095,7 +1095,7 @@ Public Class httpHelper
 
             Dim httpWebResponse As Net.WebResponse = httpWebRequest.GetResponse()
 
-            If url.ToLower.StartsWith("https://") = True Then
+            If url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) = True Then
                 sslCertificate = New X509Certificates.X509Certificate2(httpWebRequest.ServicePoint.Certificate)
             Else
                 sslCertificate = Nothing

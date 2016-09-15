@@ -241,7 +241,7 @@ Namespace My
                                 Dim strRestorePointName As String = "System Checkpoint made by System Restore Point Creator"
 
                                 If My.Application.CommandLineArgs.Count = 2 Then
-                                    If My.Application.CommandLineArgs(1).ToLower.Trim.StartsWith("-name=") Then
+                                    If My.Application.CommandLineArgs(1).Trim.StartsWith("-name=", StringComparison.OrdinalIgnoreCase) Then
                                         strRestorePointName = Regex.Replace(My.Application.CommandLineArgs(1).Trim, "-name=", "", RegexOptions.IgnoreCase)
                                     End If
                                 End If
