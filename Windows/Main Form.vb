@@ -1919,19 +1919,21 @@ updateCode:
         Threading.Thread.Sleep(750)
         Functions.wait.createPleaseWaitWindow("Loading Restore Points... Please Wait.")
 
-        startSystemRestorePointListLoadThread = New Threading.Thread(Sub()
-                                                                         Try
-                                                                             startSystemRestorePointListLoadThreadKiller.Enabled = True
-                                                                             loadRestorePointsFromSystemIntoList()
-                                                                             startSystemRestorePointListLoadThread = Nothing
-                                                                             startSystemRestorePointListLoadThreadKiller.Enabled = False
-                                                                         Catch ex As Threading.ThreadAbortException
-                                                                         End Try
-                                                                     End Sub)
+        startSystemRestorePointListLoadThread = New Threading.Thread(AddressOf startSystemRestorePointListLoadThreadSub)
         startSystemRestorePointListLoadThread.Name = "Start System Restore Point List Load Thread Thread"
         startSystemRestorePointListLoadThread.Start()
 
         Functions.wait.openPleaseWaitWindow(Me)
+    End Sub
+
+    Sub startSystemRestorePointListLoadThreadSub()
+        Try
+            startSystemRestorePointListLoadThreadKiller.Enabled = True
+            loadRestorePointsFromSystemIntoList()
+            startSystemRestorePointListLoadThread = Nothing
+            startSystemRestorePointListLoadThreadKiller.Enabled = False
+        Catch ex As Threading.ThreadAbortException
+        End Try
     End Sub
 
     Sub interfaceTooSmallSettingCheckFormLoadSubRoutine()
@@ -2065,6 +2067,61 @@ updateCode:
         End If
     End Sub
 
+    Private Sub newFileDeleterThreadSub()
+        Dim strFoundFile As String = New IO.FileInfo(Application.ExecutablePath & ".new.exe").Name
+
+        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+            Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Found file named {0}{1}{0}. Now searching for any processes that have parent executables files of {0}{1}{0}.", Chr(34), strFoundFile))
+        End If
+
+        Functions.support.searchForProcessAndKillIt(Application.ExecutablePath & ".new.exe", True)
+
+        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+            Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Now attempting to delete {0}{1}{0}.", Chr(34), strFoundFile))
+        End If
+
+        Try
+            IO.File.Delete(Application.ExecutablePath & ".new.exe")
+
+            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deletion of {0}{1}{0} was successful.", Chr(34), strFoundFile))
+            End If
+        Catch ex As Exception
+            Functions.APIs.MoveFileEx(Application.ExecutablePath & ".new.exe", vbNullString, 4)
+
+            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deletion of {0}{1}{0} was unsuccessful, scheduling it to be deleted at next system reboot.", Chr(34), strFoundFile))
+            End If
+        End Try
+    End Sub
+
+    Private Sub updaterDeleterThreadSub()
+        Functions.support.searchForProcessAndKillIt("updater.exe", False)
+        Functions.support.searchForProcessAndKillIt("updater.exe", False)
+        Threading.Thread.Sleep(250) ' We're going to sleep to give the system some time to kill the process.
+        Functions.support.deleteFileWithNoException("updater.exe")
+    End Sub
+
+    Private Sub checkRestorePointSpaceThreadSub()
+        Try
+            checkRestorePointSpaceThreadThreadKiller.Enabled = True
+            Functions.vss.checkSystemDrivesForFullShadowStorage()
+            checkRestorePointSpaceThread = Nothing
+            checkRestorePointSpaceThreadThreadKiller.Enabled = False
+        Catch ex As Threading.ThreadAbortException
+        End Try
+    End Sub
+
+    Private Sub checkForAndEnableSystemRestoreIfNeededSub()
+        Try
+            checkForAndEnableSystemRestoreIfNeededThreadKiller.Enabled = True
+            Functions.vss.checkForAndEnableSystemRestoreIfNeeded()
+            checkForAndEnableSystemRestoreIfNeeded = Nothing
+            checkForAndEnableSystemRestoreIfNeededThreadKiller.Enabled = False
+        Catch ex As Threading.ThreadAbortException
+        End Try
+    End Sub
+
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Control.CheckForIllegalCrossThreadCalls = False
 
@@ -2076,12 +2133,7 @@ updateCode:
             If globalVariables.boolLogLoadsAndExitsToEventLog = True Then Functions.eventLogFunctions.writeToSystemEventLog("The user " & Environment.UserName & " started the program.", EventLogEntryType.Information)
 
             If IO.File.Exists("updater.exe") = True Then
-                Dim updaterDeleterThread As New Threading.Thread(Sub()
-                                                                     Functions.support.searchForProcessAndKillIt("updater.exe", False)
-                                                                     Functions.support.searchForProcessAndKillIt("updater.exe", False)
-                                                                     Threading.Thread.Sleep(250) ' We're going to sleep to give the system some time to kill the process.
-                                                                     Functions.support.deleteFileWithNoException("updater.exe")
-                                                                 End Sub)
+                Dim updaterDeleterThread As New Threading.Thread(AddressOf updaterDeleterThreadSub)
                 updaterDeleterThread.Name = "Legacy Updater File Deletion Thread"
                 updaterDeleterThread.Start()
             End If
@@ -2125,33 +2177,7 @@ updateCode:
             applySavedSorting()
 
             If IO.File.Exists(Application.ExecutablePath & ".new.exe") = True Then
-                Dim newFileDeleterThread As New Threading.Thread(Sub()
-                                                                     Dim strFoundFile As String = New IO.FileInfo(Application.ExecutablePath & ".new.exe").Name
-
-                                                                     If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                                                                         Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Found file named {0}{1}{0}. Now searching for any processes that have parent executables files of {0}{1}{0}.", Chr(34), strFoundFile))
-                                                                     End If
-
-                                                                     Functions.support.searchForProcessAndKillIt(Application.ExecutablePath & ".new.exe", True)
-
-                                                                     If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                                                                         Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Now attempting to delete {0}{1}{0}.", Chr(34), strFoundFile))
-                                                                     End If
-
-                                                                     Try
-                                                                         IO.File.Delete(Application.ExecutablePath & ".new.exe")
-
-                                                                         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                                                                             Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deletion of {0}{1}{0} was successful.", Chr(34), strFoundFile))
-                                                                         End If
-                                                                     Catch ex As Exception
-                                                                         Functions.APIs.MoveFileEx(Application.ExecutablePath & ".new.exe", vbNullString, 4)
-
-                                                                         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                                                                             Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deletion of {0}{1}{0} was unsuccessful, scheduling it to be deleted at next system reboot.", Chr(34), strFoundFile))
-                                                                         End If
-                                                                     End Try
-                                                                 End Sub)
+                Dim newFileDeleterThread As New Threading.Thread(AddressOf newFileDeleterThreadSub)
                 newFileDeleterThread.Name = "New Application File Deletion Thread"
                 newFileDeleterThread.Start()
             End If
@@ -2166,15 +2192,7 @@ updateCode:
             End If
 
             If My.Settings.checkSystemDrivesForFullShadowStorage = True Then
-                checkRestorePointSpaceThread = New Threading.Thread(Sub()
-                                                                        Try
-                                                                            checkRestorePointSpaceThreadThreadKiller.Enabled = True
-                                                                            Functions.vss.checkSystemDrivesForFullShadowStorage()
-                                                                            checkRestorePointSpaceThread = Nothing
-                                                                            checkRestorePointSpaceThreadThreadKiller.Enabled = False
-                                                                        Catch ex As Threading.ThreadAbortException
-                                                                        End Try
-                                                                    End Sub)
+                checkRestorePointSpaceThread = New Threading.Thread(AddressOf checkRestorePointSpaceThreadSub)
                 checkRestorePointSpaceThread.Name = "Restore Point Storage Status Checking Thread"
                 checkRestorePointSpaceThread.Priority = Threading.ThreadPriority.Lowest
                 checkRestorePointSpaceThread.Start()
@@ -2186,15 +2204,7 @@ updateCode:
                 Me.Text &= String.Format(" (Release Candidate {0})", globalVariables.version.shortReleaseCandidateVersion)
             End If
 
-            checkForAndEnableSystemRestoreIfNeeded = New Threading.Thread(Sub()
-                                                                              Try
-                                                                                  checkForAndEnableSystemRestoreIfNeededThreadKiller.Enabled = True
-                                                                                  Functions.vss.checkForAndEnableSystemRestoreIfNeeded()
-                                                                                  checkForAndEnableSystemRestoreIfNeeded = Nothing
-                                                                                  checkForAndEnableSystemRestoreIfNeededThreadKiller.Enabled = False
-                                                                              Catch ex As Threading.ThreadAbortException
-                                                                              End Try
-                                                                          End Sub)
+            checkForAndEnableSystemRestoreIfNeeded = New Threading.Thread(AddressOf checkForAndEnableSystemRestoreIfNeededSub)
             checkForAndEnableSystemRestoreIfNeeded.Name = "Check For and Enable System Restore if Needed Thread"
             checkForAndEnableSystemRestoreIfNeeded.Start()
             checkForAndEnableSystemRestoreIfNeededThreadKiller.Enabled = True
@@ -3313,6 +3323,70 @@ updateCode:
         End If
     End Sub
 
+    Private Sub switchToDebugBuildDownloadThreadSub()
+        Try
+            Dim memoryStream As New IO.MemoryStream()
+
+            If Functions.http.downloadFile(globalVariables.webURLs.updateBranch.debug.strProgramZIP, memoryStream) = False Then
+                Functions.wait.closePleaseWaitWindow()
+                MsgBox("There was an error while downloading required files, please check the Event Log for more details.", MsgBoxStyle.Critical, Me.Text)
+
+                memoryStream.Close()
+                memoryStream.Dispose()
+                memoryStream = Nothing
+
+                Exit Sub
+            End If
+
+            If Functions.checksum.verifyChecksum(globalVariables.webURLs.updateBranch.debug.strProgramZIPSHA2, memoryStream, True) = False Then
+                memoryStream.Close()
+                memoryStream.Dispose()
+                memoryStream = Nothing
+
+                Exit Sub
+            End If
+
+            Dim strNewApplicationFileNameFullName As String = New IO.FileInfo(Application.ExecutablePath).FullName & ".new.exe"
+
+            memoryStream.Position = 0
+            Dim zipFileObject As New ZipFile(memoryStream)
+
+            If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.programFileNameInZIP, strNewApplicationFileNameFullName) = False Then
+                MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, Me.Text)
+
+                zipFileObject.Close()
+                memoryStream.Close()
+                memoryStream.Dispose()
+                memoryStream = Nothing
+                Exit Sub
+            End If
+
+            If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.pdbFileNameInZIP, globalVariables.pdbFileNameInZIP & ".new") = False Then
+                MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, Me.Text)
+
+                zipFileObject.Close()
+                memoryStream.Close()
+                memoryStream.Dispose()
+                memoryStream = Nothing
+                Exit Sub
+            End If
+
+            zipFileObject.Close()
+            memoryStream.Close()
+            memoryStream.Dispose()
+            memoryStream = Nothing
+
+            If IO.File.Exists(strNewApplicationFileNameFullName) = True Then
+                Process.Start(New ProcessStartInfo With {.FileName = strNewApplicationFileNameFullName, .Arguments = "-updatewithoutuninstallinfoupdate", .Verb = "runas"})
+                Process.GetCurrentProcess.Kill()
+            Else
+                MsgBox("Something went wrong during the download, update process aborted.", MsgBoxStyle.Critical, Me.Text)
+            End If
+        Catch ex As Exception
+            exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
+        End Try
+    End Sub
+
     Private Sub SwitchToDebugBuildToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SwitchToDebugBuildToolStripMenuItem.Click
         If globalVariables.version.boolDebugBuild = True Then
             Exit Sub
@@ -3323,70 +3397,7 @@ updateCode:
         If msgBoxResult = MsgBoxResult.Yes Then
             Functions.wait.createPleaseWaitWindow("Downloading Debug Build... Please Wait.", True)
 
-            Dim downloadThread As New Threading.Thread(Sub()
-                                                           Try
-                                                               Dim memoryStream As New IO.MemoryStream()
-
-                                                               If Functions.http.downloadFile(globalVariables.webURLs.updateBranch.debug.strProgramZIP, memoryStream) = False Then
-                                                                   Functions.wait.closePleaseWaitWindow()
-                                                                   MsgBox("There was an error while downloading required files, please check the Event Log for more details.", MsgBoxStyle.Critical, Me.Text)
-
-                                                                   memoryStream.Close()
-                                                                   memoryStream.Dispose()
-                                                                   memoryStream = Nothing
-
-                                                                   Exit Sub
-                                                               End If
-
-                                                               If Functions.checksum.verifyChecksum(globalVariables.webURLs.updateBranch.debug.strProgramZIPSHA2, memoryStream, True) = False Then
-                                                                   memoryStream.Close()
-                                                                   memoryStream.Dispose()
-                                                                   memoryStream = Nothing
-
-                                                                   Exit Sub
-                                                               End If
-
-                                                               Dim strNewApplicationFileNameFullName As String = New IO.FileInfo(Application.ExecutablePath).FullName & ".new.exe"
-
-                                                               memoryStream.Position = 0
-                                                               Dim zipFileObject As New ZipFile(memoryStream)
-
-                                                               If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.programFileNameInZIP, strNewApplicationFileNameFullName) = False Then
-                                                                   MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, Me.Text)
-
-                                                                   zipFileObject.Close()
-                                                                   memoryStream.Close()
-                                                                   memoryStream.Dispose()
-                                                                   memoryStream = Nothing
-                                                                   Exit Sub
-                                                               End If
-
-                                                               If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.pdbFileNameInZIP, globalVariables.pdbFileNameInZIP & ".new") = False Then
-                                                                   MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, Me.Text)
-
-                                                                   zipFileObject.Close()
-                                                                   memoryStream.Close()
-                                                                   memoryStream.Dispose()
-                                                                   memoryStream = Nothing
-                                                                   Exit Sub
-                                                               End If
-
-                                                               zipFileObject.Close()
-                                                               memoryStream.Close()
-                                                               memoryStream.Dispose()
-                                                               memoryStream = Nothing
-
-                                                               If IO.File.Exists(strNewApplicationFileNameFullName) = True Then
-                                                                   Process.Start(New ProcessStartInfo With {.FileName = strNewApplicationFileNameFullName, .Arguments = "-updatewithoutuninstallinfoupdate", .Verb = "runas"})
-                                                                   Process.GetCurrentProcess.Kill()
-                                                               Else
-                                                                   MsgBox("Something went wrong during the download, update process aborted.", MsgBoxStyle.Critical, Me.Text)
-                                                               End If
-                                                           Catch ex As Exception
-                                                               exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
-                                                           End Try
-                                                       End Sub)
-
+            Dim downloadThread As New Threading.Thread(AddressOf switchToDebugBuildDownloadThreadSub)
             downloadThread.Name = "Debug Build Download Thread"
             downloadThread.Start()
         End If
