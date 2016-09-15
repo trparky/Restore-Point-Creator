@@ -752,7 +752,7 @@ Namespace Functions.support
 
         Public Sub launchURLInWebBrowser(url As String, Optional errorMessage As String = "An error occurred when trying the URL In your Default browser. The URL has been copied to your Windows Clipboard for you to paste into the address bar in the web browser of your choice.")
 
-            If url.Trim.StartsWith("http", True) = False Then
+            If url.Trim.StartsWith("http", StringComparison.OrdinalIgnoreCase) = False Then
                 If My.Settings.useSSL = True Then
                     url = "https://" & url
                 Else

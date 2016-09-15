@@ -3564,11 +3564,11 @@ updateCode:
                     While streamReader.EndOfStream = False
                         strTemp = streamReader.ReadLine
 
-                        If strTemp.StartsWith("Payload: ", StringComparison.OrdinalIgnoreCase) = True Then
+                        If strTemp.StartsWith("Payload: ") = True Then
                             strDataPayload = strTemp.Replace("Payload: ", "").Trim
-                        ElseIf strTemp.StartsWith("Random String: ", StringComparison.OrdinalIgnoreCase) = True Then
+                        ElseIf strTemp.StartsWith("Random String: ") = True Then
                             strRandomString = strTemp.Replace("Random String: ", "").Trim
-                        ElseIf strTemp.StartsWith("Checksum: ", StringComparison.OrdinalIgnoreCase) = True Then
+                        ElseIf strTemp.StartsWith("Checksum: ") = True Then
                             strChecksum = strTemp.Replace("Checksum: ", "").Trim
                         End If
                     End While
