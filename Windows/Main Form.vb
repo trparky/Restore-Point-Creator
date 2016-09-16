@@ -2096,10 +2096,14 @@ updateCode:
     End Sub
 
     Private Sub updaterDeleterThreadSub()
-        Functions.support.searchForProcessAndKillIt("updater.exe", False)
-        Functions.support.searchForProcessAndKillIt("updater.exe", False)
-        Threading.Thread.Sleep(250) ' We're going to sleep to give the system some time to kill the process.
-        Functions.support.deleteFileWithNoException("updater.exe")
+        Try
+            Functions.support.searchForProcessAndKillIt("updater.exe", False)
+            Functions.support.searchForProcessAndKillIt("updater.exe", False)
+            Threading.Thread.Sleep(250) ' We're going to sleep to give the system some time to kill the process.
+            Functions.support.deleteFileWithNoException("updater.exe")
+        Catch ex As Threading.ThreadAbortException
+        Catch ex As Exception
+        End Try
     End Sub
 
     Private Sub checkRestorePointSpaceThreadSub()
@@ -2109,6 +2113,7 @@ updateCode:
             checkRestorePointSpaceThread = Nothing
             checkRestorePointSpaceThreadThreadKiller.Enabled = False
         Catch ex As Threading.ThreadAbortException
+        Catch ex As Exception
         End Try
     End Sub
 
@@ -2119,6 +2124,7 @@ updateCode:
             checkForAndEnableSystemRestoreIfNeeded = Nothing
             checkForAndEnableSystemRestoreIfNeededThreadKiller.Enabled = False
         Catch ex As Threading.ThreadAbortException
+        Catch ex As Exception
         End Try
     End Sub
 
