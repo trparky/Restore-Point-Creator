@@ -2485,67 +2485,6 @@ updateCode:
     End Sub
 #End Region
 
-#Region "--== Commented Out Code ==--"
-    'Sub updaterExecutableRemover()
-    '    Functions.wmi.searchForProcessAndKillIt("updater.exe", False)
-    '    Functions.registryStuff.updateRestorePointCreatorUninstallationInfo()
-
-    '    Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Updated program to version {0}.", globalVariables.version.strFullVersionString), EventLogEntryType.Information)
-
-    '    Try
-    '        IO.File.Delete("updater.exe")
-    '    Catch ex As Exception
-    '        Functions.eventLogFunctions.writeToSystemEventLog("Unable to delete updater.exe, an exception has occurred. Rebooting your computer and relaunching program should fix this issue.", EventLogEntryType.Error)
-    '        Functions.eventLogFunctions.writeCrashToEventLog(ex)
-    '    End Try
-    'End Sub
-
-    'Private Sub chkConfirmDeletions_CheckedChanged(sender As Object, e As EventArgs) Handles chkConfirmDeletions.CheckedChanged
-    '    If boolDoneLoading = True Then
-    '        If chkConfirmDeletions.Checked = True Then
-    '            My.Settings.confirmRestorePointDeletions = True
-    '        Else
-    '            My.Settings.confirmRestorePointDeletions = False
-    '        End If
-    '        My.Settings.Save()
-    '    End If
-    'End Sub
-
-    'Private Sub chkCheckForUpdates_CheckedChanged(sender As Object, e As EventArgs) Handles chkCheckForUpdates.CheckedChanged
-    '    If boolDoneLoading = True Then
-    '        If chkCheckForUpdates.Checked = True Then
-    '            My.Settings.CheckForUpdates = True
-    '        Else
-    '            My.Settings.CheckForUpdates = False
-    '        End If
-    '        My.Settings.Save()
-    '    End If
-    'End Sub
-
-    'Private Sub chkCloseAfterCreating_CheckedChanged(sender As Object, e As EventArgs) Handles chkCloseAfterCreating.CheckedChanged
-    '    If boolDoneLoading = True Then
-    '        If chkCloseAfterCreating.Checked = True Then
-    '            My.Settings.closeAfterCreatingRestorePoint = True
-    '            'debug.writeline("My.Settings.closeAfterCreatingRestorePoint = True")
-    '        Else
-    '            My.Settings.closeAfterCreatingRestorePoint = False
-    '            'debug.writeline("My.Settings.closeAfterCreatingRestorePoint = False")
-    '        End If
-    '        My.Settings.Save()
-    '    End If
-    'End Sub
-
-    'Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-    '    Dim searcher As New ManagementObjectSearcher("Root\DEFAULT", "SELECT * FROM SystemRestoreConfig")
-
-    '    For Each queryObj As ManagementObject In searcher.Get()
-    '        'debug.writeline("DiskPercent :  {0}", queryObj("DiskPercent"))
-    '        'debug.writeline("MyKey : {0}", queryObj("MyKey"))
-    '        'debug.writeline("RPSessionInterval : {0}", queryObj("RPSessionInterval"))
-    '    Next
-    'End Sub
-#End Region
-
     Private Sub toolStripViewDiskSpaceUsage_Click(sender As Object, e As EventArgs) Handles toolStripViewDiskSpaceUsage.Click
         If (globalVariables.windows.frmDiskSpaceUsageWindow Is Nothing) Then
             globalVariables.windows.frmDiskSpaceUsageWindow = New Disk_Space_Usage
