@@ -2023,11 +2023,13 @@ updateCode:
     End Sub
 
     Private Sub addShortCutForEventLogToUsersStartMenu()
+        Dim pathInStartMenu As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs\Restore Point Creator")
+
         ' Checks to see if this application's executable is in a safe place, in this case... Program Files.
         If Application.ExecutablePath.caseInsensitiveContains("program files") = True Then
             ' Checks to see if a program folder exists.
-            If IO.Directory.Exists(IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs\Restore Point Creator")) = True Then
-                Dim pathOfShortcutWeAreGoingToMake As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs\Restore Point Creator\Restore Point Creator Event Log Viewer.lnk")
+            If IO.Directory.Exists(pathInStartMenu) = True Then
+                Dim pathOfShortcutWeAreGoingToMake As String = IO.Path.Combine(pathInStartMenu, "Restore Point Creator Event Log Viewer.lnk")
 
                 If IO.File.Exists(pathOfShortcutWeAreGoingToMake) = False Then
                     Functions.support.createShortcut(pathOfShortcutWeAreGoingToMake, Application.ExecutablePath, Application.ExecutablePath, "Restore Point Creator Event Log Viewer", "-eventlog")
