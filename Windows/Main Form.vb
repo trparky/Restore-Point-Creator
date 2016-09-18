@@ -2360,6 +2360,20 @@ updateCode:
         txtRestorePointDescription.Text = ""
     End Sub
 
+    Private Sub chkShowVersionInTitleBarToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles chkShowVersionInTitleBarToolStripMenuItem.Click
+        My.Settings.boolShowVersionInWindowTitle = chkShowVersionInTitleBarToolStripMenuItem.Checked
+
+        If My.Settings.boolShowVersionInWindowTitle = True Then
+            If globalVariables.version.boolBeta Then
+                Me.Text = String.Format("Restore Point Creator ({0} Public Beta {1})", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion)
+            ElseIf globalVariables.version.boolReleaseCandidate Then
+                Me.Text = String.Format("Restore Point Creator ({0} Release Candidate {1})", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion)
+            Else
+                Me.Text = "Restore Point Creator (" & globalVariables.version.strFullVersionString & ")"
+            End If
+        End If
+    End Sub
+
     Private Sub txtRestorePointDescription_Leave(sender As Object, e As EventArgs) Handles txtRestorePointDescription.Leave
         doTheGrayingOfTheRestorePointNameTextBox()
     End Sub
@@ -2612,10 +2626,14 @@ updateCode:
                 checkRestorePointSpaceThread.Start()
             End If
 
-            If globalVariables.version.boolBeta Then
-                Me.Text &= String.Format(" (Public Beta {0})", globalVariables.version.shortBetaVersion)
-            ElseIf globalVariables.version.boolReleaseCandidate Then
-                Me.Text &= String.Format(" (Release Candidate {0})", globalVariables.version.shortReleaseCandidateVersion)
+            If My.Settings.boolShowVersionInWindowTitle = True Then
+                If globalVariables.version.boolBeta Then
+                    Me.Text = String.Format("Restore Point Creator ({0} Public Beta {1})", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion)
+                ElseIf globalVariables.version.boolReleaseCandidate Then
+                    Me.Text = String.Format("Restore Point Creator ({0} Release Candidate {1})", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion)
+                Else
+                    Me.Text = "Restore Point Creator (" & globalVariables.version.strFullVersionString & ")"
+                End If
             End If
 
             checkForAndEnableSystemRestoreIfNeeded = New Threading.Thread(AddressOf checkForAndEnableSystemRestoreIfNeededSub)
