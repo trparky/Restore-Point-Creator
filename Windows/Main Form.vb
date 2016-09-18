@@ -2626,6 +2626,8 @@ updateCode:
                 checkRestorePointSpaceThread.Start()
             End If
 
+            chkShowVersionInTitleBarToolStripMenuItem.Checked = My.Settings.boolShowVersionInWindowTitle
+
             If My.Settings.boolShowVersionInWindowTitle = True Then
                 If globalVariables.version.boolBeta Then
                     Me.Text = String.Format("Restore Point Creator ({0} Public Beta {1})", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion)
