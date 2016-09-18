@@ -93,6 +93,7 @@ Partial Class Form1
         Me.SoftwareUpdateSettingsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.toolStripAutomaticallyCheckForUpdates = New System.Windows.Forms.ToolStripMenuItem()
         Me.AskBeforeUpgradingUpdatingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.EnableExtendedLoggingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ConfigureAutomaticUpdatesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.toolStripCheckEveryWeek = New System.Windows.Forms.ToolStripMenuItem()
         Me.toolStripCheckEveryTwoWeeks = New System.Windows.Forms.ToolStripMenuItem()
@@ -134,7 +135,7 @@ Partial Class Form1
         Me.checkForAndEnableSystemRestoreIfNeededThreadKiller = New System.Windows.Forms.Timer(Me.components)
         Me.checkRestorePointSpaceThreadThreadKiller = New System.Windows.Forms.Timer(Me.components)
         Me.startSystemRestorePointListLoadThreadKiller = New System.Windows.Forms.Timer(Me.components)
-        Me.EnableExtendedLoggingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.chkShowVersionInTitleBarToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.restorePointListContextMenu.SuspendLayout()
         Me.buttonTableLayout.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
@@ -479,7 +480,7 @@ Partial Class Form1
         '
         'OptionsToolStripMenuItem
         '
-        Me.OptionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveSafeModeBootOptionToolStripMenuItem, Me.InterfaceTooBigToolStripMenuItem, Me.AdditionalOptionsAndSettingsToolStripMenuItem, Me.ConfigurationBackupRestoreToolStripMenuItem, Me.ToolStripMenuItem5, Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem, Me.SetBarColorToolStripMenuItem, Me.toolStripClear, Me.toolStripMyComputer, Me.CreateRestorePointAtUserLogonToolStripMenuItem, Me.ConfigureProxyToolStripMenuItem, Me.SetWindowsActivePowerPlanSettingsForWakeTimersBackToDefaultToolStripMenuItem, Me.KeepXAmountOfRestorePointsToolStripMenuItem, Me.DefaultCustomRestorePointNameToolStripMenuItem, Me.ToolStripMenuItem3, Me.SoftwareUpdateSettingsToolStripMenuItem, Me.NotificationOptionsToolStripMenuItem, Me.UseSSLToolStripMenuItem, Me.lineBeforeDebugMenuItem, Me.SwitchToDebugBuildToolStripMenuItem})
+        Me.OptionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveSafeModeBootOptionToolStripMenuItem, Me.InterfaceTooBigToolStripMenuItem, Me.AdditionalOptionsAndSettingsToolStripMenuItem, Me.ConfigurationBackupRestoreToolStripMenuItem, Me.ToolStripMenuItem5, Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem, Me.SetBarColorToolStripMenuItem, Me.toolStripClear, Me.toolStripMyComputer, Me.CreateRestorePointAtUserLogonToolStripMenuItem, Me.ConfigureProxyToolStripMenuItem, Me.SetWindowsActivePowerPlanSettingsForWakeTimersBackToDefaultToolStripMenuItem, Me.KeepXAmountOfRestorePointsToolStripMenuItem, Me.DefaultCustomRestorePointNameToolStripMenuItem, Me.chkShowVersionInTitleBarToolStripMenuItem, Me.ToolStripMenuItem3, Me.SoftwareUpdateSettingsToolStripMenuItem, Me.NotificationOptionsToolStripMenuItem, Me.UseSSLToolStripMenuItem, Me.lineBeforeDebugMenuItem, Me.SwitchToDebugBuildToolStripMenuItem})
         Me.OptionsToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.settings
         Me.OptionsToolStripMenuItem.Name = "OptionsToolStripMenuItem"
         Me.OptionsToolStripMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.AsNeeded
@@ -693,6 +694,13 @@ Partial Class Form1
         Me.AskBeforeUpgradingUpdatingToolStripMenuItem.Name = "AskBeforeUpgradingUpdatingToolStripMenuItem"
         Me.AskBeforeUpgradingUpdatingToolStripMenuItem.Size = New System.Drawing.Size(352, 22)
         Me.AskBeforeUpgradingUpdatingToolStripMenuItem.Text = "Ask Before Upgrading/Updating"
+        '
+        'EnableExtendedLoggingToolStripMenuItem
+        '
+        Me.EnableExtendedLoggingToolStripMenuItem.CheckOnClick = True
+        Me.EnableExtendedLoggingToolStripMenuItem.Name = "EnableExtendedLoggingToolStripMenuItem"
+        Me.EnableExtendedLoggingToolStripMenuItem.Size = New System.Drawing.Size(352, 22)
+        Me.EnableExtendedLoggingToolStripMenuItem.Text = "Enable Extended Logging"
         '
         'ConfigureAutomaticUpdatesToolStripMenuItem
         '
@@ -956,12 +964,12 @@ Partial Class Form1
         '
         Me.startSystemRestorePointListLoadThreadKiller.Interval = 30000
         '
-        'EnableExtendedLoggingToolStripMenuItem
+        'chkShowVersionInTitleBarToolStripMenuItem
         '
-        Me.EnableExtendedLoggingToolStripMenuItem.CheckOnClick = True
-        Me.EnableExtendedLoggingToolStripMenuItem.Name = "EnableExtendedLoggingToolStripMenuItem"
-        Me.EnableExtendedLoggingToolStripMenuItem.Size = New System.Drawing.Size(352, 22)
-        Me.EnableExtendedLoggingToolStripMenuItem.Text = "Enable Extended Logging"
+        Me.chkShowVersionInTitleBarToolStripMenuItem.CheckOnClick = True
+        Me.chkShowVersionInTitleBarToolStripMenuItem.Name = "chkShowVersionInTitleBarToolStripMenuItem"
+        Me.chkShowVersionInTitleBarToolStripMenuItem.Size = New System.Drawing.Size(431, 22)
+        Me.chkShowVersionInTitleBarToolStripMenuItem.Text = "Show Version in Title Bar"
         '
         'Form1
         '
@@ -1105,4 +1113,5 @@ Partial Class Form1
     Friend WithEvents AskBeforeCreatingRestorePointToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents RebootSystemToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents EnableExtendedLoggingToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents chkShowVersionInTitleBarToolStripMenuItem As ToolStripMenuItem
 End Class
