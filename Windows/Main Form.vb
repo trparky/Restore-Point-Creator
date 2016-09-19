@@ -2154,7 +2154,7 @@ updateCode:
                         deletionConfirmationWindow.lblCreatedOn.Text &= " " & item.SubItems(enums.restorePointListSubItems.restorePointDate).Text
                         deletionConfirmationWindow.lblRestorePointName.Text &= " " & item.SubItems(enums.restorePointListSubItems.restorePointName).Text
                         deletionConfirmationWindow.StartPosition = FormStartPosition.CenterParent
-                        deletionConfirmationWindow.ShowDialog()
+                        deletionConfirmationWindow.ShowDialog(Me)
 
                         If deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.yes Then
                             boolUserWantsToDeleteTheRestorePoint = True
