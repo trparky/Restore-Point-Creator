@@ -128,6 +128,38 @@ Public Class frmManageSystemRestoreStorageSpace
         End Try
     End Sub
 
+    Sub setSize(ByVal dblSize As Double)
+        Dim newSize As Long
+
+        If listSizeType.Text = "Kilobytes" Then
+            newSize = dblSize * kilobytesInBytes
+        ElseIf listSizeType.Text = "Megabytes" Then
+            newSize = dblSize * megabytesInBytes
+        ElseIf listSizeType.Text = "Gigabytes" Then
+            newSize = dblSize * gigabytesInBytes
+        ElseIf listSizeType.Text = "Terabytes" Then
+            newSize = dblSize * terabytesInBytes
+        ElseIf listSizeType.Text = "% (Percentage)" Then
+            dblSize = dblSize / 100
+            newSize = getSizeOfDrive(globalVariables.systemDriveLetter) * dblSize
+        End If
+
+        Dim size As ULong = Functions.vss.getMaxSize(globalVariables.systemDriveLetter)
+
+        If size = 0 Then
+            Functions.vss.executeVSSAdminCommand(globalVariables.systemDriveLetter)
+            Functions.vss.setShadowStorageSize(globalVariables.systemDriveLetter, newSize)
+            Functions.vss.enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
+        Else
+            Functions.vss.setShadowStorageSize(globalVariables.systemDriveLetter, newSize)
+            Functions.vss.enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
+        End If
+
+        getSize(globalVariables.systemDriveLetter)
+
+        MsgBox("New System Restore Point Storage Space Size has been set.", MsgBoxStyle.Information, Me.Text)
+    End Sub
+
     Private Sub btnSetSize_Click(sender As Object, e As EventArgs) Handles btnSetSize.Click
         Dim dblSize As Double
 
@@ -137,37 +169,7 @@ Public Class frmManageSystemRestoreStorageSpace
                 Exit Sub
             End If
 
-            Dim dataSavingThread As New Threading.Thread(Sub()
-                                                             Dim newSize As Long
-
-                                                             If listSizeType.Text = "Kilobytes" Then
-                                                                 newSize = dblSize * kilobytesInBytes
-                                                             ElseIf listSizeType.Text = "Megabytes" Then
-                                                                 newSize = dblSize * megabytesInBytes
-                                                             ElseIf listSizeType.Text = "Gigabytes" Then
-                                                                 newSize = dblSize * gigabytesInBytes
-                                                             ElseIf listSizeType.Text = "Terabytes" Then
-                                                                 newSize = dblSize * terabytesInBytes
-                                                             ElseIf listSizeType.Text = "% (Percentage)" Then
-                                                                 dblSize = dblSize / 100
-                                                                 newSize = getSizeOfDrive(globalVariables.systemDriveLetter) * dblSize
-                                                             End If
-
-                                                             Dim size As ULong = Functions.vss.getMaxSize(globalVariables.systemDriveLetter)
-
-                                                             If size = 0 Then
-                                                                 Functions.vss.executeVSSAdminCommand(globalVariables.systemDriveLetter)
-                                                                 Functions.vss.setShadowStorageSize(globalVariables.systemDriveLetter, newSize)
-                                                                 Functions.vss.enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
-                                                             Else
-                                                                 Functions.vss.setShadowStorageSize(globalVariables.systemDriveLetter, newSize)
-                                                                 Functions.vss.enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
-                                                             End If
-
-                                                             getSize(globalVariables.systemDriveLetter)
-
-                                                             MsgBox("New System Restore Point Storage Space Size has been set.", MsgBoxStyle.Information, Me.Text)
-                                                         End Sub)
+            Dim dataSavingThread As New Threading.Thread(Sub() setSize(dblSize))
             dataSavingThread.Name = "Data Saving Thread"
             dataSavingThread.Start()
         Else
