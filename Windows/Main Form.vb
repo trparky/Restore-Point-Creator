@@ -43,13 +43,13 @@ Public Class Form1
             If startSystemRestorePointListLoadThread IsNot Nothing Then
                 If startSystemRestorePointListLoadThread.IsAlive = True Then
                     startSystemRestorePointListLoadThread.Abort()
-                    startSystemRestorePointListLoadThread = Nothing
                 End If
             End If
         Catch ex As Exception
+        Finally
+            startSystemRestorePointListLoadThreadKiller.Enabled = False
+            startSystemRestorePointListLoadThread = Nothing
         End Try
-
-        startSystemRestorePointListLoadThreadKiller.Enabled = False
     End Sub
 
     Private Sub checkRestorePointSpaceThreadThreadKiller_Tick(sender As Object, e As EventArgs) Handles checkRestorePointSpaceThreadThreadKiller.Tick
@@ -57,13 +57,13 @@ Public Class Form1
             If checkRestorePointSpaceThread IsNot Nothing Then
                 If checkRestorePointSpaceThread.IsAlive = True Then
                     checkRestorePointSpaceThread.Abort()
-                    checkRestorePointSpaceThread = Nothing
                 End If
             End If
         Catch ex As Exception
+        Finally
+            checkRestorePointSpaceThreadThreadKiller.Enabled = False
+            checkRestorePointSpaceThread = Nothing
         End Try
-
-        checkRestorePointSpaceThreadThreadKiller.Enabled = False
     End Sub
 
     Private Sub checkForAndEnableSystemRestoreIfNeededThreadKiller_Tick(sender As Object, e As EventArgs) Handles checkForAndEnableSystemRestoreIfNeededThreadKiller.Tick
@@ -71,13 +71,13 @@ Public Class Form1
             If checkForAndEnableSystemRestoreIfNeeded IsNot Nothing Then
                 If checkForAndEnableSystemRestoreIfNeeded.IsAlive = True Then
                     checkForAndEnableSystemRestoreIfNeeded.Abort()
-                    checkForAndEnableSystemRestoreIfNeeded = Nothing
                 End If
             End If
         Catch ex As Exception
+        Finally
+            checkForAndEnableSystemRestoreIfNeededThreadKiller.Enabled = False
+            checkForAndEnableSystemRestoreIfNeeded = Nothing
         End Try
-
-        checkForAndEnableSystemRestoreIfNeededThreadKiller.Enabled = False
     End Sub
 #End Region
 
