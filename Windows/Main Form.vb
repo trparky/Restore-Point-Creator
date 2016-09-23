@@ -743,7 +743,7 @@ Public Class Form1
                 Dim valueInRegistry As String = registryKeyWeAreWorkingWith.GetValue(Process.GetCurrentProcess.MainModule.FileName.ToLower, "Nothing")
 
                 ' Now we check to see if the value isn't equal to "Nothing" and if it contains the word "HIGHDPIAWARE".
-                If valueInRegistry.Equals("Nothing") = False And valueInRegistry.ToUpper.caseInsensitiveContains("HIGHDPIAWARE") = True Then
+                If valueInRegistry.Equals("Nothing") = False And valueInRegistry.caseInsensitiveContains("HIGHDPIAWARE") = True Then
                     InterfaceTooBigToolStripMenuItem.Checked = True
                 End If
 
