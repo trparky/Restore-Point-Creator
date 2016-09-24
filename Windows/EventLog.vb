@@ -46,14 +46,6 @@ Public Class eventLogForm
                                 itemAdd.ImageIndex = 2
                         End Select
 
-                        'If eventInstance.Level = Eventing.Reader.StandardEventLevel.Error Then ' Error
-                        '    itemAdd.ImageIndex = 0
-                        'ElseIf eventInstance.Level = Eventing.Reader.StandardEventLevel.Informational Then ' Information
-                        '    itemAdd.ImageIndex = 1
-                        'ElseIf eventInstance.Level = Eventing.Reader.StandardEventLevel.Warning Then ' Warning
-                        '    itemAdd.ImageIndex = 2
-                        'End If
-
                         itemAdd.SubItems.Add(eventInstance.TimeCreated.Value.ToLocalTime.ToString)
                         itemAdd.SubItems.Add(eventInstance.RecordId)
                         itemAdd.SubItems.Add(strEventLog)
@@ -416,7 +408,6 @@ Public Class eventLogForm
             searchWindow.Dispose()
             searchWindow = Nothing
 
-            'Dim boolResultsFound As Boolean = False
             Dim longEntriesFound As Long = 0
 
             For Each item As ListViewItem In eventLogList.Items
@@ -509,12 +500,4 @@ Public Class eventLogForm
         eventLogList.ListViewItemSorter = New Functions.listViewSorter.ListViewComparer(1, SortOrder.Descending)
         eventLogList.Sort()
     End Sub
-
-    'Private Sub eventLogText_MouseUp(sender As Object, e As MouseEventArgs) Handles eventLogText.MouseUp
-    'Dim selectedDate As Date
-    'If Date.TryParse(eventLogText.SelectedText, selectedDate) = True Then
-    '    MonthCalendar1.Visible = True
-    '    MonthCalendar1.SetDate(selectedDate)
-    'End If
-    'End Sub
 End Class
