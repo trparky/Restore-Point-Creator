@@ -1,7 +1,4 @@
-﻿Imports System.Text
-Imports ICSharpCode.SharpZipLib.Zip
-
-Public Class frmManuallySubmitCrashData
+﻿Public Class frmManuallySubmitCrashData
     Private boolSubmitted As Boolean = False
     Private boolDoWeHaveAttachments As Boolean = False
     Public crashData As String
