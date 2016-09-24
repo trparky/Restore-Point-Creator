@@ -7,12 +7,10 @@ Namespace Functions.registryStuff
             Try
                 Dim registryKey As RegistryKey = Registry.ClassesRoot.OpenSubKey(fileType, False)
 
-                ' If registryKey Is Nothing = False Then
                 If registryKey IsNot Nothing Then
                     Dim fileTypeNameInRegistry As String = registryKey.GetValue("")
                     Dim registryKey2 As RegistryKey = Registry.ClassesRoot.OpenSubKey(fileTypeNameInRegistry & "\shell\open\command", False)
 
-                    ' If registryKey2 Is Nothing = False Then
                     If registryKey2 IsNot Nothing Then
                         Return registryKey2.GetValue("").ToString.Replace("""", "").Replace("%1", "").Trim
                     End If
