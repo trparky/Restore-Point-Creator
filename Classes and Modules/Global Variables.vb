@@ -132,9 +132,6 @@ Namespace globalVariables
                 Public Const strFullChangeLog As String = "www.toms-world.org/download/restorepointcreatorchangelog.rtf"
 
                 Public Const strRecentChangesLog As String = "www.toms-world.org/recentRPCChange.txt"
-
-                'Public Const strUpdater As String = "www.toms-world.org/download/updater.exe"
-                'Public Const strUpdaterSHA2 As String = "www.toms-world.org/download/updater.exe.sha2"
             End Module
         End Namespace
     End Namespace
@@ -196,15 +193,6 @@ Namespace globalVariables
 
         Public Const constStringRoot As String = "root"
 
-        ' We don't use this anymore but is kept here for reference to the datatypes in the systemRestorePoint Object.
-        'Public Enum systemRestorePointDataType
-        '    <Description("CreationTime")> CreationTime
-        '    <Description("Description")> Description
-        '    <Description("EventType")> EventType
-        '    <Description("RestorePointType")> RestorePointType
-        '    <Description("SequenceNumber")> SequenceNumber
-        'End Enum
-        '
         ' The systemRestorePoint Object has the following attributes...
         ' CreationTime : The encoded time of when the restore point was created.  This must be parsed to get a proper date from it.
         ' Description : This is the name of the restore point.
