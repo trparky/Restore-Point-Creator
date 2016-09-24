@@ -4,8 +4,6 @@ Imports System.Security.Principal
 Namespace Functions.privilegeChecks
     Module privilegeChecks
         Public Function areWeRunningAsSystemUser() As Boolean
-            'Dim identity As System.Security.Principal.WindowsIdentity = System.Security.Principal.WindowsIdentity.GetCurrent()
-            'Return identity.IsSystem
             Return WindowsIdentity.GetCurrent().IsSystem
         End Function
 
