@@ -61,8 +61,6 @@
             Else
                 MsgBox("A general HTTP error occured, please check the Event Log for more details.", MsgBoxStyle.Critical, "Restore Point Creator")
             End If
-
-            'eventLogFunctions.writeToSystemEventLog("The HTTPHelper Class Instance had the following data in memory..." & vbCrLf & vbCrLf & classInstance.toString(), EventLogEntryType.Information)
         End Sub
 
         Public Function createNewHTTPHelperObject() As httpHelper
