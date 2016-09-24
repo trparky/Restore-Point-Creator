@@ -45,17 +45,6 @@
                     Dim logName As String = "Application"
                     Dim host As String = "."
 
-                    'Dim registryKey As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application", True)
-
-                    'If registryKey.OpenSubKey(sSource) Is Nothing Then
-                    '    registryKey.CreateSubKey(sSource)
-                    '    registryKey.OpenSubKey(sSource, True).SetValue("EventMessageFile", IO.Path.Combine(System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "EventLogMessages.dll"), Microsoft.Win32.RegistryValueKind.String)
-                    'End If
-
-                    'registryKey.Close()
-                    'registryKey.Dispose()
-                    'registryKey = Nothing
-
                     If Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application\" & logSource) Is Nothing Then
                         Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application", True).CreateSubKey(logSource)
                         Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application\" & logSource, True).SetValue("EventMessageFile", IO.Path.Combine(Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "EventLogMessages.dll"), Microsoft.Win32.RegistryValueKind.String)
