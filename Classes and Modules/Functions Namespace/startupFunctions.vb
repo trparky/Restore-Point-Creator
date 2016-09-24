@@ -93,17 +93,11 @@ Namespace Functions.startupFunctions
             Try
                 vss.checkForAndEnableSystemRestoreIfNeeded()
 
-                'Dim systemRestore As New SystemRestorePointCreator.Classes.SystemRestore
-                'Dim sequenceNumber As Long = Functions.getNewestSystemRestorePointID() + 1
                 Dim newRestorePointID As Integer
                 Dim result As Integer
 
                 Dim oldNewestRestorePointID As Integer = wmi.getNewestSystemRestorePointID()
-
                 result = wmi.createRestorePoint(strRestorePointDescription, support.RestoreType.WindowsType, newRestorePointID)
-
-                'SystemRestorePointCreator.Classes.SystemRestore.EndRestore(newRestorePointID)
-
                 wait.closePleaseWaitWindow()
 
                 If displayMessage = True Then
@@ -111,7 +105,6 @@ Namespace Functions.startupFunctions
 
                     If result = globalVariables.ERROR_SUCCESS Then
                         ' Does nothing.
-                        'MsgBox("System Restore Point Created Successfully.", MsgBoxStyle.Information, msgBoxTitle)
                     ElseIf result = globalVariables.ERROR_DISK_FULL Then
                         MsgBox("System Restore Point Creation Failed.  Disk Full." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_DISK_FULL (112)", MsgBoxStyle.Critical, msgBoxTitle)
                     ElseIf result = globalVariables.ERROR_INTERNAL_ERROR Then
@@ -156,7 +149,6 @@ Namespace Functions.startupFunctions
                 If boolKillProcessAfterRun = True Then Process.GetCurrentProcess.Kill()
             Catch ex As Exception
                 eventLogFunctions.writeCrashToEventLog(ex)
-                ' Does nothing
             End Try
         End Sub
 
@@ -220,13 +212,11 @@ Namespace Functions.startupFunctions
                 ' Loops through systemRestorePoints.
                 For Each systemRestorePoint As ManagementObject In systemRestorePoints.Get()
                     If systemRestorePoint("CreationTime").ToString.Trim <> "" Then
-                        systemRestorePointCreationDate = Functions.support.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime"))
+                        systemRestorePointCreationDate = support.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime"))
 
                         dateDiffResults = Math.Abs(DateDiff(DateInterval.Day, Date.Now, systemRestorePointCreationDate))
-                        'debug.writeline("dateDiffResults = " & dateDiffResults & " -- " & systemRestorePointCreationDate.ToShortDateString & " -- " & Date.Now)
 
                         If dateDiffResults >= maxDays Then
-                            ''debug.writeline("Removing System Restore Point ID: " & Integer.Parse(systemRestorePoint(systemRestorePointDataType.SequenceNumber.ToString).ToString))
                             support.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber"))) ' Deletes the Restore Point.
 
                             If boolLogDeletedRestorePoints Then
