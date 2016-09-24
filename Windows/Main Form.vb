@@ -266,88 +266,6 @@ Public Class Form1
         End Try
     End Sub
 
-    'Sub addTask(taskName As String, taskDescription As String, taskEXEPath As String, taskParameters As String, taskTriggers As TriggerCollection)
-    '    If Functions.support.areWeInSafeMode() = True Then Exit Sub
-
-    '    Try
-    '        taskName = taskName.Trim
-    '        taskDescription = taskDescription.Trim
-    '        taskEXEPath = taskEXEPath.Trim
-    '        taskParameters = taskParameters.Trim
-
-    '        Dim triggerDescription As String
-
-    '        If IO.File.Exists(taskEXEPath) = False Then
-    '            MsgBox("Executable path not found.", MsgBoxStyle.Critical, Me.Text)
-    '            Exit Sub
-    '        End If
-
-    '        Dim taskService As TaskService = New TaskService()
-    '        Dim newTask As TaskDefinition = taskService.NewTask
-
-    '        newTask.RegistrationInfo.Description = taskDescription
-
-    '        For Each taskTrigger As Trigger In taskTriggers
-    '            If taskTrigger.TriggerType = TaskTriggerType.Daily Then
-    '                Dim trigger As Trigger = newTask.Triggers.Add(New TaskScheduler.DailyTrigger(1))
-    '                trigger.StartBoundary = taskTrigger.StartBoundary
-    '            ElseIf taskTrigger.TriggerType = TaskTriggerType.Weekly Then
-    '                Dim daysOfWeekSetting As New DaysOfTheWeek
-
-    '                triggerDescription = taskTrigger.ToString(New Globalization.CultureInfo("en-US"))
-
-    '                With triggerDescription
-    '                    If .Contains("Sunday") Then daysOfWeekSetting += DaysOfTheWeek.Sunday
-    '                    If .Contains("Monday") Then daysOfWeekSetting += DaysOfTheWeek.Monday
-    '                    If .Contains("Tuesday") Then daysOfWeekSetting += DaysOfTheWeek.Tuesday
-    '                    If .Contains("Wednesday") Then daysOfWeekSetting += DaysOfTheWeek.Wednesday
-    '                    If .Contains("Thursday") Then daysOfWeekSetting += DaysOfTheWeek.Thursday
-    '                    If .Contains("Friday") Then daysOfWeekSetting += DaysOfTheWeek.Friday
-    '                    If .Contains("Saturday") Then daysOfWeekSetting += DaysOfTheWeek.Saturday
-    '                End With
-
-    '                newTask.Triggers.Add(New WeeklyTrigger() With {.StartBoundary = taskTrigger.StartBoundary, .DaysOfWeek = daysOfWeekSetting})
-    '            End If
-    '        Next
-
-    '        Dim exeFileInfo As New IO.FileInfo(taskEXEPath)
-
-    '        newTask.Actions.Add(New ExecAction(Chr(34) & taskEXEPath & Chr(34), taskParameters, exeFileInfo.DirectoryName))
-
-    '        'If parameters = Nothing Then
-    '        '    newTask.Actions.Add(New ExecAction(Chr(34) & txtEXEPath.Text & Chr(34), Nothing, exeFileInfo.DirectoryName))
-    '        'Else
-    '        '    newTask.Actions.Add(New ExecAction(Chr(34) & txtEXEPath.Text & Chr(34), parameters, exeFileInfo.DirectoryName))
-    '        'End If
-
-    '        newTask.Principal.UserId = "NT AUTHORITY\System"
-
-    '        If GlobalVariables.boolWinXP = False Then
-    '            newTask.Principal.RunLevel = TaskRunLevel.Highest
-    '            newTask.Settings.Compatibility = TaskCompatibility.V1
-    '            newTask.Settings.AllowDemandStart = True
-    '            newTask.Settings.AllowHardTerminate = False
-    '            'newTask.Settings.UseUnifiedSchedulingEngine = False
-    '            newTask.Settings.StartWhenAvailable = True
-    '        End If
-
-    '        newTask.Settings.DisallowStartIfOnBatteries = False
-    '        newTask.Settings.RunOnlyIfIdle = False
-    '        newTask.Settings.StopIfGoingOnBatteries = False
-    '        newTask.Settings.ExecutionTimeLimit = Nothing
-
-    '        taskService.RootFolder.RegisterTaskDefinition(taskName, newTask)
-
-    '        newTask.Dispose()
-    '        taskService.Dispose()
-    '        newTask = Nothing
-    '        taskService = Nothing
-    '    Catch ex As Exception
-    '        Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
-    '        manuallyLoadCrashWindow(ex.Message, ex.StackTrace, ex.GetType)
-    '    End Try
-    'End Sub
-
     Sub checkScheduledTaskEXEPathsSubRoutine(ByRef taskService As TaskScheduler.TaskService, ByRef task As TaskScheduler.Task, commandLineArgument As String)
         If Functions.support.areWeInSafeMode() = True Then Exit Sub
 
@@ -502,10 +420,6 @@ Public Class Form1
 
                 boolShowDonationMessage = Functions.support.getBooleanValueFromRegistry(registryObject, "Show Donation Message", True)
 
-                'If Boolean.TryParse(registryObject.GetValue("UpdateAtNextRunTime", "False"), boolUpdateAtNextRunTime) = False Then
-                '    boolUpdateAtNextRunTime = False
-                'End If
-
                 ' Converts some settings over to Registry-based Settings.
                 If registryObject.GetValue("Log Restore Point Deletions", Nothing) = Nothing Then
                     registryObject.SetValue("Log Restore Point Deletions", My.Settings.boolLogDeletedRestorePoints.ToString)
@@ -545,34 +459,6 @@ Public Class Form1
 
                 globalVariables.boolExtendedLoggingDuringUpdating = Functions.support.getBooleanValueFromRegistry(registryObject, "Enable Extended Logging During Updating", "True")
                 EnableExtendedLoggingToolStripMenuItem.Checked = globalVariables.boolExtendedLoggingDuringUpdating
-
-                'If Boolean.TryParse(registryObject.GetValue("No Task", "False"), boolNoTask) Then
-                '    BypassNoUACLauncherToolStripMenuItem.Checked = boolNoTask
-                'End If
-
-                'If Boolean.TryParse(registryObject.GetValue("Extended Logging For Scheduled Tasks", "True"), boolExtendedLoggingForScheduledTasks) Then
-                '    ExtendedLoggingForScheduledTasks.Checked = boolExtendedLoggingForScheduledTasks
-                'Else
-                '    ExtendedLoggingForScheduledTasks.Checked = True
-                '    boolExtendedLoggingForScheduledTasks = True
-                'End If
-
-                'If Boolean.TryParse(registryObject.GetValue("Log Restore Point Deletions", "True"), boolLogRestorePointDeletions) Then
-                '    toolStripLogRestorePointDeletions.Checked = boolLogRestorePointDeletions
-                'Else
-                '    boolLogRestorePointDeletions = True
-                '    toolStripLogRestorePointDeletions.Checked = True
-                'End If
-
-                ' We're going to try to parse the value from the Registry.
-                'If Boolean.TryParse(registryObject.GetValue("Enable Extended Logging During Updating", "True"), globalVariables.boolExtendedLoggingDuringUpdating) Then
-                '    ' Good, we were able to parse it.
-                '    EnableExtendedLoggingToolStripMenuItem.Checked = globalVariables.boolExtendedLoggingDuringUpdating
-                'Else
-                '    ' Damn, we weren't able to parse it so let's give things the default value of True.
-                '    EnableExtendedLoggingToolStripMenuItem.Checked = True
-                '    globalVariables.boolExtendedLoggingDuringUpdating = True
-                'End If
 
                 registryObject.Close()
                 registryObject.Dispose()
