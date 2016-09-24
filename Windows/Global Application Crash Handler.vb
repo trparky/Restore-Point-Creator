@@ -94,62 +94,6 @@ Public Class frmCrash
         stopBitmapIcon = Nothing
     End Sub
 
-    'Private Sub btnSubmitCrashData_Click(sender As System.Object, e As System.EventArgs) Handles btnSubmitCrashData.Click
-
-    '    Dim submitThread As New Threading.Thread(Sub()
-    '                                                 Dim msgBoxResult As MsgBoxResult
-
-    '                                                 If txtEmailAddress.Text.Trim = Nothing Then
-    '                                                     msgBoxResult = MsgBox("You did not enter an email address." & vbCrLf & vbCrLf & "If you don't want to provide an email address, press the OK button.  Press the Cancel button to try again.", MsgBoxStyle.Information + MsgBoxStyle.OkCancel, Me.Text)
-
-    '                                                     If msgBoxResult = Microsoft.VisualBasic.MsgBoxResult.Cancel Then Exit Sub
-    '                                                 End If
-
-    '                                                 msgBoxResult = Microsoft.VisualBasic.MsgBoxResult.Retry
-
-    '                                                 If txtEmailAddress.Text.Trim <> Nothing And System.Text.RegularExpressions.Regex.IsMatch(txtEmailAddress.Text.Trim, "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?") = False Then
-    '                                                     msgBoxResult = MsgBox("Invalid Email Address Format." & vbCrLf & vbCrLf & "If you don't want to provide an email address, press the OK button.  Press the Cancel button to try again.", MsgBoxStyle.Information + MsgBoxStyle.OkCancel, Me.Text)
-
-    '                                                     If msgBoxResult = Microsoft.VisualBasic.MsgBoxResult.Cancel Then
-    '                                                         Exit Sub
-    '                                                     ElseIf msgBoxResult = Microsoft.VisualBasic.MsgBoxResult.Ok Then
-    '                                                         txtEmailAddress.Text = ""
-    '                                                     End If
-    '                                                 End If
-
-    '                                                 Dim stringWhatWereYouDoing As String = txtWhatWereYouDoing.Text
-    '                                                 If stringWhatWereYouDoing.Trim = Nothing Then
-    '                                                     stringWhatWereYouDoing = "(Nothing Provided)"
-    '                                                 End If
-
-    '                                                 Dim dataToBeSent As String = String.Format("doing={0}&program={1}&error={2}", UrlEncode(stringWhatWereYouDoing), UrlEncode(Application.ProductName), UrlEncode(txtStackTrace.Text))
-
-    '                                                 If (txtEmailAddress.Text.Trim = Nothing) = False Then
-    '                                                     dataToBeSent &= "&email=" & UrlEncode(txtEmailAddress.Text)
-    '                                                 End If
-
-    '                                                 If dataToBeSent.Trim = Nothing Then
-    '                                                     MsgBox("Something went wrong, post data is invalid.", MsgBoxStyle.Information, Me.Text)
-    '                                                     Exit Sub
-    '                                                 End If
-
-    '                                                 Dim webPageResults As String = postData(dataToBeSent, "http://www.toms-world.org/crashReporter")
-    '                                                 boolSubmittedCrashData = True
-    '                                                 dataToBeSent = Nothing
-    '                                                 stringWhatWereYouDoing = Nothing
-
-    '                                                 If webPageResults = "ok" Then
-    '                                                     MsgBox("Bug report submitted successfully.", MsgBoxStyle.Information, Me.Text)
-    '                                                 Else
-    '                                                     MsgBox("Bug report submission error." & vbCrLf & vbCrLf & "Error: " & webPageResults, MsgBoxStyle.Information, Me.Text)
-    '                                                 End If
-
-    '                                                 Process.GetCurrentProcess.Kill()
-    '                                             End Sub)
-    '    submitThread.Name = "Data Submission Thread"
-    '    submitThread.Start()
-    'End Sub
-
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         If lblHeader.Visible = True Then
             lblHeader.Visible = False
@@ -162,14 +106,6 @@ Public Class frmCrash
         Clipboard.SetText(text)
         MsgBox("Copied to Windows Clipboard.", MsgBoxStyle.Information, Me.Text)
     End Sub
-
-    'Private Sub btnSubmitAutomatically_Click(sender As Object, e As EventArgs) Handles btnSubmitAutomatically.Click
-    '    Dim frmSubmitCrashDataInstance As New frmSubmitCrashData
-    '    frmSubmitCrashDataInstance.Icon = My.Resources.RestorePoint_noBackground_2
-    '    frmSubmitCrashDataInstance.crashData = txtStackTrace.Text
-    '    frmSubmitCrashDataInstance.StartPosition = FormStartPosition.CenterParent
-    '    frmSubmitCrashDataInstance.ShowDialog()
-    'End Sub
 
     Private boolSubmitted As Boolean = False
     Private boolDoWeHaveAttachments As Boolean = False
@@ -410,7 +346,6 @@ Namespace exceptionHandler
 
                 Functions.support.launchURLInWebBrowser(globalVariables.webURLs.webPages.strCOMExceptionCrash)
                 Process.GetCurrentProcess.Kill()
-                ' ElseIf exceptionType = GetType(Management.ManagementException) And (exceptionMessage.caseInsensitiveContains("createRestorePoint") = True Or exceptionMessage.caseInsensitiveContains("restoreToSystemRestorePoint") = True) Then
             ElseIf exceptionType = GetType(Management.ManagementException) Then
                 Functions.eventLogFunctions.writeCrashToEventLog(exceptionObject)
 
@@ -508,27 +443,5 @@ Friend Class ThreadExceptionHandler
 
         Dim currentProcess As Process = Process.GetCurrentProcess()
         Environment.Exit(1)
-
-        'Try
-        '    If exceptionHandler.handleCrashWithAnErrorOrRedirectUserInstead(exceptionObject.Exception) = True Then
-        '        Dim crashWindow As New frmCrash
-        '        Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
-        '        crashWindow.exceptionMessage = exceptionObject.Exception.Message
-        '        crashWindow.exceptionStackTrace = exceptionObject.Exception.StackTrace
-        '        crashWindow.exceptionType = exceptionObject.Exception.GetType.ToString
-        '        crashWindow.ShowDialog()
-
-        '        Dim currentProcess As Process = Process.GetCurrentProcess()
-        '        currentProcess.Kill()
-        '    End If
-        'Catch
-        '    ' Fatal error, terminate program
-        '    Try
-        '        MessageBox.Show("Fatal Error", "Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Stop)
-        '    Finally
-        '        Dim currentProcess As Process = Process.GetCurrentProcess()
-        '        currentProcess.Kill()
-        '    End Try
-        'End Try
     End Sub
 End Class
