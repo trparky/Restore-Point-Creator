@@ -22,13 +22,6 @@ Public Class Disk_Space_Usage
         End If
     End Sub
 
-    'Sub addObjectToForm(ByVal objectToAdd As Object)
-    '    Me.Invoke(Sub()
-    '                  GroupBox1.Controls.Add(objectToAdd)
-    '                  objectToAdd = Nothing
-    '              End Sub)
-    'End Sub
-
     ''' <summary>This function creates labels on the GUI so that the messy code doesn't have to be in the main code branches.</summary>
     ''' <param name="strLabelText">The text you want the label to have.</param>
     ''' <param name="xPosition">Obviously.</param>
@@ -43,7 +36,6 @@ Public Class Disk_Space_Usage
         lblLabel.Text = strLabelText
         If boolBold = True Then lblLabel.Font = boldFont
 
-        'GroupBox1.Controls.Add(lblLabel)
         GroupBox1.Invoke(Sub() GroupBox1.Controls.Add(lblLabel))
 
         xPosition += lblLabel.Width
@@ -60,7 +52,6 @@ Public Class Disk_Space_Usage
 
         AddHandler lblManageLink.Click, Sub() manualFixSub(currentDriveLetter)
 
-        'GroupBox1.Controls.Add(lblManageLink)
         GroupBox1.Invoke(Sub() GroupBox1.Controls.Add(lblManageLink))
 
         lblManageLink = Nothing
@@ -85,7 +76,6 @@ Public Class Disk_Space_Usage
 
         ToolTip.SetToolTip(diskUsageBar, String.Format("{0}% Used ({1}% Free)", usedSpacePercentage, freeSpacePercentage))
 
-        'GroupBox1.Controls.Add(diskUsageBar)
         GroupBox1.Invoke(Sub() GroupBox1.Controls.Add(diskUsageBar))
 
         diskUsageBar = Nothing
@@ -262,25 +252,6 @@ Public Class Disk_Space_Usage
         End Try
     End Sub
 
-    'Public Shared Sub SetProgressNoAnimation(pb As ProgressBar)
-    '    Dim value As Short = pb.Value
-
-    '    ' To get around this animation, we need to move the progress bar backwards.
-    '    If value = pb.Maximum Then
-    '        ' Special case (can't set value > Maximum).
-    '        pb.Value = value
-    '        ' Set the value
-    '        ' Move it backwards
-    '        pb.Value = value - 1
-    '    Else
-    '        ' Move past
-    '        pb.Value = value + 1
-    '    End If
-
-    '    pb.Value = value
-    '    ' Move to correct value
-    'End Sub
-
     Private Sub Disk_Space_Usage_Activated(sender As Object, e As EventArgs) Handles Me.Activated
         GroupBox1.Focus()
     End Sub
@@ -350,7 +321,6 @@ Public Class Disk_Space_Usage
             controlObject.Dispose()
 
             Functions.PSLib.cEventHelper.RemoveAllEventHandlers(controlObject)
-            'GroupBox1.Controls.Remove(controlObject)
             controlObject = Nothing
         Next i
     End Sub
@@ -423,10 +393,6 @@ Public Class Disk_Space_Usage
         Else
             globalVariables.windows.frmManageSystemRestoreStorageSpace.BringToFront()
         End If
-    End Sub
-
-    Private Sub GroupBox1_Click(sender As Object, e As EventArgs) Handles GroupBox1.Click
-        'GroupBox1.Focus()
     End Sub
 
     Private Sub btnSetBarColor_Click(sender As Object, e As EventArgs) Handles btnSetBarColor.Click
