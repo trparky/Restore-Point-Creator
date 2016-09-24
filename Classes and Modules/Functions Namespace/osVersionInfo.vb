@@ -73,12 +73,6 @@
             End Try
 
             Return strOSName
-
-            'Try
-            '    strOSName &= String.Format(" (Microsoft .NET {0}.{1})", Environment.Version.Major, Environment.Version.Minor)
-            'Catch ex As Exception
-            '    strOSName &= " (Unknown Microsoft .NET Version)"
-            'End Try
         End Function
     End Module
 End Namespace
