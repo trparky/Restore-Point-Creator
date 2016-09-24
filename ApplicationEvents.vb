@@ -11,7 +11,6 @@ Namespace My
     ' StartupNextInstance: Raised when launching a single-instance application and the application is already active.
     ' NetworkAvailabilityChanged: Raised when the network connection is connected or disconnected.
     Partial Friend Class MyApplication
-        'Private pathToDeleteLogFile As String = System.IO.Path.Combine(New System.IO.FileInfo(Process.GetCurrentProcess.MainModule.FileName).DirectoryName, "Restore Point Delete Log File.log")
         Private pleaseWaitInstance As Please_Wait
 
         Private Sub MyApplication_Startup(sender As Object, e As ApplicationServices.StartupEventArgs) Handles Me.Startup
@@ -117,11 +116,7 @@ Namespace My
                 End Try
             End If
 
-            'GlobalVariables.notask() Registry.LocalMachine.OpenSubKey(globalVariables.registry.strProgramRegistryKey, True).GetValue("No Task", "True")
-
             Dim executablePathPathInfo As New IO.FileInfo(Windows.Forms.Application.ExecutablePath)
-            'Dim executablePathPathInfo As New System.IO.FileInfo(Process.GetCurrentProcess.MainModule.FileName)
-            'MsgBox(executablePathPathInfo.FullName)
 
 #If DEBUG Then
             If Debugger.IsAttached = True And boolAreWeAnAdministrator = False Then
@@ -158,8 +153,6 @@ Namespace My
                                 taskService.Dispose()
                                 taskService = Nothing
                             Catch ex As UnauthorizedAccessException
-                                ' If something goes wrong, we're just going to bypass the whole task engine entirely on this system.
-                                'Registry.LocalMachine.OpenSubKey(globalVariables.registry.strProgramRegistryKey, True).SetValue("No Task", "True", RegistryValueKind.String)
                                 Functions.support.reRunWithAdminUserRights()
                             Catch ex2 As Runtime.InteropServices.COMException
                                 ' If something goes wrong, we're just going to bypass the whole task engine entirely on this system.
@@ -170,8 +163,6 @@ Namespace My
                     End If
 
                     If boolAreWeAnAdministrator = True And My.Application.CommandLineArgs.Count = 1 Then
-                        'Dim task As TaskScheduler.Task
-
                         commandLineArgument = My.Application.CommandLineArgs(0).ToLower.Trim
 
                         If commandLineArgument = "-createtasks" Then
@@ -202,11 +193,6 @@ Namespace My
                 If boolAreWeAnAdministrator = False Then
                     Functions.support.reRunWithAdminUserRights()
                 End If
-
-                'Dim wmiCheckingThread As New Threading.Thread(AddressOf wmiCheckingProcess)
-                'wmiCheckingThread.Name = "System Event Log Checking for WMI Errors Thread"
-                'wmiCheckingThread.Priority = Threading.ThreadPriority.Highest
-                'wmiCheckingThread.Start()
 
                 Boolean.TryParse(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Keep X Amount of Restore Points", "False"), globalVariables.KeepXAmountOfRestorePoints)
 
@@ -255,7 +241,6 @@ Namespace My
                                 creatingThread.Name = "Restore Point Creating Thread"
                                 creatingThread.Start()
 
-                                'createSystemRestorePoint(True)
                                 e.Cancel = True
                                 Exit Sub
                             Case "-createrestorepointcustomname"
