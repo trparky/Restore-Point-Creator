@@ -39,8 +39,6 @@
                 If httpHelper.getWebData(globalVariables.webURLs.core.strFullChangeLog, changeLogData) = True Then
                     Dim stringWeAreLookingFor As String = String.Format("Version {0}.{1} Build {2}", globalVariables.version.shortMajor, globalVariables.version.shortMinor, globalVariables.version.shortBuild)
                     changeLogData = changeLogData.Replace(stringWeAreLookingFor, stringWeAreLookingFor & " (Currently Installed Version)")
-                    'Dim regExMatchString As String = String.Format("(.* --Version {0}\.{1} Build {2})", majorVersion, minorVersion, buildVersion)
-                    'changeLogData = System.Text.RegularExpressions.Regex.Replace(changeLogData, regExMatchString, "$1 (Currently Installed Version)")
 
                     RichTextBox1.Rtf = changeLogData
                     changeLogData = Nothing
