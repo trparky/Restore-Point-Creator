@@ -42,23 +42,6 @@ Namespace Functions.PSLib
                     lst.Add(fi)
                 End If
             Next
-
-            ' OLD version of the code - called itself recursively to get all fields
-            ' for 't' and ancestors and then tested each one to see if it's an EVENT
-            ' Much less efficient than the new code
-            '
-            '      foreach (FieldInfo fi in t.GetFields(AllBindings))
-            '      {
-            '        EventInfo ei = t.GetEvent(fi.Name, AllBindings);
-            '        if (ei != null)
-            '        {
-            '          lst.Add(fi);
-            '          Console.WriteLine(ei.Name);
-            '        }
-            '      }
-            '      if (t.BaseType != null)
-            '        BuildEventFields(t.BaseType, lst);
-
         End Sub
 
         '--------------------------------------------------------------------------------
