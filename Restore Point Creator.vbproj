@@ -323,6 +323,9 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Check for Updates Every.resx">
+      <DependentUpon>Check for Updates Every.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Windows\Confirm Restore Point Deletion.resx">
       <DependentUpon>Confirm Restore Point Deletion.vb</DependentUpon>
     </EmbeddedResource>
