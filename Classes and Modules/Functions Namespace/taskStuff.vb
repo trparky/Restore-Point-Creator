@@ -2,16 +2,6 @@
 
 Namespace Functions.taskStuff
     Module taskStuff
-        'Private Function parseExecutableOutOfScheduledTaskAction(input As String) As String
-        '    Dim matches As Match = Regex.Match(input, "((?:""|'){0,1}[A-Za-z]:\\.*\.(?:bat|bin|cmd|com|cpl|exe|gadget|inf1|ins|inx|isu|job|jse|lnk|msc|msi|msp|mst|paf|pif|ps1|reg|rgs|sct|shb|shs|u3p|vb|vbe|vbs|vbscript|ws|wsf)(?:""|'){0,1} {0,1})(.*)", RegexOptions.IgnoreCase)
-
-        '    If matches.Success = True Then
-        '        Return matches.Groups(1).Value.Replace(Chr(34), "").Trim
-        '    Else
-        '        Return Nothing
-        '    End If
-        'End Function
-
         Public Function getOurTaskFolder(ByRef taskService As TaskScheduler.TaskService) As TaskScheduler.TaskFolder
             Return If(taskService.GetFolder(globalVariables.taskFolder), taskService.RootFolder.CreateFolder(globalVariables.taskFolder))
         End Function
@@ -241,8 +231,6 @@ Namespace Functions.taskStuff
                 taskService = Nothing
             Catch ex As Exception
                 eventLogFunctions.writeCrashToEventLog(ex)
-                'Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registry.strProgramRegistryKey, True).SetValue("No Task", "True", Microsoft.Win32.RegistryValueKind.String)
-                'reRunAsAdmin()
             End Try
         End Sub
 
@@ -331,19 +319,6 @@ Namespace Functions.taskStuff
             End Try
         End Sub
 
-        'Public Sub deleteTask(task As TaskScheduler.Task, Optional taskFolder As String = globalVariables.constStringRoot)
-        '    Try
-        '        Using taskServiceObject As TaskScheduler.TaskService = New TaskScheduler.TaskService()
-        '            If taskFolder = globalVariables.constStringRoot Then
-        '                taskServiceObject.RootFolder.DeleteTask(task.Name, False)
-        '            Else
-        '                taskServiceObject.RootFolder.SubFolders(taskFolder).DeleteTask(task.Name, False)
-        '            End If
-        '        End Using
-        '    Catch ex As Exception
-        '    End Try
-        'End Sub
-
         ''' <summary>Deletes a scheduled task.</summary>
         ''' <param name="taskName">The task name to be deleted.</param>
         ''' <param name="taskFolder">The task folder in which the task can be found. The default input is "root".</param>
@@ -361,19 +336,10 @@ Namespace Functions.taskStuff
         End Sub
 
         Public Sub setMultiRunForTask()
-            'If osVersionInfo.isWindowsVista() = True Then Exit Sub
-
             Dim task As TaskScheduler.Task = Nothing
 
             If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC", task) = True Then
                 If task.Definition.Settings.MultipleInstances <> TaskScheduler.TaskInstancesPolicy.Parallel Then
-                    ' Was causing some issues with some users. Until the issue is fixed, we're going to use the workaround below.
-                    'task.Definition.Settings.MultipleInstances = TaskScheduler.TaskInstancesPolicy.Parallel
-                    'task.RegisterChanges()
-                    'task.Dispose()
-                    'eventLogFunctions.writeToSystemEventLog("Updated the RunTime task for multi-run mode.")
-
-                    ' Workaround for issue that presented itself with the above code.
                     deleteTask(task)
                     task.Dispose()
 
