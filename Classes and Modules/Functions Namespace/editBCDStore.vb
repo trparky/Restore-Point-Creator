@@ -33,33 +33,5 @@ Namespace Functions.editBCDStore
             Dim currentBootloader As New ManagementObject(managementScope, managementPath, Nothing)
             currentBootloader.InvokeMethod("DeleteElement", New Object() {BcdOSLoaderInteger_SafeBoot})
         End Sub
-
-        'Function isSafeModeBootEnabled() As Boolean
-        '    Dim bcdEditOutput As String = Nothing
-        '    If Functions.executeShellCommandAndGetOutput(bcdEditOutput, "bcdedit") = True Then
-        '        If bcdEditOutput.caseInsensitiveContains("safeboot", False) = True Then
-        '            Return True
-        '        Else
-        '            Return False
-        '        End If
-        '    Else
-        '        Return True
-        '    End If
-        'End Function
-
-        'Public Sub RemoveSafeboot()
-        '    Dim removeSafeModeBootThread As New Threading.Thread(Sub()
-        '                                                             Try
-        '                                                                 If isSafeModeBootEnabled() = True Then
-        '                                                                     Dim currentBootloader As New ManagementObject(managementScope, managementPath, Nothing)
-        '                                                                     currentBootloader.InvokeMethod("DeleteElement", New Object() {BcdOSLoaderInteger_SafeBoot})
-        '                                                                 End If
-        '                                                             Catch ex As Runtime.InteropServices.COMException
-        '                                                                 Debug.WriteLine("A COMException occurred here but we don't care")
-        '                                                             End Try
-        '                                                         End Sub)
-        '    removeSafeModeBootThread.Name = "Remove Safe Mode Boot Setting Thread"
-        '    removeSafeModeBootThread.Start()
-        'End Sub
     End Class
 End Namespace
