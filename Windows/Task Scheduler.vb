@@ -125,7 +125,6 @@ Public Class frmTaskScheduler
 
         txtDays.Text = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("MaxDays", 15).ToString
         txtDaysDelete.Text = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("MaxDays", 15).ToString
-        'txtCustomName.Text = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registry.strProgramRegistryKey, False).GetValue("Custom Name for Scheduled Restore Points", "")
 
         ' Checks to see if the Registry Value exists.
         If (Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).GetValue("Every", Nothing) = Nothing) = False Then
@@ -164,7 +163,6 @@ Public Class frmTaskScheduler
 
         Dim taskService As New TaskService
         Dim taskTriggers As TriggerCollection
-        'Dim taskDescription As String
         Dim boolDoesTaskExist As Boolean = False
         Dim taskObject As Task = Nothing
 
@@ -259,15 +257,6 @@ Public Class frmTaskScheduler
 
             btnDeleteTask.Enabled = True
         End If
-
-        'If (txtEveryDay.Text.Trim = Nothing) = False And boolDoesTaskExist = True Then
-        '    radEvery.Checked = True
-        'Else
-        '    txtEveryDay.Text = Nothing
-        '    lblDays.Visible = False
-        '    lblEvery.Visible = False
-        '    txtEveryDay.Visible = False
-        'End If
 
         taskService.Dispose()
         taskService = Nothing
@@ -369,7 +358,6 @@ Public Class frmTaskScheduler
             newTask.Settings.Compatibility = TaskCompatibility.V2
             newTask.Settings.AllowDemandStart = True
             newTask.Settings.AllowHardTerminate = False
-            'newTask.Settings.UseUnifiedSchedulingEngine = False
             newTask.Settings.StartWhenAvailable = chkRunMissedTask.Checked
 
             newTask.Settings.DisallowStartIfOnBatteries = False
@@ -599,7 +587,6 @@ Public Class frmTaskScheduler
             newTask.Settings.Compatibility = TaskCompatibility.V2
             newTask.Settings.AllowDemandStart = True
             newTask.Settings.AllowHardTerminate = False
-            'newTask.Settings.UseUnifiedSchedulingEngine = False
             newTask.Settings.StartWhenAvailable = chkRunMissedTaskDelete.Checked
 
             newTask.Settings.DisallowStartIfOnBatteries = False
