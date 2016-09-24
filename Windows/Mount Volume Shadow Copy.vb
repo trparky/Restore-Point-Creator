@@ -32,33 +32,6 @@ Public Class Mount_Volume_Shadow_Copy
 
         searcher.Dispose()
         searcher = Nothing
-
-        'Dim searcher As New ManagementObjectSearcher("root\CIMV2", "SELECT * FROM Win32_ShadowCopy")
-
-        'listShadowCopyIDs.Items.Clear()
-        'shadowCopyCache.Clear()
-        'ListBox1.Items.Clear()
-
-        'Dim timeCreated As Date
-
-        'For Each queryObj As ManagementObject In searcher.Get()
-        '    timeCreated = Functions.parseSystemRestorePointCreationDate(queryObj("InstallDate").ToString).ToUniversalTime
-
-        '    itemTitle = (timeCreated.ToLongDateString & " at " & timeCreated.ToLongTimeString).Trim
-
-        '    If shadowCopyCache.ContainsKey(Functions.SHA1ChecksumString(itemTitle)) = False Then
-        '        shadowCopyCache.Add(, queryObj("DeviceObject").ToString)
-        '        listShadowCopyIDs.Items.Add((timeCreated.ToLongDateString & " at " & timeCreated.ToLongTimeString).Trim)
-
-        '        Debug.WriteLine("shadow copy info | " & itemTitle & " | " & queryObj("DeviceObject").ToString)
-        '    End If
-
-        '    timeCreated = Nothing
-        '    itemTitle = Nothing
-        'Next
-
-        'searcher.Dispose()
-        'searcher = Nothing
     End Sub
 
     Private Sub Mount_Volume_Shadow_Copy_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -80,9 +53,7 @@ Public Class Mount_Volume_Shadow_Copy
             If IO.Directory.Exists(globalVariables.shadowCopyMountFolder) Then IO.Directory.Delete(globalVariables.shadowCopyMountFolder)
 
             If shadowCopyCache.ContainsKey(listShadowCopyIDs.SelectedIndex) = True Then
-                'Dim deviceID As String = shadowCopyCache(Functions.SHA1ChecksumString(listShadowCopyIDs.SelectedItem.ToString.Trim)) & "\"
                 Dim deviceID As String = shadowCopyCache(listShadowCopyIDs.SelectedIndex) & "\"
-                Debug.WriteLine("deviceID = " & deviceID)
 
                 Dim mountProcessInfo As New ProcessStartInfo
                 mountProcessInfo.FileName = IO.Path.Combine(GlobalVariables.strPathToSystemFolder, "cmd.exe")
