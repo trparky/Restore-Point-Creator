@@ -212,55 +212,6 @@ Namespace Functions.support
             My.Settings.Save()
         End Sub
 
-        'Public Sub deleteProgramConfigFile()
-        '    AddHandler Application.ApplicationExit, Sub()
-        '                                                If IO.File.Exists(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath) = True Then IO.File.Delete(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath)
-
-        '                                                If IO.File.Exists(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoaming).FilePath) = True Then IO.File.Delete(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoaming).FilePath)
-
-        '                                                If IO.File.Exists(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).FilePath) = True Then IO.File.Delete(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).FilePath)
-        '                                            End Sub
-        '    Dim path As String
-
-        '    path = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath
-        '    MsgBox("zfgdsfgdanbdbndf " & path)
-
-        '    Try
-        '        IO.File.Delete(path)
-        '        MsgBox("The deletion of """ & path & """ was successful.", MsgBoxStyle.Information, "Restore Point Creator")
-        '    Catch ex2 As Exception
-        '        MsgBox("Unable to delete """ & path & """." & vbCrLf & vbCrLf & ex2.Message & " " & ex2.StackTrace, MsgBoxStyle.Critical, "Restore Point Creator")
-        '    End Try
-
-        '    path = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoaming).FilePath
-
-        '    Try
-        '        IO.File.Delete(path)
-        '        MsgBox("The deletion of """ & path & """ was successful.", MsgBoxStyle.Information, "Restore Point Creator")
-        '    Catch ex2 As Exception
-        '        MsgBox("Unable to delete """ & path & """." & vbCrLf & vbCrLf & ex2.Message & " " & ex2.StackTrace, MsgBoxStyle.Critical, "Restore Point Creator")
-        '    End Try
-
-        '    path = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).FilePath
-
-        '    Try
-        '        IO.File.Delete(path)
-        '        MsgBox("The deletion of """ & path & """ was successful.", MsgBoxStyle.Information, "Restore Point Creator")
-        '    Catch ex2 As Exception
-        '        MsgBox("Unable to delete """ & path & """." & vbCrLf & vbCrLf & ex2.Message & " " & ex2.StackTrace, MsgBoxStyle.Critical, "Restore Point Creator")
-        '    End Try
-
-        '    'Try
-        '    '    If IO.File.Exists(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath) = True Then
-        '    '        IO.File.Delete(ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath)
-        '    '        eventLogFunctions.writeToSystemEventLog("The program's user config file was found to be corrupted, the config file was deleted.", EventLogEntryType.Information)
-        '    '    End If
-        '    'Catch ex As Exception
-        '    '    eventLogFunctions.writeToSystemEventLog("There was an error while attempting to delete the program's user config file.", EventLogEntryType.Error)
-        '    '    eventLogFunctions.writeCrashToEventLog(ex)
-        '    'End Try
-        'End Sub
-
         ''' <summary>ZIPs the exported log file.</summary>
         ''' <param name="pathToZIPFile">The path the ZIP file we will be working with.</param>
         ''' <param name="fileToAddToZIPFile">The path to the file we will be adding to the ZIP file.</param>
@@ -620,11 +571,6 @@ Namespace Functions.support
         End Function
 
         Public Function parseSystemRestorePointCreationDate(strDate As String, Optional boolFullDateParsing As Boolean = True) As Date
-            ' Parses out the date.  This is the old way of doing the below code with the use of a Regular Expression.
-            'year = Mid$(strDate, 1, 4)
-            'month = Mid$(strDate, 5, 2)
-            'day = Mid$(strDate, 7, 2)
-
             Dim regexMatches As Match = globalVariables.regexRestorePointCreationTimeParser.Match(strDate)
             Dim year, month, day, second, minute, hour As Integer
 
@@ -813,7 +759,6 @@ Namespace Functions.support
         End Function
 
         Public Function isNumeric(input As String) As Boolean
-            'Return Regex.IsMatch(input.Trim, "\A[0-9]*\Z")
             Return Regex.IsMatch(input.Trim, "\A-{0,1}[0-9.]*\Z")
         End Function
 
