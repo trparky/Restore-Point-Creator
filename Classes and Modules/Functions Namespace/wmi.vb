@@ -50,7 +50,6 @@ Namespace Functions.wmi
                     boolResult = False
                     Return Nothing
                 Else
-                    'Debug.WriteLine("managementObjectSearcher.Get.Count = " & managementObjectSearcher.Get.Count)
                     Dim managementObjectCollection As Management.ManagementObjectCollection = managementObjectSearcher.Get()
 
                     Dim deviceID As String = managementObjectCollection(0)("DeviceID").ToString
@@ -105,49 +104,6 @@ Namespace Functions.wmi
             systemRestorePoints.Dispose()
             systemRestorePoints = Nothing
         End Sub
-
-        'Public Function doesProcessIDExist(PID As Integer) As Boolean
-        '    Try
-        '        Dim searcher As New Management.ManagementObjectSearcher("root\CIMV2", String.Format("Select * FROM Win32_Process WHERE ProcessId={0}", PID))
-
-        '        If searcher.Get.Count = 0 Then
-        '            searcher.Dispose()
-        '            Return False
-        '        Else
-        '            searcher.Dispose()
-        '            Return True
-        '        End If
-        '    Catch ex3 As Runtime.InteropServices.COMException
-        '        giveComExceptionCrashMessage()
-        '        Return False
-        '    Catch ex As Exception
-        '        Return False
-        '    End Try
-        'End Function
-
-        'Public Sub searchForProcessAndKillIt(strFileName As String, boolFullFilePathPassed As Boolean)
-        '    Dim fullFileName As String
-
-        '    If boolFullFilePathPassed = True Then
-        '        fullFileName = strFileName
-        '    Else
-        '        fullFileName = New IO.FileInfo(strFileName).FullName
-        '    End If
-
-        '    Dim searcher As New Management.ManagementObjectSearcher("root\CIMV2", String.Format("Select ExecutablePath, ProcessId FROM Win32_Process WHERE ExecutablePath = '{0}'", fullFileName.addSlashes()))
-
-        '    Try
-        '        For Each queryObj As Management.ManagementObject In searcher.Get()
-        '            support.killProcess(Integer.Parse(queryObj("ProcessId").ToString))
-        '        Next
-
-        '        'debug.writeline("All processes killed... Update process can continue.")
-        '    Catch ex3 As Runtime.InteropServices.COMException
-        '        giveComExceptionCrashMessage()
-        '    Catch err As Management.ManagementException
-        '        ' Does nothing
-        '    End Try
-        'End Sub
 
         Public Function checkToSeeIfSystemRestoreIsEnabledOnSystemDrive() As Boolean
             Try
@@ -235,17 +191,7 @@ Namespace Functions.wmi
 
                 Dim oOutParams As Management.ManagementBaseObject = managementClass.InvokeMethod("Restore", managementParameters, Nothing)
 
-                'Dim managementObject As New ManagementObject("root\DEFAULT", "SystemRestore.ReplaceKeyPropery='ReplaceKeyPropertyValue'", Nothing)
-                'Dim inParams As ManagementBaseObject = managementObject.GetMethodParameters("Restore")
-                'inParams("SequenceNumber") = point
-                'Dim outParams As ManagementBaseObject = managementObject.InvokeMethod("Restore", inParams, Nothing)
-                'rebootSystem()
-
-                'Dim systemRestorePointObject As Object = GetObject("winmgmts:\\.\root\Default:SystemRestore")
-                'systemRestorePointObject.Restore(point)
-
                 support.rebootSystem()
-                'System.Diagnostics.Process.Start("shutdown.exe", "-r -t 0")
             Catch ex4 As ArgumentException
                 eventLogFunctions.writeCrashToEventLog(ex4)
                 MsgBox("Unable to restore system to selected restore point, a COM Exception has occurred. Restore process aborted.", MsgBoxStyle.Critical, "Restore Point Creator")
