@@ -36,13 +36,6 @@ Module StringExtensions
     Public Function caseInsensitiveContains(haystack As String, needle As String) As Boolean
         Dim index As Integer = haystack.IndexOf(needle, StringComparison.OrdinalIgnoreCase)
         Return (index >= 0)
-
-        'Try
-        '    If boolDoEscaping = True Then needle = Regex.Escape(needle)
-        '    Return Regex.IsMatch(haystack, needle, RegexOptions.IgnoreCase)
-        'Catch ex As Exception
-        '    Return False
-        'End Try
     End Function
 
     <Extension()>
