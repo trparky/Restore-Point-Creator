@@ -51,7 +51,6 @@
     End Sub
 
     Private Sub Please_Wait_LostFocus(sender As Object, e As EventArgs) Handles Me.LostFocus
-        'Functions.SetForegroundWindow(Me.Handle)
         Try
             If allowAutoFocus = True Then Me.Focus()
         Catch ex As Exception
