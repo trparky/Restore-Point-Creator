@@ -1621,13 +1621,11 @@ Public Class Form1
     End Sub
 
     Private Sub formLoadCheckForUpdatesRoutine(Optional forceRunOfUpdate As Boolean = False)
-        If forceRunOfUpdate = True Then GoTo updateCode
-
-        If My.Settings.CheckForUpdates = True Then
+        If My.Settings.CheckForUpdates = True Or forceRunOfUpdate = True Then
             toolStripAutomaticallyCheckForUpdates.Checked = True
+            Dim longDateDiff As Long = Math.Abs(DateDiff(DateInterval.Day, Now, My.Settings.lastUpdateTime))
 
-            If My.Settings.ProgramExecutionsSinceLastUpdateCheck >= 50 Or Math.Abs(DateDiff(DateInterval.Day, Now, My.Settings.lastUpdateTime)) >= My.Settings.checkForUpdatesEveryInDays Then
-updateCode:
+            If My.Settings.ProgramExecutionsSinceLastUpdateCheck >= 50 Or longDateDiff >= My.Settings.checkForUpdatesEveryInDays Or forceRunOfUpdate = True Then
                 My.Settings.ProgramExecutionsSinceLastUpdateCheck = 0
                 My.Settings.Save()
 
