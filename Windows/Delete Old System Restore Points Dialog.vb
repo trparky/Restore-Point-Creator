@@ -60,8 +60,6 @@ Public Class frmDeleteOldSystemRestorePoints
 
     Private Sub frmDeleteOldSystemRestorePoints_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
         txtMaxAge.Select()
-        'Functions.loadIcon(btnOK, Functions.ResizeImage(My.Resources.imageNext, 15, 15))
-        'Functions.loadIcon(btnCancel, Functions.ResizeImage(My.Resources.removeSmall, 15, 15))
     End Sub
 
     Private Sub frmDeleteOldSystemRestorePoints_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
