@@ -356,7 +356,7 @@ Public Class eventLogForm
                             globalVariables.windows.frmManuallySubmitCrashDataInstance.crashData = eventLogText.Text
                             globalVariables.windows.frmManuallySubmitCrashDataInstance.Show()
 
-                            globalVariables.windows.frmManuallySubmitCrashDataInstance.Location = Functions.support.returnPreferedPlaceOnScreen(Me)
+                            globalVariables.windows.frmManuallySubmitCrashDataInstance.Location = My.Settings.ManuallySubmitCrashDataInstanceLocation
                         Else
                             globalVariables.windows.frmManuallySubmitCrashDataInstance.BringToFront()
                             globalVariables.windows.frmManuallySubmitCrashDataInstance.crashData = eventLogText.Text

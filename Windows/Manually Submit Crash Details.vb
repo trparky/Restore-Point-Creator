@@ -30,6 +30,7 @@
             End If
         End If
 
+        My.Settings.ManuallySubmitCrashDataInstanceLocation = Me.Location
         globalVariables.windows.frmManuallySubmitCrashDataInstance.Dispose()
         globalVariables.windows.frmManuallySubmitCrashDataInstance = Nothing
     End Sub
