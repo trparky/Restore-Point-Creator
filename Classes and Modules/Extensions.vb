@@ -17,6 +17,16 @@ Module DateExtensions
 End Module
 
 Module StringExtensions
+    ''' <summary>This function operates a lot like Replace() but is case-InSeNsItIvE.</summary>
+    ''' <param name="source">The source String, aka the String where the data will be replaced in.</param>
+    ''' <param name="replace">What you want to replace in the String.</param>
+    ''' <param name="replaceWith">What you want to replace with in the String.</param>
+    ''' <return>Returns a String value.</return>
+    <Extension()>
+    Public Function caseInsensitiveReplace(source As String, replace As String, replaceWith As String) As String
+        Return Regex.Replace(source, Regex.Escape(replace), replaceWith, RegexOptions.IgnoreCase)
+    End Function
+
     ' PHP like addSlashes and stripSlashes. Call using String.addSlashes() and String.stripSlashes().
     <Extension()>
     Public Function addSlashes(unsafeString As String) As String
