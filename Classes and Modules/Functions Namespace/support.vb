@@ -207,11 +207,6 @@ Namespace Functions.support
             End Try
         End Sub
 
-        Sub deleteProgramConfigFile()
-            My.Settings.Reset()
-            My.Settings.Save()
-        End Sub
-
         ''' <summary>ZIPs the exported log file.</summary>
         ''' <param name="pathToZIPFile">The path the ZIP file we will be working with.</param>
         ''' <param name="fileToAddToZIPFile">The path to the file we will be adding to the ZIP file.</param>
