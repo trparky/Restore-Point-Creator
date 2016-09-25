@@ -238,10 +238,6 @@ Namespace Functions.support
         <Runtime.InteropServices.DllImport("Srclient.dll")> Public Function SRRemoveRestorePoint(index As Integer) As Integer
         End Function
 
-        Public Function returnPreferedPlaceOnScreen(formObject As Form) As Point
-            Return (Screen.FromControl(formObject)).Bounds.Location + New Point(100, 100)
-        End Function
-
         ''' <summary>Converts the number of Bytes to a nice way of saying it, like MBs, GBs, etc.</summary>
         ''' <param name="size">The amount of data in Bytes.</param>
         ''' <param name="roundToNearestWholeNumber">Tells the function if it should round the number to the nearest whole number.</param>
