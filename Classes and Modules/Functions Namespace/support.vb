@@ -666,15 +666,6 @@ Namespace Functions.support
             Threading.Thread.Sleep(250) ' We're going to sleep (again) to give the system some time to kill the process.
         End Sub
 
-        Private Function convertLineFeeds(Input As String) As String
-            ' Checks to see if the file is in Windows linefeed format or UNIX linefeed format.
-            If Input.Contains(vbCrLf) Then
-                Return Input ' It's in Windows linefeed format so we return the output as is.
-            Else
-                Return Input.Replace(vbLf, vbCrLf) ' It's in UNIX linefeed format so we have to convert it to Windows before we return the output.
-            End If
-        End Function
-
         Public Function calculatePercentageValue(longSmallerNumber As ULong, longLargerNumber As ULong) As Double
             Dim result As Double = Math.Round(((longSmallerNumber / longLargerNumber) * 100), 2)
 
