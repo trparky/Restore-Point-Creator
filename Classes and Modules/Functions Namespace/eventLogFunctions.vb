@@ -55,7 +55,7 @@
                     End If
 
                     If Not EventLog.SourceExists(logSource, host) Then
-                        EventLog.CreateEventSource(logSource, logName, host)
+                        EventLog.CreateEventSource(New EventSourceCreationData(logSource, logName))
                     End If
 
                     Dim eventLogObject As New EventLog(logName, host, logSource)
