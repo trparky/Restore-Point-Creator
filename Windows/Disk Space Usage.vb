@@ -348,29 +348,20 @@ Public Class Disk_Space_Usage
     End Sub
 
     Sub doTheResizingOfTheBars()
-        Dim controlObject As Control
-        Dim smoothProgressBarObject As SmoothProgressBar
+        Dim index As Integer
 
         If GroupBox1.VerticalScroll.Visible = True Then
-            For i As Integer = (GroupBox1.Controls.Count - 1) To 0 Step -1
-                controlObject = GroupBox1.Controls(i)
-
-                If controlObject.GetType.ToString = "Tom.SmoothProgressBar" Then
-                    smoothProgressBarObject = DirectCast(controlObject, SmoothProgressBar)
-
-                    smoothProgressBarObject.Width = GroupBox1.Width - 48
+            For index = (GroupBox1.Controls.Count - 1) To 0 Step -1
+                If GroupBox1.Controls(index).GetType.ToString.Equals("Tom.SmoothProgressBar", StringComparison.OrdinalIgnoreCase) Then
+                    DirectCast(GroupBox1.Controls(index), SmoothProgressBar).Width = GroupBox1.Width - 48
                 End If
-            Next i
+            Next index
         Else
-            For i As Integer = (GroupBox1.Controls.Count - 1) To 0 Step -1
-                controlObject = GroupBox1.Controls(i)
-
-                If controlObject.GetType.ToString = "Tom.SmoothProgressBar" Then
-                    smoothProgressBarObject = DirectCast(controlObject, SmoothProgressBar)
-
-                    smoothProgressBarObject.Width = GroupBox1.Width - 30
+            For index = (GroupBox1.Controls.Count - 1) To 0 Step -1
+                If GroupBox1.Controls(index).GetType.ToString.Equals("Tom.SmoothProgressBar", StringComparison.OrdinalIgnoreCase) Then
+                    DirectCast(GroupBox1.Controls(index), SmoothProgressBar).Width = GroupBox1.Width - 30
                 End If
-            Next i
+            Next index
         End If
     End Sub
 
