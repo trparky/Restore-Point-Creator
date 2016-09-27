@@ -7,7 +7,6 @@ Public Class Disk_Space_Usage
     Private boolLoadingDiskData As Boolean = False
 
     Sub manualFixSub(Optional drive As String = "C:")
-        'debug.writeline("drive = " & drive)
         If (globalVariables.windows.frmManageSystemRestoreStorageSpace Is Nothing) Then
             Dim screen As Screen = Screen.FromControl(Me)
 
