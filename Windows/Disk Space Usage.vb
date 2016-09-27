@@ -14,9 +14,8 @@ Public Class Disk_Space_Usage
             globalVariables.windows.frmManageSystemRestoreStorageSpace = New frmManageSystemRestoreStorageSpace()
             globalVariables.windows.frmManageSystemRestoreStorageSpace.StartPosition = FormStartPosition.CenterParent
             globalVariables.windows.frmManageSystemRestoreStorageSpace.preSelectedDriveLetter = drive
+            globalVariables.windows.frmManageSystemRestoreStorageSpace.Location = My.Settings.ManageSystemRestoreStorageSpaceWindowLocation
             globalVariables.windows.frmManageSystemRestoreStorageSpace.Show()
-
-            globalVariables.windows.frmManageSystemRestoreStorageSpace.Location = screen.Bounds.Location + New Point(100, 100)
         Else
             globalVariables.windows.frmManageSystemRestoreStorageSpace.BringToFront()
         End If
