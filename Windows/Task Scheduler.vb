@@ -1,6 +1,7 @@
 ﻿Imports Microsoft.Win32.TaskScheduler
 Imports System.Management
 Imports System.Globalization
+Imports Microsoft.Win32
 
 Public Class frmTaskScheduler
     Private boolDoneLoading As Boolean = False
@@ -116,19 +117,19 @@ Public Class frmTaskScheduler
     Private Sub frmTaskScheduler_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         checkWindowsTaskScheduler()
 
-        Dim boolValueDeleteOldRestorePointsAsString As String = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Delete Old Restore Points", "False").Trim
+        Dim boolValueDeleteOldRestorePointsAsString As String = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Delete Old Restore Points", "False").Trim
         Dim boolValueDeleteOldRestorePoints As Boolean
 
         If Boolean.TryParse(boolValueDeleteOldRestorePointsAsString, boolValueDeleteOldRestorePoints) = True Then
             chkDeleteOldRestorePoints.Checked = boolValueDeleteOldRestorePoints
         End If
 
-        txtDays.Text = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("MaxDays", 15).ToString
-        txtDaysDelete.Text = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("MaxDays", 15).ToString
+        txtDays.Text = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("MaxDays", 15).ToString
+        txtDaysDelete.Text = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("MaxDays", 15).ToString
 
         ' Checks to see if the Registry Value exists.
-        If (Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).GetValue("Every", Nothing) = Nothing) = False Then
-            txtEveryDay.Text = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).GetValue("Every")
+        If (Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).GetValue("Every", Nothing) = Nothing) = False Then
+            txtEveryDay.Text = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).GetValue("Every")
 
             If Functions.support.isNumeric(txtEveryDay.Text) = False Then
                 txtEveryDay.Text = Nothing
@@ -290,7 +291,7 @@ Public Class frmTaskScheduler
     End Sub
 
     Private Sub btnSaveTask_Click(sender As Object, e As EventArgs) Handles btnSaveTask.Click
-        Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Every", False)
+        Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Every", False)
         Dim shortEvery As Short = Nothing
 
         If radEvery.Checked = True And Short.TryParse(txtEveryDay.Text.Trim, shortEvery) = False Then
@@ -384,13 +385,13 @@ Public Class frmTaskScheduler
                     txtDays.Text = 10
                 End If
 
-                Dim regKey As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
-                regKey.SetValue("MaxDays", Short.Parse(txtDays.Text.Trim), Microsoft.Win32.RegistryValueKind.String)
-                regKey.SetValue(strDeleteTaskName, "True", Microsoft.Win32.RegistryValueKind.String)
+                Dim regKey As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
+                regKey.SetValue("MaxDays", Short.Parse(txtDays.Text.Trim), RegistryValueKind.String)
+                regKey.SetValue(strDeleteTaskName, "True", RegistryValueKind.String)
                 regKey.Close()
                 regKey.Dispose()
             Else
-                Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue(strDeleteTaskName, "False", Microsoft.Win32.RegistryValueKind.String)
+                Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue(strDeleteTaskName, "False", RegistryValueKind.String)
             End If
 
             boolThingsChanged = False
@@ -405,7 +406,7 @@ Public Class frmTaskScheduler
 
             MsgBox("There was an error creating/updating your task, please try again.", MsgBoxStyle.Critical, Me.Text)
         Catch ex As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New System.Globalization.CultureInfo("en-US")
+            Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
         Finally
             taskService.Dispose()
@@ -437,7 +438,7 @@ Public Class frmTaskScheduler
             boolThingsChanged = False
             MsgBox("Task deleted.", MsgBoxStyle.Information, Me.Text)
         Catch ex As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
+            Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
         End Try
     End Sub
@@ -447,7 +448,7 @@ Public Class frmTaskScheduler
             tellTheProgramThingsChanged()
 
             If chkDeleteOldRestorePoints.Checked Then
-                txtDays.Text = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("MaxDays", 15).ToString
+                txtDays.Text = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("MaxDays", 15).ToString
 
                 ' Checks for valid data.
                 If Functions.support.isNumeric(txtDays.Text) = False Then
@@ -483,12 +484,12 @@ Public Class frmTaskScheduler
                 deleteOldRestorePointsTaskSettings.Enabled = True
             End If
 
-            Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue(strDeleteTaskName, chkDeleteOldRestorePoints.Checked.ToString, Microsoft.Win32.RegistryValueKind.String)
+            Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue(strDeleteTaskName, chkDeleteOldRestorePoints.Checked.ToString, RegistryValueKind.String)
 
             My.Settings.deleteOldRestorePoints2 = chkDeleteOldRestorePoints.Checked
             My.Settings.Save()
         Catch ex As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New System.Globalization.CultureInfo("en-US")
+            Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
         End Try
     End Sub
@@ -509,7 +510,7 @@ Public Class frmTaskScheduler
     Private Sub btnSet_Click(sender As Object, e As EventArgs) Handles btnSet.Click
         Dim shortDays As Short
         If Short.TryParse(txtDays.Text, shortDays) = True Then
-            Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue("MaxDays", shortDays.ToString, Microsoft.Win32.RegistryValueKind.String)
+            Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue("MaxDays", shortDays.ToString, RegistryValueKind.String)
 
             MsgBox("Max Age Setting Saved.", MsgBoxStyle.Information, "Setting Saved.")
         Else
@@ -531,7 +532,7 @@ Public Class frmTaskScheduler
                 Exit Sub
             End If
 
-            Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue("MaxDays", Short.Parse(txtDays.Text.Trim), Microsoft.Win32.RegistryValueKind.String)
+            Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue("MaxDays", Short.Parse(txtDays.Text.Trim), RegistryValueKind.String)
 
             If radDailyDelete.Checked = False And radWeeklyDelete.Checked = False Then
                 MsgBox("You must select a schedule type.", MsgBoxStyle.Information, Me.Text)
@@ -577,7 +578,7 @@ Public Class frmTaskScheduler
                     newTask.Triggers.Add(New WeeklyTrigger() With {.StartBoundary = timePickerDelete.Value, .DaysOfWeek = daysOfWeekSetting})
                 End If
             Catch ex As Exception
-                Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
+                Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
                 exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
             End Try
 
@@ -619,7 +620,7 @@ Public Class frmTaskScheduler
 
             MsgBox("There was an error creating/updating your task, please try again.", MsgBoxStyle.Critical, Me.Text)
         Catch ex As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
+            Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
         Finally
             taskService.Dispose()
@@ -651,7 +652,7 @@ Public Class frmTaskScheduler
             boolThingsChanged = False
             MsgBox("Task deleted.", MsgBoxStyle.Information, Me.Text)
         Catch ex As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
+            Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
         End Try
     End Sub
