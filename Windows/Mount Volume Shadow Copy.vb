@@ -1,12 +1,11 @@
-﻿Imports System.IO
-Imports System.Management
+﻿Imports System.Management
 
 Public Class Mount_Volume_Shadow_Copy
     Private shadowCopyCache As New Dictionary(Of Integer, String)
 
     Private Sub Mount_Volume_Shadow_Copy_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         My.Settings.mountVolumeShadowCopyWindowPosition = Me.Location
-        If Directory.Exists(globalVariables.shadowCopyMountFolder) Then Directory.Delete(globalVariables.shadowCopyMountFolder)
+        If IO.Directory.Exists(globalVariables.shadowCopyMountFolder) Then IO.Directory.Delete(globalVariables.shadowCopyMountFolder)
 
         globalVariables.windows.mountVolumeShadowCopy.Dispose()
         globalVariables.windows.mountVolumeShadowCopy = Nothing
@@ -41,7 +40,7 @@ Public Class Mount_Volume_Shadow_Copy
     End Sub
 
     Private Sub listShadowCopyIDs_SelectedIndexChanged(sender As Object, e As EventArgs) Handles listShadowCopyIDs.SelectedIndexChanged
-        If Directory.Exists(globalVariables.shadowCopyMountFolder) Then Directory.Delete(globalVariables.shadowCopyMountFolder)
+        If IO.Directory.Exists(globalVariables.shadowCopyMountFolder) Then IO.Directory.Delete(globalVariables.shadowCopyMountFolder)
 
         btnUnmount.Enabled = False
         btnMount.Enabled = True
@@ -51,13 +50,13 @@ Public Class Mount_Volume_Shadow_Copy
 
     Private Sub btnMount_Click(sender As Object, e As EventArgs) Handles btnMount.Click
         Try
-            If Directory.Exists(globalVariables.shadowCopyMountFolder) Then Directory.Delete(globalVariables.shadowCopyMountFolder)
+            If IO.Directory.Exists(globalVariables.shadowCopyMountFolder) Then IO.Directory.Delete(globalVariables.shadowCopyMountFolder)
 
             If shadowCopyCache.ContainsKey(listShadowCopyIDs.SelectedIndex) = True Then
                 Dim deviceID As String = shadowCopyCache(listShadowCopyIDs.SelectedIndex) & "\"
 
                 Dim mountProcessInfo As New ProcessStartInfo
-                mountProcessInfo.FileName = Path.Combine(globalVariables.strPathToSystemFolder, "cmd.exe")
+                mountProcessInfo.FileName = IO.Path.Combine(GlobalVariables.strPathToSystemFolder, "cmd.exe")
                 mountProcessInfo.Arguments = String.Format("/c mklink /d {0}{1}{0} {0}{2}{0}", Chr(34), globalVariables.shadowCopyMountFolder, deviceID) '"/c mklink /d C:\shadowcopy """ & deviceID & """"
                 mountProcessInfo.Verb = "runas"
                 mountProcessInfo.CreateNoWindow = True
@@ -67,7 +66,7 @@ Public Class Mount_Volume_Shadow_Copy
                 mountProcess.WaitForExit()
                 mountProcessInfo = Nothing
 
-                Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe"), globalVariables.shadowCopyMountFolder)
+                Process.Start(IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe"), globalVariables.shadowCopyMountFolder)
                 btnUnmount.Enabled = True
             Else
                 MsgBox("Something went wrong, unable to find entry in shadowCopyCache Object.", MsgBoxStyle.Critical, Me.Text)
@@ -81,7 +80,7 @@ Public Class Mount_Volume_Shadow_Copy
     End Sub
 
     Private Sub btnUnmount_Click(sender As Object, e As EventArgs) Handles btnUnmount.Click
-        If Directory.Exists(globalVariables.shadowCopyMountFolder) Then Directory.Delete(globalVariables.shadowCopyMountFolder)
+        If IO.Directory.Exists(globalVariables.shadowCopyMountFolder) Then IO.Directory.Delete(globalVariables.shadowCopyMountFolder)
         btnUnmount.Enabled = False
     End Sub
 

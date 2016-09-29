@@ -1,5 +1,4 @@
 ﻿Imports System.Globalization
-Imports System.IO
 Imports System.Text
 
 Public Class frmCrash
@@ -7,12 +6,12 @@ Public Class frmCrash
     Property exceptionStackTrace As String
     Property exceptionType As String
 
-    Private strFileToHaveDataExportedTo As String = Path.Combine(Path.GetTempPath(), "event log entries.reslog")
-    Private strTempZIPFile As String = Path.Combine(Path.GetTempPath(), "attachments.zip")
+    Private strFileToHaveDataExportedTo As String = IO.Path.Combine(IO.Path.GetTempPath(), "event log entries.reslog")
+    Private strTempZIPFile As String = IO.Path.Combine(IO.Path.GetTempPath(), "attachments.zip")
 
     Sub deleteFileWithCrashPrevention(strPathToFile As String)
         Try
-            If File.Exists(strPathToFile) = True Then File.Delete(strPathToFile)
+            If IO.File.Exists(strPathToFile) = True Then IO.File.Delete(strPathToFile)
         Catch ex As Exception
         End Try
     End Sub
@@ -145,7 +144,7 @@ Public Class frmCrash
 
                 If Functions.eventLogFunctions.exportLogsToFile(strFileToHaveDataExportedTo, logCount) = True Then
                     If Functions.support.addFileToZipFile(strTempZIPFile, strFileToHaveDataExportedTo) = True Then
-                        If File.Exists(strTempZIPFile) = True Then
+                        If IO.File.Exists(strTempZIPFile) = True Then
                             boolDoWeHaveAttachments = True
                             httpHelper.addFileUpload("attachment", strTempZIPFile, Nothing, "application/zip")
                         End If
@@ -153,7 +152,7 @@ Public Class frmCrash
                 End If
             End If
 
-            If File.Exists(globalVariables.strDumpFilePath) Then
+            If IO.File.Exists(globalVariables.strDumpFilePath) Then
                 If Functions.support.addFileToZipFile(strTempZIPFile, globalVariables.strDumpFilePath) = True Then
                     boolDoWeHaveAttachments = True
                     httpHelper.addFileUpload("attachment", strTempZIPFile, Nothing, "application/zip")
@@ -263,7 +262,7 @@ Public Class frmCrash
 
         Dim boolDoWeHaveAttachmentsInLine As Boolean = False
 
-        If File.Exists(globalVariables.strDumpFilePath) Then
+        If IO.File.Exists(globalVariables.strDumpFilePath) Then
             boolDoWeHaveAttachmentsInLine = True
         End If
         If chkSendLogs.Checked = True Then
@@ -315,7 +314,7 @@ Namespace exceptionHandler
 
             Dim exceptionMessage As String = exceptionObject.Message
 
-            If exceptionType = GetType(FileLoadException) And exceptionMessage.regExSearch("(?:restoreToSystemRestorePoint|createRestorePoint)") = True Then
+            If exceptionType = GetType(IO.FileLoadException) And exceptionMessage.regExSearch("(?:restoreToSystemRestorePoint|createRestorePoint)") = True Then
                 MsgBox("There has been an error while loading a required system library for System Restore. Please reboot your computer and try again.", MsgBoxStyle.Critical, "System Restore Point Creator")
                 Process.GetCurrentProcess.Kill()
             ElseIf exceptionType = GetType(Configuration.ConfigurationErrorsException) Or exceptionType = GetType(Configuration.ConfigurationException) Then
