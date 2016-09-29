@@ -1,5 +1,4 @@
-﻿Imports System.Globalization
-Imports System.Text.RegularExpressions
+﻿Imports System.Text.RegularExpressions
 Imports ICSharpCode.SharpZipLib.Zip
 
 Namespace Functions.support
@@ -556,7 +555,7 @@ Namespace Functions.support
                     Return Nothing
                 End If
             Catch ex As Exception
-                Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
+                Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
                 exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
                 Return Nothing
             End Try

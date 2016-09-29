@@ -1,6 +1,4 @@
-﻿Imports Microsoft.Win32
-
-Public Class createRestorePointAtUserLogon
+﻿Public Class createRestorePointAtUserLogon
     Public parentFormG As Form1
 
     Private Sub btnOK_Click(sender As Object, e As EventArgs) Handles btnOK.Click
@@ -8,8 +6,8 @@ Public Class createRestorePointAtUserLogon
             Dim shortMaxNumber As Short
 
             If Short.TryParse(txtMaxNumber.Text.Trim, shortMaxNumber) = True Then
-                Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue("Keep X Amount of Restore Points Value", shortMaxNumber.ToString, RegistryValueKind.String)
-                Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue("Keep X Amount of Restore Points", "True", RegistryValueKind.String)
+                Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue("Keep X Amount of Restore Points Value", shortMaxNumber.ToString, Microsoft.Win32.RegistryValueKind.String)
+                Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue("Keep X Amount of Restore Points", "True", Microsoft.Win32.RegistryValueKind.String)
 
                 globalVariables.KeepXAmountOfRestorePoints = True
                 globalVariables.KeepXAmountofRestorePointsValue = shortMaxNumber

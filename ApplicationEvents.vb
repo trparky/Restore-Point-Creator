@@ -1,7 +1,6 @@
 ﻿Imports System.Text.RegularExpressions
 Imports Microsoft.Win32.TaskScheduler
 Imports Microsoft.Win32
-Imports System.Globalization
 
 Namespace My
     ' The following events are available for MyApplication:
@@ -397,7 +396,7 @@ Namespace My
                     Functions.taskStuff.disableBuiltInRestorePointTask()
                 End If
             Catch ex As Exception
-                Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
+                Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
                 exceptionHandler.manuallyLoadCrashWindow(ex, "Application Startup Routine" & vbCrLf & vbCrLf & ex.Message, ex.StackTrace, ex.GetType)
             End Try
 
@@ -408,7 +407,7 @@ Namespace My
         End Sub
 
         Private Sub MyApplication_UnhandledException(sender As Object, e As ApplicationServices.UnhandledExceptionEventArgs) Handles Me.UnhandledException
-            Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
+            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
 
             Dim result As Boolean = exceptionHandler.handleCrashWithAnErrorOrRedirectUserInstead(e.Exception)
             If result = True Then exceptionHandler.manuallyLoadCrashWindow(e.Exception, e.Exception.Message, e.Exception.StackTrace, e.Exception.GetType)

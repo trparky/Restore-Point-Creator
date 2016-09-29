@@ -1,5 +1,4 @@
 ﻿Imports Tom
-Imports System.Globalization
 
 Public Class Disk_Space_Usage
     Private pleaseWaitInstance As Please_Wait
@@ -241,7 +240,7 @@ Public Class Disk_Space_Usage
                 End Try
             Next
         Catch ex As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
+            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
         Finally
             boolLoadingDiskData = False
@@ -307,7 +306,7 @@ Public Class Disk_Space_Usage
                 My.Settings.diskUsageWindowSize = Me.Size
             End If
         Catch ex As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
+            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
         End Try
     End Sub
@@ -343,7 +342,7 @@ Public Class Disk_Space_Usage
 
             Functions.wait.openPleaseWaitWindow(Me)
         Catch ex As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
+            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
         End Try
     End Sub
@@ -428,7 +427,7 @@ Public Class Disk_Space_Usage
                 End If
             Next i
         Catch ex As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
+            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
         End Try
     End Sub

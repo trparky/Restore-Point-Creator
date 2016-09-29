@@ -4,7 +4,7 @@ Public Class Set_Default_Custom_Restore_Point_Name
     Public parentFormG As Form1
 
     Private Sub Set_Default_Custom_Restore_Point_Name_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        txtName.Text = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey).GetValue("Default Custom Restore Point Name", "").ToString.Trim
+        txtName.Text = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey).GetValue("Default Custom Restore Point Name", "").ToString.Trim
     End Sub
 
     Private Sub txtName_KeyUp(sender As Object, e As KeyEventArgs) Handles txtName.KeyUp
@@ -14,7 +14,7 @@ Public Class Set_Default_Custom_Restore_Point_Name
     End Sub
 
     Private Sub btnOK_Click(sender As Object, e As EventArgs) Handles btnOK.Click
-        Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue("Default Custom Restore Point Name", txtName.Text, RegistryValueKind.String)
+        Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue("Default Custom Restore Point Name", txtName.Text, RegistryValueKind.String)
         parentFormG.defaultCustomRestorePointName = txtName.Text
         parentFormG.btnCreateRestorePointNameWithDefaultName.Visible = True
         Me.Close()
@@ -26,7 +26,7 @@ Public Class Set_Default_Custom_Restore_Point_Name
 
     Private Sub btnDelete_Click(sender As Object, e As EventArgs) Handles btnDelete.Click
         Try
-            Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Default Custom Restore Point Name", False)
+            Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Default Custom Restore Point Name", False)
         Catch ex As Exception
         End Try
 
