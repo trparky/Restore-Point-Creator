@@ -1521,7 +1521,7 @@ Public Class Form1
                             userInitiatedCheckForUpdatesThread = Nothing
                             Exit Sub
                         ElseIf shortRemoteBuild < globalVariables.version.shortBuild Then
-                            MsgBox("Somehow you have a version that is newer than is listed on the product web site, wierd.", MsgBoxStyle.Information, messageBoxTitle)
+                            MsgBox("Somehow you have a version that is newer than is listed on the product web site, weird.", MsgBoxStyle.Information, messageBoxTitle)
                         ElseIf shortRemoteBuild = globalVariables.version.shortBuild Then
                             If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
                                 MsgBox("You already have the latest version.", MsgBoxStyle.Information, messageBoxTitle)
@@ -1584,9 +1584,9 @@ Public Class Form1
                     If Short.TryParse(strRemoteBuild, shortRemoteBuild) = True Then
                         If shortRemoteBuild < globalVariables.version.shortBuild Then
                             If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
-                                MsgBox("Somehow you have a version that is newer than is listed on the product web site, wierd.", MsgBoxStyle.Information, messageBoxTitle)
+                                MsgBox("Somehow you have a version that is newer than is listed on the product web site, weird.", MsgBoxStyle.Information, messageBoxTitle)
                             Else
-                                NotifyIcon1.ShowBalloonTip(5000, "Restore Point Creator", "Somehow you have a version that is newer than is listed on the product web site, wierd.", ToolTipIcon.Info)
+                                NotifyIcon1.ShowBalloonTip(5000, "Restore Point Creator", "Somehow you have a version that is newer than is listed on the product web site, weird.", ToolTipIcon.Info)
                             End If
                         ElseIf shortRemoteBuild = globalVariables.version.shortBuild Then
                             If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
