@@ -163,21 +163,21 @@ Namespace My
                     End If
 
                     If boolAreWeAnAdministrator = True And My.Application.CommandLineArgs.Count = 1 Then
-                        commandLineArgument = My.Application.CommandLineArgs(0).ToLower.Trim
+                        commandLineArgument = My.Application.CommandLineArgs(0)
 
-                        If commandLineArgument = "-createtasks" Then
+                        If commandLineArgument.stringCompare("-createtasks") Then
                             Functions.taskStuff.createRunTimeTasksSubRoutine()
                             Process.GetCurrentProcess.Kill()
-                        ElseIf commandLineArgument = "-update" Or commandLineArgument = "-updatewithoutuninstallinfoupdate" Then
+                        ElseIf commandLineArgument.stringCompare("-update") Or commandLineArgument.stringCompare("-updatewithoutuninstallinfoupdate") Then
                             Functions.startupFunctions.performApplicationUpdate(commandLineArgument)
                             e.Cancel = True
                             Exit Sub
-                        ElseIf commandLineArgument = "-fixruntimetasks" Then
+                        ElseIf commandLineArgument.stringCompare("-fixruntimetasks") Then
                             Functions.startupFunctions.repairRuntimeTasks()
 
                             e.Cancel = True
                             Exit Sub
-                        ElseIf commandLineArgument = "-deletealltasks" Then
+                        ElseIf commandLineArgument.stringCompare("-deletealltasks") Then
                             Functions.startupFunctions.deleteAllTasks()
                         End If
                     End If
@@ -217,174 +217,173 @@ Namespace My
 
                 If My.Application.CommandLineArgs IsNot Nothing Then
                     If My.Application.CommandLineArgs.Count >= 1 Then
-                        commandLineArgument = My.Application.CommandLineArgs(0).ToLower.Trim
+                        commandLineArgument = My.Application.CommandLineArgs(0)
 
-                        Select Case commandLineArgument
-                            Case "-createrestorepoint"
-                                Functions.startupFunctions.giveSafeModeErrorMessage(boolAreWeInSafeMode)
-                                Functions.eventLogFunctions.writeToSystemEventLog("Activated JumpList Task.", EventLogEntryType.Information)
+                        If commandLineArgument.stringCompare("-createrestorepoint") Then
+                            Functions.startupFunctions.giveSafeModeErrorMessage(boolAreWeInSafeMode)
+                            Functions.eventLogFunctions.writeToSystemEventLog("Activated JumpList Task.", EventLogEntryType.Information)
 
-                                Dim strRestorePointName As String = "System Checkpoint made by System Restore Point Creator"
+                            Dim strRestorePointName As String = "System Checkpoint made by System Restore Point Creator"
 
-                                If My.Application.CommandLineArgs.Count = 2 Then
-                                    If My.Application.CommandLineArgs(1).Trim.StartsWith("-name=", StringComparison.OrdinalIgnoreCase) Then
-                                        strRestorePointName = Regex.Replace(My.Application.CommandLineArgs(1).Trim, "-name=", "", RegexOptions.IgnoreCase)
-                                    End If
+                            If My.Application.CommandLineArgs.Count = 2 Then
+                                If My.Application.CommandLineArgs(1).Trim.StartsWith("-name=", StringComparison.OrdinalIgnoreCase) Then
+                                    strRestorePointName = Regex.Replace(My.Application.CommandLineArgs(1).Trim, "-name=", "", RegexOptions.IgnoreCase)
                                 End If
+                            End If
 
-                                Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", True)
+                            Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", True)
 
-                                ' This is a special way of making a thread in which you can pass parameters to the sub-routine that you're running as a separate thread.
-                                Dim creatingThread As New Threading.Thread(Sub()
-                                                                               Functions.startupFunctions.createSystemRestorePoint(True, strRestorePointName)
-                                                                           End Sub)
-                                creatingThread.Name = "Restore Point Creating Thread"
-                                creatingThread.Start()
+                            ' This is a special way of making a thread in which you can pass parameters to the sub-routine that you're running as a separate thread.
+                            Dim creatingThread As New Threading.Thread(Sub()
+                                                                           Functions.startupFunctions.createSystemRestorePoint(True, strRestorePointName)
+                                                                       End Sub)
+                            creatingThread.Name = "Restore Point Creating Thread"
+                            creatingThread.Start()
 
+                            e.Cancel = True
+                            Exit Sub
+                        ElseIf commandLineArgument.stringCompare("-createrestorepointcustomname") Then
+                            Functions.startupFunctions.giveSafeModeErrorMessage(boolAreWeInSafeMode)
+                            Functions.eventLogFunctions.writeToSystemEventLog("Activated JumpList Task.", EventLogEntryType.Information)
+
+                            Dim Custom_Named_Restore_Point_Instance As Custom_Named_Restore_Point
+                            Custom_Named_Restore_Point_Instance = New Custom_Named_Restore_Point
+                            Custom_Named_Restore_Point_Instance.StartPosition = FormStartPosition.CenterScreen
+                            Custom_Named_Restore_Point_Instance.ShowDialog()
+
+                            Dim restorePointName As String
+
+                            If Custom_Named_Restore_Point_Instance.createRestorePoint = False Then
+                                MsgBox("Restore Point not created.", MsgBoxStyle.Information, "Restore Point Creator") ' Gives the user some feedback.
                                 e.Cancel = True
                                 Exit Sub
-                            Case "-createrestorepointcustomname"
-                                Functions.startupFunctions.giveSafeModeErrorMessage(boolAreWeInSafeMode)
-                                Functions.eventLogFunctions.writeToSystemEventLog("Activated JumpList Task.", EventLogEntryType.Information)
+                            Else
+                                restorePointName = Custom_Named_Restore_Point_Instance.restorePointName
+                            End If
 
-                                Dim Custom_Named_Restore_Point_Instance As Custom_Named_Restore_Point
-                                Custom_Named_Restore_Point_Instance = New Custom_Named_Restore_Point
-                                Custom_Named_Restore_Point_Instance.StartPosition = FormStartPosition.CenterScreen
-                                Custom_Named_Restore_Point_Instance.ShowDialog()
+                            Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", True)
 
-                                Dim restorePointName As String
+                            ' This is a special way of making a thread in which you can pass parameters to the sub-routine that you're running as a separate thread.
+                            Dim creatingThread As New Threading.Thread(Sub()
+                                                                           Functions.startupFunctions.createSystemRestorePoint(True, restorePointName)
+                                                                       End Sub)
+                            creatingThread.Name = "Restore Point Creating Thread"
+                            creatingThread.Start()
 
-                                If Custom_Named_Restore_Point_Instance.createRestorePoint = False Then
-                                    MsgBox("Restore Point not created.", MsgBoxStyle.Information, "Restore Point Creator") ' Gives the user some feedback.
-                                    e.Cancel = True
-                                    Exit Sub
+                            e.Cancel = True
+                            Exit Sub
+                        ElseIf commandLineArgument.stringCompare("-createscheduledrestorepoint") Then
+                            Dim restorePointNameForScheduledTasks As String = globalVariables.strDefaultNameForScheduledTasks
+                            Dim boolExtendedLoggingForScheduledTasks As Boolean = True
+                            Dim oldNewestRestorePointID As Integer
+
+                            Dim registryObject As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+
+                            If registryObject IsNot Nothing Then
+                                restorePointNameForScheduledTasks = registryObject.GetValue("Custom Name for Scheduled Restore Points", globalVariables.strDefaultNameForScheduledTasks)
+
+                                If Boolean.TryParse(registryObject.GetValue("Extended Logging For Scheduled Tasks", "True"), boolExtendedLoggingForScheduledTasks) Then
+                                    boolExtendedLoggingForScheduledTasks = boolExtendedLoggingForScheduledTasks
                                 Else
-                                    restorePointName = Custom_Named_Restore_Point_Instance.restorePointName
+                                    boolExtendedLoggingForScheduledTasks = True
                                 End If
 
-                                Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", True)
+                                registryObject.Close()
+                                registryObject.Dispose()
+                            End If
 
-                                ' This is a special way of making a thread in which you can pass parameters to the sub-routine that you're running as a separate thread.
-                                Dim creatingThread As New Threading.Thread(Sub()
-                                                                               Functions.startupFunctions.createSystemRestorePoint(True, restorePointName)
-                                                                           End Sub)
-                                creatingThread.Name = "Restore Point Creating Thread"
-                                creatingThread.Start()
+                            If boolExtendedLoggingForScheduledTasks = True Then
+                                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Starting scheduled restore point job. Task running as user {0}. There are currently {1} system restore point(s) on this system.", Environment.UserName, Functions.wmi.getNumberOfRestorePoints()), EventLogEntryType.Information)
+                            Else
+                                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Starting scheduled restore point job. Task running as user {0}.", Environment.UserName), EventLogEntryType.Information)
+                            End If
 
-                                e.Cancel = True
-                                Exit Sub
-                            Case "-createscheduledrestorepoint"
-                                Dim restorePointNameForScheduledTasks As String = globalVariables.strDefaultNameForScheduledTasks
-                                Dim boolExtendedLoggingForScheduledTasks As Boolean = True
-                                Dim oldNewestRestorePointID As Integer
+                            Functions.startupFunctions.writeLastRunFile()
 
-                                Dim registryObject As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+                            If boolExtendedLoggingForScheduledTasks = True Then oldNewestRestorePointID = Functions.wmi.getNewestSystemRestorePointID()
 
-                                If registryObject IsNot Nothing Then
-                                    restorePointNameForScheduledTasks = registryObject.GetValue("Custom Name for Scheduled Restore Points", globalVariables.strDefaultNameForScheduledTasks)
+                            Functions.support.createScheduledSystemRestorePoint(restorePointNameForScheduledTasks)
 
-                                    If Boolean.TryParse(registryObject.GetValue("Extended Logging For Scheduled Tasks", "True"), boolExtendedLoggingForScheduledTasks) Then
-                                        boolExtendedLoggingForScheduledTasks = boolExtendedLoggingForScheduledTasks
-                                    Else
-                                        boolExtendedLoggingForScheduledTasks = True
-                                    End If
+                            If boolExtendedLoggingForScheduledTasks = True Then
+                                ' We wait here with this loop until the system's has the restore point created.
+                                While oldNewestRestorePointID = Functions.wmi.getNewestSystemRestorePointID()
+                                    ' Does nothing, just loops and sleeps for half a second.
+                                    Threading.Thread.Sleep(500)
+                                End While
+                            End If
 
-                                    registryObject.Close()
-                                    registryObject.Dispose()
+                            If boolExtendedLoggingForScheduledTasks = True Then Functions.support.writeSystemRestorePointsToApplicationLogs()
+
+                            Dim boolValueFromRegistryAsString As String = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Delete Old Restore Points", "False").Trim
+                            Dim boolValueFromRegistry As Boolean
+
+                            ' This checks if we have valid data from the Registry value.  It attempts to parse it and passes the value of the parses data to boolValueFromRegistry.
+                            If Boolean.TryParse(boolValueFromRegistryAsString, boolValueFromRegistry) = True Then
+                                ' OK, we do have valid data, let's continue.
+                                If boolValueFromRegistryAsString = True Then
+                                    Functions.startupFunctions.deleteOldRestorePoints()
                                 End If
+                            End If
 
-                                If boolExtendedLoggingForScheduledTasks = True Then
-                                    Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Starting scheduled restore point job. Task running as user {0}. There are currently {1} system restore point(s) on this system.", Environment.UserName, Functions.wmi.getNumberOfRestorePoints()), EventLogEntryType.Information)
+                            If globalVariables.KeepXAmountOfRestorePoints = True Then
+                                Functions.wmi.doDeletingOfXNumberOfRestorePoints(globalVariables.KeepXAmountofRestorePointsValue)
+                            End If
+
+                            Functions.eventLogFunctions.writeToSystemEventLog("Scheduled restore point job complete.", EventLogEntryType.Information)
+
+                            e.Cancel = True
+                            Exit Sub
+                        ElseIf commandLineArgument.stringCompare("-restoretopoint") Then
+                            ' The first thing we do is disable Safe Mode boot so the user doesn't get trapped in Safe Mode.
+                            Functions.registryStuff.removeSafeModeBoot(True)
+
+                            ' Now let's delete that Registry setting that tells the program that a Safe Mode boot was set up.
+                            If Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey) IsNot Nothing Then
+                                Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Safe Mode Boot Set", False)
+                            End If
+
+                            ' We try and parse the value in the Registry.
+                            If Integer.TryParse(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Preselected Restore Point for Restore in Safe Mode", 0), Functions.startupFunctions.preSelectedRestorePointID) Then
+                                ' We need to remove the registry keys from the registry, we no longer need them.
+                                Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Preselected Restore Point for Restore in Safe Mode", False)
+                                Registry.LocalMachine.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\RunOnce", True).DeleteValue("*Restore To Restore Point", False)
+
+                                ' OK, what we have is an Interger. Great. Let's do some work with it.
+
+                                If Functions.startupFunctions.preSelectedRestorePointID = 0 Then
+                                    MsgBox("Something went wrong, we don't have a valid restore point to restore to. The program will execute as normal from now on.", MsgBoxStyle.Information, "Restore Point Creator")
                                 Else
-                                    Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Starting scheduled restore point job. Task running as user {0}.", Environment.UserName), EventLogEntryType.Information)
-                                End If
+                                    Functions.wait.createPleaseWaitWindow("Beginning the Restore Process... Please wait.", True)
 
-                                Functions.startupFunctions.writeLastRunFile()
+                                    Functions.startupFunctions.isMyRestoreThreadRunning = True
 
-                                If boolExtendedLoggingForScheduledTasks = True Then oldNewestRestorePointID = Functions.wmi.getNewestSystemRestorePointID()
+                                    Dim thread As New Threading.Thread(AddressOf Functions.startupFunctions.restoreSystemRestorePoint)
+                                    thread.Name = "Restore System Restore Point Thread"
+                                    thread.Priority = Threading.ThreadPriority.Normal
+                                    thread.Start()
 
-                                Functions.support.createScheduledSystemRestorePoint(restorePointNameForScheduledTasks)
-
-                                If boolExtendedLoggingForScheduledTasks = True Then
-                                    ' We wait here with this loop until the system's has the restore point created.
-                                    While oldNewestRestorePointID = Functions.wmi.getNewestSystemRestorePointID()
-                                        ' Does nothing, just loops and sleeps for half a second.
-                                        Threading.Thread.Sleep(500)
+                                    While Functions.startupFunctions.isMyRestoreThreadRunning = True
+                                        Threading.Thread.Sleep(1000)
                                     End While
                                 End If
+                            Else
+                                ' We need to remove the registry keys from the registry, we no longer need them.
+                                Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Preselected Restore Point for Restore in Safe Mode", False)
+                                Registry.LocalMachine.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\RunOnce", True).DeleteValue("*Restore To Restore Point", False)
 
-                                If boolExtendedLoggingForScheduledTasks = True Then Functions.support.writeSystemRestorePointsToApplicationLogs()
+                                ' Nope, we don't have an Integer. Let's stop things right here.
+                                MsgBox("Something went wrong, we don't have a valid restore point to restore to. The program will execute as normal from now on.", MsgBoxStyle.Information, "Restore Point Creator")
+                            End If
 
-                                Dim boolValueFromRegistryAsString As String = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Delete Old Restore Points", "False").Trim
-                                Dim boolValueFromRegistry As Boolean
-
-                                ' This checks if we have valid data from the Registry value.  It attempts to parse it and passes the value of the parses data to boolValueFromRegistry.
-                                If Boolean.TryParse(boolValueFromRegistryAsString, boolValueFromRegistry) = True Then
-                                    ' OK, we do have valid data, let's continue.
-                                    If boolValueFromRegistryAsString = True Then
-                                        Functions.startupFunctions.deleteOldRestorePoints()
-                                    End If
-                                End If
-
-                                If globalVariables.KeepXAmountOfRestorePoints = True Then
-                                    Functions.wmi.doDeletingOfXNumberOfRestorePoints(globalVariables.KeepXAmountofRestorePointsValue)
-                                End If
-
-                                Functions.eventLogFunctions.writeToSystemEventLog("Scheduled restore point job complete.", EventLogEntryType.Information)
-
-                                e.Cancel = True
-                                Exit Sub
-                            Case "-restoretopoint"
-                                ' The first thing we do is disable Safe Mode boot so the user doesn't get trapped in Safe Mode.
-                                Functions.registryStuff.removeSafeModeBoot(True)
-
-                                ' Now let's delete that Registry setting that tells the program that a Safe Mode boot was set up.
-                                If Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey) IsNot Nothing Then
-                                    Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Safe Mode Boot Set", False)
-                                End If
-
-                                ' We try and parse the value in the Registry.
-                                If Integer.TryParse(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Preselected Restore Point for Restore in Safe Mode", 0), Functions.startupFunctions.preSelectedRestorePointID) Then
-                                    ' We need to remove the registry keys from the registry, we no longer need them.
-                                    Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Preselected Restore Point for Restore in Safe Mode", False)
-                                    Registry.LocalMachine.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\RunOnce", True).DeleteValue("*Restore To Restore Point", False)
-
-                                    ' OK, what we have is an Interger. Great. Let's do some work with it.
-
-                                    If Functions.startupFunctions.preSelectedRestorePointID = 0 Then
-                                        MsgBox("Something went wrong, we don't have a valid restore point to restore to. The program will execute as normal from now on.", MsgBoxStyle.Information, "Restore Point Creator")
-                                    Else
-                                        Functions.wait.createPleaseWaitWindow("Beginning the Restore Process... Please wait.", True)
-
-                                        Functions.startupFunctions.isMyRestoreThreadRunning = True
-
-                                        Dim thread As New Threading.Thread(AddressOf Functions.startupFunctions.restoreSystemRestorePoint)
-                                        thread.Name = "Restore System Restore Point Thread"
-                                        thread.Priority = Threading.ThreadPriority.Normal
-                                        thread.Start()
-
-                                        While Functions.startupFunctions.isMyRestoreThreadRunning = True
-                                            Threading.Thread.Sleep(1000)
-                                        End While
-                                    End If
-                                Else
-                                    ' We need to remove the registry keys from the registry, we no longer need them.
-                                    Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Preselected Restore Point for Restore in Safe Mode", False)
-                                    Registry.LocalMachine.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\RunOnce", True).DeleteValue("*Restore To Restore Point", False)
-
-                                    ' Nope, we don't have an Integer. Let's stop things right here.
-                                    MsgBox("Something went wrong, we don't have a valid restore point to restore to. The program will execute as normal from now on.", MsgBoxStyle.Information, "Restore Point Creator")
-                                End If
-
-                                e.Cancel = True
-                                Exit Sub
-                            Case "-deleteoldrestorepoints"
-                                Functions.startupFunctions.deleteOldRestorePoints()
-                                e.Cancel = True
-                                Exit Sub
-                            Case "-prefscleanup"
-                                Functions.startupFunctions.prefsCleanup()
-                        End Select
+                            e.Cancel = True
+                            Exit Sub
+                        ElseIf commandLineArgument.stringCompare("-deleteoldrestorepoints") Then
+                            Functions.startupFunctions.deleteOldRestorePoints()
+                            e.Cancel = True
+                            Exit Sub
+                        ElseIf commandLineArgument.stringCompare("-prefscleanup") Then
+                            Functions.startupFunctions.prefsCleanup()
+                        End If
                     Else
                         Functions.registryStuff.removeSafeModeBoot()
                     End If
