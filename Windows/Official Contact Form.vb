@@ -83,34 +83,31 @@ Public Class Official_Contact_Form
             If boolHTTPResponseResult = True Then
                 If boolDoWeHaveAttachments = True Then Functions.wait.closePleaseWaitWindow()
 
-                Debug.WriteLine("strHTTPResponse = " & strHTTPResponse)
+                If strHTTPResponse.stringCompare("ok") Then
+                    listAttachedFiles.Items.Clear()
+                    If IO.File.Exists(zipFilePath) Then IO.File.Delete(zipFilePath)
 
-                Select Case strHTTPResponse
-                    Case "ok"
-                        listAttachedFiles.Items.Clear()
-                        If IO.File.Exists(zipFilePath) Then IO.File.Delete(zipFilePath)
-
-                        MsgBox("Your email to the developer has been sent. This window will now close.", MsgBoxStyle.Information, Me.Text)
-                        Me.Close()
-                    Case "error-invalid-email"
-                        MsgBox("Invalid email address. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                    Case "email-server-said-user-doesnt-exist"
-                        MsgBox("The remote email server said that the email address doesn't exist. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                    Case "dns-error"
-                        MsgBox("The domain name doesn't exist. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                    Case "server-connect-error"
-                        MsgBox("Unable to contact mail server, more than likely your email address is invalid. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                    Case "invalid-email-syntax"
-                        MsgBox("The email address didn't pass syntax validation. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                    Case "no-email-servers-contactable"
-                        MsgBox("No mail servers found, more than likely your email address is invalid. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                    Case "no-access-allowed"
-                        MsgBox("Error accessing server side script.", MsgBoxStyle.Critical, Me.Text)
-                    Case "error-no-message-found"
-                        MsgBox("No message found. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                    Case "file_attachment_failure"
-                        MsgBox("File attachment failure. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                End Select
+                    MsgBox("Your email to the developer has been sent. This window will now close.", MsgBoxStyle.Information, Me.Text)
+                    Me.Close()
+                ElseIf strHTTPResponse.stringCompare("error-invalid-email") Then
+                    MsgBox("Invalid email address. Please try again.", MsgBoxStyle.Critical, Me.Text)
+                ElseIf strHTTPResponse.stringCompare("email-server-said-user-doesnt-exist") Then
+                    MsgBox("The remote email server said that the email address doesn't exist. Please try again.", MsgBoxStyle.Critical, Me.Text)
+                ElseIf strHTTPResponse.stringCompare("dns-error") Then
+                    MsgBox("The domain name doesn't exist. Please try again.", MsgBoxStyle.Critical, Me.Text)
+                ElseIf strHTTPResponse.stringCompare("server-connect-error") Then
+                    MsgBox("Unable to contact mail server, more than likely your email address is invalid. Please try again.", MsgBoxStyle.Critical, Me.Text)
+                ElseIf strHTTPResponse.stringCompare("invalid-email-syntax") Then
+                    MsgBox("The email address didn't pass syntax validation. Please try again.", MsgBoxStyle.Critical, Me.Text)
+                ElseIf strHTTPResponse.stringCompare("no-email-servers-contactable") Then
+                    MsgBox("No mail servers found, more than likely your email address is invalid. Please try again.", MsgBoxStyle.Critical, Me.Text)
+                ElseIf strHTTPResponse.stringCompare("no-access-allowed") Then
+                    MsgBox("Error accessing server side script.", MsgBoxStyle.Critical, Me.Text)
+                ElseIf strHTTPResponse.stringCompare("error-no-message-found") Then
+                    MsgBox("No message found. Please try again.", MsgBoxStyle.Critical, Me.Text)
+                ElseIf strHTTPResponse.stringCompare("file_attachment_failure") Then
+                    MsgBox("File attachment failure. Please try again.", MsgBoxStyle.Critical, Me.Text)
+                End If
 
                 btnSubmit.Enabled = True
             Else
