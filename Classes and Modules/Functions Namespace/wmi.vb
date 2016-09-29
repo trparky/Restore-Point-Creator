@@ -1,4 +1,5 @@
-﻿Imports System.Text.RegularExpressions
+﻿Imports System.Globalization
+Imports System.Text.RegularExpressions
 
 Namespace Functions.wmi
     Module wmi
@@ -166,7 +167,7 @@ Namespace Functions.wmi
                 giveComExceptionCrashMessage()
                 Return 0
             Catch ex As Exception
-                Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
+                Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
 
                 If privilegeChecks.areWeRunningAsSystemUser() = False Then
                     exceptionHandler.manuallyLoadCrashWindow(ex)
@@ -198,7 +199,7 @@ Namespace Functions.wmi
             Catch ex3 As Runtime.InteropServices.COMException
                 giveComExceptionCrashMessage()
             Catch ex As Exception
-                Threading.Thread.CurrentThread.CurrentUICulture = New System.Globalization.CultureInfo("en-US")
+                Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
                 exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
             End Try
         End Sub

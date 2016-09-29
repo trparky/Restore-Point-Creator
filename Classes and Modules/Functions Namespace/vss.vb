@@ -1,4 +1,6 @@
-﻿Namespace Functions.vss
+﻿Imports System.Globalization
+
+Namespace Functions.vss
     Module vss
         ''' <summary>Gets the Shadow Storage Information for a particular storage device in the system.</summary>
         ''' <param name="volumeID">This input can accept either a storage device GUID or a drive letter such as "C:".</param>
@@ -166,7 +168,7 @@
                     Dim shadowStorageDetails As supportClasses.ShadowStorageData = getData(globalVariables.systemDriveLetter, boolGetVSSDataResult)
 
                     If boolGetVSSDataResult = True Then
-                    	eventLogFunctions.writeToSystemEventLog(String.Format("The old max space assigned for System Restore Points was {0}.", support.bytesToHumanSize(shadowStorageDetails.MaxSpace)), EventLogEntryType.Information)
+                        eventLogFunctions.writeToSystemEventLog(String.Format("The old max space assigned for System Restore Points was {0}.", support.bytesToHumanSize(shadowStorageDetails.MaxSpace)), EventLogEntryType.Information)
 
                         executeVSSAdminCommand(globalVariables.systemDriveLetter)
                         enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
@@ -248,7 +250,7 @@
                     eventLogFunctions.writeCrashToEventLog(ex)
                     giveMessageAboutShadowCopyServiceBeingBroken()
                 Else
-                    Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
+                    Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
                     exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
                 End If
             End Try

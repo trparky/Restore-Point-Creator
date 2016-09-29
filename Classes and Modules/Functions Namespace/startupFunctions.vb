@@ -1,5 +1,6 @@
 ﻿Imports Microsoft.Win32.TaskScheduler
 Imports System.IO
+Imports System.Globalization
 Imports Microsoft.Win32
 Imports System.Management
 Imports System.Text.RegularExpressions
@@ -124,7 +125,7 @@ Namespace Functions.startupFunctions
                     msgBoxTitle = Nothing
                 End If
             Catch ex As Exception
-                Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
+                Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
                 exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
             End Try
         End Sub
