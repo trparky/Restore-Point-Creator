@@ -1,4 +1,5 @@
 ﻿Imports Microsoft.Win32
+Imports System.IO
 
 Namespace Functions.eventLogFunctions
     Module eventLogFunctions
@@ -11,8 +12,8 @@ Namespace Functions.eventLogFunctions
             Try
                 Dim jsonEngine As New Web.Script.Serialization.JavaScriptSerializer
 
-                If IO.File.Exists(strLogFile) Then IO.File.Delete(strLogFile)
-                Dim fileHandle As New IO.StreamWriter(strLogFile, False, Text.Encoding.UTF8)
+                If File.Exists(strLogFile) Then File.Delete(strLogFile)
+                Dim fileHandle As New StreamWriter(strLogFile, False, Text.Encoding.UTF8)
 
                 fileHandle.WriteLine("// Export Data Version: 3")
                 fileHandle.WriteLine("// Program Version: " & globalVariables.version.strFullVersionString)
@@ -49,10 +50,10 @@ Namespace Functions.eventLogFunctions
 
                     If Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application\" & logSource) Is Nothing Then
                         Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application", True).CreateSubKey(logSource)
-                        Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application\" & logSource, True).SetValue("EventMessageFile", IO.Path.Combine(Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "EventLogMessages.dll"), RegistryValueKind.String)
+                        Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application\" & logSource, True).SetValue("EventMessageFile", Path.Combine(Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "EventLogMessages.dll"), RegistryValueKind.String)
                     Else
                         If Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application\" & logSource, False).GetValue("EventMessageFile", Nothing) Is Nothing Then
-                            Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application\" & logSource, True).SetValue("EventMessageFile", IO.Path.Combine(Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "EventLogMessages.dll"), RegistryValueKind.String)
+                            Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application\" & logSource, True).SetValue("EventMessageFile", Path.Combine(Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "EventLogMessages.dll"), RegistryValueKind.String)
                         End If
                     End If
 
@@ -114,7 +115,7 @@ Namespace Functions.eventLogFunctions
             End Try
         End Sub
 
-        Private Sub exportApplicationEventLogEntriesToFile(ByVal strEventLog As String, ByRef fileHandle As IO.StreamWriter, ByRef jsonEngine As Web.Script.Serialization.JavaScriptSerializer, ByRef logCount As ULong)
+        Private Sub exportApplicationEventLogEntriesToFile(ByVal strEventLog As String, ByRef fileHandle As StreamWriter, ByRef jsonEngine As Web.Script.Serialization.JavaScriptSerializer, ByRef logCount As ULong)
             Dim eventLogQuery As Eventing.Reader.EventLogQuery
             Dim logReader As Eventing.Reader.EventLogReader
             Dim eventInstance As Eventing.Reader.EventRecord

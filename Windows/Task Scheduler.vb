@@ -2,6 +2,7 @@
 Imports System.Management
 Imports System.Globalization
 Imports Microsoft.Win32
+Imports System.IO
 
 Public Class frmTaskScheduler
     Private boolDoneLoading As Boolean = False
@@ -315,7 +316,7 @@ Public Class frmTaskScheduler
             Dim newTask As TaskDefinition = taskService.NewTask
             newTask.RegistrationInfo.Description = strCheckPointTaskName
 
-            Dim exePathInfo As New IO.FileInfo(Application.ExecutablePath)
+            Dim exePathInfo As New FileInfo(Application.ExecutablePath)
             newTask.Actions.Add(New ExecAction(Chr(34) & exePathInfo.FullName & Chr(34), "-createscheduledrestorepoint", exePathInfo.DirectoryName))
             exePathInfo = Nothing
 
@@ -396,7 +397,7 @@ Public Class frmTaskScheduler
 
             boolThingsChanged = False
             MsgBox("System Restore Point Creation Task Created.", MsgBoxStyle.Information, Me.Text)
-        Catch ex2 As IO.FileNotFoundException
+        Catch ex2 As FileNotFoundException
             Try
                 If boolDoesTaskExist(strCheckPointTaskName) Then
                     taskService.RootFolder.DeleteTask(strCheckPointTaskName)
@@ -542,7 +543,7 @@ Public Class frmTaskScheduler
             Dim newTask As TaskDefinition = taskService.NewTask
             newTask.RegistrationInfo.Description = strDeleteTaskName
 
-            Dim exePathInfo As New IO.FileInfo(Application.ExecutablePath)
+            Dim exePathInfo As New FileInfo(Application.ExecutablePath)
             newTask.Actions.Add(New ExecAction(Chr(34) & exePathInfo.FullName & Chr(34), "-deleteoldrestorepoints", exePathInfo.DirectoryName))
             exePathInfo = Nothing
 
@@ -610,7 +611,7 @@ Public Class frmTaskScheduler
 
             boolThingsChanged = False
             MsgBox("Delete Old System Restore Points Task Created.", MsgBoxStyle.Information, Me.Text)
-        Catch ex2 As IO.FileNotFoundException
+        Catch ex2 As FileNotFoundException
             Try
                 If boolDoesTaskExist(strDeleteTaskName) Then
                     taskService.RootFolder.DeleteTask(strDeleteTaskName)

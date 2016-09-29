@@ -1,10 +1,12 @@
-﻿Public Class frmManuallySubmitCrashData
+﻿Imports System.IO
+
+Public Class frmManuallySubmitCrashData
     Private boolSubmitted As Boolean = False
     Private boolDoWeHaveAttachments As Boolean = False
     Public crashData As String
 
-    Private strLogFile As String = IO.Path.Combine(IO.Path.GetTempPath(), "event log entries.reslog")
-    Private strZIPFile As String = IO.Path.Combine(IO.Path.GetTempPath(), "attachments.zip")
+    Private strLogFile As String = Path.Combine(Path.GetTempPath(), "event log entries.reslog")
+    Private strZIPFile As String = Path.Combine(Path.GetTempPath(), "attachments.zip")
 
     Private Sub Manually_Submit_Crash_Details_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         If My.Settings.useSSL = True Then
@@ -37,7 +39,7 @@
 
     Sub deleteFileWithCrashPrevention(strPathToFile As String)
         Try
-            If IO.File.Exists(strPathToFile) = True Then IO.File.Delete(strPathToFile)
+            If File.Exists(strPathToFile) = True Then File.Delete(strPathToFile)
         Catch ex As Exception
         End Try
     End Sub
@@ -82,7 +84,7 @@
 
                 If Functions.eventLogFunctions.exportLogsToFile(strLogFile, logCount) = True Then
                     If Functions.support.addFileToZipFile(strZIPFile, strLogFile) = True Then
-                        If IO.File.Exists(strZIPFile) = True Then
+                        If File.Exists(strZIPFile) = True Then
                             boolDoWeHaveAttachments = True
                             httpHelper.addFileUpload("attachment", strZIPFile, Nothing, "application/zip")
                         End If
