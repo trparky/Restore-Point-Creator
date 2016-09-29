@@ -2255,6 +2255,8 @@ Public Class Form1
             Else
                 Me.Text = "Restore Point Creator (" & globalVariables.version.strFullVersionString & ")"
             End If
+        Else
+            Me.Text = "Restore Point Creator"
         End If
     End Sub
 
