@@ -23,6 +23,7 @@ Public Class Form1
 
     Private restorePointDateData As New Dictionary(Of String, String)
     Dim deleteAllRestorePointsThreadInstance As Threading.Thread
+    Private Const messageBoxTitle As String = "System Restore Point Creator"
 #End Region
 
 #Region "--== Timers ==--"
@@ -288,7 +289,7 @@ Public Class Form1
             taskService.RootFolder.DeleteTask(task.Name)
             Functions.eventLogFunctions.writeCrashToEventLog(ex3)
             Functions.eventLogFunctions.writeToSystemEventLog("Invalid XML data has been detected as part of the task validation routine. The task named """ & task.Name & """ has been deleted.", EventLogEntryType.Error)
-            MsgBox("One or more of your scheduled Restore Point Creator tasks have been found to be corrupted. Please check your scheduled tasks to see if any of them have been deleted.", MsgBoxStyle.Information, Me.Text)
+            MsgBox("One or more of your scheduled Restore Point Creator tasks have been found to be corrupted. Please check your scheduled tasks to see if any of them have been deleted.", MsgBoxStyle.Information, messageBoxTitle)
         Catch ex2 As IO.FileNotFoundException
             Functions.eventLogFunctions.writeCrashToEventLog(ex2)
         Catch ex As Exception
@@ -817,7 +818,7 @@ Public Class Form1
                 Dim randomNumberGenerator As New Random()
 
                 If randomNumberGenerator.Next(0, 5) = randomNumberGenerator.Next(0, 5) Then
-                    Dim result As MsgBoxResult = MsgBox("Though this is free software, donations are welcome." & vbCrLf & vbCrLf & "Remember... donations are optional, there is no requirement to donate to use this software." & vbCrLf & vbCrLf & "Do you want to donate today?  If not, click ""No"" and you won't be asked like this again.", MsgBoxStyle.YesNo + MsgBoxStyle.Question, Me.Text)
+                    Dim result As MsgBoxResult = MsgBox("Though this is free software, donations are welcome." & vbCrLf & vbCrLf & "Remember... donations are optional, there is no requirement to donate to use this software." & vbCrLf & vbCrLf & "Do you want to donate today?  If not, click ""No"" and you won't be asked like this again.", MsgBoxStyle.YesNo + MsgBoxStyle.Question, messageBoxTitle)
 
                     If result = MsgBoxResult.Yes Then
                         launchDonationURL()
@@ -869,7 +870,7 @@ Public Class Form1
 
             If Functions.http.downloadFile(globalVariables.webURLs.updateBranch.debug.strProgramZIP, memoryStream) = False Then
                 Functions.wait.closePleaseWaitWindow()
-                MsgBox("There was an error while downloading required files, please check the Event Log for more details.", MsgBoxStyle.Critical, Me.Text)
+                MsgBox("There was an error while downloading required files, please check the Event Log for more details.", MsgBoxStyle.Critical, messageBoxTitle)
 
                 memoryStream.Close()
                 memoryStream.Dispose()
@@ -892,7 +893,7 @@ Public Class Form1
             Dim zipFileObject As New ZipFile(memoryStream)
 
             If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.programFileNameInZIP, strNewApplicationFileNameFullName) = False Then
-                MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, Me.Text)
+                MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, messageBoxTitle)
 
                 zipFileObject.Close()
                 memoryStream.Close()
@@ -902,7 +903,7 @@ Public Class Form1
             End If
 
             If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.pdbFileNameInZIP, globalVariables.pdbFileNameInZIP & ".new") = False Then
-                MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, Me.Text)
+                MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, messageBoxTitle)
 
                 zipFileObject.Close()
                 memoryStream.Close()
@@ -920,7 +921,7 @@ Public Class Form1
                 Process.Start(New ProcessStartInfo With {.FileName = strNewApplicationFileNameFullName, .Arguments = "-updatewithoutuninstallinfoupdate", .Verb = "runas"})
                 Process.GetCurrentProcess.Kill()
             Else
-                MsgBox("Something went wrong during the download, update process aborted.", MsgBoxStyle.Critical, Me.Text)
+                MsgBox("Something went wrong during the download, update process aborted.", MsgBoxStyle.Critical, messageBoxTitle)
             End If
         Catch ex As Exception
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
@@ -1134,7 +1135,7 @@ Public Class Form1
         If result = globalVariables.ERROR_SUCCESS Then
             If Me.ShowMessageBoxAfterSuccessfulCreationOfRestorePointToolStripMenuItem.Checked = True Then
                 If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
-                    MsgBox("System Restore Point Created Successfully.", MsgBoxStyle.Information, Me.Text)
+                    MsgBox("System Restore Point Created Successfully.", MsgBoxStyle.Information, messageBoxTitle)
                 Else
                     NotifyIcon1.ShowBalloonTip(5000, "Restore Point Creator", "System Restore Point Created Successfully.", ToolTipIcon.Info)
                 End If
@@ -1172,7 +1173,7 @@ Public Class Form1
         End If
 
         If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
-            MsgBox(messageText, messageType, Me.Text)
+            MsgBox(messageText, messageType, messageBoxTitle)
         Else
             NotifyIcon1.ShowBalloonTip(5000, Me.Text, messageText, toolTipType)
         End If
@@ -1181,7 +1182,7 @@ Public Class Form1
     Private Sub unifiedCreateSystemRestorePoint(Optional ByVal stringRestorePointName As String = "System Checkpoint made by System Restore Point Creator")
         Try
             If stringRestorePointName.Trim = "" Then
-                MsgBox("You must enter a description for your System Restore Point.", MsgBoxStyle.Critical, Me.Text)
+                MsgBox("You must enter a description for your System Restore Point.", MsgBoxStyle.Critical, messageBoxTitle)
                 Exit Sub
             End If
 
@@ -1226,7 +1227,7 @@ Public Class Form1
 
     Sub giveDownloadErrorMessage()
         Functions.wait.closePleaseWaitWindow()
-        MsgBox("There was an error while downloading required files, please check the Event Log for more details.", MsgBoxStyle.Critical, Me.Text)
+        MsgBox("There was an error while downloading required files, please check the Event Log for more details.", MsgBoxStyle.Critical, messageBoxTitle)
     End Sub
 
     Private Sub downloadAndDoTheUpdate(Optional boolOverrideUserUpdateChannelPreferences As Boolean = False)
@@ -1339,7 +1340,7 @@ Public Class Form1
             If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.pdbFileNameInZIP, globalVariables.pdbFileNameInZIP & ".new") = False Then
                 ' This code executes only if the file extraction from the ZIP file fails.
                 Functions.eventLogFunctions.writeToSystemEventLog("There was an issue extracting data from the downloaded ZIP file.", EventLogEntryType.Error)
-                MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, Me.Text) ' Gives some feedback.
+                MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, messageBoxTitle) ' Gives some feedback.
 
                 If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                     Functions.eventLogFunctions.writeToSystemEventLog("Closing out ZIP File Object and freeing up memory.", EventLogEntryType.Information)
@@ -1359,7 +1360,7 @@ Public Class Form1
         If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.programFileNameInZIP, strNewApplicationFileNameFullName) = False Then
             ' This code executes only if the file extraction from the ZIP file fails.
             Functions.eventLogFunctions.writeToSystemEventLog("There was an issue extracting data from the downloaded ZIP file.", EventLogEntryType.Error)
-            MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, Me.Text) ' Gives some feedback.
+            MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, messageBoxTitle) ' Gives some feedback.
 
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                 Functions.eventLogFunctions.writeToSystemEventLog("Closing out ZIP File Object and freeing up memory.", EventLogEntryType.Information)
@@ -1397,12 +1398,12 @@ Public Class Form1
             Process.GetCurrentProcess.Kill()
         Else
             Functions.eventLogFunctions.writeToSystemEventLog("New executable doesn't exists, update process aborted.", EventLogEntryType.Error)
-            MsgBox("Something went wrong during the download, update process aborted.", MsgBoxStyle.Critical, Me.Text)
+            MsgBox("Something went wrong during the download, update process aborted.", MsgBoxStyle.Critical, messageBoxTitle)
         End If
     End Sub
 
     Sub disableAutomaticUpdatesAndNotifyUser()
-        Dim msgBoxResult As MsgBoxResult = MsgBox("Since you have told the program that you didn't want to update to the newest supported version, do you want to also disable Automatic Update Checking?" & vbCrLf & vbCrLf & "By disabling Automatic Update Checking you will no longer be notified about new versions of this program, that is, unless you manually check for updates." & vbCrLf & vbCrLf & "Do you want to disable Automatic Checking for Updates?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, Me.Text)
+        Dim msgBoxResult As MsgBoxResult = MsgBox("Since you have told the program that you didn't want to update to the newest supported version, do you want to also disable Automatic Update Checking?" & vbCrLf & vbCrLf & "By disabling Automatic Update Checking you will no longer be notified about new versions of this program, that is, unless you manually check for updates." & vbCrLf & vbCrLf & "Do you want to disable Automatic Checking for Updates?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, messageBoxTitle)
 
         If msgBoxResult = MsgBoxResult.Yes Then
             My.Settings.CheckForUpdates = False
@@ -1444,7 +1445,7 @@ Public Class Form1
         If Functions.http.checkForInternetConnection() = False Then
             toolStripCheckForUpdates.Enabled = True
             userInitiatedCheckForUpdatesThread = Nothing
-            MsgBox("No Internet connection detected.", MsgBoxStyle.Information, Me.Text)
+            MsgBox("No Internet connection detected.", MsgBoxStyle.Information, messageBoxTitle)
         Else
             Try
                 Dim strRemoteBuild As String = Nothing
@@ -1463,7 +1464,7 @@ Public Class Form1
 
                 Try
                     If httpHelper.getWebData(globalVariables.webURLs.core.strProgramUpdateChecker, strRemoteBuild) = False Then
-                        MsgBox("There was an error checking for a software update; update check aborted.", MsgBoxStyle.Information, Me.Text)
+                        MsgBox("There was an error checking for a software update; update check aborted.", MsgBoxStyle.Information, messageBoxTitle)
                         userInitiatedCheckForUpdatesThread = Nothing
                         Exit Sub
                     End If
@@ -1472,14 +1473,14 @@ Public Class Form1
 
                     If TypeOf ex Is Net.WebException Or TypeOf ex Is httpProtocolException Then
                         Functions.eventLogFunctions.writeToSystemEventLog("The server responded with an HTTP error.", EventLogEntryType.Error)
-                        MsgBox("The server responded with an HTTP error.", MsgBoxStyle.Critical, Me.Text)
+                        MsgBox("The server responded with an HTTP error.", MsgBoxStyle.Critical, messageBoxTitle)
                     ElseIf TypeOf ex Is sslErrorException Then
                         Functions.eventLogFunctions.writeToSystemEventLog("An HTTP SSL error occurred.", EventLogEntryType.Error)
-                        MsgBox("An HTTP SSL error occurred.", MsgBoxStyle.Critical, Me.Text)
+                        MsgBox("An HTTP SSL error occurred.", MsgBoxStyle.Critical, messageBoxTitle)
                     ElseIf TypeOf ex Is Threading.ThreadAbortException Then
                         ' We don't do anything here.
                     Else
-                        MsgBox("A general error occured, please check the Event Log.", MsgBoxStyle.Critical, Me.Text)
+                        MsgBox("A general error occured, please check the Event Log.", MsgBoxStyle.Critical, messageBoxTitle)
                     End If
 
                     userInitiatedCheckForUpdatesThread = Nothing
@@ -1487,7 +1488,7 @@ Public Class Form1
                 End Try
 
                 If strRemoteBuild.caseInsensitiveContains("unknown") = True Then
-                    MsgBox("There was an error checking for updates." & vbCrLf & vbCrLf & "HTTP Response: " & strRemoteBuild, MsgBoxStyle.Critical, Me.Text)
+                    MsgBox("There was an error checking for updates." & vbCrLf & vbCrLf & "HTTP Response: " & strRemoteBuild, MsgBoxStyle.Critical, messageBoxTitle)
                     userInitiatedCheckForUpdatesThread = Nothing
                     Exit Sub
                 ElseIf strRemoteBuild.caseInsensitiveContains("newversion") = True Then
@@ -1520,10 +1521,10 @@ Public Class Form1
                             userInitiatedCheckForUpdatesThread = Nothing
                             Exit Sub
                         ElseIf shortRemoteBuild < globalVariables.version.shortBuild Then
-                            MsgBox("Somehow you have a version that is newer than is listed on the product web site, wierd.", MsgBoxStyle.Information, Me.Text)
+                            MsgBox("Somehow you have a version that is newer than is listed on the product web site, wierd.", MsgBoxStyle.Information, messageBoxTitle)
                         ElseIf shortRemoteBuild = globalVariables.version.shortBuild Then
                             If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
-                                MsgBox("You already have the latest version.", MsgBoxStyle.Information, Me.Text)
+                                MsgBox("You already have the latest version.", MsgBoxStyle.Information, messageBoxTitle)
                             Else
                                 NotifyIcon1.ShowBalloonTip(5000, "Restore Point Creator", "You already have the latest version.", ToolTipIcon.Info)
                             End If
@@ -1532,7 +1533,7 @@ Public Class Form1
                         Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
 
                         userInitiatedCheckForUpdatesThread = Nothing
-                        MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, Me.Text)
+                        MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, messageBoxTitle)
                         Exit Sub
                     End If
                 ElseIf strRemoteBuild.caseInsensitiveContains("minor") = True Then
@@ -1564,7 +1565,7 @@ Public Class Form1
                             Exit Sub
                         ElseIf shortRemoteBuild = globalVariables.version.shortBuild Then
                             If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
-                                MsgBox("You already have the latest version.", MsgBoxStyle.Information, Me.Text)
+                                MsgBox("You already have the latest version.", MsgBoxStyle.Information, messageBoxTitle)
                             Else
                                 NotifyIcon1.ShowBalloonTip(5000, "Restore Point Creator", "You already have the latest version.", ToolTipIcon.Info)
                             End If
@@ -1573,7 +1574,7 @@ Public Class Form1
                         Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
 
                         userInitiatedCheckForUpdatesThread = Nothing
-                        MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, Me.Text)
+                        MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, messageBoxTitle)
                         Exit Sub
                     End If
 
@@ -1583,13 +1584,13 @@ Public Class Form1
                     If Short.TryParse(strRemoteBuild, shortRemoteBuild) = True Then
                         If shortRemoteBuild < globalVariables.version.shortBuild Then
                             If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
-                                MsgBox("Somehow you have a version that is newer than is listed on the product web site, wierd.", MsgBoxStyle.Information, Me.Text)
+                                MsgBox("Somehow you have a version that is newer than is listed on the product web site, wierd.", MsgBoxStyle.Information, messageBoxTitle)
                             Else
                                 NotifyIcon1.ShowBalloonTip(5000, "Restore Point Creator", "Somehow you have a version that is newer than is listed on the product web site, wierd.", ToolTipIcon.Info)
                             End If
                         ElseIf shortRemoteBuild = globalVariables.version.shortBuild Then
                             If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
-                                MsgBox("You already have the latest version.", MsgBoxStyle.Information, Me.Text)
+                                MsgBox("You already have the latest version.", MsgBoxStyle.Information, messageBoxTitle)
                             Else
                                 NotifyIcon1.ShowBalloonTip(5000, "Restore Point Creator", "You already have the latest version.", ToolTipIcon.Info)
                             End If
@@ -1605,7 +1606,7 @@ Public Class Form1
                         Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
 
                         userInitiatedCheckForUpdatesThread = Nothing
-                        MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, Me.Text)
+                        MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, messageBoxTitle)
                         Exit Sub
                     End If
                 End If
@@ -1630,7 +1631,7 @@ Public Class Form1
                 My.Settings.Save()
 
                 If Functions.http.checkForInternetConnection() = False Then
-                    MsgBox("No Internet connection detected.", MsgBoxStyle.Information, Me.Text)
+                    MsgBox("No Internet connection detected.", MsgBoxStyle.Information, messageBoxTitle)
                     formLoadCheckForUpdatesRoutineThread = Nothing
                     Exit Sub
                 Else
@@ -1654,7 +1655,7 @@ Public Class Form1
 
                         Try
                             If httpHelper.getWebData(globalVariables.webURLs.core.strProgramUpdateChecker, strRemoteBuild) = False Then
-                                MsgBox("There was an error checking for a software update; update check aborted. Please see the Event Log for more information regarding this error message.", MsgBoxStyle.Information, Me.Text)
+                                MsgBox("There was an error checking for a software update; update check aborted. Please see the Event Log for more information regarding this error message.", MsgBoxStyle.Information, messageBoxTitle)
 
                                 formLoadCheckForUpdatesRoutineThread = Nothing
                                 Exit Sub
@@ -1664,14 +1665,14 @@ Public Class Form1
 
                             If TypeOf ex Is Net.WebException Or TypeOf ex Is httpProtocolException Then
                                 Functions.eventLogFunctions.writeToSystemEventLog("The server responded with an HTTP error.", EventLogEntryType.Error)
-                                MsgBox("The server responded with an HTTP error.", MsgBoxStyle.Critical, Me.Text)
+                                MsgBox("The server responded with an HTTP error.", MsgBoxStyle.Critical, messageBoxTitle)
                             ElseIf TypeOf ex Is sslErrorException Then
                                 Functions.eventLogFunctions.writeToSystemEventLog("An HTTP SSL error occurred.", EventLogEntryType.Error)
-                                MsgBox("An HTTP SSL error occurred.", MsgBoxStyle.Critical, Me.Text)
+                                MsgBox("An HTTP SSL error occurred.", MsgBoxStyle.Critical, messageBoxTitle)
                             ElseIf TypeOf ex Is Threading.ThreadAbortException Then
                                 ' We don't do anything here.
                             Else
-                                MsgBox("A general error occured, please check the Event Log.", MsgBoxStyle.Critical, Me.Text)
+                                MsgBox("A general error occured, please check the Event Log.", MsgBoxStyle.Critical, messageBoxTitle)
                             End If
 
                             formLoadCheckForUpdatesRoutineThread = Nothing
@@ -1679,7 +1680,7 @@ Public Class Form1
                         End Try
 
                         If strRemoteBuild.caseInsensitiveContains("unknown") = True Then
-                            MsgBox("There was an error checking for updates." & vbCrLf & vbCrLf & "HTTP Response: " & strRemoteBuild, MsgBoxStyle.Critical, Me.Text)
+                            MsgBox("There was an error checking for updates." & vbCrLf & vbCrLf & "HTTP Response: " & strRemoteBuild, MsgBoxStyle.Critical, messageBoxTitle)
 
                             formLoadCheckForUpdatesRoutineThread = Nothing
                             Exit Sub
@@ -1723,7 +1724,7 @@ Public Class Form1
                                 Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
 
                                 userInitiatedCheckForUpdatesThread = Nothing
-                                MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, Me.Text)
+                                MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, messageBoxTitle)
                                 Exit Sub
                             End If
                         ElseIf strRemoteBuild.caseInsensitiveContains("minor") = True Then
@@ -1751,7 +1752,7 @@ Public Class Form1
                                 Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
 
                                 userInitiatedCheckForUpdatesThread = Nothing
-                                MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, Me.Text)
+                                MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, messageBoxTitle)
                                 Exit Sub
                             End If
 
@@ -1773,7 +1774,7 @@ Public Class Form1
                                 Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
 
                                 userInitiatedCheckForUpdatesThread = Nothing
-                                MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, Me.Text)
+                                MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, messageBoxTitle)
                                 Exit Sub
                             End If
                         End If
@@ -2019,7 +2020,7 @@ Public Class Form1
                         ' Checks to see if the user is trying to delete the newest System Restore Point based upon ID.
                         If Integer.Parse(item.SubItems(enums.restorePointListSubItems.restorePointID).Text) = newestSystemRestoreID Then
                             ' Yep, the user is trying to do that.  Stupid user, now we give that stupid user a message to prevent his/her stupidity.
-                            MsgBox("You can't delete the most recent System Restore Point.  This is for your own protection.", MsgBoxStyle.Information, Me.Text)
+                            MsgBox("You can't delete the most recent System Restore Point.  This is for your own protection.", MsgBoxStyle.Information, messageBoxTitle)
                             Exit Sub
                         End If
                     End If
@@ -2089,7 +2090,7 @@ Public Class Form1
 
                     If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
                         ' Gives some feedback.
-                        MsgBox("No System Restore Points were deleted.", MsgBoxStyle.Information, Me.Text)
+                        MsgBox("No System Restore Points were deleted.", MsgBoxStyle.Information, messageBoxTitle)
                     Else
                         ' Gives some feedback.
                         NotifyIcon1.ShowBalloonTip(5000, "Restore Point Creator", "No System Restore Points were deleted.", ToolTipIcon.Info)
@@ -2102,9 +2103,9 @@ Public Class Form1
                     If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
                         ' Gives some feedback.
                         If boolMultipleRestorePointsDeleted = True Then
-                            MsgBox(shortNumberOfRestorePointsDeleted.ToString & " System Restore Points were deleted.", MsgBoxStyle.Information, Me.Text)
+                            MsgBox(shortNumberOfRestorePointsDeleted.ToString & " System Restore Points were deleted.", MsgBoxStyle.Information, messageBoxTitle)
                         Else
-                            MsgBox("One System Restore Point was deleted.", MsgBoxStyle.Information, Me.Text)
+                            MsgBox("One System Restore Point was deleted.", MsgBoxStyle.Information, messageBoxTitle)
                         End If
                     Else
                         ' Gives some feedback.
@@ -2119,7 +2120,7 @@ Public Class Form1
                 End If
             End If
         Catch ex As Threading.ThreadAbortException
-            MsgBox("System Restore Point Deletion Process Aborted.", MsgBoxStyle.Information, Me.Text)
+            MsgBox("System Restore Point Deletion Process Aborted.", MsgBoxStyle.Information, messageBoxTitle)
         Catch ex3 As ArgumentOutOfRangeException
             Functions.eventLogFunctions.writeCrashToEventLog(ex3)
         Catch ex2 As Exception
@@ -2637,7 +2638,7 @@ Public Class Form1
             Functions.taskStuff.addRunTimeTask("Restore Point Creator -- Run with no UAC", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, "", True)
         End If
 
-        MsgBox("The Runtime tasks have been repaired.", MsgBoxStyle.Information, Me.Text)
+        MsgBox("The Runtime tasks have been repaired.", MsgBoxStyle.Information, messageBoxTitle)
     End Sub
 
     Private Sub AskBeforeCreatingRestorePointToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AskBeforeCreatingRestorePointToolStripMenuItem.Click
@@ -2759,7 +2760,7 @@ Public Class Form1
 
             iniFile = Nothing
 
-            MsgBox("Backup complete.", MsgBoxStyle.Information, Me.Text)
+            MsgBox("Backup complete.", MsgBoxStyle.Information, messageBoxTitle)
         End If
     End Sub
 
@@ -2797,7 +2798,7 @@ Public Class Form1
                     If calculateConfigBackupDataPayloadChecksum(strDataPayload, strRandomString) = strChecksum Then
                         iniFile.loadINIFileFromText(Functions.support.convertFromBase64(strDataPayload))
                     Else
-                        MsgBox("Invalid backup file.", MsgBoxStyle.Critical, Me.Text)
+                        MsgBox("Invalid backup file.", MsgBoxStyle.Critical, messageBoxTitle)
                         Exit Sub
                     End If
                 End If
@@ -2895,7 +2896,7 @@ Public Class Form1
                 loadPreferences()
                 loadRestorePointListColumnOrder()
 
-                MsgBox("Backup configuration file restoration complete.", MsgBoxStyle.Information, Me.Text)
+                MsgBox("Backup configuration file restoration complete.", MsgBoxStyle.Information, messageBoxTitle)
             End If
         End If
     End Sub
@@ -2949,7 +2950,7 @@ Public Class Form1
 
     Private Sub RemoveSafeModeBootOptionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RemoveSafeModeBootOptionToolStripMenuItem.Click
         Functions.registryStuff.removeSafeModeBoot(True)
-        MsgBox("The setting to boot your system into Safe Mode has been removed. Your system will now reboot.", MsgBoxStyle.Information, Me.Text)
+        MsgBox("The setting to boot your system into Safe Mode has been removed. Your system will now reboot.", MsgBoxStyle.Information, messageBoxTitle)
         Functions.support.rebootSystem()
     End Sub
 
@@ -3065,7 +3066,7 @@ Public Class Form1
             registryKeyWeAreWorkingWith.Close()
             registryKeyWeAreWorkingWith.Dispose()
 
-            MsgBox("The compatibility flag has been set for the program. The program will relaunch for the changes to take effect.", MsgBoxStyle.Information, Me.Text)
+            MsgBox("The compatibility flag has been set for the program. The program will relaunch for the changes to take effect.", MsgBoxStyle.Information, messageBoxTitle)
             Functions.support.reRunWithAdminUserRights()
         Else
             Dim registryKeyWeAreWorkingWith As RegistryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers", True)
@@ -3083,7 +3084,7 @@ Public Class Form1
         If AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked Then
             AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked = False
         Else
-            Dim msgBoxResult As MsgBoxResult = MsgBox("It isn't recommended to allow System Restore Point Creator to delete all System Restore Points that exist on this system, including the most recent System Restore Point." & vbCrLf & vbCrLf & "Are you sure you want to do this?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, Me.Text)
+            Dim msgBoxResult As MsgBoxResult = MsgBox("It isn't recommended to allow System Restore Point Creator to delete all System Restore Points that exist on this system, including the most recent System Restore Point." & vbCrLf & vbCrLf & "Are you sure you want to do this?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, messageBoxTitle)
 
             If msgBoxResult = Microsoft.VisualBasic.MsgBoxResult.Yes Then
                 AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked = True
@@ -3181,9 +3182,9 @@ Public Class Form1
 
             If Application.ExecutablePath.caseInsensitiveContains("program files") = False Then
                 If Environment.Is64BitOperatingSystem Then
-                    MsgBox("It is HIGHLY recommended to place this program's executable in C:\Program Files (x86)." & vbCrLf & vbCrLf & "The reason why is that this portion of the program creates a My Computer right-click option so if Windows can't find the executable in the specified path, the right-click option will be invalid.", MsgBoxStyle.Information, Me.Text)
+                    MsgBox("It is HIGHLY recommended to place this program's executable in C:\Program Files (x86)." & vbCrLf & vbCrLf & "The reason why is that this portion of the program creates a My Computer right-click option so if Windows can't find the executable in the specified path, the right-click option will be invalid.", MsgBoxStyle.Information, messageBoxTitle)
                 Else
-                    MsgBox("It is HIGHLY recommended to place this program's executable in C:\Program Files." & vbCrLf & vbCrLf & "The reason why is that this portion of the program creates a My Computer right-click option so if Windows can't find the executable in the specified path, the right-click option will be invalid.", MsgBoxStyle.Information, Me.Text)
+                    MsgBox("It is HIGHLY recommended to place this program's executable in C:\Program Files." & vbCrLf & vbCrLf & "The reason why is that this portion of the program creates a My Computer right-click option so if Windows can't find the executable in the specified path, the right-click option will be invalid.", MsgBoxStyle.Information, messageBoxTitle)
                 End If
 
                 toolStripMyComputer.Checked = False
@@ -3278,7 +3279,7 @@ Public Class Form1
             Catch ex As Security.SecurityException
                 toolStripMyComputer.Checked = False
                 Functions.eventLogFunctions.writeCrashToEventLog(ex)
-                MsgBox("Unable to modify the My Computer right-click context menu. A security violation has occurred. Please contact your system administrator for assistance.", MsgBoxStyle.Critical, Me.Text)
+                MsgBox("Unable to modify the My Computer right-click context menu. A security violation has occurred. Please contact your system administrator for assistance.", MsgBoxStyle.Critical, messageBoxTitle)
             End Try
         Else
             Try
@@ -3303,7 +3304,7 @@ Public Class Form1
                 ' All of this prevents a rare Null Reference Exception.
             Catch ex As Security.SecurityException
                 Functions.eventLogFunctions.writeCrashToEventLog(ex)
-                MsgBox("Unable to modify the My Computer right-click context menu. A security violation has occurred. Please contact your system administrator for assistance.", MsgBoxStyle.Critical, Me.Text)
+                MsgBox("Unable to modify the My Computer right-click context menu. A security violation has occurred. Please contact your system administrator for assistance.", MsgBoxStyle.Critical, messageBoxTitle)
             End Try
         End If
     End Sub
@@ -3371,7 +3372,7 @@ Public Class Form1
         End If
 
         If boolRegistryShowDonationMessageValue = False Then
-            MsgBox("It appears that you have already donated to the developer of this program.  You don't have to donate again but if you want to, I won't argue with you.", MsgBoxStyle.Information, Me.Text)
+            MsgBox("It appears that you have already donated to the developer of this program.  You don't have to donate again but if you want to, I won't argue with you.", MsgBoxStyle.Information, messageBoxTitle)
         End If
 
         launchDonationURL()
@@ -3415,7 +3416,7 @@ Public Class Form1
 
             Functions.wait.openPleaseWaitWindow()
         Else
-            MsgBox("Restore points not deleted.", MsgBoxStyle.Information, Me.Text)
+            MsgBox("Restore points not deleted.", MsgBoxStyle.Information, messageBoxTitle)
         End If
     End Sub
 
@@ -3595,10 +3596,10 @@ Public Class Form1
 #Region "--== Button Click Event Code ==--"
     Private Sub btnRestoreToRestorePointSafeMode_Click(sender As Object, e As EventArgs) Handles btnRestoreToRestorePointSafeMode.Click
         If systemRestorePointsList.SelectedItems.Count > 1 Then
-            MsgBox("You can't have multiple System Restore Points selected for this function to work, you must only select one.", MsgBoxStyle.Information, Me.Text)
+            MsgBox("You can't have multiple System Restore Points selected for this function to work, you must only select one.", MsgBoxStyle.Information, messageBoxTitle)
             Exit Sub
         ElseIf systemRestorePointsList.SelectedItems.Count = 0 Then
-            MsgBox("You must select a System Restore Point to restore your system to.", MsgBoxStyle.Information, Me.Text)
+            MsgBox("You must select a System Restore Point to restore your system to.", MsgBoxStyle.Information, messageBoxTitle)
             Exit Sub
         End If
 
@@ -3623,13 +3624,13 @@ Public Class Form1
             ' Then finally reboot the system.
             Functions.support.rebootSystem()
         Else
-            MsgBox("Your system has NOT been restored to the selected System Restore Point.", MsgBoxStyle.Information, Me.Text)
+            MsgBox("Your system has NOT been restored to the selected System Restore Point.", MsgBoxStyle.Information, messageBoxTitle)
         End If
     End Sub
 
     Private Sub btnCreateRestorePointNameWithDefaultName_Click(sender As Object, e As EventArgs) Handles btnCreateRestorePointNameWithDefaultName.Click
         If Functions.support.areWeInSafeMode() = True Then
-            MsgBox("You are in Safe Mode, it's not recommended to make restore points in Safe Mode.", MsgBoxStyle.Information, Me.Text)
+            MsgBox("You are in Safe Mode, it's not recommended to make restore points in Safe Mode.", MsgBoxStyle.Information, messageBoxTitle)
             Exit Sub
         End If
 
@@ -3646,7 +3647,7 @@ Public Class Form1
 
     Private Sub btnCreate_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnCreate.Click
         If Functions.support.areWeInSafeMode() = True Then
-            MsgBox("You are in Safe Mode, it's not recommended to make restore points in Safe Mode.", MsgBoxStyle.Information, Me.Text)
+            MsgBox("You are in Safe Mode, it's not recommended to make restore points in Safe Mode.", MsgBoxStyle.Information, messageBoxTitle)
             Exit Sub
         End If
 
@@ -3679,7 +3680,7 @@ Public Class Form1
 
     Private Sub btnCreateSystemCheckpoint_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnCreateSystemCheckpoint.Click
         If Functions.support.areWeInSafeMode() = True Then
-            MsgBox("You are in Safe Mode, it's not recommended to make restore points in Safe Mode.", MsgBoxStyle.Information, Me.Text)
+            MsgBox("You are in Safe Mode, it's not recommended to make restore points in Safe Mode.", MsgBoxStyle.Information, messageBoxTitle)
             Exit Sub
         End If
 
@@ -3704,10 +3705,10 @@ Public Class Form1
 
     Private Sub btnRestoreToRestorePoint_Click(sender As Object, e As EventArgs) Handles btnRestoreToRestorePoint.Click
         If systemRestorePointsList.SelectedItems.Count > 1 Then
-            MsgBox("You can't have multiple System Restore Points selected for this function to work, you must only select one.", MsgBoxStyle.Information, Me.Text)
+            MsgBox("You can't have multiple System Restore Points selected for this function to work, you must only select one.", MsgBoxStyle.Information, messageBoxTitle)
             Exit Sub
         ElseIf systemRestorePointsList.SelectedItems.Count = 0 Then
-            MsgBox("You must select a System Restore Point to restore your system to.", MsgBoxStyle.Information, Me.Text)
+            MsgBox("You must select a System Restore Point to restore your system to.", MsgBoxStyle.Information, messageBoxTitle)
             Exit Sub
         End If
 
@@ -3729,7 +3730,7 @@ Public Class Form1
 
             Functions.wait.openPleaseWaitWindow()
         Else
-            MsgBox("Your system has NOT been restored to the selected System Restore Point.", MsgBoxStyle.Information, Me.Text)
+            MsgBox("Your system has NOT been restored to the selected System Restore Point.", MsgBoxStyle.Information, messageBoxTitle)
         End If
     End Sub
 
@@ -3757,7 +3758,7 @@ Public Class Form1
 
     Private Sub btnDeleteRestorePoint_Click(sender As Object, e As EventArgs) Handles btnDeleteRestorePoint.Click
         If systemRestorePointsList.SelectedItems.Count = 0 Then
-            MsgBox("You must select one Or more System Restore Points to delete.", MsgBoxStyle.Information, Me.Text)
+            MsgBox("You must select one Or more System Restore Points to delete.", MsgBoxStyle.Information, messageBoxTitle)
             Exit Sub
         End If
 
