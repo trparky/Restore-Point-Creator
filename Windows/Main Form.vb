@@ -22,7 +22,7 @@ Public Class Form1
     Private formLoadCheckForUpdatesRoutineThread, userInitiatedCheckForUpdatesThread, deleteThread, updateRestorePointListThread As Threading.Thread
 
     Private restorePointDateData As New Dictionary(Of String, String)
-    Dim deleteAllRestorePointsThreadInstance As Threading.Thread
+    Private deleteAllRestorePointsThreadInstance As Threading.Thread
     Private Const messageBoxTitle As String = "System Restore Point Creator"
 #End Region
 
