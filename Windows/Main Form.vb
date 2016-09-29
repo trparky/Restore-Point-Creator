@@ -16,14 +16,14 @@ Public Class Form1
     Private m_SortingColumn As ColumnHeader
 
     Private Const strTypeYourRestorePointName As String = "Type in a name for your custom-named System Restore Point and press Enter..."
+    Private Const strMessageBoxTitle As String = "System Restore Point Creator"
     Public defaultCustomRestorePointName As String
 
     Private checkForAndEnableSystemRestoreIfNeeded, checkRestorePointSpaceThread, startSystemRestorePointListLoadThread As Threading.Thread
     Private formLoadCheckForUpdatesRoutineThread, userInitiatedCheckForUpdatesThread, deleteThread, updateRestorePointListThread As Threading.Thread
+    Private deleteAllRestorePointsThreadInstance As Threading.Thread
 
     Private restorePointDateData As New Dictionary(Of String, String)
-    Private deleteAllRestorePointsThreadInstance As Threading.Thread
-    Private Const strMessageBoxTitle As String = "System Restore Point Creator"
 #End Region
 
 #Region "--== Timers ==--"
