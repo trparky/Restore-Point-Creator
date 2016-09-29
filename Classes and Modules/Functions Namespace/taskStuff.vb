@@ -1,5 +1,4 @@
-﻿Imports System.Globalization
-Imports Microsoft.Win32
+﻿Imports Microsoft.Win32
 
 Namespace Functions.taskStuff
     Module taskStuff
@@ -35,7 +34,7 @@ Namespace Functions.taskStuff
                 taskFolderObject = Nothing
                 taskService = Nothing
             Catch ex As Exception
-                Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
+                Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
                 exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
             End Try
         End Sub

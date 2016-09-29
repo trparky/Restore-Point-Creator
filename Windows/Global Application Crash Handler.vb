@@ -1,5 +1,4 @@
-﻿Imports System.Globalization
-Imports System.Text
+﻿Imports System.Text
 
 Public Class frmCrash
     Property exceptionMessage As String
@@ -286,7 +285,7 @@ Public Class frmCrash
         If boolSubmitted = False Then
             If MsgBox("Are you sure you want to close this window? You have not submitted the crash data yet.", MsgBoxStyle.Question + MsgBoxStyle.YesNo, Me.Text) = MsgBoxResult.Yes Then
                 boolSubmitted = True
-                Functions.support.deleteFileWithNoException(globalVariables.strDumpFilePath)
+	            Functions.support.deleteFileWithNoException(globalVariables.strDumpFilePath)
                 Me.Close()
             End If
         End If
@@ -375,11 +374,11 @@ Namespace exceptionHandler
             exceptionStackTrace = Functions.support.removeSourceCodePathInfo(exceptionStackTrace)
 
             If handleCrashWithAnErrorOrRedirectUserInstead(exceptionType, exceptionObject) = True Then
-                Try
-                    Functions.miniDump.MiniDump.MiniDumpToFile(globalVariables.strDumpFilePath)
-                Catch Ex As Exception
-                    ' Does nothing
-                End Try
+            	Try
+                	Functions.miniDump.MiniDump.MiniDumpToFile(globalVariables.strDumpFilePath)
+            	Catch Ex As Exception
+            		' Does nothing
+            	End Try
 
                 Dim crashWindow As New frmCrash
                 crashWindow.Text = "Critical Application Error Detected!"
@@ -402,14 +401,14 @@ Friend Class ThreadExceptionHandler
     Public Sub Application_ThreadException(ByVal sender As Object, ByVal exceptionObject As Threading.ThreadExceptionEventArgs)
         Try
             If exceptionHandler.handleCrashWithAnErrorOrRedirectUserInstead(exceptionObject.Exception) = True Then
-                Try
-                    Functions.miniDump.MiniDump.MiniDumpToFile(globalVariables.strDumpFilePath)
-                Catch Ex As Exception
-                    ' Does nothing
-                End Try
+            	Try
+                	Functions.miniDump.MiniDump.MiniDumpToFile(globalVariables.strDumpFilePath)
+            	Catch Ex As Exception
+            		' Does nothing
+            	End Try
 
                 Dim crashWindow As New frmCrash
-                Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
+                Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
                 crashWindow.exceptionMessage = exceptionObject.Exception.Message
                 crashWindow.exceptionStackTrace = exceptionObject.Exception.StackTrace
                 crashWindow.exceptionType = exceptionObject.Exception.GetType.ToString
@@ -436,7 +435,7 @@ Friend Class ThreadExceptionHandler
         Functions.eventLogFunctions.writeCrashToEventLog(exceptionObject.ExceptionObject)
 
         Dim crashWindow As New frmCrash
-        Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
+        Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
         crashWindow.exceptionMessage = exceptionObject.ExceptionObject.Exception.Message
         crashWindow.exceptionStackTrace = exceptionObject.ExceptionObject.Exception.StackTrace
         crashWindow.exceptionType = exceptionObject.ExceptionObject.Exception.GetType.ToString

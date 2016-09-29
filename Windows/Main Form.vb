@@ -5,7 +5,6 @@ Imports System.Text
 Imports System.Runtime.InteropServices
 Imports System.Management
 Imports ICSharpCode.SharpZipLib.Zip
-Imports System.Globalization
 #End Region
 
 Public Class Form1
@@ -263,7 +262,7 @@ Public Class Form1
                 End If
             End If
         Catch ex As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
+            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
         End Try
     End Sub
@@ -294,7 +293,7 @@ Public Class Form1
         Catch ex2 As IO.FileNotFoundException
             Functions.eventLogFunctions.writeCrashToEventLog(ex2)
         Catch ex As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
+            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
         End Try
     End Sub
@@ -321,7 +320,7 @@ Public Class Form1
         Catch ex As IO.FileNotFoundException
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
         Catch ex As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
+            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
         End Try
     End Sub
@@ -496,7 +495,7 @@ Public Class Form1
                 formLoadCheckForUpdatesRoutineThread.Start()
             End If
         Catch ex As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
+            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
         End Try
     End Sub
@@ -1048,7 +1047,7 @@ Public Class Form1
         Catch ex As Threading.ThreadAbortException
             ' Does nothing
         Catch ex2 As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
+            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex2, ex2.Message, ex2.StackTrace, ex2.GetType)
         Finally
             If toolStripLogRestorePointDeletions.Checked Then
@@ -1221,7 +1220,7 @@ Public Class Form1
 
             If toolStripCloseAfterRestorePointIsCreated.Checked Then Me.Close()
         Catch ex2 As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
+            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex2, ex2.Message, ex2.StackTrace, ex2.GetType)
         End Try
     End Sub
@@ -1933,7 +1932,7 @@ Public Class Form1
         Catch ex3 As COMException
             Functions.wmi.giveComExceptionCrashMessage()
         Catch ex2 As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
+            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex2, ex2.Message, ex2.StackTrace, ex2.GetType)
         Finally
             Functions.wait.closePleaseWaitWindow()
@@ -2125,7 +2124,7 @@ Public Class Form1
         Catch ex3 As ArgumentOutOfRangeException
             Functions.eventLogFunctions.writeCrashToEventLog(ex3)
         Catch ex2 As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
+            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex2, ex2.Message, ex2.StackTrace, ex2.GetType)
         Finally
             systemRestorePointsList.Enabled = True
@@ -2229,7 +2228,7 @@ Public Class Form1
         Catch ex As Threading.ThreadAbortException
             ' Does nothing
         Catch ex2 As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
+            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex2, ex2.Message, ex2.StackTrace, ex2.GetType)
         Finally
             toolStripDeleteOldRestorePoints.Enabled = True
@@ -2536,7 +2535,7 @@ Public Class Form1
 
             My.Settings.boolFirstRun = False
         Catch ex As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
+            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, "Main Form Load" & vbCrLf & vbCrLf & ex.Message, ex.StackTrace, ex.GetType)
         End Try
     End Sub
