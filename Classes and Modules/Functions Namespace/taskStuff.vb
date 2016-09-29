@@ -1,6 +1,5 @@
 ﻿Imports System.Globalization
 Imports Microsoft.Win32
-Imports System.IO
 
 Namespace Functions.taskStuff
     Module taskStuff
@@ -177,7 +176,7 @@ Namespace Functions.taskStuff
 
                 eventLogFunctions.writeToSystemEventLog("Creating task """ & taskName & """", EventLogEntryType.Information)
 
-                If File.Exists(taskEXEPath) = False Then
+                If IO.File.Exists(taskEXEPath) = False Then
                     MsgBox("Executable path not found.", MsgBoxStyle.Critical, "Restore Point Creator")
                     Exit Sub
                 End If
@@ -187,7 +186,7 @@ Namespace Functions.taskStuff
 
                 newTask.RegistrationInfo.Description = taskDescription
 
-                Dim exeFileInfo As New FileInfo(taskEXEPath)
+                Dim exeFileInfo As New IO.FileInfo(taskEXEPath)
 
                 newTask.Actions.Add(New TaskScheduler.ExecAction(taskEXEPath, taskParameters, exeFileInfo.DirectoryName))
 
@@ -373,7 +372,7 @@ Namespace Functions.taskStuff
 
                         If execActionPath.Contains(Chr(34)) = True Then execActionPath = execActionPath.Replace(Chr(34), "")
 
-                        If File.Exists(execActionPath) = True Then
+                        If IO.File.Exists(execActionPath) = True Then
                             Return True
                         Else
                             deleteTask(taskObject) ' This is an invalid RunTime task so we need to delete it.

@@ -1,6 +1,5 @@
 ﻿Imports Tom
 Imports System.Globalization
-Imports System.IO
 
 Public Class Disk_Space_Usage
     Private pleaseWaitInstance As Please_Wait
@@ -90,11 +89,11 @@ Public Class Disk_Space_Usage
             Dim yPosition As Integer = 10
             Dim xPosition As Integer = 12
 
-            For Each currentDrive As DriveInfo In My.Computer.FileSystem.Drives
+            For Each currentDrive As IO.DriveInfo In My.Computer.FileSystem.Drives
                 xPosition = 12 ' Resets the X position back to the beginning of the line.
 
                 Try
-                    If currentDrive.IsReady = True And (currentDrive.DriveType = DriveType.Fixed Or currentDrive.DriveType = DriveType.Removable) Then
+                    If currentDrive.IsReady = True And (currentDrive.DriveType = IO.DriveType.Fixed Or currentDrive.DriveType = IO.DriveType.Removable) Then
                         currentDriveLetter = currentDrive.RootDirectory.ToString.Replace("\", "")
 
                         ' Some math.  YAY MATH!
@@ -237,7 +236,8 @@ Public Class Disk_Space_Usage
 
                         yPosition += 50 ' Advances the Y position down for the display of data for the next system drive.
                     End If
-                Catch ex As IOException
+                Catch ex As IO.IOException
+
                 End Try
             Next
         Catch ex As Exception

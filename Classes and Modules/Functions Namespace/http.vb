@@ -1,6 +1,4 @@
-﻿Imports System.IO
-
-Namespace Functions.http
+﻿Namespace Functions.http
     Module http
         Public Function checkForInternetConnection() As Boolean
             If My.Computer.Network.IsAvailable = True Then
@@ -22,7 +20,7 @@ Namespace Functions.http
             End If
         End Function
 
-        Public Function downloadFile(ByVal urlToDownloadFrom As String, ByRef memStream As MemoryStream) As Boolean
+        Public Function downloadFile(ByVal urlToDownloadFrom As String, ByRef memStream As IO.MemoryStream) As Boolean
             Try
                 Dim httpHelper As httpHelper = createNewHTTPHelperObject()
                 Return httpHelper.getDownloadDataStream(urlToDownloadFrom, memStream, False)
@@ -75,7 +73,7 @@ Namespace Functions.http
             httpHelper.setProxyMode(My.Settings.useHTTPProxy)
             httpHelper.setHTTPTimeout(10)
 
-            If File.Exists("tom") = True Then
+            If IO.File.Exists("tom") = True Then
                 httpHelper.addPOSTData("dontcount", "True")
             End If
 

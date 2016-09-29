@@ -1,12 +1,11 @@
 ﻿Imports System.Text.RegularExpressions
-Imports System.IO
 
 Namespace Functions.checksum
     Module checksum
         Private Function SHA256ChecksumFile(ByVal filename As String) As String
             Dim SHA1Engine As New Security.Cryptography.SHA256CryptoServiceProvider
 
-            Dim FileStream As New FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read, 10 * 1048576, FileOptions.SequentialScan)
+            Dim FileStream As New IO.FileStream(filename, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read, 10 * 1048576, IO.FileOptions.SequentialScan)
             Dim Output As Byte() = SHA1Engine.ComputeHash(FileStream)
             FileStream.Close()
             FileStream.Dispose()
@@ -14,14 +13,14 @@ Namespace Functions.checksum
             Return BitConverter.ToString(Output).ToLower().Replace("-", "").Trim
         End Function
 
-        Private Function SHA256ChecksumStream(ByRef stream As Stream) As String
+        Private Function SHA256ChecksumStream(ByRef stream As IO.Stream) As String
             Dim SHA1Engine As New Security.Cryptography.SHA256CryptoServiceProvider
 
             Dim Output As Byte() = SHA1Engine.ComputeHash(stream)
             Return BitConverter.ToString(Output).ToLower().Replace("-", "").Trim
         End Function
 
-        Public Function verifyChecksum(urlOfChecksumFile As String, memStream As MemoryStream, boolGiveUserAnErrorMessage As Boolean) As Boolean
+        Public Function verifyChecksum(urlOfChecksumFile As String, memStream As IO.MemoryStream, boolGiveUserAnErrorMessage As Boolean) As Boolean
             Dim checksumFromWeb As String = Nothing
             memStream.Position = 0
 

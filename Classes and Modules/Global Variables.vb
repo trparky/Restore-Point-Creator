@@ -1,5 +1,4 @@
-﻿Imports System.IO
-Imports System.Text.RegularExpressions
+﻿Imports System.Text.RegularExpressions
 
 Namespace globalVariables
     Namespace booleans
@@ -149,7 +148,7 @@ Namespace globalVariables
         Public Const programFileNameInZIP As String = "Restore Point Creator.exe"
         Public Const pdbFileNameInZIP As String = "Restore Point Creator.pdb"
 
-        Public strDumpFilePath As String = Path.Combine(Path.GetTempPath(), "restorePointCreator.dmp")
+        Public strDumpFilePath As String = IO.Path.Combine(IO.Path.GetTempPath(), "restorePointCreator.dmp")
         Public Const updaterFileName As String = "updater.exe"
 
         Public Const programName As String = "Restore Point Creator"

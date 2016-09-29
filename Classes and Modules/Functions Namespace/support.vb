@@ -1,7 +1,6 @@
 ﻿Imports System.Globalization
 Imports System.Text.RegularExpressions
 Imports ICSharpCode.SharpZipLib.Zip
-Imports System.IO
 
 Namespace Functions.support
     Module support
@@ -77,13 +76,13 @@ Namespace Functions.support
 
         Public Sub searchForProcessAndKillIt(strFileName As String, boolFullFilePathPassed As Boolean)
             Dim processExecutablePath As String
-            Dim processExecutablePathFileInfo As FileInfo
+            Dim processExecutablePathFileInfo As IO.FileInfo
 
             For Each process As Process In Process.GetProcesses()
                 processExecutablePath = getProcessExecutablePath(process.Id)
 
                 If processExecutablePath IsNot Nothing Then
-                    processExecutablePathFileInfo = New FileInfo(processExecutablePath)
+                    processExecutablePathFileInfo = New IO.FileInfo(processExecutablePath)
 
                     If boolFullFilePathPassed = True Then
                         If stringCompare(strFileName, processExecutablePathFileInfo.FullName) = True Then
@@ -107,7 +106,7 @@ Namespace Functions.support
         ''' <returns>A Boolean Value. If the function was able to sucessfully extract the requested file from the ZIP file, it will return a True value. However, if for whatever reason something goes wrong anywhere in this function, it will return a False value.</returns>
         Public Function extractUpdatedFileFromZIPPackage(ByRef zipFileObject As ZipFile, ByVal fileToExtract As String, ByVal extractionTarget As String, Optional boolDeleteTargetIfExists As Boolean = True) As Boolean
             Try
-                Dim extractionTargetFileInfo As New FileInfo(extractionTarget)
+                Dim extractionTargetFileInfo As New IO.FileInfo(extractionTarget)
 
                 If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                     eventLogFunctions.writeToSystemEventLog(String.Format("Beginning extraction of {0}{1}{0} to {0}{2}{0}.", Chr(34), fileToExtract, extractionTargetFileInfo.Name), EventLogEntryType.Information)
@@ -122,7 +121,7 @@ Namespace Functions.support
                     Return False ' Nope, the file doesn't exist in the ZIP file so we exit out of the routine by returning a False value for the function.
                 Else
                     ' This checks to see if the file we are trying to extract to from the ZIP file exists or not.
-                    If File.Exists(extractionTarget) = True Then
+                    If IO.File.Exists(extractionTarget) = True Then
                         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                             eventLogFunctions.writeToSystemEventLog(String.Format("The file named {0}{1}{0} already exists, attempting to delete it.", Chr(34), fileToExtract), EventLogEntryType.Information)
                         End If
@@ -140,7 +139,7 @@ Namespace Functions.support
                             End If
 
                             Try
-                                File.Delete(extractionTarget) ' And now let's try and delete the file.
+                                IO.File.Delete(extractionTarget) ' And now let's try and delete the file.
 
                                 If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                                     eventLogFunctions.writeToSystemEventLog(String.Format("The file named {0}{1}{0} has been successfully deleted.", Chr(34), extractionTargetFileInfo.FullName), EventLogEntryType.Information)
@@ -165,7 +164,7 @@ Namespace Functions.support
                     End If
 
                     ' Create a new FileStream Object to write out our extracted file.
-                    Dim fileStream As New FileStream(extractionTarget, FileMode.Create)
+                    Dim fileStream As New IO.FileStream(extractionTarget, IO.FileMode.Create)
 
                     If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                         eventLogFunctions.writeToSystemEventLog(String.Format("IO.FileStream created successfully. Commencing the process of writing file {0}{1}{0} as {0}{2}{0} to disk.", Chr(34), fileToExtract, extractionTargetFileInfo.Name), EventLogEntryType.Information)
@@ -204,7 +203,7 @@ Namespace Functions.support
         ''' <summary>Delete a file with no Exception. It first checks to see if the file exists and if it does it attempts to delete it. If it fails to do so then it will fail silently without an Exception.</summary>
         Public Sub deleteFileWithNoException(ByVal pathToFile As String)
             Try
-                If File.Exists(pathToFile) Then File.Delete(pathToFile)
+                If IO.File.Exists(pathToFile) Then IO.File.Delete(pathToFile)
             Catch ex As Exception
             End Try
         End Sub
@@ -218,7 +217,7 @@ Namespace Functions.support
                 Dim zipFileObject As ZipFile ' Creates a ZIPFile Object.
 
                 ' This checks to see if the ZIP file we want to work with already exists.
-                If File.Exists(pathToZIPFile) = True Then
+                If IO.File.Exists(pathToZIPFile) = True Then
                     ' OK, the ZIP file already exists so we create a new ZIPFile Object by opening the existing ZIP file.
                     zipFileObject = New ZipFile(pathToZIPFile)
                 Else
@@ -227,7 +226,7 @@ Namespace Functions.support
                 End If
 
                 zipFileObject.BeginUpdate() ' We need to open the ZIP file for writing.
-                zipFileObject.Add(fileToAddToZIPFile, New FileInfo(fileToAddToZIPFile).Name) ' Adds the file to the ZIP file.
+                zipFileObject.Add(fileToAddToZIPFile, New IO.FileInfo(fileToAddToZIPFile).Name) ' Adds the file to the ZIP file.
                 zipFileObject.CommitUpdate() ' Commits the added file to the ZIP file.
                 zipFileObject.Close() ' Closes the ZIPFile Object.
 
@@ -352,7 +351,7 @@ Namespace Functions.support
         End Sub
 
         Public Sub executeCommand(pathToExecutable As String, arguments As String, Optional runAsAdmin As Boolean = False)
-            If File.Exists(pathToExecutable) = True Then
+            If IO.File.Exists(pathToExecutable) = True Then
                 Dim processStartInfo As New ProcessStartInfo()
                 processStartInfo.FileName = pathToExecutable
                 processStartInfo.WindowStyle = ProcessWindowStyle.Hidden
@@ -366,7 +365,7 @@ Namespace Functions.support
         End Sub
 
         Public Sub executeCommand(pathToExecutable As String, Optional runAsAdmin As Boolean = False)
-            If File.Exists(pathToExecutable) = True Then
+            If IO.File.Exists(pathToExecutable) = True Then
                 Dim processStartInfo As New ProcessStartInfo()
                 processStartInfo.FileName = pathToExecutable
                 processStartInfo.WindowStyle = ProcessWindowStyle.Hidden
@@ -379,7 +378,7 @@ Namespace Functions.support
         End Sub
 
         Public Sub executeCommandWithWait(pathToExecutable As String, arguments As String, Optional runAsAdmin As Boolean = False)
-            If File.Exists(pathToExecutable) = True Then
+            If IO.File.Exists(pathToExecutable) = True Then
                 Dim processStartInfo As New ProcessStartInfo()
                 processStartInfo.FileName = pathToExecutable
                 processStartInfo.WindowStyle = ProcessWindowStyle.Hidden
@@ -393,7 +392,7 @@ Namespace Functions.support
         End Sub
 
         Public Sub executeCommandWithWait(pathToExecutable As String, Optional runAsAdmin As Boolean = False)
-            If File.Exists(pathToExecutable) = True Then
+            If IO.File.Exists(pathToExecutable) = True Then
                 Dim processStartInfo As New ProcessStartInfo()
                 processStartInfo.FileName = pathToExecutable
                 processStartInfo.WindowStyle = ProcessWindowStyle.Hidden
@@ -406,9 +405,9 @@ Namespace Functions.support
         End Sub
 
         Public Sub rebootSystem()
-            Dim strPathToShutDown As String = Path.Combine(globalVariables.strPathToSystemFolder, "shutdown.exe")
+            Dim strPathToShutDown As String = IO.Path.Combine(globalVariables.strPathToSystemFolder, "shutdown.exe")
 
-            If File.Exists(strPathToShutDown) = True Then
+            If IO.File.Exists(strPathToShutDown) = True Then
                 executeCommand(strPathToShutDown, "-r -t 0", True)
             Else
                 MsgBox("Unable to find the Windows command line reboot tool to trigger a reboot. You will have to manually trigger a reboot yourself.", MsgBoxStyle.Exclamation, "Restore Point Creator")
@@ -507,7 +506,7 @@ Namespace Functions.support
         Public Sub launchRuntimeTaskFixRoutine()
             Try
                 Dim startInfo As New ProcessStartInfo
-                startInfo.FileName = New FileInfo(Application.ExecutablePath).FullName
+                startInfo.FileName = New IO.FileInfo(Application.ExecutablePath).FullName
                 startInfo.Arguments = "-fixruntimetasks"
 
                 If privilegeChecks.areWeAnAdministrator() = False Then startInfo.Verb = "runas"
@@ -524,7 +523,7 @@ Namespace Functions.support
         Public Sub reRunWithAdminUserRights()
             Try
                 Dim startInfo As New ProcessStartInfo
-                startInfo.FileName = New FileInfo(Application.ExecutablePath).FullName
+                startInfo.FileName = New IO.FileInfo(Application.ExecutablePath).FullName
 
                 If Environment.GetCommandLineArgs.Count <> 1 Then
                     startInfo.Arguments = Environment.GetCommandLineArgs(1)
@@ -695,7 +694,7 @@ Namespace Functions.support
                 If registryStuff.getFileAssociation(".html", associatedApplication) = False Then
                     Process.Start(url)
                 Else
-                    If File.Exists(associatedApplication) = True Then
+                    If IO.File.Exists(associatedApplication) = True Then
                         Process.Start(associatedApplication, Chr(34) & url & Chr(34))
                     Else
                         Process.Start(url)

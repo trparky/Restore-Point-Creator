@@ -1,18 +1,17 @@
 ﻿Imports System.ComponentModel
 Imports ICSharpCode.SharpZipLib.Zip
 Imports System.Text
-Imports System.IO
 
 Public Class Official_Contact_Form
     Protected Const apiAccessCode As String = "YWiIMIyGVVFEunRpDF5PNIF2yzcADdBxneRmWDlLpMTCoVFEunRWiIMIyRmWnRpDF"
-    Private strFileToHaveDataExportedTo As String = Path.Combine(Path.GetTempPath(), "event log entries.reslog")
+    Private strFileToHaveDataExportedTo As String = IO.Path.Combine(IO.Path.GetTempPath(), "event log entries.reslog")
 
     Private Sub btnClose_Click(sender As Object, e As EventArgs) Handles btnClose.Click
         Me.Close()
     End Sub
 
     Private Sub Official_Contact_Form_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        If File.Exists(strFileToHaveDataExportedTo) = True Then
+        If IO.File.Exists(strFileToHaveDataExportedTo) = True Then
             Functions.support.deleteFileWithNoException(strFileToHaveDataExportedTo)
         End If
 
@@ -23,8 +22,8 @@ Public Class Official_Contact_Form
     End Sub
 
     Sub dataSubmitThread()
-        Dim zipFilePath As String = Path.Combine(Path.GetTempPath(), "attachments.zip")
-        If File.Exists(zipFilePath) Then File.Delete(zipFilePath)
+        Dim zipFilePath As String = IO.Path.Combine(IO.Path.GetTempPath(), "attachments.zip")
+        If IO.File.Exists(zipFilePath) Then IO.File.Delete(zipFilePath)
 
         Dim boolDoWeHaveAttachments As Boolean = False
         If listAttachedFiles.Items.Count <> 0 Then boolDoWeHaveAttachments = True
@@ -38,7 +37,7 @@ Public Class Official_Contact_Form
 
                 For i = 0 To listAttachedFiles.Items.Count - 1
                     fileToAdd = listAttachedFiles.Items.Item(i).ToString
-                    zipFileObject.Add(fileToAdd, New FileInfo(fileToAdd).Name) ' Adds the file to the ZIP file.
+                    zipFileObject.Add(fileToAdd, New IO.FileInfo(fileToAdd).Name) ' Adds the file to the ZIP file.
                 Next
 
                 zipFileObject.CommitUpdate() ' Commits the added file(s) to the ZIP file.
@@ -62,7 +61,7 @@ Public Class Official_Contact_Form
         If boolDoWeHaveAttachments = True Then
             Try
                 httpHelper.addFileUpload("attachment", zipFilePath, Nothing, "application/zip")
-            Catch ex As FileNotFoundException
+            Catch ex As IO.FileNotFoundException
                 MsgBox("The file attachment you have chosen doesn't exist.", MsgBoxStyle.Critical, Me.Text)
                 enableFormElements()
                 Exit Sub
@@ -89,7 +88,7 @@ Public Class Official_Contact_Form
                 Select Case strHTTPResponse
                     Case "ok"
                         listAttachedFiles.Items.Clear()
-                        If File.Exists(zipFilePath) Then File.Delete(zipFilePath)
+                        If IO.File.Exists(zipFilePath) Then IO.File.Delete(zipFilePath)
 
                         MsgBox("Your email to the developer has been sent. This window will now close.", MsgBoxStyle.Information, Me.Text)
                         Me.Close()
@@ -181,11 +180,11 @@ Public Class Official_Contact_Form
         OpenFileDialog1.Filter = "All Accepted File Types|*.png;*.jpg;*.jpeg;*.txt;*.log;*.reslog|Image Files (JPEG, PNG)|*.png;*.jpg;*.jpeg|Text Files|*.txt;*.log;*.reslog"
 
         If OpenFileDialog1.ShowDialog() = DialogResult.OK Then
-            Dim fileInfo As New FileInfo(OpenFileDialog1.FileName)
+            Dim fileInfo As New IO.FileInfo(OpenFileDialog1.FileName)
 
             If fileInfo.Extension.ToLower = ".png" Or fileInfo.Extension.ToLower = ".jpg" Or fileInfo.Extension.ToLower = ".jpeg" Or fileInfo.Extension.ToLower = ".txt" Or fileInfo.Extension.ToLower = ".log" Or fileInfo.Extension.ToLower = ".reslog" Then
                 If doesFileExistInList(OpenFileDialog1.FileName.ToString) = True Then
-                    MsgBox("A file by the name of " & Chr(34) & New FileInfo(OpenFileDialog1.FileName.ToString).Name & Chr(34) & " already exists in the list of attached files.", MsgBoxStyle.Information, Me.Text)
+                    MsgBox("A file by the name of " & Chr(34) & New IO.FileInfo(OpenFileDialog1.FileName.ToString).Name & Chr(34) & " already exists in the list of attached files.", MsgBoxStyle.Information, Me.Text)
                 Else
                     listAttachedFiles.Items.Add(OpenFileDialog1.FileName.ToString)
                 End If
@@ -201,7 +200,7 @@ Public Class Official_Contact_Form
 
         If strFileToBeRemoved.ToLower.EndsWith(".reslog") = True Then
             Try
-                File.Delete(strFileToBeRemoved)
+                IO.File.Delete(strFileToBeRemoved)
             Catch ex As Exception
             End Try
         End If
@@ -211,10 +210,10 @@ Public Class Official_Contact_Form
         If listAttachedFiles.Items.Count = 0 Then
             Return False
         Else
-            strFileToCheckForExistanceOf = New FileInfo(strFileToCheckForExistanceOf).Name.ToLower.Trim
+            strFileToCheckForExistanceOf = New IO.FileInfo(strFileToCheckForExistanceOf).Name.ToLower.Trim
 
             For Each item As String In listAttachedFiles.Items
-                item = New FileInfo(item).Name.ToLower.Trim
+                item = New IO.FileInfo(item).Name.ToLower.Trim
                 If item = strFileToCheckForExistanceOf Then Return True
             Next
 
@@ -251,9 +250,9 @@ Public Class Official_Contact_Form
     End Sub
 
     Private Sub Official_Contact_Form_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        If File.Exists(strFileToHaveDataExportedTo) = True Then
+        If IO.File.Exists(strFileToHaveDataExportedTo) = True Then
             Try
-                File.Delete(strFileToHaveDataExportedTo)
+                IO.File.Delete(strFileToHaveDataExportedTo)
             Catch ex As Exception
             End Try
         End If
