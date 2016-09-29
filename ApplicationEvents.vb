@@ -2,6 +2,7 @@
 Imports Microsoft.Win32.TaskScheduler
 Imports Microsoft.Win32
 Imports System.Globalization
+Imports System.IO
 
 Namespace My
     ' The following events are available for MyApplication:
@@ -29,7 +30,7 @@ Namespace My
                 Process.GetCurrentProcess.Kill()
             End If
 
-            If IO.File.Exists("portable.mode") = True Or IO.File.Exists("portablemode.txt") = True Then
+            If File.Exists("portable.mode") = True Or File.Exists("portablemode.txt") = True Then
                 globalVariables.boolPortableMode = True
                 boolNoTask = True
             End If
@@ -108,16 +109,16 @@ Namespace My
             End If
 
             ' Checks to see if the update channel is set to stable, if a debug symbols file exists, and we are an Admin.
-            If My.Settings.updateChannel = globalVariables.updateChannels.stable And IO.File.Exists(globalVariables.pdbFileNameInZIP) = True And boolAreWeAnAdministrator = True Then
+            If My.Settings.updateChannel = globalVariables.updateChannels.stable And File.Exists(globalVariables.pdbFileNameInZIP) = True And boolAreWeAnAdministrator = True Then
                 ' Yes, it does exist so we try to delete it.
                 Try
-                    IO.File.Delete(globalVariables.pdbFileNameInZIP)
+                    File.Delete(globalVariables.pdbFileNameInZIP)
                 Catch ex As Exception
                     ' If something goes wrong, we don't care; we handle it silently.
                 End Try
             End If
 
-            Dim executablePathPathInfo As New IO.FileInfo(Windows.Forms.Application.ExecutablePath)
+            Dim executablePathPathInfo As New FileInfo(Windows.Forms.Application.ExecutablePath)
 
 #If DEBUG Then
             If Debugger.IsAttached = True And boolAreWeAnAdministrator = False Then
@@ -419,7 +420,7 @@ Namespace My
         End Sub
 
         Private Sub MyApplication_Shutdown(sender As Object, e As EventArgs) Handles Me.Shutdown
-            If IO.Directory.Exists(globalVariables.shadowCopyMountFolder) Then IO.Directory.Delete(globalVariables.shadowCopyMountFolder)
+            If Directory.Exists(globalVariables.shadowCopyMountFolder) Then Directory.Delete(globalVariables.shadowCopyMountFolder)
         End Sub
     End Class
 End Namespace

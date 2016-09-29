@@ -1,4 +1,5 @@
 ﻿Imports System.Globalization
+Imports System.IO
 
 Namespace Functions.vss
     Module vss
@@ -108,9 +109,9 @@ Namespace Functions.vss
 
         Public Sub executeVSSAdminCommand(driveLetter As String)
             Try
-                If IO.File.Exists(IO.Path.Combine(globalVariables.strPathToSystemFolder, "vssadmin.exe")) = True Then
+                If File.Exists(Path.Combine(globalVariables.strPathToSystemFolder, "vssadmin.exe")) = True Then
                     Dim startInfo As New ProcessStartInfo
-                    startInfo.FileName = IO.Path.Combine(globalVariables.strPathToSystemFolder, "vssadmin.exe")
+                    startInfo.FileName = Path.Combine(globalVariables.strPathToSystemFolder, "vssadmin.exe")
                     startInfo.Arguments = String.Format("Resize ShadowStorage /For={0} /On={0} /MaxSize=20%", driveLetter)
                     startInfo.Verb = "runas"
                     startInfo.UseShellExecute = False

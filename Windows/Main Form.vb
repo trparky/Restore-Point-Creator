@@ -6,6 +6,7 @@ Imports System.Runtime.InteropServices
 Imports System.Management
 Imports ICSharpCode.SharpZipLib.Zip
 Imports System.Globalization
+Imports System.IO
 #End Region
 
 Public Class Form1
@@ -128,7 +129,7 @@ Public Class Form1
 
                             If matches IsNot Nothing Then
                                 ' Now we make sure that the file exists.
-                                If IO.File.Exists(matches.Groups(1).Value.Replace(Chr(34), "").Trim) = False Then
+                                If File.Exists(matches.Groups(1).Value.Replace(Chr(34), "").Trim) = False Then
                                     '  OK, it doesn't.  The entries in the Registry are invalid, now let's fix them.
                                     registryKey = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint\Command", True)
 
@@ -162,7 +163,7 @@ Public Class Form1
 
                             If matches IsNot Nothing Then
                                 ' Now we make sure that the file exists.
-                                If IO.File.Exists(matches.Groups(1).Value.Replace(Chr(34), "").Trim) = False Then
+                                If File.Exists(matches.Groups(1).Value.Replace(Chr(34), "").Trim) = False Then
                                     ' OK, it doesn't.  The entries in the Registry are invalid, now let's fix them.
                                     registryKey = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point\Command", True)
 
@@ -198,7 +199,7 @@ Public Class Form1
 
                             If matches IsNot Nothing Then
                                 ' Now we make sure that the file exists.
-                                If IO.File.Exists(matches.Groups(1).Value.Replace(Chr(34), "").Trim) = False Then
+                                If File.Exists(matches.Groups(1).Value.Replace(Chr(34), "").Trim) = False Then
                                     ' OK, it doesn't.  The entries in the Registry are invalid, now let's fix them.
                                     registryKey = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator\Command", True)
 
@@ -291,7 +292,7 @@ Public Class Form1
             Functions.eventLogFunctions.writeCrashToEventLog(ex3)
             Functions.eventLogFunctions.writeToSystemEventLog("Invalid XML data has been detected as part of the task validation routine. The task named """ & task.Name & """ has been deleted.", EventLogEntryType.Error)
             MsgBox("One or more of your scheduled Restore Point Creator tasks have been found to be corrupted. Please check your scheduled tasks to see if any of them have been deleted.", MsgBoxStyle.Information, strMessageBoxTitle)
-        Catch ex2 As IO.FileNotFoundException
+        Catch ex2 As FileNotFoundException
             Functions.eventLogFunctions.writeCrashToEventLog(ex2)
         Catch ex As Exception
             Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
@@ -318,7 +319,7 @@ Public Class Form1
 
             taskService.Dispose()
             taskService = Nothing
-        Catch ex As IO.FileNotFoundException
+        Catch ex As FileNotFoundException
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
         Catch ex As Exception
             Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en-US")
@@ -706,15 +707,15 @@ Public Class Form1
     End Sub
 
     Private Sub addShortCutForEventLogToUsersStartMenu()
-        Dim pathInStartMenu As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs\Restore Point Creator")
+        Dim pathInStartMenu As String = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs\Restore Point Creator")
 
         ' Checks to see if this application's executable is in a safe place, in this case... Program Files.
         If Application.ExecutablePath.caseInsensitiveContains("program files") = True Then
             ' Checks to see if a program folder exists.
-            If IO.Directory.Exists(pathInStartMenu) = True Then
-                Dim pathOfShortcutWeAreGoingToMake As String = IO.Path.Combine(pathInStartMenu, "Restore Point Creator Event Log Viewer.lnk")
+            If Directory.Exists(pathInStartMenu) = True Then
+                Dim pathOfShortcutWeAreGoingToMake As String = Path.Combine(pathInStartMenu, "Restore Point Creator Event Log Viewer.lnk")
 
-                If IO.File.Exists(pathOfShortcutWeAreGoingToMake) = False Then
+                If File.Exists(pathOfShortcutWeAreGoingToMake) = False Then
                     Functions.support.createShortcut(pathOfShortcutWeAreGoingToMake, Application.ExecutablePath, Application.ExecutablePath, "Restore Point Creator Event Log Viewer", "-eventlog")
                 End If
             End If
@@ -753,7 +754,7 @@ Public Class Form1
     End Sub
 
     Private Sub newFileDeleterThreadSub()
-        Dim strFoundFile As String = New IO.FileInfo(Application.ExecutablePath & ".new.exe").Name
+        Dim strFoundFile As String = New FileInfo(Application.ExecutablePath & ".new.exe").Name
 
         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
             Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Found file named {0}{1}{0}. Now searching for any processes that have parent executables files of {0}{1}{0}.", Chr(34), strFoundFile))
@@ -766,7 +767,7 @@ Public Class Form1
         End If
 
         Try
-            IO.File.Delete(Application.ExecutablePath & ".new.exe")
+            File.Delete(Application.ExecutablePath & ".new.exe")
 
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                 Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deletion of {0}{1}{0} was successful.", Chr(34), strFoundFile))
@@ -867,7 +868,7 @@ Public Class Form1
 
     Private Sub switchToDebugBuildDownloadThreadSub()
         Try
-            Dim memoryStream As New IO.MemoryStream()
+            Dim memoryStream As New MemoryStream()
 
             If Functions.http.downloadFile(globalVariables.webURLs.updateBranch.debug.strProgramZIP, memoryStream) = False Then
                 Functions.wait.closePleaseWaitWindow()
@@ -888,7 +889,7 @@ Public Class Form1
                 Exit Sub
             End If
 
-            Dim strNewApplicationFileNameFullName As String = New IO.FileInfo(Application.ExecutablePath).FullName & ".new.exe"
+            Dim strNewApplicationFileNameFullName As String = New FileInfo(Application.ExecutablePath).FullName & ".new.exe"
 
             memoryStream.Position = 0
             Dim zipFileObject As New ZipFile(memoryStream)
@@ -918,7 +919,7 @@ Public Class Form1
             memoryStream.Dispose()
             memoryStream = Nothing
 
-            If IO.File.Exists(strNewApplicationFileNameFullName) = True Then
+            If File.Exists(strNewApplicationFileNameFullName) = True Then
                 Process.Start(New ProcessStartInfo With {.FileName = strNewApplicationFileNameFullName, .Arguments = "-updatewithoutuninstallinfoupdate", .Verb = "runas"})
                 Process.GetCurrentProcess.Kill()
             Else
@@ -1241,7 +1242,7 @@ Public Class Form1
         Dim updateChannel As String = My.Settings.updateChannel
         Dim extractPDB As Boolean = False
         Dim boolRebootNeeded As Boolean = False
-        Dim memoryStream As New IO.MemoryStream()
+        Dim memoryStream As New MemoryStream()
 
         If boolOverrideUserUpdateChannelPreferences = True Then
             updateChannel = globalVariables.updateChannels.stable
@@ -1323,10 +1324,10 @@ Public Class Form1
             Functions.eventLogFunctions.writeToSystemEventLog("Download and verification of files required for update complete. Starting application update and extraction process.", EventLogEntryType.Information)
         End If
 
-        Dim strNewApplicationFileNameFullName As String = New IO.FileInfo(Application.ExecutablePath).FullName & ".new.exe"
+        Dim strNewApplicationFileNameFullName As String = New FileInfo(Application.ExecutablePath).FullName & ".new.exe"
 
         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-            Functions.eventLogFunctions.writeToSystemEventLog("Setting position for the IO.MemoryStream() back to the beginning of the stream to ready it for file extraction.", EventLogEntryType.Information)
+            Functions.eventLogFunctions.writeToSystemEventLog("Setting position for the MemoryStream() back to the beginning of the stream to ready it for file extraction.", EventLogEntryType.Information)
         End If
 
         memoryStream.Position = 0
@@ -1390,7 +1391,7 @@ Public Class Form1
             Functions.eventLogFunctions.writeToSystemEventLog("Making sure new executable file exists.", EventLogEntryType.Information)
         End If
 
-        If IO.File.Exists(strNewApplicationFileNameFullName) = True Then
+        If File.Exists(strNewApplicationFileNameFullName) = True Then
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                 Functions.eventLogFunctions.writeToSystemEventLog("New executable exists, executing it in update mode.", EventLogEntryType.Information)
             End If
@@ -2441,14 +2442,14 @@ Public Class Form1
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Control.CheckForIllegalCrossThreadCalls = False
 
-        If IO.File.Exists("tom") Then
+        If File.Exists("tom") Then
             ToolStripMenuItemPrivateForTom.Visible = True
         End If
 
         Try
             If globalVariables.boolLogLoadsAndExitsToEventLog = True Then Functions.eventLogFunctions.writeToSystemEventLog("The user " & Environment.UserName & " started the program.", EventLogEntryType.Information)
 
-            If IO.File.Exists("updater.exe") = True Then
+            If File.Exists("updater.exe") = True Then
                 Dim updaterDeleterThread As New Threading.Thread(AddressOf updaterDeleterThreadSub)
                 updaterDeleterThread.Name = "Legacy Updater File Deletion Thread"
                 updaterDeleterThread.Start()
@@ -2492,7 +2493,7 @@ Public Class Form1
             loadRestorePointListColumnOrder()
             applySavedSorting()
 
-            If IO.File.Exists(Application.ExecutablePath & ".new.exe") = True Then
+            If File.Exists(Application.ExecutablePath & ".new.exe") = True Then
                 Dim newFileDeleterThread As New Threading.Thread(AddressOf newFileDeleterThreadSub)
                 newFileDeleterThread.Name = "New Application File Deletion Thread"
                 newFileDeleterThread.Start()
@@ -2684,8 +2685,8 @@ Public Class Form1
         exportBackupDialog.FileName = Nothing
 
         If exportBackupDialog.ShowDialog() = DialogResult.OK Then
-            If IO.File.Exists(exportBackupDialog.FileName) Then
-                IO.File.Delete(exportBackupDialog.FileName)
+            If File.Exists(exportBackupDialog.FileName) Then
+                File.Delete(exportBackupDialog.FileName)
             End If
 
             Dim iniFile As New IniFile
@@ -2740,7 +2741,7 @@ Public Class Form1
             registryKeyWeAreWorkingWith.Close()
             registryKeyWeAreWorkingWith.Dispose()
 
-            Dim fileInfo As New IO.FileInfo(exportBackupDialog.FileName)
+            Dim fileInfo As New FileInfo(exportBackupDialog.FileName)
             Debug.WriteLine(fileInfo.Extension)
 
             If fileInfo.Extension.stringCompare(".ini") Then
@@ -2750,7 +2751,7 @@ Public Class Form1
                 Dim randomString As String = Functions.support.randomStringGenerator((New Random).Next(100, 300))
                 Dim checksum As String = calculateConfigBackupDataPayloadChecksum(iniFileTextBase64ed, randomString)
 
-                Dim streamWriter As New IO.StreamWriter(exportBackupDialog.FileName)
+                Dim streamWriter As New StreamWriter(exportBackupDialog.FileName)
                 streamWriter.WriteLine("Payload: " & iniFileTextBase64ed)
                 streamWriter.WriteLine("Random String: " & randomString)
                 streamWriter.Write("Checksum: " & checksum)
@@ -2771,14 +2772,14 @@ Public Class Form1
         importBackupDialog.FileName = Nothing
 
         If importBackupDialog.ShowDialog() = DialogResult.OK Then
-            If IO.File.Exists(importBackupDialog.FileName) = True Then
-                Dim fileInfo As New IO.FileInfo(importBackupDialog.FileName)
+            If File.Exists(importBackupDialog.FileName) = True Then
+                Dim fileInfo As New FileInfo(importBackupDialog.FileName)
                 Dim iniFile As New IniFile
 
                 If fileInfo.Extension.stringCompare(".ini") Then
                     iniFile.loadINIFileFromFile(importBackupDialog.FileName)
                 Else
-                    Dim streamReader As New IO.StreamReader(importBackupDialog.FileName)
+                    Dim streamReader As New StreamReader(importBackupDialog.FileName)
                     Dim strDataPayload = Nothing, strRandomString = Nothing, strChecksum = Nothing, strTemp As String
 
                     While streamReader.EndOfStream = False
@@ -3438,9 +3439,9 @@ Public Class Form1
         My.Settings.updateChannel = globalVariables.updateChannels.stable
         My.Settings.Save()
 
-        If IO.File.Exists(globalVariables.pdbFileNameInZIP) = True Then
+        If File.Exists(globalVariables.pdbFileNameInZIP) = True Then
             Try
-                IO.File.Delete(globalVariables.pdbFileNameInZIP)
+                File.Delete(globalVariables.pdbFileNameInZIP)
             Catch ex As Exception
                 Functions.APIs.MoveFileEx(globalVariables.pdbFileNameInZIP, vbNullString, 4)
             End Try

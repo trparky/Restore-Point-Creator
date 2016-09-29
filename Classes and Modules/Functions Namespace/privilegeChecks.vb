@@ -1,5 +1,6 @@
 ﻿Imports System.Security.AccessControl
 Imports System.Security.Principal
+Imports System.IO
 
 Namespace Functions.privilegeChecks
     Module privilegeChecks
@@ -8,7 +9,7 @@ Namespace Functions.privilegeChecks
         End Function
 
         Public Function canIWriteToTheCurrentDirectory() As Boolean
-            Return canIWriteThere(New IO.FileInfo(Application.ExecutablePath).DirectoryName)
+            Return canIWriteThere(New FileInfo(Application.ExecutablePath).DirectoryName)
         End Function
 
         Public Function canIWriteThere(folderPath As String) As Boolean
@@ -17,14 +18,14 @@ Namespace Functions.privilegeChecks
                 folderPath = folderPath.Substring(0, folderPath.Length - 1)
             End If
 
-            If String.IsNullOrEmpty(folderPath) = True Or IO.Directory.Exists(folderPath) = False Then
+            If String.IsNullOrEmpty(folderPath) = True Or Directory.Exists(folderPath) = False Then
                 Return False
             End If
 
             If checkByFolderACLs(folderPath) = True Then
                 Try
-                    IO.File.Create(IO.Path.Combine(folderPath, "test.txt"), 1, IO.FileOptions.DeleteOnClose).Close()
-                    If IO.File.Exists(IO.Path.Combine(folderPath, "test.txt")) Then IO.File.Delete(IO.Path.Combine(folderPath, "test.txt"))
+                    File.Create(Path.Combine(folderPath, "test.txt"), 1, FileOptions.DeleteOnClose).Close()
+                    If File.Exists(Path.Combine(folderPath, "test.txt")) Then File.Delete(Path.Combine(folderPath, "test.txt"))
                     Return True
                 Catch ex As Exception
                     Return False
@@ -36,7 +37,7 @@ Namespace Functions.privilegeChecks
 
         Private Function checkByFolderACLs(folderPath As String) As Boolean
             Try
-                Dim directoryACLs As DirectorySecurity = IO.Directory.GetAccessControl(folderPath)
+                Dim directoryACLs As DirectorySecurity = Directory.GetAccessControl(folderPath)
                 Dim directoryUsers As String = WindowsIdentity.GetCurrent.User.Value
                 Dim directoryAccessRights As FileSystemAccessRule
                 Dim fileSystemRights As FileSystemRights
@@ -63,9 +64,9 @@ Namespace Functions.privilegeChecks
 
         Public Function areWeAnAdministrator() As Boolean
             Try
-                Dim principal As Security.Principal.WindowsPrincipal = New Security.Principal.WindowsPrincipal(Security.Principal.WindowsIdentity.GetCurrent())
+                Dim principal As WindowsPrincipal = New WindowsPrincipal(WindowsIdentity.GetCurrent())
 
-                If principal.IsInRole(Security.Principal.WindowsBuiltInRole.Administrator) = True Then
+                If principal.IsInRole(WindowsBuiltInRole.Administrator) = True Then
                     Return True
                 Else
                     Return False
@@ -142,9 +143,9 @@ Namespace Functions.privilegeChecks
                 End If
 
                 ' Check if the token to be checked contains admin SID.
-                Dim id As New Security.Principal.WindowsIdentity(hTokenToCheck.DangerousGetHandle)
-                Dim principal As New Security.Principal.WindowsPrincipal(id)
-                fInAdminGroup = principal.IsInRole(Security.Principal.WindowsBuiltInRole.Administrator)
+                Dim id As New WindowsIdentity(hTokenToCheck.DangerousGetHandle)
+                Dim principal As New WindowsPrincipal(id)
+                fInAdminGroup = principal.IsInRole(WindowsBuiltInRole.Administrator)
             Catch ex As Exception
                 ' Something went wrong here so we are going to assume that the user isn't part of the Administrator user group.
                 fInAdminGroup = False
