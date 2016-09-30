@@ -3,69 +3,72 @@ Imports Microsoft.Win32
 
 Namespace Functions.power
     Module power
-        Private Function getActivePowerPlanGUID() As String
+        Private Function getActivePowerPlanGUID(ByRef strResult As String) As Boolean
             Try
                 Dim powerPlanSeacher As New Management.ManagementObjectSearcher("root\CIMV2\power", "SELECT * FROM Win32_PowerPlan WHERE IsActive = True")
 
                 If powerPlanSeacher.Get().Count = 0 Then
                     eventLogFunctions.writeToSystemEventLog("WMI returned 0 results from Win32_PowerPlan.", EventLogEntryType.Error)
-                    Return "INVALID"
+                    Return False
                 Else
                     Dim powerPlanDetails As Management.ManagementObject = powerPlanSeacher.Get()(0)
                     Dim powerGUIDFromWMI As String = powerPlanDetails("InstanceID")
 
                     If Regex.IsMatch(powerGUIDFromWMI, "(\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\})", RegexOptions.IgnoreCase) Then
-                        Return Regex.Match(powerGUIDFromWMI, "(\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\})", RegexOptions.IgnoreCase).Groups(1).Value.Replace("{", "").Replace("}", "").Trim.ToLower
+                        strResult = Regex.Match(powerGUIDFromWMI, "(\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\})", RegexOptions.IgnoreCase).Groups(1).Value.Replace("{", "").Replace("}", "").Trim.ToLower
+                        Return True
                     Else
                         eventLogFunctions.writeToSystemEventLog("Unable to parse out GUID from WMI output.", EventLogEntryType.Error)
-                        Return "INVALID"
+                        Return False
                     End If
                 End If
             Catch ex As Exception
+                Dim strResult2 As String = Nothing
                 Dim registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\Control\Power\User\PowerSchemes", False)
 
                 If registryKey Is Nothing Then
-                    Return executePowerCFGToGetActivePowerPlanGUID()
+                    If executePowerCFGToGetActivePowerPlanGUID(strResult2) Then
+                        strResult = strResult2
+                        Return True
+                    Else
+                        Return False
+                    End If
                 Else
                     Dim powerGUID As String = registryKey.GetValue("ActivePowerScheme", globalVariables.invalidGUID)
                     registryKey.Close()
                     registryKey.Dispose()
 
                     If powerGUID = globalVariables.invalidGUID Then
-                        Return executePowerCFGToGetActivePowerPlanGUID()
+                        If executePowerCFGToGetActivePowerPlanGUID(strResult2) Then
+                            strResult = strResult2
+                            Return True
+                        Else
+                            Return False
+                        End If
                     Else
-                        Return powerGUID.Trim.ToLower
+                        strResult = powerGUID.Trim.ToLower
+                        Return True
                     End If
                 End If
             End Try
         End Function
 
-        Private Function executePowerCFGToGetActivePowerPlanGUID() As String
+        Private Function executePowerCFGToGetActivePowerPlanGUID(ByRef strResult As String) As Boolean
             Dim commandLineOutput As String = Nothing
-            Dim boolResult As Boolean = support.executeShellCommandAndGetOutput(commandLineOutput, "powercfg.exe", "/GETACTIVESCHEME")
+            Dim boolResult As Boolean = support.executeShellCommandAndGetOutput(commandLineOutput, IO.Path.Combine(globalVariables.strPathToSystemFolder, "powercfg.exe"), "/GETACTIVESCHEME")
 
             If boolResult = True Then
                 commandLineOutput = commandLineOutput.Trim
 
                 If Regex.IsMatch(commandLineOutput, "([0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12})", RegexOptions.IgnoreCase) Then
-                    Return Regex.Match(commandLineOutput, "([0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12})", RegexOptions.IgnoreCase).Groups(1).Value.Trim.ToLower
+                    strResult = Regex.Match(commandLineOutput, "([0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12})", RegexOptions.IgnoreCase).Groups(1).Value.Trim.ToLower
+                    Return True
                 Else
                     eventLogFunctions.writeToSystemEventLog("Unable to parse out GUID from powercfg.exe output.", EventLogEntryType.Error)
-
-                    Return "INVALID"
+                    Return False
                 End If
             Else
-                Return "INVALID"
-            End If
-        End Function
-
-        Private Function doWeHaveAValidActivePowerPlan(ByRef activePowerPlanGUID As String) As Boolean
-            activePowerPlanGUID = getActivePowerPlanGUID()
-
-            If activePowerPlanGUID = "INVALID" Then
                 Return False
-            Else
-                Return True
             End If
         End Function
 
@@ -74,7 +77,7 @@ Namespace Functions.power
                 Dim activePowerPlanGUID As String = Nothing
                 Dim strPathToPowerCFG As String = IO.Path.Combine(globalVariables.strPathToSystemFolder, "powercfg.exe")
 
-                If doWeHaveAValidActivePowerPlan(activePowerPlanGUID) = True Then
+                If getActivePowerPlanGUID(activePowerPlanGUID) = True Then
                     Dim registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\Control\Power\User\PowerSchemes\" & activePowerPlanGUID & "\238c9fa8-0aad-41ed-83f4-97be242c8f20\bd3b718a-0680-4d9d-8ab2-e1d2b4ac806d", False)
 
                     Dim boolDidWeChangeAnything As Boolean = False
@@ -117,7 +120,7 @@ Namespace Functions.power
                 Dim activePowerPlanGUID As String = Nothing
                 Dim strPathToPowerCFG As String = IO.Path.Combine(globalVariables.strPathToSystemFolder, "powercfg.exe")
 
-                If doWeHaveAValidActivePowerPlan(activePowerPlanGUID) = True Then
+                If getActivePowerPlanGUID(activePowerPlanGUID) = True Then
                     Dim registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\Control\Power\User\PowerSchemes\" & activePowerPlanGUID & "\238c9fa8-0aad-41ed-83f4-97be242c8f20\bd3b718a-0680-4d9d-8ab2-e1d2b4ac806d", False)
 
                     Dim boolDidWeChangeAnything As Boolean = False
