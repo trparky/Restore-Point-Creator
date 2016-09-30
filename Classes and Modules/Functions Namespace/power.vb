@@ -3,6 +3,8 @@ Imports Microsoft.Win32
 
 Namespace Functions.power
     Module power
+        Private strPathToPowerCFG As String = IO.Path.Combine(globalVariables.strPathToSystemFolder, "powercfg.exe")
+
         Private Function getActivePowerPlanGUID(ByRef strResult As String) As Boolean
             Try
                 Dim powerPlanSeacher As New Management.ManagementObjectSearcher("root\CIMV2\power", "SELECT * FROM Win32_PowerPlan WHERE IsActive = True")
@@ -75,7 +77,6 @@ Namespace Functions.power
         Public Sub disablePowerPlanWakeFromSleep()
             Try
                 Dim activePowerPlanGUID As String = Nothing
-                Dim strPathToPowerCFG As String = IO.Path.Combine(globalVariables.strPathToSystemFolder, "powercfg.exe")
 
                 If getActivePowerPlanGUID(activePowerPlanGUID) = True Then
                     Dim registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\Control\Power\User\PowerSchemes\" & activePowerPlanGUID & "\238c9fa8-0aad-41ed-83f4-97be242c8f20\bd3b718a-0680-4d9d-8ab2-e1d2b4ac806d", False)
@@ -112,7 +113,6 @@ Namespace Functions.power
         Public Sub checkIfActivePowerPlanIsSetProperlyForWakingFromSleep(Optional boolShowNoChangesNeededMessage As Boolean = False)
             Try
                 Dim activePowerPlanGUID As String = Nothing
-                Dim strPathToPowerCFG As String = IO.Path.Combine(globalVariables.strPathToSystemFolder, "powercfg.exe")
 
                 If getActivePowerPlanGUID(activePowerPlanGUID) = True Then
                     Dim registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\Control\Power\User\PowerSchemes\" & activePowerPlanGUID & "\238c9fa8-0aad-41ed-83f4-97be242c8f20\bd3b718a-0680-4d9d-8ab2-e1d2b4ac806d", False)
