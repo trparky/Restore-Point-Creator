@@ -86,16 +86,10 @@ Namespace Functions.power
                         boolDidWeChangeAnything = True
 
                         support.executeCommand(strPathToPowerCFG, "-SETACVALUEINDEX " & activePowerPlanGUID & " SUB_SLEEP bd3b718a-0680-4d9d-8ab2-e1d2b4ac806d 0")
-                        support.executeCommand(strPathToPowerCFG, "-SETDCVALUEINDEX " & activePowerPlanGUID & " SUB_SLEEP bd3b718a-0680-4d9d-8ab2-e1d2b4ac806d 0")
                     Else
                         If Short.Parse(registryKey.GetValue("ACSettingIndex", "0").ToString) = 1 Then
                             boolDidWeChangeAnything = True
                             support.executeCommand(strPathToPowerCFG, "-SETACVALUEINDEX " & activePowerPlanGUID & " SUB_SLEEP bd3b718a-0680-4d9d-8ab2-e1d2b4ac806d 0")
-                        End If
-
-                        If Short.Parse(registryKey.GetValue("DCSettingIndex", "0").ToString) = 1 Then
-                            boolDidWeChangeAnything = True
-                            support.executeCommand(strPathToPowerCFG, "-SETDCVALUEINDEX " & activePowerPlanGUID & " SUB_SLEEP bd3b718a-0680-4d9d-8ab2-e1d2b4ac806d 0")
                         End If
 
                         registryKey.Close()
@@ -129,16 +123,10 @@ Namespace Functions.power
                         boolDidWeChangeAnything = True
 
                         support.executeCommand(strPathToPowerCFG, "-SETACVALUEINDEX " & activePowerPlanGUID & " SUB_SLEEP bd3b718a-0680-4d9d-8ab2-e1d2b4ac806d 1")
-                        support.executeCommand(strPathToPowerCFG, "-SETDCVALUEINDEX " & activePowerPlanGUID & " SUB_SLEEP bd3b718a-0680-4d9d-8ab2-e1d2b4ac806d 1")
                     Else
                         If Short.Parse(registryKey.GetValue("ACSettingIndex", "0").ToString) <> 1 Then
                             boolDidWeChangeAnything = True
                             support.executeCommand(strPathToPowerCFG, "-SETACVALUEINDEX " & activePowerPlanGUID & " SUB_SLEEP bd3b718a-0680-4d9d-8ab2-e1d2b4ac806d 1")
-                        End If
-
-                        If Short.Parse(registryKey.GetValue("DCSettingIndex", "0").ToString) <> 1 Then
-                            boolDidWeChangeAnything = True
-                            support.executeCommand(strPathToPowerCFG, "-SETDCVALUEINDEX " & activePowerPlanGUID & " SUB_SLEEP bd3b718a-0680-4d9d-8ab2-e1d2b4ac806d 1")
                         End If
 
                         registryKey.Close()
