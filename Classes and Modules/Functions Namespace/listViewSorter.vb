@@ -33,6 +33,13 @@
                 strSecondString = lvSecondListView.SubItems(intColumnNumber).Text
             End If
 
+            If Text.RegularExpressions.Regex.IsMatch(strFirstString, "^\d{1,3}(,\d{3})*(\.\d+)?$") Then
+                strFirstString = strFirstString.Replace(",", "")
+            End If
+            If Text.RegularExpressions.Regex.IsMatch(strSecondString, "^\d{1,3}(,\d{3})*(\.\d+)?$") Then
+                strSecondString = strSecondString.Replace(",", "")
+            End If
+
             ' Compare them.
             If soSortOrder = SortOrder.Ascending Then
                 If Double.TryParse(strFirstString, dbl1) And Double.TryParse(strSecondString, dbl2) Then
