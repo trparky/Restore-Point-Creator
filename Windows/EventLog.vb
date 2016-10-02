@@ -47,7 +47,7 @@ Public Class eventLogForm
                         End Select
 
                         itemAdd.SubItems.Add(eventInstance.TimeCreated.Value.ToLocalTime.ToString)
-                        itemAdd.SubItems.Add(eventInstance.RecordId)
+                        itemAdd.SubItems.Add(Long.Parse(eventInstance.RecordId).ToString("N0"))
                         itemAdd.SubItems.Add(strEventLog)
                         itemAdd.SubItems.Add("")
 
@@ -84,7 +84,7 @@ Public Class eventLogForm
         newWayToLoadEventLogData(globalVariables.eventLog.strApplication, itemsToPutInToList, cachedEventLogApplication)
         newWayToLoadEventLogData(globalVariables.eventLog.strSystemRestorePointCreator, itemsToPutInToList, cachedEventLogCustom)
 
-        lblLogEntryCount.Text = "Entries in Event Log: " & itemsToPutInToList.Count
+        lblLogEntryCount.Text = "Entries in Event Log: " & itemsToPutInToList.Count.ToString("N0")
         eventLogList.Items.Clear()
         eventLogList.Items.AddRange(itemsToPutInToList.ToArray())
         eventLogList.Sort()
@@ -95,7 +95,7 @@ Public Class eventLogForm
 
         Functions.wait.closePleaseWaitWindow()
         timeStamp.Stop()
-        lblProcessedIn.Text = String.Format("Event Log Loaded and Processed in {0}ms ({1} seconds).", timeStamp.ElapsedMilliseconds, Math.Round(timeStamp.Elapsed.TotalSeconds, 3))
+        lblProcessedIn.Text = String.Format("Event Log Loaded and Processed in {0}ms ({1} seconds).", timeStamp.ElapsedMilliseconds.ToString("N0"), Math.Round(timeStamp.Elapsed.TotalSeconds, 2))
     End Sub
 
     Private Sub eventLogForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
@@ -343,7 +343,7 @@ Public Class eventLogForm
     Private Sub eventLogList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles eventLogList.SelectedIndexChanged
         Try
             If eventLogList.SelectedItems.Count <> 0 Then
-                Dim eventID As Long = Long.Parse(eventLogList.SelectedItems(0).SubItems(2).Text)
+                Dim eventID As Long = Long.Parse(eventLogList.SelectedItems(0).SubItems(2).Text.Replace(",", ""))
                 Dim source As String = eventLogList.SelectedItems(0).SubItems(3).Text
 
                 eventLogText.Text = Functions.support.removeSourceCodePathInfo(getEventLogEntryDetails(eventID, source))
