@@ -160,7 +160,8 @@ Namespace Functions.wmi
                 eventLogFunctions.writeCrashToEventLog(ex4)
                 eventLogFunctions.writeToSystemEventLog("Unable to create system restore point. System permissions seem to not allow it.", EventLogEntryType.Error)
                 MsgBox("Unable to create system restore point. System permissions seem to not allow it.", MsgBoxStyle.Critical, "Error Creating System Restore Point")
-                Return 0
+
+                Return APIs.errorCodes.ERROR_INTERNAL_ERROR
             Catch ex3 As Runtime.InteropServices.COMException
                 Try
                     eventLogFunctions.writeToSystemEventLog("Falling back to core Windows APIs to create restore point.")
@@ -168,7 +169,8 @@ Namespace Functions.wmi
                 Catch ex5 As Exception
                     eventLogFunctions.writeCrashToEventLog(ex5)
                     giveComExceptionCrashMessage()
-                    Return 0
+
+                    Return APIs.errorCodes.ERROR_INTERNAL_ERROR
                 End Try
             Catch ex As Exception
                 Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
@@ -178,7 +180,8 @@ Namespace Functions.wmi
                 End If
 
                 eventLogFunctions.writeCrashToEventLog(ex)
-                Return 0
+
+                Return APIs.errorCodes.ERROR_INTERNAL_ERROR
             End Try
         End Function
 
