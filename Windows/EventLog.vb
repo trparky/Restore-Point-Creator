@@ -11,7 +11,7 @@ Public Class eventLogForm
 
     Private rawSearchTerms As String = Nothing, previousSearchType As Search_Event_Log.searceType
 
-    Sub newWayToLoadEventLogData(ByVal strEventLog As String, ByRef itemsToPutInToList As List(Of ListViewItem), ByRef cache As Dictionary(Of Long, String))
+    Sub loadEventLogData(ByVal strEventLog As String, ByRef itemsToPutInToList As List(Of ListViewItem), ByRef cache As Dictionary(Of Long, String))
         Dim itemAdd As ListViewItem
         Dim eventLogQuery As Eventing.Reader.EventLogQuery
         Dim logReader As Eventing.Reader.EventLogReader
@@ -81,8 +81,8 @@ Public Class eventLogForm
         Dim timeStamp As New Stopwatch
         timeStamp.Start()
 
-        newWayToLoadEventLogData(globalVariables.eventLog.strApplication, itemsToPutInToList, cachedEventLogApplication)
-        newWayToLoadEventLogData(globalVariables.eventLog.strSystemRestorePointCreator, itemsToPutInToList, cachedEventLogCustom)
+        loadEventLogData(globalVariables.eventLog.strApplication, itemsToPutInToList, cachedEventLogApplication)
+        loadEventLogData(globalVariables.eventLog.strSystemRestorePointCreator, itemsToPutInToList, cachedEventLogCustom)
 
         lblLogEntryCount.Text = "Entries in Event Log: " & itemsToPutInToList.Count.ToString("N0")
         eventLogList.Items.Clear()
