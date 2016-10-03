@@ -107,6 +107,8 @@ Namespace Functions.startupFunctions
                         ' Does nothing.
                     ElseIf result = APIs.errorCodes.ERROR_DISK_FULL Then
                         MsgBox("System Restore Point Creation Failed.  Disk Full." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_DISK_FULL (112)", MsgBoxStyle.Critical, msgBoxTitle)
+                    ElseIf result = APIs.errorCodes.ERROR_ACCESS_DENIED Then
+                        MsgBox("System Restore Point Creation Failed.  Access Denied." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_ACCESS_DENIED (5)", MsgBoxStyle.Critical, msgBoxTitle)
                     ElseIf result = APIs.errorCodes.ERROR_INTERNAL_ERROR Then
                         MsgBox("System Restore Point Creation Failed.  Internal Error." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_INTERNAL_ERROR (1359)", MsgBoxStyle.Critical, msgBoxTitle)
                     ElseIf result = APIs.errorCodes.ERROR_INVALID_DATA Then

@@ -1146,6 +1146,10 @@ Public Class Form1
             messageText = "System Restore Point Creation Failed.  Disk Full." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_DISK_FULL (112)"
             messageType = MsgBoxStyle.Critical
             toolTipType = ToolTipIcon.Error
+        ElseIf result = Functions.APIs.errorCodes.ERROR_ACCESS_DENIED Then
+            messageText = "System Restore Point Creation Failed.  Access Denied." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_ACCESS_DENIED (5)"
+            messageType = MsgBoxStyle.Critical
+            toolTipType = ToolTipIcon.Error
         ElseIf result = Functions.APIs.errorCodes.ERROR_INTERNAL_ERROR Then
             messageText = "System Restore Point Creation Failed.  Internal Error." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_INTERNAL_ERROR (1359)"
             messageType = MsgBoxStyle.Critical
