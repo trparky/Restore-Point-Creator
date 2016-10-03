@@ -157,14 +157,19 @@ Namespace Functions.wmi
 
                 Return oOutParams("ReturnValue")
             Catch ex4 As UnauthorizedAccessException
-                eventLogFunctions.writeCrashToEventLog(ex4)
-                eventLogFunctions.writeToSystemEventLog("Unable to create system restore point. System permissions seem to not allow it.", EventLogEntryType.Error)
-                MsgBox("Unable to create system restore point. System permissions seem to not allow it.", MsgBoxStyle.Critical, "Error Creating System Restore Point")
+                Try
+                    eventLogFunctions.writeToSystemEventLog("Falling back to core Windows APIs to create restore point.", EventLogEntryType.Warning)
+                    Return APIs.systemRestore.StartRestore(restorePointName, restorePointType, restorePointID)
+                Catch ex6 As Exception
+                    eventLogFunctions.writeCrashToEventLog(ex6)
+                    eventLogFunctions.writeToSystemEventLog("Unable to create system restore point. System permissions seem to not allow it.", EventLogEntryType.Error)
+                    MsgBox("Unable to create system restore point. System permissions seem to not allow it.", MsgBoxStyle.Critical, "Error Creating System Restore Point")
 
-                Return APIs.errorCodes.ERROR_INTERNAL_ERROR
+                    Return APIs.errorCodes.ERROR_INTERNAL_ERROR
+                End Try
             Catch ex3 As Runtime.InteropServices.COMException
                 Try
-                    eventLogFunctions.writeToSystemEventLog("Falling back to core Windows APIs to create restore point.")
+                    eventLogFunctions.writeToSystemEventLog("Falling back to core Windows APIs to create restore point.", EventLogEntryType.Warning)
                     Return APIs.systemRestore.StartRestore(restorePointName, restorePointType, restorePointID)
                 Catch ex5 As Exception
                     eventLogFunctions.writeCrashToEventLog(ex5)
