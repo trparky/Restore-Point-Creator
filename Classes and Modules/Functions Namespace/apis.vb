@@ -232,6 +232,7 @@ Namespace Functions.APIs
 
         Public Enum errorCodes As Integer
             ERROR_SUCCESS = 0
+            ERROR_ACCESS_DENIED = 5
             ERROR_BAD_ENVIRONMENT = 10
             ERROR_INVALID_DATA = 13
             ERROR_DISK_FULL = 112
