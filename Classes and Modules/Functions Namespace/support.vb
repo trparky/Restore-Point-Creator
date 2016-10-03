@@ -709,8 +709,8 @@ Namespace Functions.support
         End Sub
 
         Public Function removeSourceCodePathInfo(strInput As String) As String
-            If strInput.ToLower.caseInsensitiveContains("Google Drive") = True Then
-                Return Regex.Replace(strInput, Regex.Escape("C:\Users\Tom\Google Drive\My Visual Studio Projects\Projects\"), "", RegexOptions.IgnoreCase)
+            If strInput.regExSearch("(?:Google Drive|OneDrive)") = True Then
+                Return Regex.Replace(strInput, "C:\\Users\\Tom\\(?:Google Drive|OneDrive)\\My Visual Studio Projects\\Projects\\", "", RegexOptions.IgnoreCase)
             Else
                 Return strInput
             End If
