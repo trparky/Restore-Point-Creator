@@ -103,19 +103,19 @@ Namespace Functions.startupFunctions
                 If displayMessage = True Then
                     Dim msgBoxTitle As String = "Restore Point Creator"
 
-                    If result = globalVariables.ERROR_SUCCESS Then
+                    If result = APIs.errorCodes.ERROR_SUCCESS Then
                         ' Does nothing.
-                    ElseIf result = globalVariables.ERROR_DISK_FULL Then
+                    ElseIf result = APIs.errorCodes.ERROR_DISK_FULL Then
                         MsgBox("System Restore Point Creation Failed.  Disk Full." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_DISK_FULL (112)", MsgBoxStyle.Critical, msgBoxTitle)
-                    ElseIf result = globalVariables.ERROR_INTERNAL_ERROR Then
+                    ElseIf result = APIs.errorCodes.ERROR_INTERNAL_ERROR Then
                         MsgBox("System Restore Point Creation Failed.  Internal Error." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_INTERNAL_ERROR (1359)", MsgBoxStyle.Critical, msgBoxTitle)
-                    ElseIf result = globalVariables.ERROR_INVALID_DATA Then
+                    ElseIf result = APIs.errorCodes.ERROR_INVALID_DATA Then
                         MsgBox("System Restore Point Creation Failed.  Invalid Data." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_INVALID_DATA (13)", MsgBoxStyle.Critical, msgBoxTitle)
-                    ElseIf result = globalVariables.ERROR_TIMEOUT Then
+                    ElseIf result = APIs.errorCodes.ERROR_TIMEOUT Then
                         MsgBox("System Restore Point Creation Failed.  Invalid Data." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_TIMEOUT (1460)", MsgBoxStyle.Critical, msgBoxTitle)
-                    ElseIf result = globalVariables.ERROR_SERVICE_DISABLED Then
+                    ElseIf result = APIs.errorCodes.ERROR_SERVICE_DISABLED Then
                         MsgBox("System Restore Point Creation Failed.  Invalid Data." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_SERVICE_DISABLED (1058)", MsgBoxStyle.Critical, msgBoxTitle)
-                    ElseIf result = globalVariables.ERROR_BAD_ENVIRONMENT Then
+                    ElseIf result = APIs.errorCodes.ERROR_BAD_ENVIRONMENT Then
                         MsgBox("System Restore Point Creation Failed.  Invalid Data." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_BAD_ENVIRONMENT (10)", MsgBoxStyle.Critical, msgBoxTitle)
                     Else
                         MsgBox("System Restore Point Creation Failed." & vbCrLf & vbCrLf & "Internal Windows Error Code: UNKNOWN_ERROR (9999)", MsgBoxStyle.Critical, msgBoxTitle)
