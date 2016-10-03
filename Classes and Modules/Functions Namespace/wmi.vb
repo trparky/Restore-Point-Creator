@@ -163,6 +163,7 @@ Namespace Functions.wmi
                 Return 0
             Catch ex3 As Runtime.InteropServices.COMException
                 Try
+                    eventLogFunctions.writeToSystemEventLog("Falling back to core Windows APIs to create restore point.")
                     Return APIs.systemRestore.StartRestore(restorePointName, restorePointType, restorePointID)
                 Catch ex5 As Exception
                     eventLogFunctions.writeCrashToEventLog(ex5)
