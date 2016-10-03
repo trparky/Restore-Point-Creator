@@ -183,14 +183,6 @@ Namespace globalVariables
         Public Const warningPercentage As Short = 90
         Public boolPortableMode As Boolean = False
 
-        Public Const ERROR_SUCCESS As Integer = 0
-        Public Const ERROR_BAD_ENVIRONMENT As Integer = 10
-        Public Const ERROR_DISK_FULL As Integer = 112
-        Public Const ERROR_INTERNAL_ERROR As Integer = 1359
-        Public Const ERROR_INVALID_DATA As Integer = 13
-        Public Const ERROR_SERVICE_DISABLED As Integer = 1058
-        Public Const ERROR_TIMEOUT As Integer = 1460
-
         Public Const constStringRoot As String = "root"
 
         ' The systemRestorePoint Object has the following attributes...
