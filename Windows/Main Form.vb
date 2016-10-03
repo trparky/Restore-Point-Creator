@@ -1198,6 +1198,11 @@ Public Class Form1
 
             result = Functions.wmi.createRestorePoint(stringRestorePointName, Functions.support.RestoreType.WindowsType, sequenceNumber)
 
+            If result <> Functions.APIs.errorCodes.ERROR_SUCCESS Then
+                MsgBox(String.Format("There was an error while attempting to creating the restore point. The error code returned from the system was {0}{1}{0}.", Chr(34), result), MsgBoxStyle.Critical, strMessageBoxTitle)
+                Exit Sub
+            End If
+
             ' We wait here with this loop until the system's has the restore point created.
             While oldNewestRestorePointID = Functions.wmi.getNewestSystemRestorePointID()
                 ' Does nothing, just loops and sleeps for half a second.
