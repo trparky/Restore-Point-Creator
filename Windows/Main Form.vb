@@ -1132,7 +1132,7 @@ Public Class Form1
     Sub giveFeedbackAfterCreatingRestorePoint(result As Integer)
         Dim messageText As String, messageType As MsgBoxStyle, toolTipType As ToolTipIcon
 
-        If result = globalVariables.ERROR_SUCCESS Then
+        If result = Functions.APIs.errorCodes.ERROR_SUCCESS Then
             If Me.ShowMessageBoxAfterSuccessfulCreationOfRestorePointToolStripMenuItem.Checked = True Then
                 If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
                     MsgBox("System Restore Point Created Successfully.", MsgBoxStyle.Information, strMessageBoxTitle)
@@ -1142,27 +1142,27 @@ Public Class Form1
             End If
 
             Exit Sub
-        ElseIf result = globalVariables.ERROR_DISK_FULL Then
+        ElseIf result = Functions.APIs.errorCodes.ERROR_DISK_FULL Then
             messageText = "System Restore Point Creation Failed.  Disk Full." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_DISK_FULL (112)"
             messageType = MsgBoxStyle.Critical
             toolTipType = ToolTipIcon.Error
-        ElseIf result = globalVariables.ERROR_INTERNAL_ERROR Then
+        ElseIf result = Functions.APIs.errorCodes.ERROR_INTERNAL_ERROR Then
             messageText = "System Restore Point Creation Failed.  Internal Error." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_INTERNAL_ERROR (1359)"
             messageType = MsgBoxStyle.Critical
             toolTipType = ToolTipIcon.Error
-        ElseIf result = globalVariables.ERROR_INVALID_DATA Then
+        ElseIf result = Functions.APIs.errorCodes.ERROR_INVALID_DATA Then
             messageText = "System Restore Point Creation Failed.  Invalid Data." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_INVALID_DATA (13)"
             messageType = MsgBoxStyle.Critical
             toolTipType = ToolTipIcon.Error
-        ElseIf result = globalVariables.ERROR_TIMEOUT Then
+        ElseIf result = Functions.APIs.errorCodes.ERROR_TIMEOUT Then
             messageText = "System Restore Point Creation Failed.  Invalid Data." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_TIMEOUT (1460)"
             messageType = MsgBoxStyle.Critical
             toolTipType = ToolTipIcon.Error
-        ElseIf result = globalVariables.ERROR_SERVICE_DISABLED Then
+        ElseIf result = Functions.APIs.errorCodes.ERROR_SERVICE_DISABLED Then
             messageText = "System Restore Point Creation Failed.  Invalid Data." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_SERVICE_DISABLED (1058)"
             messageType = MsgBoxStyle.Critical
             toolTipType = ToolTipIcon.Error
-        ElseIf result = globalVariables.ERROR_BAD_ENVIRONMENT Then
+        ElseIf result = Functions.APIs.errorCodes.ERROR_BAD_ENVIRONMENT Then
             messageText = "System Restore Point Creation Failed.  Invalid Data." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_BAD_ENVIRONMENT (10)"
             messageType = MsgBoxStyle.Critical
             toolTipType = ToolTipIcon.Error
