@@ -162,13 +162,9 @@ Namespace Functions.wmi
                 MsgBox("Unable to create system restore point. System permissions seem to not allow it.", MsgBoxStyle.Critical, "Error Creating System Restore Point")
                 Return 0
             Catch ex3 As Runtime.InteropServices.COMException
-                Try
-                    Return APIs.systemRestore.StartRestore(restorePointName, restorePointType, restorePointID)
-                Catch ex5 As Exception
-                    eventLogFunctions.writeCrashToEventLog(ex5)
-                    giveComExceptionCrashMessage()
-                    Return 0
-                End Try
+                eventLogFunctions.writeCrashToEventLog(ex3)
+                giveComExceptionCrashMessage()
+                Return 0
             Catch ex As Exception
                 Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
 
