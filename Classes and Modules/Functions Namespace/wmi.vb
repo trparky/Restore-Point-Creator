@@ -164,7 +164,9 @@ Namespace Functions.wmi
             Catch ex3 As Runtime.InteropServices.COMException
                 Try
                     Return APIs.systemRestore.StartRestore(restorePointName, restorePointType, restorePointID)
-                Catch ex As Exception
+                Catch ex5 As Exception
+                    eventLogFunctions.writeCrashToEventLog(ex5)
+                    giveComExceptionCrashMessage()
                     Return 0
                 End Try
             Catch ex As Exception
