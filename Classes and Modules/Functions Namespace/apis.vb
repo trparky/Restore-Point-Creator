@@ -119,6 +119,11 @@ Namespace Functions.APIs
                 Return True
             End If
 
+            ' Windows 10
+            If majorVersion = 10 Then
+                Return True
+            End If
+
             ' All others : Win 95, 98, 2000, Server
             Return False
         End Function
