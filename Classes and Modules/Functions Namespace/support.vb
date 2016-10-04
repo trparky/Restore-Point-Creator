@@ -3,7 +3,6 @@ Imports ICSharpCode.SharpZipLib.Zip
 
 Namespace Functions.support
     Module support
-
         ''' <summary>Gets a setting from the application's Registry key.</summary>
         ''' <param name="registryObject">This is Registry Key Object that will be used in this function to pull the Registry value from.</param>
         ''' <param name="valueToGetFromRegistry">The name of the Registry Value we will be pulling from.</param>
