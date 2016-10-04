@@ -135,7 +135,7 @@ Namespace Functions.APIs
         ''' <param name="rt">The type of restore point</param>
         ''' <param name="lSeqNum">Returns the sequence number</param>
         ''' <returns>The status of call</returns>
-        ''' <seealso cref="Use EndRestore() or CancelRestore() to end the system restore"/>
+        ''' <remarks>Use EndRestore() or CancelRestore() to end the system restore</remarks>
         Public Shared Function StartRestore(strDescription As String, rt As RestoreType, ByRef lSeqNum As Long) As Integer
             Dim rpInfo As New RestorePointInfo()
             Dim rpStatus As New STATEMGRSTATUS()
