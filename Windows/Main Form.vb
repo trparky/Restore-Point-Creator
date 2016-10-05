@@ -338,7 +338,7 @@ Public Class Form1
                 defaultCustomRestorePointName = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey).GetValue("Default Custom Restore Point Name", "").ToString.Trim
             End If
 
-            If defaultCustomRestorePointName.Trim <> "" And Functions.support.areWeInSafeMode() = False Then btnCreateRestorePointNameWithDefaultName.Visible = True
+            If String.IsNullOrEmpty(defaultCustomRestorePointName.Trim) = False And Functions.support.areWeInSafeMode() = False Then btnCreateRestorePointNameWithDefaultName.Visible = True
 
             If My.Settings.updateChannel = globalVariables.updateChannels.stable Then
                 toolStripStableChannel.Checked = True
@@ -1014,7 +1014,7 @@ Public Class Form1
                         If toolStripLogRestorePointDeletions.Checked Then
                             numberOfOldRestorePointsDeleted += 1
 
-                            If systemRestorePoint("CreationTime").ToString.Trim <> "" Then
+                            If String.IsNullOrEmpty(systemRestorePoint("CreationTime").ToString.Trim) = False Then
                                 dateTime = Functions.support.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime"))
 
                                 If toolStripLogRestorePointDeletions.Checked Then
@@ -1185,7 +1185,7 @@ Public Class Form1
 
     Private Sub unifiedCreateSystemRestorePoint(Optional ByVal stringRestorePointName As String = "System Checkpoint made by System Restore Point Creator")
         Try
-            If stringRestorePointName.Trim = "" Then
+            If String.IsNullOrEmpty(stringRestorePointName.Trim) Then
                 MsgBox("You must enter a description for your System Restore Point.", MsgBoxStyle.Critical, strMessageBoxTitle)
                 Exit Sub
             End If
@@ -1857,7 +1857,7 @@ Public Class Form1
 
                                 listViewItem.SubItems.Add(restorePointDetails("Description").ToString)
 
-                                If restorePointDetails("CreationTime").ToString.Trim <> "" Then
+                                If String.IsNullOrEmpty(restorePointDetails("CreationTime").ToString.Trim) = False Then
                                     restorePointCreationDate = Functions.support.parseSystemRestorePointCreationDate(restorePointDetails("CreationTime"))
                                     listViewItem.SubItems.Add(String.Format("{0} {1}", restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToLongTimeString))
                                     restorePointAge = calculateRestorePointAge(restorePointCreationDate)
@@ -2072,7 +2072,7 @@ Public Class Form1
                         shortNumberOfRestorePointsDeleted += 1
 
                         If toolStripLogRestorePointDeletions.Checked Then
-                            If restorePointDateData(item.SubItems(0).Text).Trim <> "" And toolStripLogRestorePointDeletions.Checked Then
+                            If String.IsNullOrEmpty(restorePointDateData(item.SubItems(0).Text).Trim) = False And toolStripLogRestorePointDeletions.Checked Then
                                 dateData = Functions.support.parseSystemRestorePointCreationDate(restorePointDateData(item.SubItems(0).Text))
                                 Functions.eventLogFunctions.writeToSystemEventLog(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", item.SubItems(1).Text, dateData.ToShortDateString, dateData.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
                                 dateData = Nothing
@@ -2714,7 +2714,7 @@ Public Class Form1
 
                     If settingType.stringCompare("System.Int16") Or settingType.stringCompare("System.Int32") Or settingType.stringCompare("System.Boolean") Or settingType.stringCompare("System.String") Or settingType.stringCompare("System.Drawing.Size") Or settingType.stringCompare("System.Drawing.Color") Then
                         If settingType.stringCompare("System.String") Then
-                            If settingValue.Trim <> "" Then
+                            If String.IsNullOrEmpty(DirectCast(settingValue, String).Trim) = False Then
                                 iniFile.SetKeyValue("Settings", settingName, settingType & "," & settingValue)
                             End If
                         Else

@@ -213,7 +213,7 @@ Namespace Functions.startupFunctions
 
                 ' Loops through systemRestorePoints.
                 For Each systemRestorePoint As ManagementObject In systemRestorePoints.Get()
-                    If systemRestorePoint("CreationTime").ToString.Trim <> "" Then
+                    If String.IsNullOrEmpty(systemRestorePoint("CreationTime").ToString.Trim) = False Then
                         systemRestorePointCreationDate = support.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime"))
 
                         dateDiffResults = Math.Abs(DateDiff(DateInterval.Day, Date.Now, systemRestorePointCreationDate))
