@@ -438,11 +438,11 @@ Namespace Functions.support
                             If (restorePointDetails("SequenceNumber") IsNot Nothing) And (restorePointDetails("CreationTime") IsNot Nothing) And (restorePointDetails("Description") IsNot Nothing) And (restorePointDetails("RestorePointType") IsNot Nothing) Then
                                 restorePoints.Append(restorePointDetails("SequenceNumber").ToString & " | " & restorePointDetails("Description").ToString & " | ")
 
-                                If restorePointDetails("CreationTime").ToString.Trim <> "" Then
+                                If String.IsNullOrEmpty(restorePointDetails("CreationTime").ToString.Trim) Then
+                                    restorePoints.Append("Error Parsing Date")
+                                Else
                                     restorePointCreationDate = parseSystemRestorePointCreationDate(restorePointDetails("CreationTime").ToString)
                                     restorePoints.Append(String.Format("{0} {1}", restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToLongTimeString))
-                                Else
-                                    restorePoints.Append("Error Parsing Date")
                                 End If
 
                                 restorePoints.Append(" | " & whatTypeOfRestorePointIsIt(Integer.Parse(restorePointDetails("RestorePointType").ToString)))
