@@ -3397,9 +3397,7 @@ Public Class Form1
     End Sub
 
     Private Sub OldToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles toolStripDeleteOldRestorePoints.Click
-        If My.Settings.maxDaysManualDelete <> -1 Then
-            doDeleteOldSystemRestorePoint(My.Settings.maxDaysManualDelete)
-        Else
+        If My.Settings.maxDaysManualDelete = -1 Then
             Dim frmDeleteOldSystemRestorePointsInstance = New frmDeleteOldSystemRestorePoints
             frmDeleteOldSystemRestorePointsInstance.StartPosition = FormStartPosition.CenterScreen
             frmDeleteOldSystemRestorePointsInstance.ShowDialog()
@@ -3407,6 +3405,8 @@ Public Class Form1
 
             frmDeleteOldSystemRestorePointsInstance.Dispose()
             frmDeleteOldSystemRestorePointsInstance = Nothing
+        Else
+            doDeleteOldSystemRestorePoint(My.Settings.maxDaysManualDelete)
         End If
     End Sub
 
