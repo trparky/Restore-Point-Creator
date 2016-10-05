@@ -66,7 +66,7 @@ Namespace Functions.PSLib
             Dim static_event_handlers As EventHandlerList = Nothing
 
             For Each fi As FieldInfo In event_fields
-                If EventName <> "" AndAlso String.Compare(EventName, fi.Name, True) <> 0 Then
+                If String.IsNullOrEmpty(EventName) = False AndAlso String.Compare(EventName, fi.Name, True) <> 0 Then
                     Continue For
                 End If
 
