@@ -1179,7 +1179,7 @@ Public Class Form1
         If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
             MsgBox(messageText, messageType, strMessageBoxTitle)
         Else
-            NotifyIcon1.ShowBalloonTip(5000, Me.Text, messageText, toolTipType)
+            NotifyIcon1.ShowBalloonTip(5000, strMessageBoxTitle, messageText, toolTipType)
         End If
     End Sub
 
