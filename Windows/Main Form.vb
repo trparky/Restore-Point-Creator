@@ -3337,7 +3337,7 @@ Public Class Form1
     Private Sub AboutThisProgramToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutThisProgramToolStripMenuItem.Click
         Dim stringBuilder As New StringBuilder
 
-        stringBuilder.AppendLine(Me.Text)
+        stringBuilder.AppendLine("Restore Point Creator")
         stringBuilder.AppendLine("Written By Tom Parkison")
         stringBuilder.AppendLine("Copyright Thomas Parkison 2012-2017.")
         stringBuilder.AppendLine()
