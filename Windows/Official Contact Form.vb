@@ -117,9 +117,9 @@ Public Class Official_Contact_Form
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
 
             If TypeOf ex Is Net.WebException Or TypeOf ex Is httpProtocolException Then
-                Functions.eventLogFunctions.writeToSystemEventLog("The server responded with an HTTP error.", EventLogEntryType.Error)
+                Functions.eventLogFunctions.writeToSystemEventLog("The server responded with an HTTP error.", EventLogEntryType.Warning)
                 btnSubmit.Enabled = True
-                MsgBox("The server responded with an HTTP error.", MsgBoxStyle.Critical, Me.Text)
+                MsgBox("The server responded with an HTTP error. This may be because the web site is down or some other kind of issue. Please check back at at later time.", MsgBoxStyle.Exclamation, Me.Text)
             ElseIf TypeOf ex Is sslErrorException Then
                 Functions.eventLogFunctions.writeToSystemEventLog("An HTTP SSL error occurred.", EventLogEntryType.Error)
                 MsgBox("An HTTP SSL error occurred.", MsgBoxStyle.Critical, Me.Text)

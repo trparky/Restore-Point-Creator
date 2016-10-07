@@ -1481,8 +1481,8 @@ Public Class Form1
                     Functions.eventLogFunctions.writeCrashToEventLog(ex)
 
                     If TypeOf ex Is Net.WebException Or TypeOf ex Is httpProtocolException Then
-                        Functions.eventLogFunctions.writeToSystemEventLog("The server responded with an HTTP error.", EventLogEntryType.Error)
-                        MsgBox("The server responded with an HTTP error.", MsgBoxStyle.Critical, strMessageBoxTitle)
+                        Functions.eventLogFunctions.writeToSystemEventLog("The server responded with an HTTP error. This may be because the web site is down or some other kind of issue. Please check back at at later time.", EventLogEntryType.Warning)
+                        MsgBox("The server responded with an HTTP error. This may be because the web site is down or some other kind of issue. Please check back at at later time.", MsgBoxStyle.Exclamation, strMessageBoxTitle)
                     ElseIf TypeOf ex Is sslErrorException Then
                         Functions.eventLogFunctions.writeToSystemEventLog("An HTTP SSL error occurred.", EventLogEntryType.Error)
                         MsgBox("An HTTP SSL error occurred.", MsgBoxStyle.Critical, strMessageBoxTitle)
@@ -1673,8 +1673,8 @@ Public Class Form1
                             Functions.eventLogFunctions.writeCrashToEventLog(ex)
 
                             If TypeOf ex Is Net.WebException Or TypeOf ex Is httpProtocolException Then
-                                Functions.eventLogFunctions.writeToSystemEventLog("The server responded with an HTTP error.", EventLogEntryType.Error)
-                                MsgBox("The server responded with an HTTP error.", MsgBoxStyle.Critical, strMessageBoxTitle)
+                                Functions.eventLogFunctions.writeToSystemEventLog("The server responded with an HTTP error. This may be because the web site is down or some other kind of issue. Please check back at at later time.", EventLogEntryType.Warning)
+                                MsgBox("The server responded with an HTTP error. This may be because the web site is down or some other kind of issue. Please check back at at later time.", MsgBoxStyle.Exclamation, strMessageBoxTitle)
                             ElseIf TypeOf ex Is sslErrorException Then
                                 Functions.eventLogFunctions.writeToSystemEventLog("An HTTP SSL error occurred.", EventLogEntryType.Error)
                                 MsgBox("An HTTP SSL error occurred.", MsgBoxStyle.Critical, strMessageBoxTitle)
