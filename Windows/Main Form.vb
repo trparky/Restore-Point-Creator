@@ -1624,8 +1624,6 @@ Public Class Form1
             Functions.eventLogFunctions.writeToSystemEventLog("The server responded with an HTTP error. This may be because the web site is down or some other kind of issue. Please check back at at later time.", EventLogEntryType.Warning)
         ElseIf TypeOf ex Is sslErrorException Then
             Functions.eventLogFunctions.writeToSystemEventLog("An HTTP SSL error occurred.", EventLogEntryType.Error)
-        ElseIf TypeOf ex Is Threading.ThreadAbortException Then
-            ' We don't do anything here.
         End If
     End Sub
 
