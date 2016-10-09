@@ -71,7 +71,7 @@
             httpHelper.addHTTPHeader("OPERATING_SYSTEM", osVersionInfo.getFullOSVersionString())
             httpHelper.useHTTPCompression(True)
             httpHelper.setProxyMode(My.Settings.useHTTPProxy)
-            httpHelper.setHTTPTimeout(10)
+            httpHelper.setHTTPTimeout(30)
 
             If IO.File.Exists("tom") = True Then
                 httpHelper.addPOSTData("dontcount", "True")
