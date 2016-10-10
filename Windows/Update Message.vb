@@ -70,15 +70,6 @@
                     txtChanges.Text = "Error Loading Change Log... Please Try Again."
                 End If
             Catch ex As Exception
-                If TypeOf ex Is Net.WebException Or TypeOf ex Is httpProtocolException Then
-                    Functions.eventLogFunctions.writeToSystemEventLog("The server responded with an HTTP error. This may be because the web site is down or some other kind of issue. Please check back at at later time.", EventLogEntryType.Warning)
-                    MsgBox("The server responded with an HTTP error. This may be because the web site is down or some other kind of issue. Please check back at at later time.", MsgBoxStyle.Exclamation, "Restore Point Creator")
-                ElseIf TypeOf ex Is sslErrorException Then
-                    Functions.eventLogFunctions.writeToSystemEventLog("An HTTP SSL error occurred.", EventLogEntryType.Error)
-                End If
-
-                Functions.eventLogFunctions.writeCrashToEventLog(ex)
-
                 txtChanges.Text = "Error Loading Change Log... Please Try Again."
             End Try
 

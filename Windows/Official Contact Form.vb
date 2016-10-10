@@ -114,20 +114,6 @@ Public Class Official_Contact_Form
                 MsgBox("Error accessing server side script.", MsgBoxStyle.Critical, Me.Text)
             End If
         Catch ex As Exception
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
-
-            If TypeOf ex Is Net.WebException Or TypeOf ex Is httpProtocolException Then
-                Functions.eventLogFunctions.writeToSystemEventLog("The server responded with an HTTP error.", EventLogEntryType.Warning)
-                btnSubmit.Enabled = True
-                MsgBox("The server responded with an HTTP error. This may be because the web site is down or some other kind of issue. Please check back at at later time.", MsgBoxStyle.Exclamation, Me.Text)
-            ElseIf TypeOf ex Is sslErrorException Then
-                Functions.eventLogFunctions.writeToSystemEventLog("An HTTP SSL error occurred.", EventLogEntryType.Error)
-                MsgBox("An HTTP SSL error occurred.", MsgBoxStyle.Critical, Me.Text)
-            ElseIf TypeOf ex Is Threading.ThreadAbortException Then
-                ' We don't do anything here.
-            Else
-                MsgBox("A general error occured, please check the Event Log.", MsgBoxStyle.Critical, Me.Text)
-            End If
         Finally
             enableFormElements()
         End Try
