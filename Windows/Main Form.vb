@@ -1478,7 +1478,6 @@ Public Class Form1
                         Exit Sub
                     End If
                 Catch ex As Exception
-                    handleHTTPExceptions(ex)
                     userInitiatedCheckForUpdatesThread = Nothing
                     Exit Sub
                 End Try
@@ -1617,16 +1616,6 @@ Public Class Form1
         userInitiatedCheckForUpdatesThread = Nothing
     End Sub
 
-    Sub handleHTTPExceptions(ex As Exception)
-        Functions.eventLogFunctions.writeCrashToEventLog(ex)
-
-        If TypeOf ex Is Net.WebException Or TypeOf ex Is httpProtocolException Then
-            Functions.eventLogFunctions.writeToSystemEventLog("The server responded with an HTTP error. This may be because the web site is down or some other kind of issue. Please check back at at later time.", EventLogEntryType.Warning)
-        ElseIf TypeOf ex Is sslErrorException Then
-            Functions.eventLogFunctions.writeToSystemEventLog("An HTTP SSL error occurred.", EventLogEntryType.Error)
-        End If
-    End Sub
-
     Private Sub formLoadCheckForUpdatesRoutine(Optional forceRunOfUpdate As Boolean = False)
         If My.Settings.CheckForUpdates = True Or forceRunOfUpdate = True Then
             toolStripAutomaticallyCheckForUpdates.Checked = True
@@ -1667,7 +1656,6 @@ Public Class Form1
                                 Exit Sub
                             End If
                         Catch ex As Exception
-                            handleHTTPExceptions(ex)
                             formLoadCheckForUpdatesRoutineThread = Nothing
                             Exit Sub
                         End Try
