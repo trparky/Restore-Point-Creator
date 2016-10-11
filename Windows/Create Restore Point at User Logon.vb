@@ -13,10 +13,64 @@ Public Class Create_Restore_Point_at_User_Logon
         End If
     End Sub
 
+    Private Function doesAtUserLoginTaskExist(ByRef delayedTime As Short) As Boolean
+        Try
+            Dim taskObject As Task
+
+            Using taskServiceObject As TaskService = New TaskService() ' Creates a new instance of the TaskService.
+                taskObject = taskServiceObject.GetTask(globalVariables.taskFolder & "\Create a Restore Point at User Logon (" & Environment.UserName & ")") ' Gets the task.
+
+                ' Makes sure that the task exists and we don't get a Null Reference Exception.
+                If taskObject IsNot Nothing Then
+                    ' Makes sure that we have some triggers to actually work with.
+                    If taskObject.Definition.Triggers.Count > 0 Then
+                        ' Good, we have some triggers to work with.
+                        Dim trigger As Trigger = taskObject.Definition.Triggers.Item(0) ' Stores the trigger object in a Trigger type variable.
+
+                        ' Checks to see if the trigger type is a user logon type.
+                        If trigger.TriggerType = TaskTriggerType.Logon Then
+                            ' Yes, it is. So we go on.
+
+                            ' Checks to see if the trigger is a delayed trigger.
+                            If (TypeOf trigger Is ITriggerDelay) Then
+                                ' Yes, it is. So we go on.
+
+                                ' Gets the delayed time and stores it in the ByRef delayedTime which is a pointer to a variable that's passed to this function.
+                                delayedTime = DirectCast(taskObject.Definition.Triggers.Item(0), ITriggerDelay).Delay.Minutes
+                            Else
+                                ' No, it's not a delayed trigger so we have to give the delayedTime pointer variable as value of 0.
+                                delayedTime = 0
+                            End If
+
+                            ' OK, so we know that the trigger is a At User Logon type so this is a valid task so we return True.
+                            Return True
+                        Else
+                            ' The trigger type doesn't match what we are looking for so this is an invalid task and so we give the delayedTime pointer variable a value of 0 and return False.
+                            delayedTime = 0
+                            Return False
+                        End If
+                    Else
+                        ' We don't even have a trigger so this is an invalid task and so we give the delayedTime pointer variable a value of 0 and return False.
+                        delayedTime = 0
+                        Return False
+                    End If
+                Else
+                    ' The task doesn't exist so we give the delayedTime pointer variable a value of 0 and return False.
+                    delayedTime = 0
+                    Return False
+                End If
+            End Using
+        Catch ex As Exception
+            ' Something we went wrong so we give the delayedTime pointer variable a value of 0 and return False.
+            delayedTime = 0
+            Return False
+        End Try
+    End Function
+
     Private Sub btnCreateTask_Click(sender As Object, e As EventArgs) Handles btnCreateTask.Click
         Dim delayedTime As Short = 0
 
-        If Functions.taskStuff.doesAtUserLoginTaskExist(delayedTime) = True Then
+        If doesAtUserLoginTaskExist(delayedTime) = True Then
             Functions.taskStuff.deleteAtUserLogonTask()
         End If
 
@@ -111,7 +165,7 @@ Public Class Create_Restore_Point_at_User_Logon
         Try
             Dim delayedTime As Short = 0
 
-            If Functions.taskStuff.doesAtUserLoginTaskExist(delayedTime) = True Then
+            If doesAtUserLoginTaskExist(delayedTime) = True Then
                 btnDeleteTask.Enabled = True
 
                 If delayedTime <> 0 Then
@@ -136,7 +190,7 @@ Public Class Create_Restore_Point_at_User_Logon
     Private Sub btnDeleteTask_Click(sender As Object, e As EventArgs) Handles btnDeleteTask.Click
         Dim delayedTime As Short = 0
 
-        If Functions.taskStuff.doesAtUserLoginTaskExist(delayedTime) = True Then
+        If doesAtUserLoginTaskExist(delayedTime) = True Then
             Functions.taskStuff.deleteAtUserLogonTask()
             btnDeleteTask.Enabled = False
             boolThingsChanged = False
