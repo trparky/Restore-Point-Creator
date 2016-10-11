@@ -50,7 +50,7 @@ Public Class Create_Restore_Point_at_User_Logon
         End If
 
         newTask.Triggers.Add(logonTriggerDefinition)
-        newTask.RegistrationInfo.Description = "Creates a Restore Point at User Logon"
+        newTask.RegistrationInfo.Description = "Create a Restore Point at User Logon (" & Environment.UserName & ")"
         newTask.Principal.RunLevel = TaskRunLevel.Highest
         newTask.Principal.LogonType = TaskLogonType.InteractiveToken
 
@@ -82,7 +82,7 @@ Public Class Create_Restore_Point_at_User_Logon
         End Try
 
         Dim taskFolderObject As TaskFolder = Functions.taskStuff.getOurTaskFolder(taskService)
-        taskFolderObject.RegisterTaskDefinition("Create a Restore Point at User Logon", newTask)
+        taskFolderObject.RegisterTaskDefinition("Create a Restore Point at User Logon (" & Environment.UserName & ")", newTask)
 
         taskFolderObject.Dispose()
         newTask.Dispose()

@@ -44,7 +44,7 @@ Namespace Functions.taskStuff
                 Dim taskObject As TaskScheduler.Task
 
                 Using taskServiceObject As TaskScheduler.TaskService = New TaskScheduler.TaskService() ' Creates a new instance of the TaskService.
-                    taskObject = taskServiceObject.GetTask(globalVariables.taskFolder & "\Create a Restore Point at User Logon") ' Gets the task.
+                    taskObject = taskServiceObject.GetTask(globalVariables.taskFolder & "\Create a Restore Point at User Logon (" & Environment.UserName & ")") ' Gets the task.
 
                     ' Makes sure that the task exists and we don't get a Null Reference Exception.
                     If taskObject IsNot Nothing Then
