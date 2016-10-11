@@ -43,7 +43,7 @@ Public Class Create_Restore_Point_at_User_Logon
         Dim newTask As TaskDefinition = taskService.NewTask
         Dim logonTriggerDefinition As LogonTrigger = New LogonTrigger
 
-        logonTriggerDefinition.UserId = Environment.UserName
+        logonTriggerDefinition.UserId = Security.Principal.WindowsIdentity.GetCurrent().Name
 
         If delayed = True Then
             logonTriggerDefinition.Delay = TimeSpan.FromMinutes(delayTimeInMinutes)
