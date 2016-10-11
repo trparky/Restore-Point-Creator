@@ -104,7 +104,7 @@ Public Class Create_Restore_Point_at_User_Logon
         End If
 
         newTask.Triggers.Add(logonTriggerDefinition)
-        newTask.RegistrationInfo.Description = "Create a Restore Point at User Logon (" & Environment.UserName & ")"
+        newTask.RegistrationInfo.Description = "Creates a Restore Point at User Logon for the user " & Environment.UserName & "."
         newTask.Principal.RunLevel = TaskRunLevel.Highest
         newTask.Principal.LogonType = TaskLogonType.InteractiveToken
 
