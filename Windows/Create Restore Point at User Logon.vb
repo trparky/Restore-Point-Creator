@@ -13,6 +13,64 @@ Public Class Create_Restore_Point_at_User_Logon
         End If
     End Sub
 
+    Private Sub renameOldTask()
+        Try
+            Using taskServiceObject As TaskService = New TaskService() ' Creates a new instance of the TaskService.
+                Dim oldTaskObject As Task = taskServiceObject.GetTask(globalVariables.taskFolder & "\Create a Restore Point at User Logon") ' Gets the task.
+
+                ' Makes sure that the task exists and we don't get a Null Reference Exception.
+                If oldTaskObject IsNot Nothing Then
+                    Dim newTask As TaskDefinition = taskServiceObject.NewTask
+
+                    Dim logonTriggerDefinition As LogonTrigger = New LogonTrigger
+                    logonTriggerDefinition.UserId = Security.Principal.WindowsIdentity.GetCurrent().Name
+
+                    Dim triggerDelayMinutes As Integer = DirectCast(oldTaskObject.Definition.Triggers.Item(0), ITriggerDelay).Delay.Minutes
+                    If triggerDelayMinutes <> 0 Then
+                        logonTriggerDefinition.Delay = TimeSpan.FromMinutes(triggerDelayMinutes)
+                    End If
+                    triggerDelayMinutes = 0
+
+                    newTask.Triggers.Add(logonTriggerDefinition)
+
+                    Functions.taskStuff.deleteTask(oldTaskObject)
+
+                    newTask.RegistrationInfo.Description = "Creates a Restore Point at User Logon for the user " & Environment.UserName & "."
+                    newTask.Principal.RunLevel = TaskRunLevel.Highest
+                    newTask.Principal.LogonType = TaskLogonType.InteractiveToken
+
+                    Dim exePathInfo As New IO.FileInfo(Application.ExecutablePath)
+                    newTask.Actions.Add(New ExecAction(exePathInfo.FullName, "-createscheduledrestorepoint", exePathInfo.DirectoryName))
+                    exePathInfo = Nothing
+
+                    With newTask.Settings
+                        .Compatibility = TaskCompatibility.V2
+                        .AllowDemandStart = True
+                        .DisallowStartIfOnBatteries = False
+                        .RunOnlyIfIdle = False
+                        .StopIfGoingOnBatteries = False
+                        .AllowHardTerminate = False
+                        .ExecutionTimeLimit = Nothing
+                    End With
+
+                    If newTask.Validate() Then
+                        Dim taskFolderObject As TaskFolder = Functions.taskStuff.getOurTaskFolder(taskServiceObject)
+                        taskFolderObject.RegisterTaskDefinition("Create a Restore Point at User Logon (" & Environment.UserName & ")", newTask)
+
+                        taskFolderObject.Dispose()
+                        newTask.Dispose()
+                        logonTriggerDefinition.Dispose()
+
+                        taskFolderObject = Nothing
+                        newTask = Nothing
+                        logonTriggerDefinition = Nothing
+                    End If
+                End If
+            End Using
+        Catch ex As Exception
+        End Try
+    End Sub
+
     Private Function doesAtUserLoginTaskExist(ByRef delayedTime As Short) As Boolean
         Try
             Dim taskObject As Task
@@ -163,8 +221,9 @@ Public Class Create_Restore_Point_at_User_Logon
 
     Private Sub Create_Restore_Point_at_User_Logon_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Try
-            Dim delayedTime As Short = 0
+            renameOldTask()
 
+            Dim delayedTime As Short = 0
             If doesAtUserLoginTaskExist(delayedTime) = True Then
                 btnDeleteTask.Enabled = True
 
