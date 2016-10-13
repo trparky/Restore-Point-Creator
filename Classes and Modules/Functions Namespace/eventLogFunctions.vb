@@ -71,8 +71,9 @@
 
         ''' <summary>Write the exception event to the System Log File.</summary>
         ''' <param name="exceptionObject">The exception object.</param>
+        ''' <param name="errorType">The type of Event Log you want the Exception Event to be recorded to the Application Event Log as.</param>
         ''' <example>functions.eventLogFunctions.writeCrashToEventLog(ex)</example>
-        Public Sub writeCrashToEventLog(exceptionObject As Exception)
+        Public Sub writeCrashToEventLog(exceptionObject As Exception, Optional errorType As EventLogEntryType = EventLogEntryType.Error)
             Try
                 Dim stringBuilder As New Text.StringBuilder
 
@@ -105,7 +106,7 @@
 
                 stringBuilder.AppendLine(support.removeSourceCodePathInfo(exceptionObject.StackTrace.Trim))
 
-                writeToSystemEventLog(stringBuilder.ToString.Trim, EventLogEntryType.Error)
+                writeToSystemEventLog(stringBuilder.ToString.Trim, errorType)
                 stringBuilder = Nothing
             Catch ex2 As Exception
                 ' Does nothing
