@@ -39,7 +39,7 @@
         End Function
 
         Private Sub customHTTPHelperErrorHandler(ex As Exception, classInstance As httpHelper)
-            eventLogFunctions.writeCrashToEventLog(ex)
+            eventLogFunctions.writeCrashToEventLog(ex, EventLogEntryType.Warning)
             Dim lastAccessedURL As String = classInstance.getLastAccessedURL()
 
             If TypeOf ex Is Net.WebException Then
