@@ -545,6 +545,32 @@ Public Class Form1
 #End Region
 
 #Region "--== Functions and Sub-Routines ==--"
+    Public Enum userFeedbackType As Short
+        typeError = 0
+        typeInfo = 1
+        typeWarning = 2
+    End Enum
+
+    Sub giveFeedbackToUser(feedBackMessage As String, Optional feedbackType As userFeedbackType = userFeedbackType.typeInfo)
+        If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
+            If feedbackType = userFeedbackType.typeInfo Then
+                MsgBox(feedBackMessage, MsgBoxStyle.Information, strMessageBoxTitle)
+            ElseIf feedbackType = userFeedbackType.typeError Then
+                MsgBox(feedBackMessage, MsgBoxStyle.Critical, strMessageBoxTitle)
+            ElseIf feedbackType = userFeedbackType.typeWarning Then
+                MsgBox(feedBackMessage, MsgBoxStyle.Exclamation, strMessageBoxTitle)
+            End If
+        Else
+            If feedbackType = userFeedbackType.typeInfo Then
+                NotifyIcon1.ShowBalloonTip(5000, strMessageBoxTitle, feedBackMessage, ToolTipIcon.Info)
+            ElseIf feedbackType = userFeedbackType.typeError Then
+                NotifyIcon1.ShowBalloonTip(5000, strMessageBoxTitle, feedBackMessage, ToolTipIcon.Error)
+            ElseIf feedbackType = userFeedbackType.typeWarning Then
+                NotifyIcon1.ShowBalloonTip(5000, strMessageBoxTitle, feedBackMessage, ToolTipIcon.Warning)
+            End If
+        End If
+    End Sub
+
     Sub savePreferenceToRegistry(variableName As String, variableValue As String)
         Dim registryKeyObject As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
 
@@ -1130,57 +1156,41 @@ Public Class Form1
     End Sub
 
     Sub giveFeedbackAfterCreatingRestorePoint(result As Integer)
-        Dim messageText As String, messageType As MsgBoxStyle, toolTipType As ToolTipIcon
+        Dim messageText As String, feedbackType As userFeedbackType
 
         If result = Functions.APIs.errorCodes.ERROR_SUCCESS Then
             If Me.ShowMessageBoxAfterSuccessfulCreationOfRestorePointToolStripMenuItem.Checked = True Then
-                If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
-                    MsgBox("System Restore Point Created Successfully.", MsgBoxStyle.Information, strMessageBoxTitle)
-                Else
-                    NotifyIcon1.ShowBalloonTip(5000, "Restore Point Creator", "System Restore Point Created Successfully.", ToolTipIcon.Info)
-                End If
+                giveFeedbackToUser("System Restore Point Created Successfully.", userFeedbackType.typeInfo)
             End If
 
             Exit Sub
         ElseIf result = Functions.APIs.errorCodes.ERROR_DISK_FULL Then
             messageText = "System Restore Point Creation Failed.  Disk Full." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_DISK_FULL (112)"
-            messageType = MsgBoxStyle.Critical
-            toolTipType = ToolTipIcon.Error
+            feedbackType = userFeedbackType.typeError
         ElseIf result = Functions.APIs.errorCodes.ERROR_ACCESS_DENIED Then
             messageText = "System Restore Point Creation Failed.  Access Denied." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_ACCESS_DENIED (5)"
-            messageType = MsgBoxStyle.Critical
-            toolTipType = ToolTipIcon.Error
+            feedbackType = userFeedbackType.typeError
         ElseIf result = Functions.APIs.errorCodes.ERROR_INTERNAL_ERROR Then
             messageText = "System Restore Point Creation Failed.  Internal Error." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_INTERNAL_ERROR (1359)"
-            messageType = MsgBoxStyle.Critical
-            toolTipType = ToolTipIcon.Error
+            feedbackType = userFeedbackType.typeError
         ElseIf result = Functions.APIs.errorCodes.ERROR_INVALID_DATA Then
             messageText = "System Restore Point Creation Failed.  Invalid Data." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_INVALID_DATA (13)"
-            messageType = MsgBoxStyle.Critical
-            toolTipType = ToolTipIcon.Error
+            feedbackType = userFeedbackType.typeError
         ElseIf result = Functions.APIs.errorCodes.ERROR_TIMEOUT Then
             messageText = "System Restore Point Creation Failed.  Invalid Data." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_TIMEOUT (1460)"
-            messageType = MsgBoxStyle.Critical
-            toolTipType = ToolTipIcon.Error
+            feedbackType = userFeedbackType.typeError
         ElseIf result = Functions.APIs.errorCodes.ERROR_SERVICE_DISABLED Then
             messageText = "System Restore Point Creation Failed.  Invalid Data." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_SERVICE_DISABLED (1058)"
-            messageType = MsgBoxStyle.Critical
-            toolTipType = ToolTipIcon.Error
+            feedbackType = userFeedbackType.typeError
         ElseIf result = Functions.APIs.errorCodes.ERROR_BAD_ENVIRONMENT Then
             messageText = "System Restore Point Creation Failed.  Invalid Data." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_BAD_ENVIRONMENT (10)"
-            messageType = MsgBoxStyle.Critical
-            toolTipType = ToolTipIcon.Error
+            feedbackType = userFeedbackType.typeError
         Else
             messageText = "System Restore Point Creation Failed." & vbCrLf & vbCrLf & "Internal Windows Error Code: UNKNOWN_ERROR (9999)"
-            messageType = MsgBoxStyle.Critical
-            toolTipType = ToolTipIcon.Error
+            feedbackType = userFeedbackType.typeError
         End If
 
-        If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
-            MsgBox(messageText, messageType, strMessageBoxTitle)
-        Else
-            NotifyIcon1.ShowBalloonTip(5000, strMessageBoxTitle, messageText, toolTipType)
-        End If
+        giveFeedbackToUser(messageText, feedbackType)
     End Sub
 
     Private Sub unifiedCreateSystemRestorePoint(Optional ByVal stringRestorePointName As String = "System Checkpoint made by System Restore Point Creator")
@@ -1497,11 +1507,7 @@ Public Class Form1
                     If Short.TryParse(strRemoteBuildParts(1).Trim, shortRemoteBuild) = True Then
                         If shortRemoteBuild > globalVariables.version.shortBuild Then
                             If strRemoteBuild.caseInsensitiveContains("beta") = True And My.Settings.onlyGiveMeRCs = True Then
-                                If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
-                                    MsgBox("You already have the latest version.", MsgBoxStyle.Information, strMessageBoxTitle)
-                                Else
-                                    NotifyIcon1.ShowBalloonTip(5000, "Restore Point Creator", "You already have the latest version.", ToolTipIcon.Info)
-                                End If
+                                giveFeedbackToUser("You already have the latest version.")
 
                                 userInitiatedCheckForUpdatesThread = Nothing
                                 Exit Sub
@@ -1522,13 +1528,9 @@ Public Class Form1
                             userInitiatedCheckForUpdatesThread = Nothing
                             Exit Sub
                         ElseIf shortRemoteBuild < globalVariables.version.shortBuild Then
-                            MsgBox("Somehow you have a version that is newer than is listed on the product web site, weird.", MsgBoxStyle.Information, strMessageBoxTitle)
+                            giveFeedbackToUser("Somehow you have a version that is newer than is listed on the product web site, weird.")
                         ElseIf shortRemoteBuild = globalVariables.version.shortBuild Then
-                            If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
-                                MsgBox("You already have the latest version.", MsgBoxStyle.Information, strMessageBoxTitle)
-                            Else
-                                NotifyIcon1.ShowBalloonTip(5000, "Restore Point Creator", "You already have the latest version.", ToolTipIcon.Info)
-                            End If
+                            giveFeedbackToUser("You already have the latest version.")
                         End If
                     Else
                         Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
@@ -1565,11 +1567,7 @@ Public Class Form1
                             userInitiatedCheckForUpdatesThread = Nothing
                             Exit Sub
                         ElseIf shortRemoteBuild = globalVariables.version.shortBuild Then
-                            If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
-                                MsgBox("You already have the latest version.", MsgBoxStyle.Information, strMessageBoxTitle)
-                            Else
-                                NotifyIcon1.ShowBalloonTip(5000, "Restore Point Creator", "You already have the latest version.", ToolTipIcon.Info)
-                            End If
+                            giveFeedbackToUser("You already have the latest version.")
                         End If
                     Else
                         Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
@@ -1584,17 +1582,9 @@ Public Class Form1
                 Else
                     If Short.TryParse(strRemoteBuild, shortRemoteBuild) = True Then
                         If shortRemoteBuild < globalVariables.version.shortBuild Then
-                            If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
-                                MsgBox("Somehow you have a version that is newer than is listed on the product web site, weird.", MsgBoxStyle.Information, strMessageBoxTitle)
-                            Else
-                                NotifyIcon1.ShowBalloonTip(5000, "Restore Point Creator", "Somehow you have a version that is newer than is listed on the product web site, weird.", ToolTipIcon.Info)
-                            End If
+                            giveFeedbackToUser("Somehow you have a version that is newer than is listed on the product web site, weird.")
                         ElseIf shortRemoteBuild = globalVariables.version.shortBuild Then
-                            If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
-                                MsgBox("You already have the latest version.", MsgBoxStyle.Information, strMessageBoxTitle)
-                            Else
-                                NotifyIcon1.ShowBalloonTip(5000, "Restore Point Creator", "You already have the latest version.", ToolTipIcon.Info)
-                            End If
+                            giveFeedbackToUser("You already have the latest version.")
                         ElseIf shortRemoteBuild > globalVariables.version.shortBuild Then
                             If openUpdateDialog(Update_Message.versionUpdateType.standardVersionUpdate) = Update_Message.userResponse.doTheUpdate Then
                                 openThePleaseWaitWindowAndStartTheDownloadThread()
@@ -2074,33 +2064,16 @@ Public Class Form1
             If ShowMessageBoxAfterSuccessfulDeletionOfRestorePointsToolStripMenuItem.Checked = True Then
                 If shortNumberOfRestorePointsDeleted = 0 Then
                     If globalVariables.windows.frmPleaseWait IsNot Nothing Then globalVariables.windows.frmPleaseWait.TopMost = False
-
-                    If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
-                        ' Gives some feedback.
-                        MsgBox("No System Restore Points were deleted.", MsgBoxStyle.Information, strMessageBoxTitle)
-                    Else
-                        ' Gives some feedback.
-                        NotifyIcon1.ShowBalloonTip(5000, "Restore Point Creator", "No System Restore Points were deleted.", ToolTipIcon.Info)
-                    End If
-
+                    giveFeedbackToUser("No System Restore Points were deleted.")
                     If globalVariables.windows.frmPleaseWait IsNot Nothing Then globalVariables.windows.frmPleaseWait.TopMost = True
                 ElseIf shortNumberOfRestorePointsDeleted > 0 Then
                     If globalVariables.windows.frmPleaseWait IsNot Nothing Then globalVariables.windows.frmPleaseWait.TopMost = False
 
-                    If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
-                        ' Gives some feedback.
-                        If boolMultipleRestorePointsDeleted = True Then
-                            MsgBox(shortNumberOfRestorePointsDeleted.ToString & " System Restore Points were deleted.", MsgBoxStyle.Information, strMessageBoxTitle)
-                        Else
-                            MsgBox("One System Restore Point was deleted.", MsgBoxStyle.Information, strMessageBoxTitle)
-                        End If
+                    ' Gives some feedback.
+                    If boolMultipleRestorePointsDeleted = True Then
+                        giveFeedbackToUser(shortNumberOfRestorePointsDeleted.ToString & " System Restore Points were deleted.")
                     Else
-                        ' Gives some feedback.
-                        If boolMultipleRestorePointsDeleted = True Then
-                            NotifyIcon1.ShowBalloonTip(5000, "Restore Point Creator", shortNumberOfRestorePointsDeleted.ToString & " System Restore Points were deleted.", ToolTipIcon.Info)
-                        Else
-                            NotifyIcon1.ShowBalloonTip(5000, "Restore Point Creator", "One System Restore Point was deleted.", ToolTipIcon.Info)
-                        End If
+                        giveFeedbackToUser("One System Restore Point was deleted.")
                     End If
 
                     If globalVariables.windows.frmPleaseWait IsNot Nothing Then globalVariables.windows.frmPleaseWait.TopMost = True
