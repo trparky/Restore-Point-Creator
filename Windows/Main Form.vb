@@ -1497,6 +1497,12 @@ Public Class Form1
                     If Short.TryParse(strRemoteBuildParts(1).Trim, shortRemoteBuild) = True Then
                         If shortRemoteBuild > globalVariables.version.shortBuild Then
                             If strRemoteBuild.caseInsensitiveContains("beta") = True And My.Settings.onlyGiveMeRCs = True Then
+                                If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
+                                    MsgBox("You already have the latest version.", MsgBoxStyle.Information, strMessageBoxTitle)
+                                Else
+                                    NotifyIcon1.ShowBalloonTip(5000, "Restore Point Creator", "You already have the latest version.", ToolTipIcon.Info)
+                                End If
+
                                 userInitiatedCheckForUpdatesThread = Nothing
                                 Exit Sub
                             End If
