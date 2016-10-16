@@ -1167,41 +1167,27 @@ Public Class Form1
     End Sub
 
     Sub giveFeedbackAfterCreatingRestorePoint(result As Integer)
-        Dim messageText As String, feedbackType As userFeedbackType
-
         If result = Functions.APIs.errorCodes.ERROR_SUCCESS Then
             If Me.ShowMessageBoxAfterSuccessfulCreationOfRestorePointToolStripMenuItem.Checked = True Then
                 giveFeedbackToUser("System Restore Point Created Successfully.", userFeedbackType.typeInfo)
             End If
-
-            Exit Sub
         ElseIf result = Functions.APIs.errorCodes.ERROR_DISK_FULL Then
-            messageText = "System Restore Point Creation Failed.  Disk Full." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_DISK_FULL (112)"
-            feedbackType = userFeedbackType.typeError
+            giveFeedbackToUser("System Restore Point Creation Failed.  Disk Full." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_DISK_FULL (112)", userFeedbackType.typeError)
         ElseIf result = Functions.APIs.errorCodes.ERROR_ACCESS_DENIED Then
-            messageText = "System Restore Point Creation Failed.  Access Denied." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_ACCESS_DENIED (5)"
-            feedbackType = userFeedbackType.typeError
+            giveFeedbackToUser("System Restore Point Creation Failed.  Access Denied." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_ACCESS_DENIED (5)", userFeedbackType.typeError)
         ElseIf result = Functions.APIs.errorCodes.ERROR_INTERNAL_ERROR Then
-            messageText = "System Restore Point Creation Failed.  Internal Error." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_INTERNAL_ERROR (1359)"
-            feedbackType = userFeedbackType.typeError
+            giveFeedbackToUser("System Restore Point Creation Failed.  Internal Error." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_INTERNAL_ERROR (1359)", userFeedbackType.typeError)
         ElseIf result = Functions.APIs.errorCodes.ERROR_INVALID_DATA Then
-            messageText = "System Restore Point Creation Failed.  Invalid Data." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_INVALID_DATA (13)"
-            feedbackType = userFeedbackType.typeError
+            giveFeedbackToUser("System Restore Point Creation Failed.  Invalid Data." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_INVALID_DATA (13)", userFeedbackType.typeError)
         ElseIf result = Functions.APIs.errorCodes.ERROR_TIMEOUT Then
-            messageText = "System Restore Point Creation Failed.  Invalid Data." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_TIMEOUT (1460)"
-            feedbackType = userFeedbackType.typeError
+            giveFeedbackToUser("System Restore Point Creation Failed.  Invalid Data." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_TIMEOUT (1460)", userFeedbackType.typeError)
         ElseIf result = Functions.APIs.errorCodes.ERROR_SERVICE_DISABLED Then
-            messageText = "System Restore Point Creation Failed.  Invalid Data." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_SERVICE_DISABLED (1058)"
-            feedbackType = userFeedbackType.typeError
+            giveFeedbackToUser("System Restore Point Creation Failed.  Invalid Data." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_SERVICE_DISABLED (1058)", userFeedbackType.typeError)
         ElseIf result = Functions.APIs.errorCodes.ERROR_BAD_ENVIRONMENT Then
-            messageText = "System Restore Point Creation Failed.  Invalid Data." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_BAD_ENVIRONMENT (10)"
-            feedbackType = userFeedbackType.typeError
+            giveFeedbackToUser("System Restore Point Creation Failed.  Invalid Data." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_BAD_ENVIRONMENT (10)", userFeedbackType.typeError)
         Else
-            messageText = "System Restore Point Creation Failed." & vbCrLf & vbCrLf & "Internal Windows Error Code: UNKNOWN_ERROR (9999)"
-            feedbackType = userFeedbackType.typeError
+            giveFeedbackToUser("System Restore Point Creation Failed." & vbCrLf & vbCrLf & "Internal Windows Error Code: UNKNOWN_ERROR (9999)", userFeedbackType.typeError)
         End If
-
-        giveFeedbackToUser(messageText, feedbackType)
     End Sub
 
     Private Sub unifiedCreateSystemRestorePoint(Optional ByVal stringRestorePointName As String = "System Checkpoint made by System Restore Point Creator")
