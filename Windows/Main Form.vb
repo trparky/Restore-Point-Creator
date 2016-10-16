@@ -747,32 +747,43 @@ Public Class Form1
     End Sub
 
     Private Sub deleteRPLifeIntervalValue()
+        Dim registryKey As RegistryKey
+
         If Environment.Is64BitOperatingSystem = False Then
-            If Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore") IsNot Nothing Then
-                If Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore", True).GetValue("RPLifeInterval", Nothing) = Nothing = False Then
-                    Try
-                        Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore", True).DeleteValue("RPLifeInterval")
-                    Catch ex As Exception
-                    End Try
-                End If
+            registryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore", True)
+
+            If registryKey IsNot Nothing Then
+                Try
+                    registryKey.DeleteValue("RPLifeInterval", False)
+                Catch ex As Exception
+                End Try
+
+                registryKey.Close()
+                registryKey.Dispose()
             End If
         Else
-            If RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64).OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore") IsNot Nothing Then
-                If RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64).OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore", True).GetValue("", Nothing) = Nothing = False Then
-                    Try
-                        RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64).OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore", True).DeleteValue("RPLifeInterval")
-                    Catch ex As Exception
-                    End Try
-                End If
+            registryKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64).OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore", True)
+
+            If registryKey IsNot Nothing Then
+                Try
+                    registryKey.DeleteValue("RPLifeInterval", False)
+                Catch ex As Exception
+                End Try
+
+                registryKey.Close()
+                registryKey.Dispose()
             End If
 
-            If Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore") IsNot Nothing Then
-                If Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore", True).GetValue("RPLifeInterval", Nothing) = Nothing = False Then
-                    Try
-                        Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore", True).DeleteValue("RPLifeInterval")
-                    Catch ex As Exception
-                    End Try
-                End If
+            registryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore", True)
+
+            If registryKey IsNot Nothing Then
+                Try
+                    registryKey.DeleteValue("RPLifeInterval", False)
+                Catch ex As Exception
+                End Try
+
+                registryKey.Close()
+                registryKey.Dispose()
             End If
         End If
     End Sub
