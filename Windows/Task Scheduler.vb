@@ -166,97 +166,99 @@ Public Class frmTaskScheduler
         Dim boolDoesTaskExist As Boolean = False
         Dim taskObject As Task = Nothing
 
-        If Functions.taskStuff.doesTaskExist(strDeleteTaskName, taskObject) = True Then
-            lblRunTimesDelete.Text = "Next Run Time: " & taskObject.NextRunTime.ToString & vbCrLf & "Last Run Time: " & taskObject.LastRunTime.ToString
+        Try
+            If Functions.taskStuff.doesTaskExist(strDeleteTaskName, taskObject) = True Then
+                lblRunTimesDelete.Text = "Next Run Time: " & taskObject.NextRunTime.ToString & vbCrLf & "Last Run Time: " & taskObject.LastRunTime.ToString
 
-            taskTriggers = taskObject.Definition.Triggers
-            chkWakeDelete.Checked = taskObject.Definition.Settings.WakeToRun
+                taskTriggers = taskObject.Definition.Triggers
+                chkWakeDelete.Checked = taskObject.Definition.Settings.WakeToRun
 
-            chkRunMissedTaskDelete.Checked = taskObject.Definition.Settings.StartWhenAvailable
+                chkRunMissedTaskDelete.Checked = taskObject.Definition.Settings.StartWhenAvailable
 
-            With taskTriggers.Item(0)
-                If .TriggerType = TaskTriggerType.Daily Then
-                    radDailyDelete.Checked = True
-                ElseIf .TriggerType = TaskTriggerType.Weekly Then
-                    radWeeklyDelete.Checked = True
-                    grpDaysOfTheWeekDelete.Enabled = True
+                With taskTriggers.Item(0)
+                    If .TriggerType = TaskTriggerType.Daily Then
+                        radDailyDelete.Checked = True
+                    ElseIf .TriggerType = TaskTriggerType.Weekly Then
+                        radWeeklyDelete.Checked = True
+                        grpDaysOfTheWeekDelete.Enabled = True
 
-                    ' I hate this hack, I really fucking hate this fucking hack! But I know of no other fucking way to do this. Did I mention that I fucking hate this fucking hack? Yes, I think I fucking did.
-                    If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Sunday)) Then chkSundayDelete.Checked = True
-                    If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Monday)) Then chkMondayDelete.Checked = True
-                    If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Tuesday)) Then chkTuesdayDelete.Checked = True
-                    If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Wednesday)) Then chkWednesdayDelete.Checked = True
-                    If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Thursday)) Then chkThursdayDelete.Checked = True
-                    If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Friday)) Then chkFridayDelete.Checked = True
-                    If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Saturday)) Then chkSaturdayDelete.Checked = True
-                End If
-
-                Try
-                    timePickerDelete.Value = .StartBoundary
-                Catch ex As Exception
-                    Functions.eventLogFunctions.writeToSystemEventLog("There was an error loading the saved schedule time from the """ & strDeleteTaskName & """ task.", EventLogEntryType.Error)
-                End Try
-            End With
-
-            taskTriggers.Dispose()
-            taskTriggers = Nothing
-
-            btnDeleteTaskDelete.Enabled = True
-        End If
-
-        If Functions.taskStuff.doesTaskExist(strCheckPointTaskName, taskObject) = True Then
-            lblRunTimes.Text = "Next Run Time: " & taskObject.NextRunTime.ToString & vbCrLf & "Last Run Time: " & taskObject.LastRunTime.ToString
-
-            boolDoesTaskExist = True
-            taskTriggers = taskObject.Definition.Triggers
-            chkWake.Checked = taskObject.Definition.Settings.WakeToRun
-
-            chkRunMissedTask.Checked = taskObject.Definition.Settings.StartWhenAvailable
-
-            With taskTriggers.Item(0)
-                If .TriggerType = TaskTriggerType.Daily Then
-                    ' We have to DirectCast the Trigger to a DailyTrigger first and then we'll get access to the DaysInterval value. I have no idea why we have to do this but we have to. ARG! It took me forever to figure this one out.
-                    Dim shortEvery As Short = DirectCast(taskTriggers.Item(0), DailyTrigger).DaysInterval
-
-                    If shortEvery = 1 Then
-                        radDaily.Checked = True
-                        txtEveryDay.Text = Nothing
-                        lblDays.Visible = False
-                        lblEvery.Visible = False
-                        txtEveryDay.Visible = False
-                    Else
-                        radEvery.Checked = True
-                        txtEveryDay.Text = shortEvery.ToString
-                        lblDays.Visible = True
-                        lblEvery.Visible = True
-                        txtEveryDay.Visible = True
+                        ' I hate this hack, I really fucking hate this fucking hack! But I know of no other fucking way to do this. Did I mention that I fucking hate this fucking hack? Yes, I think I fucking did.
+                        If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Sunday)) Then chkSundayDelete.Checked = True
+                        If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Monday)) Then chkMondayDelete.Checked = True
+                        If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Tuesday)) Then chkTuesdayDelete.Checked = True
+                        If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Wednesday)) Then chkWednesdayDelete.Checked = True
+                        If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Thursday)) Then chkThursdayDelete.Checked = True
+                        If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Friday)) Then chkFridayDelete.Checked = True
+                        If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Saturday)) Then chkSaturdayDelete.Checked = True
                     End If
-                ElseIf .TriggerType = TaskTriggerType.Weekly Then
-                    radWeekly.Checked = True
-                    grpDaysOfTheWeek.Enabled = True
 
-                    ' I hate this hack, I really fucking hate this fucking hack! But I know of no other fucking way to do this. Did I mention that I fucking hate this fucking hack? Yes, I think I fucking did.
-                    If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Sunday)) Then chkSunday.Checked = True
-                    If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Monday)) Then chkMonday.Checked = True
-                    If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Tuesday)) Then chkTuesday.Checked = True
-                    If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Wednesday)) Then chkWednesday.Checked = True
-                    If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Thursday)) Then chkThursday.Checked = True
-                    If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Friday)) Then chkFriday.Checked = True
-                    If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Saturday)) Then chkSaturday.Checked = True
-                End If
+                    timePickerDelete.Value = .StartBoundary
+                End With
 
-                Try
+                taskTriggers.Dispose()
+                taskTriggers = Nothing
+
+                btnDeleteTaskDelete.Enabled = True
+            End If
+        Catch ex As FormatException
+            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeToSystemEventLog("There was an error loading the saved schedule time from the """ & strDeleteTaskName & """ task.", EventLogEntryType.Error)
+        End Try
+
+        Try
+            If Functions.taskStuff.doesTaskExist(strCheckPointTaskName, taskObject) = True Then
+                lblRunTimes.Text = "Next Run Time: " & taskObject.NextRunTime.ToString & vbCrLf & "Last Run Time: " & taskObject.LastRunTime.ToString
+
+                boolDoesTaskExist = True
+                taskTriggers = taskObject.Definition.Triggers
+                chkWake.Checked = taskObject.Definition.Settings.WakeToRun
+
+                chkRunMissedTask.Checked = taskObject.Definition.Settings.StartWhenAvailable
+
+                With taskTriggers.Item(0)
+                    If .TriggerType = TaskTriggerType.Daily Then
+                        ' We have to DirectCast the Trigger to a DailyTrigger first and then we'll get access to the DaysInterval value. I have no idea why we have to do this but we have to. ARG! It took me forever to figure this one out.
+                        Dim shortEvery As Short = DirectCast(taskTriggers.Item(0), DailyTrigger).DaysInterval
+
+                        If shortEvery = 1 Then
+                            radDaily.Checked = True
+                            txtEveryDay.Text = Nothing
+                            lblDays.Visible = False
+                            lblEvery.Visible = False
+                            txtEveryDay.Visible = False
+                        Else
+                            radEvery.Checked = True
+                            txtEveryDay.Text = shortEvery.ToString
+                            lblDays.Visible = True
+                            lblEvery.Visible = True
+                            txtEveryDay.Visible = True
+                        End If
+                    ElseIf .TriggerType = TaskTriggerType.Weekly Then
+                        radWeekly.Checked = True
+                        grpDaysOfTheWeek.Enabled = True
+
+                        ' I hate this hack, I really fucking hate this fucking hack! But I know of no other fucking way to do this. Did I mention that I fucking hate this fucking hack? Yes, I think I fucking did.
+                        If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Sunday)) Then chkSunday.Checked = True
+                        If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Monday)) Then chkMonday.Checked = True
+                        If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Tuesday)) Then chkTuesday.Checked = True
+                        If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Wednesday)) Then chkWednesday.Checked = True
+                        If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Thursday)) Then chkThursday.Checked = True
+                        If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Friday)) Then chkFriday.Checked = True
+                        If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Saturday)) Then chkSaturday.Checked = True
+                    End If
+
                     timePicker.Value = .StartBoundary
-                Catch ex As Exception
-                    Functions.eventLogFunctions.writeToSystemEventLog("There was an error loading the saved schedule time from the """ & strCheckPointTaskName & """ task.", EventLogEntryType.Error)
-                End Try
-            End With
+                End With
 
-            taskTriggers.Dispose()
-            taskTriggers = Nothing
+                taskTriggers.Dispose()
+                taskTriggers = Nothing
 
-            btnDeleteTask.Enabled = True
-        End If
+                btnDeleteTask.Enabled = True
+            End If
+        Catch ex As FormatException
+            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeToSystemEventLog("There was an error loading the saved schedule time from the """ & strCheckPointTaskName & """ task.", EventLogEntryType.Error)
+        End Try
 
         taskService.Dispose()
         taskService = Nothing
