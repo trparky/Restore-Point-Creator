@@ -189,18 +189,25 @@ Namespace My
                     Functions.support.reRunWithAdminUserRights()
                 End If
 
-                Boolean.TryParse(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Keep X Amount of Restore Points", "False"), globalVariables.KeepXAmountOfRestorePoints)
+                Dim registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
 
-                If globalVariables.KeepXAmountOfRestorePoints = True Then
-                    Short.TryParse(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Keep X Amount of Restore Points Value", "-10"), globalVariables.KeepXAmountofRestorePointsValue)
-                End If
+                If registryKey IsNot Nothing Then
+                    Boolean.TryParse(registryKey.GetValue("Keep X Amount of Restore Points", "False"), globalVariables.KeepXAmountOfRestorePoints)
 
-                If Boolean.TryParse(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Enable System Logging", "True"), globalVariables.boolLogToSystemLog) = False Then
-                    globalVariables.boolLogToSystemLog = True
-                End If
+                    If globalVariables.KeepXAmountOfRestorePoints = True Then
+                        Short.TryParse(registryKey.GetValue("Keep X Amount of Restore Points Value", "-10"), globalVariables.KeepXAmountofRestorePointsValue)
+                    End If
 
-                If Boolean.TryParse(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Log Program Loads and Exits to Event Log", "True"), globalVariables.boolLogLoadsAndExitsToEventLog) = False Then
-                    globalVariables.boolLogLoadsAndExitsToEventLog = True
+                    If Boolean.TryParse(registryKey.GetValue("Enable System Logging", "True"), globalVariables.boolLogToSystemLog) = False Then
+                        globalVariables.boolLogToSystemLog = True
+                    End If
+
+                    If Boolean.TryParse(registryKey.GetValue("Log Program Loads and Exits to Event Log", "True"), globalVariables.boolLogLoadsAndExitsToEventLog) = False Then
+                        globalVariables.boolLogLoadsAndExitsToEventLog = True
+                    End If
+
+                    registryKey.Close()
+                    registryKey.Dispose()
                 End If
 
                 If My.Settings.UpdateRequired = True Then
