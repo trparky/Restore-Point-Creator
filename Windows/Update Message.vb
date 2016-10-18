@@ -159,6 +159,7 @@
     End Sub
 
     Private Sub Update_Message_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        My.Settings.updateMessageDialogSize = Me.Size
         If boolButtonPushed = False Then dialogResponse = userResponse.dontDoTheUpdate
     End Sub
 
@@ -173,10 +174,6 @@
 
     Private Sub Update_Message_Resize(sender As Object, e As EventArgs) Handles Me.Resize
         If Me.Width <> 788 Then Me.Width = 788
-    End Sub
-
-    Private Sub Update_Message_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
-        My.Settings.updateMessageDialogSize = Me.Size
     End Sub
 
     Private Sub chkShowPartialBetaChangeLogs_Click(sender As Object, e As EventArgs) Handles chkShowPartialBetaChangeLogs.Click
