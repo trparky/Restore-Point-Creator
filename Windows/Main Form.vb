@@ -384,7 +384,7 @@ Public Class Form1
             ShowMessageBoxAfterSuccessfulDeletionOfRestorePointsToolStripMenuItem.Checked = My.Settings.ShowMessageBoxAfterSuccessfulDeletionOfRestorePoints
             CheckSystemDrivesForFullShadowStorageToolStripMenuItem.Checked = My.Settings.checkSystemDrivesForFullShadowStorage
             EnableSystemEventLoggingToolStripMenuItem.Checked = globalVariables.boolLogToSystemLog
-            LogProgramLoadsAndExitsToEventLogToolStripMenuItem.Checked = globalVariables.boolLogLoadsAndExitsToEventLog
+            LogProgramLoadsAndExitsToEventLogToolStripMenuItem.Checked = globalVariables.boolLogLoadsAndExits
             UseSSLToolStripMenuItem.Checked = My.Settings.useSSL
             AskBeforeUpgradingUpdatingToolStripMenuItem.Checked = My.Settings.askToUpgrade
             Me.Location = My.Settings.mainWindowPosition
@@ -2349,7 +2349,7 @@ Public Class Form1
             updateRestorePointListThread.Abort()
         End If
 
-        If globalVariables.boolLogLoadsAndExitsToEventLog = True Then Functions.eventLogFunctions.writeToSystemEventLog("The user " & Environment.UserName & " closed the program.", EventLogEntryType.Information)
+        If globalVariables.boolLogLoadsAndExits = True Then Functions.eventLogFunctions.writeToSystemEventLog("The user " & Environment.UserName & " closed the program.", EventLogEntryType.Information)
     End Sub
 
     Private Sub Form1_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
@@ -2402,7 +2402,7 @@ Public Class Form1
         End If
 
         Try
-            If globalVariables.boolLogLoadsAndExitsToEventLog = True Then Functions.eventLogFunctions.writeToSystemEventLog("The user " & Environment.UserName & " started the program.", EventLogEntryType.Information)
+            If globalVariables.boolLogLoadsAndExits = True Then Functions.eventLogFunctions.writeToSystemEventLog("The user " & Environment.UserName & " started the program.", EventLogEntryType.Information)
 
             If IO.File.Exists("updater.exe") = True Then
                 Dim updaterDeleterThread As New Threading.Thread(AddressOf updaterDeleterThreadSub)
@@ -2916,9 +2916,9 @@ Public Class Form1
     End Sub
 
     Private Sub LogProgramLoadsAndExitsToEventLogToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles LogProgramLoadsAndExitsToEventLogToolStripMenuItem.Click
-        globalVariables.boolLogLoadsAndExitsToEventLog = LogProgramLoadsAndExitsToEventLogToolStripMenuItem.Checked
+        globalVariables.boolLogLoadsAndExits = LogProgramLoadsAndExitsToEventLogToolStripMenuItem.Checked
 
-        If globalVariables.boolLogLoadsAndExitsToEventLog = True Then
+        If globalVariables.boolLogLoadsAndExits = True Then
             savePreferenceToRegistry("Log Program Loads And Exits to Event Log", "True")
         Else
             savePreferenceToRegistry("Log Program Loads And Exits to Event Log", "False")
