@@ -108,12 +108,7 @@ Namespace My
 
             ' Checks to see if the update channel is set to stable, if a debug symbols file exists, and we are an Admin.
             If My.Settings.updateChannel = globalVariables.updateChannels.stable And IO.File.Exists(globalVariables.pdbFileNameInZIP) = True And boolAreWeAnAdministrator = True Then
-                ' Yes, it does exist so we try to delete it.
-                Try
-                    IO.File.Delete(globalVariables.pdbFileNameInZIP)
-                Catch ex As Exception
-                    ' If something goes wrong, we don't care; we handle it silently.
-                End Try
+                Functions.support.deleteFileWithNoException(globalVariables.pdbFileNameInZIP)
             End If
 
             Dim executablePathPathInfo As New IO.FileInfo(Windows.Forms.Application.ExecutablePath)
