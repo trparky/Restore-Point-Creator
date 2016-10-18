@@ -211,63 +211,11 @@
         End If
     End Sub
 
-    Private Sub txtChanges_Click(sender As Object, e As EventArgs) Handles txtChanges.Click
+    Private Sub Update_Message_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
         disableCountdown()
     End Sub
 
-    Private Sub lblCountdown_Click(sender As Object, e As EventArgs) Handles lblCountdown.Click
-        disableCountdown()
-    End Sub
-
-    Private Sub Update_Message_Click(sender As Object, e As EventArgs) Handles Me.Click
-        disableCountdown()
-    End Sub
-
-    Private Sub txtChanges_MouseWheel(sender As Object, e As MouseEventArgs) Handles txtChanges.MouseWheel
-        disableCountdown()
-    End Sub
-
-    Private Sub imgSSL_Click(sender As Object, e As EventArgs) Handles imgSSL.Click
-        disableCountdown()
-    End Sub
-
-    Private Sub Label2_Click(sender As Object, e As EventArgs) Handles Label2.Click
-        disableCountdown()
-    End Sub
-
-    Private Sub lblBetaNotice_Click(sender As Object, e As EventArgs) Handles lblBetaNotice.Click
-        disableCountdown()
-    End Sub
-
-    Private Sub lblChangesAsFollows_Click(sender As Object, e As EventArgs) Handles lblChangesAsFollows.Click
-        disableCountdown()
-    End Sub
-
-    Private Sub lblCurrentVersion_Click(sender As Object, e As EventArgs) Handles lblCurrentVersion.Click
-        disableCountdown()
-    End Sub
-
-    Private Sub lblMinorUpdateNotice_Click(sender As Object, e As EventArgs) Handles lblMinorUpdateNotice.Click
-        disableCountdown()
-    End Sub
-
-    Private Sub lblReleaseCandidateNotice_Click(sender As Object, e As EventArgs) Handles lblReleaseCandidateNotice.Click
-        disableCountdown()
-    End Sub
-
-    Private Sub lblStandardUpdateNotice_Click(sender As Object, e As EventArgs) Handles lblStandardUpdateNotice.Click
-        disableCountdown()
-    End Sub
-
-    Private Sub lblTotallyNewVersion_Click(sender As Object, e As EventArgs) Handles lblTotallyNewVersion.Click
-        disableCountdown()
-    End Sub
-
-    Private Sub PictureBox1_Click(sender As Object, e As EventArgs) Handles PictureBox1.Click
-        disableCountdown()
-    End Sub
-
-    Private Sub TableLayoutPanel1_Click(sender As Object, e As EventArgs) Handles TableLayoutPanel1.Click
+    Private Sub txtChanges_MouseMove(sender As Object, e As MouseEventArgs) Handles txtChanges.MouseMove
         disableCountdown()
     End Sub
 End Class
