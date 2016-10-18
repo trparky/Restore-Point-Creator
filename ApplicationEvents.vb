@@ -202,8 +202,8 @@ Namespace My
                         globalVariables.boolLogToSystemLog = True
                     End If
 
-                    If Boolean.TryParse(registryKey.GetValue("Log Program Loads and Exits to Event Log", "True"), globalVariables.boolLogLoadsAndExitsToEventLog) = False Then
-                        globalVariables.boolLogLoadsAndExitsToEventLog = True
+                    If Boolean.TryParse(registryKey.GetValue("Log Program Loads and Exits to Event Log", "True"), globalVariables.boolLogLoadsAndExits) = False Then
+                        globalVariables.boolLogLoadsAndExits = True
                     End If
 
                     registryKey.Close()
