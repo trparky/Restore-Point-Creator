@@ -14,6 +14,7 @@ Namespace My
         Private pleaseWaitInstance As Please_Wait
 
         Private Sub MyApplication_Startup(sender As Object, e As ApplicationServices.StartupEventArgs) Handles Me.Startup
+            exceptionHandler.loadExceptionHandler()
             Functions.startupFunctions.validateSettings()
 
             Dim commandLineArgument As String
@@ -216,8 +217,6 @@ Namespace My
                     My.Settings.Upgrade()
                     My.Settings.UpdateRequired = False
                 End If
-
-                exceptionHandler.loadExceptionHandler()
 
                 If My.Application.CommandLineArgs IsNot Nothing Then
                     If My.Application.CommandLineArgs.Count >= 1 Then
