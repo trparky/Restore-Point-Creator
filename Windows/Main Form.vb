@@ -136,6 +136,7 @@ Public Class Form1
                                         registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
                                         registryKey.Close()
                                         registryKey.Dispose()
+                                        registryKey = Nothing
                                     End If
                                 End If
                             End If
@@ -170,6 +171,7 @@ Public Class Form1
                                         registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
                                         registryKey.Close()
                                         registryKey.Dispose()
+                                        registryKey = Nothing
                                     End If
                                 End If
                             End If
@@ -206,6 +208,7 @@ Public Class Form1
                                         registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
                                         registryKey.Close()
                                         registryKey.Dispose()
+                                        registryKey = Nothing
                                     End If
                                 End If
                             End If
@@ -646,14 +649,14 @@ Public Class Form1
 
     Sub interfaceTooSmallSettingCheckFormLoadSubRoutine()
         Try
-            Dim registryKeyWeAreWorkingWith As RegistryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers", False)
+            Dim registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers", False)
 
             ' We don't want a Null Reference Exception so we check to see if the Registry Object we just created in Null.
-            If registryKeyWeAreWorkingWith IsNot Nothing Then
+            If registryKey IsNot Nothing Then
                 ' OK, it isn't so let's continue with the checking.
 
                 ' We now get the current value of our special Registry value. If the value doesn't exist then the default value that the .NET Framework should return is "Nothing".
-                Dim valueInRegistry As String = registryKeyWeAreWorkingWith.GetValue(Process.GetCurrentProcess.MainModule.FileName.ToLower, "Nothing")
+                Dim valueInRegistry As String = registryKey.GetValue(Application.ExecutablePath.ToLower, "Nothing")
 
                 ' Now we check to see if the value isn't equal to "Nothing" and if it contains the word "HIGHDPIAWARE".
                 If valueInRegistry.Equals("Nothing") = False And valueInRegistry.caseInsensitiveContains("HIGHDPIAWARE") = True Then
@@ -661,8 +664,8 @@ Public Class Form1
                 End If
 
                 ' Now we dispose of the Registry Access Objects.
-                registryKeyWeAreWorkingWith.Close()
-                registryKeyWeAreWorkingWith.Dispose()
+                registryKey.Close()
+                registryKey.Dispose()
             End If
         Catch ex As Exception
             ' Does nothing
@@ -760,6 +763,7 @@ Public Class Form1
 
                 registryKey.Close()
                 registryKey.Dispose()
+                registryKey = Nothing
             End If
         Else
             registryKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64).OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore", True)
@@ -772,6 +776,7 @@ Public Class Form1
 
                 registryKey.Close()
                 registryKey.Dispose()
+                registryKey = Nothing
             End If
 
             registryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore", True)
@@ -784,6 +789,7 @@ Public Class Form1
 
                 registryKey.Close()
                 registryKey.Dispose()
+                registryKey = Nothing
             End If
         End If
     End Sub
@@ -3017,19 +3023,21 @@ Public Class Form1
             Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags", True).CreateSubKey("Layers")
         End If
 
+        Dim registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers", True)
+
         If InterfaceTooBigToolStripMenuItem.Checked = True Then
-            Dim registryKeyWeAreWorkingWith As RegistryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers", True)
-            registryKeyWeAreWorkingWith.SetValue(Process.GetCurrentProcess.MainModule.FileName.ToLower, "~ HIGHDPIAWARE", RegistryValueKind.String)
-            registryKeyWeAreWorkingWith.Close()
-            registryKeyWeAreWorkingWith.Dispose()
+            registryKey.SetValue(Process.GetCurrentProcess.MainModule.FileName.ToLower, "~ HIGHDPIAWARE", RegistryValueKind.String)
+            registryKey.Close()
+            registryKey.Dispose()
+            registryKey = Nothing
 
             MsgBox("The compatibility flag has been set for the program. The program will relaunch for the changes to take effect.", MsgBoxStyle.Information, strMessageBoxTitle)
             Functions.support.reRunWithAdminUserRights()
         Else
-            Dim registryKeyWeAreWorkingWith As RegistryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers", True)
-            registryKeyWeAreWorkingWith.DeleteValue(Process.GetCurrentProcess.MainModule.FileName.ToLower, False)
-            registryKeyWeAreWorkingWith.Close()
-            registryKeyWeAreWorkingWith.Dispose()
+            registryKey.DeleteValue(Process.GetCurrentProcess.MainModule.FileName.ToLower, False)
+            registryKey.Close()
+            registryKey.Dispose()
+            registryKey = Nothing
         End If
     End Sub
 
