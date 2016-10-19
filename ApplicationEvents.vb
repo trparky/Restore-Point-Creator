@@ -17,6 +17,7 @@ Namespace My
             Functions.startupFunctions.validateSettings()
 
             Dim commandLineArgument As String
+            Dim registryKey As RegistryKey
             Dim boolNoTask As Boolean = False ' Create a Boolean data type variable.
 
             If Environment.OSVersion.ToString.Contains("5.1") = True Or Environment.OSVersion.ToString.Contains("5.2") = True Then
@@ -189,7 +190,7 @@ Namespace My
                     Functions.support.reRunWithAdminUserRights()
                 End If
 
-                Dim registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+                registryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
 
                 If registryKey IsNot Nothing Then
                     Boolean.TryParse(registryKey.GetValue("Keep X Amount of Restore Points", "False"), globalVariables.KeepXAmountOfRestorePoints)
@@ -208,6 +209,7 @@ Namespace My
 
                     registryKey.Close()
                     registryKey.Dispose()
+                    registryKey = Nothing
                 End If
 
                 If My.Settings.UpdateRequired = True Then
@@ -279,19 +281,20 @@ Namespace My
                             Dim boolExtendedLoggingForScheduledTasks As Boolean = True
                             Dim oldNewestRestorePointID As Integer
 
-                            Dim registryObject As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+                            registryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
 
-                            If registryObject IsNot Nothing Then
-                                restorePointNameForScheduledTasks = registryObject.GetValue("Custom Name for Scheduled Restore Points", globalVariables.strDefaultNameForScheduledTasks)
+                            If registryKey IsNot Nothing Then
+                                restorePointNameForScheduledTasks = registryKey.GetValue("Custom Name for Scheduled Restore Points", globalVariables.strDefaultNameForScheduledTasks)
 
-                                If Boolean.TryParse(registryObject.GetValue("Extended Logging For Scheduled Tasks", "True"), boolExtendedLoggingForScheduledTasks) Then
+                                If Boolean.TryParse(registryKey.GetValue("Extended Logging For Scheduled Tasks", "True"), boolExtendedLoggingForScheduledTasks) Then
                                     boolExtendedLoggingForScheduledTasks = boolExtendedLoggingForScheduledTasks
                                 Else
                                     boolExtendedLoggingForScheduledTasks = True
                                 End If
 
-                                registryObject.Close()
-                                registryObject.Dispose()
+                                registryKey.Close()
+                                registryKey.Dispose()
+                                registryKey = Nothing
                             End If
 
                             If boolExtendedLoggingForScheduledTasks = True Then
