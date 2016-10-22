@@ -80,20 +80,25 @@ Namespace Functions.support
                 processExecutablePath = getProcessExecutablePath(process.Id)
 
                 If processExecutablePath IsNot Nothing Then
-                    processExecutablePathFileInfo = New IO.FileInfo(processExecutablePath)
+                    Try
+                        processExecutablePathFileInfo = New IO.FileInfo(processExecutablePath)
 
-                    If boolFullFilePathPassed = True Then
-                        If stringCompare(strFileName, processExecutablePathFileInfo.FullName) = True Then
-                            killProcess(process.Id, True)
+                        If boolFullFilePathPassed = True Then
+                            If stringCompare(strFileName, processExecutablePathFileInfo.FullName) = True Then
+                                killProcess(process.Id, True)
+                            End If
+                        ElseIf boolFullFilePathPassed = False Then
+                            If stringCompare(strFileName, processExecutablePathFileInfo.Name) = True Then
+                                killProcess(process.Id, True)
+                            End If
                         End If
-                    ElseIf boolFullFilePathPassed = False Then
-                        If stringCompare(strFileName, processExecutablePathFileInfo.Name) = True Then
-                            killProcess(process.Id, True)
-                        End If
-                    End If
 
-                    processExecutablePathFileInfo = Nothing
+                        processExecutablePathFileInfo = Nothing
+                    Catch ex As ArgumentException
+                    End Try
                 End If
+
+                processExecutablePath = Nothing
             Next
         End Sub
 
