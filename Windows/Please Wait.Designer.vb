@@ -74,6 +74,7 @@ Partial Class Please_Wait
         Me.MinimizeBox = False
         Me.Name = "Please_Wait"
         Me.ShowInTaskbar = False
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Please Wait..."
         Me.ResumeLayout(False)
         Me.PerformLayout()
