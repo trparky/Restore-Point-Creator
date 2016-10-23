@@ -6,6 +6,7 @@
             loadThread.Abort()
         End If
 
+        My.Settings.changeLogWindowSize = Me.Size
         globalVariables.windows.frmChangeLog.Dispose()
         globalVariables.windows.frmChangeLog = Nothing
     End Sub
@@ -24,6 +25,7 @@
     End Sub
 
     Private Sub Change_Log_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.Size = My.Settings.changeLogWindowSize
         Control.CheckForIllegalCrossThreadCalls = False
     End Sub
 
