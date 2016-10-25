@@ -3,6 +3,7 @@
     Public allowAutoFocus As Boolean = True
     Public lblLabelText As String
     Public myParentForm As Form
+    Public howToCenter As Short = enums.howToCenterWindow.parent
 
     Private Sub Please_Wait_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         If allowClose = False And e.CloseReason <> CloseReason.UserClosing Then
@@ -12,7 +13,14 @@
     End Sub
 
     Private Sub Please_Wait_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.CenterToParent()
+        If howToCenter = enums.howToCenterWindow.parent Then
+            Me.CenterToParent()
+        ElseIf howToCenter = enums.howToCenterWindow.screen Then
+            Me.CenterToScreen()
+        End If
+
+        Me.BringToFront()
+
         Control.CheckForIllegalCrossThreadCalls = False
         SmoothProgressBar1.ProgressBarColor = My.Settings.barColor
         progressBarChanger.Enabled = True

@@ -234,7 +234,7 @@ Namespace My
                                 End If
                             End If
 
-                            Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", True)
+                            Functions.wait.createPleaseWaitWindowInCenterOfScreen("Creating Restore Point... Please Wait.", True)
 
                             ' This is a special way of making a thread in which you can pass parameters to the sub-routine that you're running as a separate thread.
                             Dim creatingThread As New Threading.Thread(Sub()
@@ -264,7 +264,7 @@ Namespace My
                                 restorePointName = Custom_Named_Restore_Point_Instance.restorePointName
                             End If
 
-                            Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", True)
+                            Functions.wait.createPleaseWaitWindowInCenterOfScreen("Creating Restore Point... Please Wait.", True)
 
                             ' This is a special way of making a thread in which you can pass parameters to the sub-routine that you're running as a separate thread.
                             Dim creatingThread As New Threading.Thread(Sub()
@@ -357,7 +357,7 @@ Namespace My
                                 If Functions.startupFunctions.preSelectedRestorePointID = 0 Then
                                     MsgBox("Something went wrong, we don't have a valid restore point to restore to. The program will execute as normal from now on.", MsgBoxStyle.Information, "Restore Point Creator")
                                 Else
-                                    Functions.wait.createPleaseWaitWindow("Beginning the Restore Process... Please wait.", True)
+                                    Functions.wait.createPleaseWaitWindowInCenterOfScreen("Beginning the Restore Process... Please wait.", True)
 
                                     Functions.startupFunctions.isMyRestoreThreadRunning = True
 

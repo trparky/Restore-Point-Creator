@@ -19,5 +19,10 @@
             balloon = 0
             msgbox = 1
         End Enum
+
+        Public Enum howToCenterWindow As Short
+            parent = 0
+            screen = 1
+        End Enum
     End Module
 End Namespace
