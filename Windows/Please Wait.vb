@@ -20,6 +20,7 @@
         End If
 
         Me.BringToFront()
+        Me.Focus()
 
         Control.CheckForIllegalCrossThreadCalls = False
         SmoothProgressBar1.ProgressBarColor = My.Settings.barColor
