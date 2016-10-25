@@ -14,5 +14,10 @@
             build = 2
             revision = 3
         End Enum
+
+        Public Enum userFeedbackType As Short
+            balloon = 0
+            msgbox = 1
+        End Enum
     End Module
 End Namespace

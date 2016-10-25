@@ -367,7 +367,19 @@ Public Class Form1
             toolStripCloseAfterRestorePointIsCreated.Checked = My.Settings.closeAfterCreatingRestorePoint
             AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked = My.Settings.allowDeleteOfAllRestorePoints
 
-            If My.Settings.notificationType = globalVariables.notificationTypeBalloon Then
+            ' This code converts the old way of saving the user feedback type preference to the new way of saving the user feedback preference.
+            If String.IsNullOrEmpty(My.Settings.notificationType) = False Then
+                If My.Settings.notificationType = globalVariables.notificationTypeBalloon Then
+                    My.Settings.notificationType2 = enums.userFeedbackType.balloon
+                ElseIf My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
+                    My.Settings.notificationType2 = enums.userFeedbackType.msgbox
+                End If
+
+                My.Settings.notificationType = Nothing
+            End If
+            ' This code converts the old way of saving the user feedback type preference to the new way of saving the user feedback preference.
+
+            If My.Settings.notificationType2 = enums.userFeedbackType.balloon Then
                 BalloonToolStripMenuItem.Checked = True
                 MessageBoxToolStripMenuItem.Checked = False
             Else
@@ -555,7 +567,7 @@ Public Class Form1
     End Enum
 
     Sub giveFeedbackToUser(feedBackMessage As String, Optional feedbackType As userFeedbackType = userFeedbackType.typeInfo)
-        If My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
+        If My.Settings.notificationType2 = enums.userFeedbackType.msgbox Then
             If feedbackType = userFeedbackType.typeInfo Then
                 MsgBox(feedBackMessage, MsgBoxStyle.Information, strMessageBoxTitle)
             ElseIf feedbackType = userFeedbackType.typeError Then
@@ -3066,14 +3078,14 @@ Public Class Form1
 
     Private Sub MessageBoxToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles MessageBoxToolStripMenuItem.Click
         BalloonToolStripMenuItem.Checked = False
-        My.Settings.notificationType = globalVariables.notificationTypeMessageBox
+        My.Settings.notificationType2 = enums.userFeedbackType.balloon
         My.Settings.Save()
         'changeMessageTypeMenuItems()
     End Sub
 
     Private Sub BalloonToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BalloonToolStripMenuItem.Click
         MessageBoxToolStripMenuItem.Checked = False
-        My.Settings.notificationType = globalVariables.notificationTypeBalloon
+        My.Settings.notificationType2 = enums.userFeedbackType.balloon
         My.Settings.Save()
         'changeMessageTypeMenuItems()
     End Sub
