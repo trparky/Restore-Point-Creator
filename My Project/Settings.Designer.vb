@@ -854,6 +854,18 @@ Namespace My
                 Me("changeLogWindowSize") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
+        Public Property notificationType2() As Short
+            Get
+                Return CType(Me("notificationType2"),Short)
+            End Get
+            Set
+                Me("notificationType2") = value
+            End Set
+        End Property
     End Class
 End Namespace
 
