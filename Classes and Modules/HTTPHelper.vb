@@ -176,7 +176,7 @@ End Class
 
 ''' <summary>Allows you to easily POST and upload files to a remote HTTP server without you, the programmer, knowing anything about how it all works. This class does it all for you. It handles adding a User Agent String, additional HTTP Request Headers, string data to your HTTP POST data, and files to be uploaded in the HTTP POST data.</summary>
 Public Class httpHelper
-    Private Const classVersion As String = "1.190"
+    Private Const classVersion As String = "1.195"
 
     Private strUserAgentString As String = Nothing
     Private boolUseProxy As Boolean = False
@@ -344,7 +344,7 @@ Public Class httpHelper
     ''' <summary>Gets the remote file size.</summary>
     ''' <param name="boolHumanReadable">Optional setting, normally set to True. Tells the function if it should transform the Integer representing the file size into a human readable format.</param>
     ''' <returns>Either a String or a Long containing the remote file size.</returns>
-    Public ReadOnly Property getHTTPDownloadRemoteFileSize(Optional boolHumanReadable As Boolean = True) As Short
+    Public ReadOnly Property getHTTPDownloadRemoteFileSize(Optional boolHumanReadable As Boolean = True) As Object
         Get
             If boolHumanReadable = True Then
                 Return fileSizeToHumanReadableFormat(remoteFileSize)
@@ -413,8 +413,8 @@ Public Class httpHelper
         End Set
     End Property
 
-    ''' <summary>Sets a timeout for any HTTP requests in this Class. Normally it's set for 5 seconds.</summary>
-    ''' <value>The amount of time in seconds (NOT miliseconds) that you want your HTTP requests to timeout in. This function will translate the seconds to miliseconds for you.</value>
+    ''' <summary>Sets a timeout for any HTTP requests in this Class. Normally it's set for 5 seconds. The input is the amount of time in seconds (NOT milliseconds) that you want your HTTP requests to timeout in. The class will translate the seconds to milliseconds for you.</summary>
+    ''' <value>The amount of time in seconds (NOT milliseconds) that you want your HTTP requests to timeout in. This function will translate the seconds to milliseconds for you.</value>
     Public WriteOnly Property setHTTPTimeout As Short
         Set
             httpTimeOut = Value * 1000
@@ -551,14 +551,14 @@ Public Class httpHelper
     ''' <summary>Checks to see if the GET data key exists in this GET data.</summary>
     ''' <param name="strName">The name of the GET data variable you are checking the existance of.</param>
     ''' <returns></returns>
-    Public Function doesGETDataExist(strName As String)
+    Public Function doesGETDataExist(strName As String) As Boolean
         Return getData.ContainsKey(strName)
     End Function
 
     ''' <summary>Checks to see if the POST data key exists in this POST data.</summary>
     ''' <param name="strName">The name of the POST data variable you are checking the existance of.</param>
     ''' <returns></returns>
-    Public Function doesPOSTDataExist(strName As String)
+    Public Function doesPOSTDataExist(strName As String) As Boolean
         Return postData.ContainsKey(strName)
     End Function
 
@@ -650,9 +650,11 @@ Public Class httpHelper
 
     ''' <summary>Gets the percentage of the file that's being downloaded from the HTTP Server.</summary>
     ''' <returns>Returns a Short Integer value.</returns>
-    Public Function getHTTPDownloadProgressPercentage() As Short
-        Return httpDownloadProgressPercentage
-    End Function
+    Public ReadOnly Property getHTTPDownloadProgressPercentage As Short
+        Get
+            Return httpDownloadProgressPercentage
+        End Get
+    End Property
 
     ''' <summary>Downloads a file from a web server while feeding back the status of the download. You can find the percentage of the download in the httpDownloadProgressPercentage variable. This function gives you the programmer more control over how HTTP downloads are done. For instance, if you don't want to write the data directly out to disk until the download is complete, this function gives you that ability whereas the downloadFile() function writes the downloaded data directly to disk bypassing system RAM. This is good for those cases you may be writing the data to an SSD in which you only want to write the data to the SSD until the download is known to be successful.</summary>
     ''' <param name="fileDownloadURL">The HTTP Path to a file on a remote server to download.</param>
@@ -713,8 +715,9 @@ Public Class httpHelper
                 currentFileSize = memStream.Length
                 httpDownloadProgressPercentage = Math.Round((memStream.Length / remoteFileSize) * 100, 0)
 
+                downloadStatusDetails = New downloadStatusDetails With {.remoteFileSize = remoteFileSize, .percentageDownloaded = httpDownloadProgressPercentage, .localFileSize = memStream.Length}
+
                 If downloadStatusUpdater IsNot Nothing Then
-                    downloadStatusDetails = New downloadStatusDetails With {.remoteFileSize = remoteFileSize, .percentageDownloaded = httpDownloadProgressPercentage, .localFileSize = memStream.Length}
                     downloadStatusUpdater(downloadStatusDetails)
                 End If
 
@@ -851,8 +854,9 @@ Public Class httpHelper
                 currentFileSize = fileWriteStream.Length
                 httpDownloadProgressPercentage = Math.Round((fileWriteStream.Length / remoteFileSize) * 100, 0)
 
+                downloadStatusDetails = New downloadStatusDetails With {.remoteFileSize = remoteFileSize, .percentageDownloaded = httpDownloadProgressPercentage, .localFileSize = fileWriteStream.Length}
+
                 If downloadStatusUpdater IsNot Nothing Then
-                    downloadStatusDetails = New downloadStatusDetails With {.remoteFileSize = remoteFileSize, .percentageDownloaded = httpDownloadProgressPercentage, .localFileSize = fileWriteStream.Length}
                     downloadStatusUpdater(downloadStatusDetails)
                 End If
 
@@ -934,7 +938,7 @@ Public Class httpHelper
             End If
             lastAccessedURL = url
 
-            If getData.Count <> 0 Then url &= "?" & getGETDataString()
+            If getData.Count <> 0 Then url &= "?" & Me.getGETDataString
 
             httpWebRequest = DirectCast(Net.WebRequest.Create(url), Net.HttpWebRequest)
             httpWebRequest.Timeout = httpTimeOut
@@ -951,7 +955,7 @@ Public Class httpHelper
                 httpWebRequest.Method = "GET"
             Else
                 httpWebRequest.Method = "POST"
-                Dim postDataString As String = getPOSTDataString()
+                Dim postDataString As String = Me.getPOSTDataString
                 httpWebRequest.ContentType = "application/x-www-form-urlencoded"
                 httpWebRequest.ContentLength = postDataString.Length
 
@@ -1052,7 +1056,7 @@ Public Class httpHelper
                 lastException = New dataMissingException("Your HTTP Request contains no POST data. Please add some data to POST before calling this function.")
                 Throw lastException
             End If
-            If getData.Count <> 0 Then url &= "?" & getGETDataString()
+            If getData.Count <> 0 Then url &= "?" & Me.getGETDataString()
 
             Dim boundary As String = "---------------------------" & Now.Ticks.ToString("x")
             Dim boundaryBytes As Byte() = Text.Encoding.ASCII.GetBytes((Convert.ToString(vbCr & vbLf & "--") & boundary) & vbCr & vbLf)
