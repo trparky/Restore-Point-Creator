@@ -2582,6 +2582,13 @@ Public Class Form1
 #End Region
 
 #Region "--== ToolStrip Click Events ==--"
+    Private Sub ConfigureHTTPTimeoutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConfigureHTTPTimeoutToolStripMenuItem.Click
+        Dim frmConfigureHTTPTimeout As New Configure_HTTP_Timeout
+        frmConfigureHTTPTimeout.StartPosition = FormStartPosition.CenterParent
+        frmConfigureHTTPTimeout.ShowDialog(Me)
+        ConfigureHTTPTimeoutToolStripMenuItem.Text = String.Format("Configure HTTP Timeout ({0} Seconds)", My.Settings.httpTimeout)
+    End Sub
+
     Private Sub ExtendedLoggingForScheduledTasks_Click(sender As Object, e As EventArgs) Handles ExtendedLoggingForScheduledTasks.Click
         If ExtendedLoggingForScheduledTasks.Checked = True Then
             savePreferenceToRegistry("Extended Logging For Scheduled Tasks", "True")
@@ -3679,13 +3686,6 @@ Public Class Form1
 
             Functions.wait.openPleaseWaitWindow()
         End If
-    End Sub
-
-    Private Sub ConfigureHTTPTimeoutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConfigureHTTPTimeoutToolStripMenuItem.Click
-        Dim frmConfigureHTTPTimeout As New Configure_HTTP_Timeout
-        frmConfigureHTTPTimeout.StartPosition = FormStartPosition.CenterParent
-        frmConfigureHTTPTimeout.ShowDialog(Me)
-        ConfigureHTTPTimeoutToolStripMenuItem.Text = String.Format("Configure HTTP Timeout ({0} Seconds)", My.Settings.httpTimeout)
     End Sub
 
     Private Sub btnRestoreToRestorePoint_Click(sender As Object, e As EventArgs) Handles btnRestoreToRestorePoint.Click
