@@ -147,6 +147,12 @@
     <Compile Include="Windows\Command Line Arguments.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Windows\Configure HTTP Timeout.Designer.vb">
+      <DependentUpon>Configure HTTP Timeout.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Configure HTTP Timeout.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Windows\Confirm Restore Point Deletion.Designer.vb">
       <DependentUpon>Confirm Restore Point Deletion.vb</DependentUpon>
     </Compile>
@@ -325,6 +331,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Check for Updates Every.resx">
       <DependentUpon>Check for Updates Every.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Configure HTTP Timeout.resx">
+      <DependentUpon>Configure HTTP Timeout.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Confirm Restore Point Deletion.resx">
       <DependentUpon>Confirm Restore Point Deletion.vb</DependentUpon>
