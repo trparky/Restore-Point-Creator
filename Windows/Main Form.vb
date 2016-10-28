@@ -330,6 +330,7 @@ Public Class Form1
 
     Sub loadPreferences()
         Try
+            ConfigureHTTPTimeoutToolStripMenuItem.Text = String.Format("Configure HTTP Timeout ({0} Seconds)", My.Settings.httpTimeout)
             Dim registryObject As RegistryKey
             My.Settings.firstRun = False
             My.Settings.Save()
@@ -3684,6 +3685,7 @@ Public Class Form1
         Dim frmConfigureHTTPTimeout As New Configure_HTTP_Timeout
         frmConfigureHTTPTimeout.StartPosition = FormStartPosition.CenterParent
         frmConfigureHTTPTimeout.ShowDialog(Me)
+        ConfigureHTTPTimeoutToolStripMenuItem.Text = String.Format("Configure HTTP Timeout ({0} Seconds)", My.Settings.httpTimeout)
     End Sub
 
     Private Sub btnRestoreToRestorePoint_Click(sender As Object, e As EventArgs) Handles btnRestoreToRestorePoint.Click
