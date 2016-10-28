@@ -176,7 +176,7 @@ End Class
 
 ''' <summary>Allows you to easily POST and upload files to a remote HTTP server without you, the programmer, knowing anything about how it all works. This class does it all for you. It handles adding a User Agent String, additional HTTP Request Headers, string data to your HTTP POST data, and files to be uploaded in the HTTP POST data.</summary>
 Public Class httpHelper
-    Private Const classVersion As String = "1.185"
+    Private Const classVersion As String = "1.190"
 
     Private strUserAgentString As String = Nothing
     Private boolUseProxy As Boolean = False
@@ -201,12 +201,14 @@ Public Class httpHelper
 
     ''' <summary>Retrieves the downloadStatusDetails data from within the Class instance.</summary>
     ''' <returns>A downloadStatusDetails Object.</returns>
-    Public Function getDownloadStatusDetails() As downloadStatusDetails
-        Return downloadStatusDetails
-    End Function
+    Public ReadOnly Property getDownloadStatusDetails As downloadStatusDetails
+        Get
+            Return downloadStatusDetails
+        End Get
+    End Property
 
     ''' <summary>This allows you to inject your own error handler for HTTP exceptions into the Class instance.</summary>
-    ''' <param name="functionIN">A Lambda</param>
+    ''' <value>A Lambda</value>
     ''' <example>
     ''' A VB.NET Example...
     ''' httpHelper.setCustomErrorHandler(Function(ByVal ex As Exception, classInstance As httpHelper)
@@ -214,18 +216,22 @@ Public Class httpHelper
     ''' OR A C# Example...
     ''' httpHelper.setCustomErrorHandler((Exception ex, httpHelper classInstance) => { }
     ''' </example>
-    Public Sub setCustomErrorHandler(functionIN As Func(Of Exception, httpHelper, String))
-        customErrorHandler = functionIN
-    End Sub
+    Public WriteOnly Property setCustomErrorHandler As Func(Of Exception, httpHelper, String)
+        Set
+            customErrorHandler = Value
+        End Set
+    End Property
 
     ''' <summary>Returns the last Exception that occurred within this Class instance.</summary>
     ''' <returns>An Exception Object.</returns>
-    Public Function getLastException() As Exception
-        Return lastException
-    End Function
+    Public ReadOnly Property getLastException As Exception
+        Get
+            Return lastException
+        End Get
+    End Property
 
     ''' <summary>This allows you to set up a function to be run while your HTTP download is being processed. This function can be used to update things on the GUI during a download.</summary>
-    ''' <param name="functionIN">A Lambda</param>
+    ''' <value>A Lambda</value>
     ''' <example>
     ''' A VB.NET Example...
     ''' httpHelper.setDownloadStatusUpdateRoutine(Function(ByVal downloadStatusDetails As downloadStatusDetails)
@@ -233,12 +239,14 @@ Public Class httpHelper
     ''' OR A C# Example...
     ''' httpHelper.setDownloadStatusUpdateRoutine((downloadStatusDetails downloadStatusDetails) => { })
     ''' </example>
-    Public Sub setDownloadStatusUpdateRoutine(functionIN As Func(Of downloadStatusDetails, Boolean))
-        downloadStatusUpdater = functionIN
-    End Sub
+    Public WriteOnly Property setDownloadStatusUpdateRoutine As Func(Of downloadStatusDetails, Boolean)
+        Set
+            downloadStatusUpdater = Value
+        End Set
+    End Property
 
     ''' <summary>This allows you to set up a Pre-Processor of sorts for URLs in case you need to add things to the beginning or end of URLs.</summary>
-    ''' <param name="functionIN">A Lambda</param>
+    ''' <value>A Lambda</value>
     ''' <example>
     ''' httpHelper.setURLPreProcessor(Function(ByVal strURLInput As String) As String
     '''   If strURLInput.ToLower.StartsWith("http://") = False Then
@@ -247,9 +255,11 @@ Public Class httpHelper
     '''   Return strURLInput
     ''' End Function)
     ''' </example>
-    Public Sub setURLPreProcessor(functionIN As Func(Of String, String))
-        urlPreProcessor = functionIN
-    End Sub
+    Public WriteOnly Property setURLPreProcessor As Func(Of String, String)
+        Set
+            urlPreProcessor = Value
+        End Set
+    End Property
 
     ''' <summary>This wipes out most of the data in this Class instance. Once you have called this function it's recommended to set the name of your class instance to Nothing. For example... httpHelper = Nothing</summary>
     Public Sub dispose()
@@ -271,9 +281,11 @@ Public Class httpHelper
 
     ''' <summary>Returns the last accessed URL by this Class instance.</summary>
     ''' <returns>A String.</returns>
-    Public Function getLastAccessedURL() As String
-        Return lastAccessedURL
-    End Function
+    Public ReadOnly Property getLastAccessedURL As String
+        Get
+            Return lastAccessedURL
+        End Get
+    End Property
 
     ''' <summary>This function allows you to get a peek inside the Class object instance. It returns many of the things that make up the Class instance like POST and GET data, cookies, additional HTTP headers, if proxy mode and HTTP compression mode is enabled, the user agent string, etc.</summary>
     ''' <returns>A String.</returns>
@@ -332,40 +344,46 @@ Public Class httpHelper
     ''' <summary>Gets the remote file size.</summary>
     ''' <param name="boolHumanReadable">Optional setting, normally set to True. Tells the function if it should transform the Integer representing the file size into a human readable format.</param>
     ''' <returns>Either a String or a Long containing the remote file size.</returns>
-    Public Function getHTTPDownloadRemoteFileSize(Optional boolHumanReadable As Boolean = True) As Object
-        If boolHumanReadable = True Then
-            Return fileSizeToHumanReadableFormat(remoteFileSize)
-        Else
-            Return remoteFileSize
-        End If
-    End Function
+    Public ReadOnly Property getHTTPDownloadRemoteFileSize(Optional boolHumanReadable As Boolean = True) As Short
+        Get
+            If boolHumanReadable = True Then
+                Return fileSizeToHumanReadableFormat(remoteFileSize)
+            Else
+                Return remoteFileSize
+            End If
+        End Get
+    End Property
 
     ''' <summary>This returns the SSL certificate details for the last HTTP request made by this Class instance.</summary>
     ''' <returns>System.Security.Cryptography.X509Certificates.X509Certificate2</returns>
     ''' <exception cref="noSSLCertificateFoundException">If this function throw a noSSLCertificateFoundException, it means that the Class doesn't have an SSL certificate in the memory space of the Class instance. Perhaps the last HTTP request wasn't an HTTPS request.</exception>
     ''' <param name="boolThrowException">An optional parameter that tells the function if it should throw an exception if an SSL certificate isn't found in the memory space of this Class instance.</param>
-    Public Function getCertificateDetails(Optional boolThrowException As Boolean = True) As X509Certificates.X509Certificate2
-        If sslCertificate Is Nothing Then
-            If boolThrowException = True Then
-                lastException = New noSSLCertificateFoundException("No valid SSL certificate found for the last HTTP request. Perhaps the last HTTP request wasn't an HTTPS request.")
-                Throw lastException
+    Public ReadOnly Property getCertificateDetails(Optional boolThrowException As Boolean = True) As X509Certificates.X509Certificate2
+        Get
+            If sslCertificate Is Nothing Then
+                If boolThrowException = True Then
+                    lastException = New noSSLCertificateFoundException("No valid SSL certificate found for the last HTTP request. Perhaps the last HTTP request wasn't an HTTPS request.")
+                    Throw lastException
+                End If
+                Return Nothing
+            Else
+                Return sslCertificate
             End If
-            Return Nothing
-        Else
-            Return sslCertificate
-        End If
-    End Function
+        End Get
+    End Property
 
     ''' <summary>Gets the current local file's size.</summary>
     ''' <param name="boolHumanReadable">Optional setting, normally set to True. Tells the function if it should transform the Integer representing the file size into a human readable format.</param>
     ''' <returns>Either a String or a Long containing the current local file's size.</returns>
-    Public Function getHTTPDownloadLocalFileSize(Optional boolHumanReadable As Boolean = True) As Object
-        If boolHumanReadable = True Then
-            Return fileSizeToHumanReadableFormat(currentFileSize)
-        Else
-            Return currentFileSize
-        End If
-    End Function
+    Public ReadOnly Property getHTTPDownloadLocalFileSize(Optional boolHumanReadable As Boolean = True) As Object
+        Get
+            If boolHumanReadable = True Then
+                Return fileSizeToHumanReadableFormat(currentFileSize)
+            Else
+                Return currentFileSize
+            End If
+        End Get
+    End Property
 
     ''' <summary>Creates a new instance of the HTTPPost Class. You will need to set things up for the Class instance using the setProxyMode() and setUserAgent() routines.</summary>
     ''' <example>Dim httpPostObject As New Tom.HTTPPost()</example>
@@ -388,29 +406,36 @@ Public Class httpHelper
         boolUseProxy = boolUseProxyIN
     End Sub
 
-    ''' <summary>Tells the HTTPPost Class if you want to use a Proxy or not. </summary>
-    ''' <param name="useProxy">True will use a Proxy, False will not.</param>
-    Public Sub setProxyMode(useProxy As Boolean)
-        boolUseProxy = useProxy
-    End Sub
+    ''' <summary>Tells the HTTPPost Class if you want to use a Proxy or not.</summary>
+    Public WriteOnly Property setProxyMode As Boolean
+        Set
+            boolUseProxy = Value
+        End Set
+    End Property
 
     ''' <summary>Sets a timeout for any HTTP requests in this Class. Normally it's set for 5 seconds.</summary>
-    ''' <param name="timeOutIN">The amount of time in seconds (NOT miliseconds) that you want your HTTP requests to timeout in. This function will translate the seconds to miliseconds for you.</param>
-    Public Sub setHTTPTimeout(timeOutIN As Short)
-        httpTimeOut = timeOutIN * 1000
-    End Sub
+    ''' <value>The amount of time in seconds (NOT miliseconds) that you want your HTTP requests to timeout in. This function will translate the seconds to miliseconds for you.</value>
+    Public WriteOnly Property setHTTPTimeout As Short
+        Set
+            httpTimeOut = Value * 1000
+        End Set
+    End Property
 
     ''' <summary>Tells this Class instance if it should use HTTP compression for transport. Using HTTP Compression can save bandwidth. Normally the Class is setup to use HTTP Compression by default.</summary>
-    ''' <param name="boolUseHTTPCompressionIN">Boolean value.</param>
-    Public Sub useHTTPCompression(boolUseHTTPCompressionIN As Boolean)
-        boolUseHTTPCompression = boolUseHTTPCompressionIN
-    End Sub
+    ''' <value>Boolean value.</value>
+    Public WriteOnly Property useHTTPCompression As Boolean
+        Set
+            boolUseHTTPCompression = Value
+        End Set
+    End Property
 
     ''' <summary>Sets the User Agent String to be used by the HTTPPost Class.</summary>
-    ''' <param name="userAgentString">Your User Agent String.</param>
-    Public Sub setUserAgent(userAgentString As String)
-        strUserAgentString = userAgentString
-    End Sub
+    ''' <value>Your User Agent String.</value>
+    Public WriteOnly Property setUserAgent As String
+        Set
+            strUserAgentString = Value
+        End Set
+    End Property
 
     ''' <summary>This adds a String variable to your POST data.</summary>
     ''' <param name="strName">The form name of the data to post.</param>
@@ -1182,33 +1207,37 @@ Public Class httpHelper
         End If
     End Function
 
-    Private Function getPOSTDataString() As String
-        Dim postDataString As String = ""
-        For Each entry As KeyValuePair(Of String, Object) In postData
-            If (TypeOf entry.Value Is FormFile) = False Then
-                postDataString &= entry.Key.Trim & "=" & Web.HttpUtility.UrlEncode(entry.Value.Trim) & "&"
+    Private ReadOnly Property getPOSTDataString As String
+        Get
+            Dim postDataString As String = ""
+            For Each entry As KeyValuePair(Of String, Object) In postData
+                If (TypeOf entry.Value Is FormFile) = False Then
+                    postDataString &= entry.Key.Trim & "=" & Web.HttpUtility.UrlEncode(entry.Value.Trim) & "&"
+                End If
+            Next
+
+            If postDataString.EndsWith("&") Then
+                postDataString = postDataString.Substring(0, postDataString.Length - 1)
             End If
-        Next
 
-        If postDataString.EndsWith("&") Then
-            postDataString = postDataString.Substring(0, postDataString.Length - 1)
-        End If
+            Return postDataString
+        End Get
+    End Property
 
-        Return postDataString
-    End Function
+    Private ReadOnly Property getGETDataString As String
+        Get
+            Dim getDataString As String = ""
+            For Each entry As KeyValuePair(Of String, String) In getData
+                getDataString &= entry.Key.Trim & "=" & Web.HttpUtility.UrlEncode(entry.Value.Trim) & "&"
+            Next
 
-    Private Function getGETDataString() As String
-        Dim getDataString As String = ""
-        For Each entry As KeyValuePair(Of String, String) In getData
-            getDataString &= entry.Key.Trim & "=" & Web.HttpUtility.UrlEncode(entry.Value.Trim) & "&"
-        Next
+            If getDataString.EndsWith("&") Then
+                getDataString = getDataString.Substring(0, getDataString.Length - 1)
+            End If
 
-        If getDataString.EndsWith("&") Then
-            getDataString = getDataString.Substring(0, getDataString.Length - 1)
-        End If
-
-        Return getDataString
-    End Function
+            Return getDataString
+        End Get
+    End Property
 
     Public Function fileSizeToHumanReadableFormat(ByVal size As Long, Optional roundToNearestWholeNumber As Boolean = False) As String
         Dim result As String
@@ -1252,17 +1281,19 @@ Public Class httpHelper
         Return result
     End Function
 
-    Private Function doWeHaveAnInternetConnection() As Boolean
-        Try
-            Dim ping As New Net.NetworkInformation.Ping()
+    Private ReadOnly Property doWeHaveAnInternetConnection() As Boolean
+        Get
+            Try
+                Dim ping As New Net.NetworkInformation.Ping()
 
-            If ping.Send("8.8.8.8").Status = Net.NetworkInformation.IPStatus.Success Then
-                Return True
-            Else
+                If ping.Send("8.8.8.8").Status = Net.NetworkInformation.IPStatus.Success Then
+                    Return True
+                Else
+                    Return False
+                End If
+            Catch ex As Exception
                 Return False
-            End If
-        Catch ex As Exception
-            Return False
-        End Try
-    End Function
+            End Try
+        End Get
+    End Property
 End Class
