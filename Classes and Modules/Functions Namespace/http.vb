@@ -79,20 +79,16 @@
 
             httpHelper.setURLPreProcessor = Function(ByVal strURLInput As String) As String
                                                 Try
-                                                    If strURLInput.Trim.StartsWith("http", StringComparison.OrdinalIgnoreCase) = False Then
-                                                        If My.Settings.useSSL = True Then
-                                                            Debug.WriteLine("The setURLPreProcessor code transformed """ & strURLInput & """ to ""https://" & strURLInput & """.")
+                                                    If strURLInput.Trim.StartsWith("http", StringComparison.OrdinalIgnoreCase) Then
+                                                        Return strURLInput
+                                                    Else
+                                                        If My.Settings.useSSL Then
                                                             Return "https://" & strURLInput
                                                         Else
-                                                            Debug.WriteLine("The setURLPreProcessor code transformed """ & strURLInput & """ to ""http://" & strURLInput & """.")
                                                             Return "http://" & strURLInput
                                                         End If
-                                                    Else
-                                                        Debug.WriteLine("The setURLPreProcessor code didn't have to do anything to the input """ & strURLInput & """.")
-                                                        Return strURLInput
                                                     End If
                                                 Catch ex As Exception
-                                                    Debug.WriteLine("The setURLPreProcessor code errored out with an input of """ & strURLInput & """.")
                                                     Return strURLInput
                                                 End Try
                                             End Function
