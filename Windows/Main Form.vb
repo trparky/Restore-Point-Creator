@@ -3680,6 +3680,12 @@ Public Class Form1
         End If
     End Sub
 
+    Private Sub ConfigureHTTPTimeoutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConfigureHTTPTimeoutToolStripMenuItem.Click
+        Dim frmConfigureHTTPTimeout As New Configure_HTTP_Timeout
+        frmConfigureHTTPTimeout.StartPosition = FormStartPosition.CenterParent
+        frmConfigureHTTPTimeout.ShowDialog(Me)
+    End Sub
+
     Private Sub btnRestoreToRestorePoint_Click(sender As Object, e As EventArgs) Handles btnRestoreToRestorePoint.Click
         If systemRestorePointsList.SelectedItems.Count > 1 Then
             MsgBox("You can't have multiple System Restore Points selected for this function to work, you must only select one.", MsgBoxStyle.Information, strMessageBoxTitle)

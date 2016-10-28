@@ -76,6 +76,7 @@ Partial Class Form1
         Me.LogProgramLoadsAndExitsToEventLogToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ExtendedLoggingForScheduledTasks = New System.Windows.Forms.ToolStripMenuItem()
         Me.AskBeforeCreatingRestorePointToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.chkShowVersionInTitleBarToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ConfigurationBackupRestoreToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BackupToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RestoreToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -135,7 +136,7 @@ Partial Class Form1
         Me.checkForAndEnableSystemRestoreIfNeededThreadKiller = New System.Windows.Forms.Timer(Me.components)
         Me.checkRestorePointSpaceThreadThreadKiller = New System.Windows.Forms.Timer(Me.components)
         Me.startSystemRestorePointListLoadThreadKiller = New System.Windows.Forms.Timer(Me.components)
-        Me.chkShowVersionInTitleBarToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ConfigureHTTPTimeoutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.restorePointListContextMenu.SuspendLayout()
         Me.buttonTableLayout.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
@@ -480,7 +481,7 @@ Partial Class Form1
         '
         'OptionsToolStripMenuItem
         '
-        Me.OptionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveSafeModeBootOptionToolStripMenuItem, Me.InterfaceTooBigToolStripMenuItem, Me.AdditionalOptionsAndSettingsToolStripMenuItem, Me.ConfigurationBackupRestoreToolStripMenuItem, Me.ToolStripMenuItem5, Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem, Me.SetBarColorToolStripMenuItem, Me.toolStripClear, Me.toolStripMyComputer, Me.CreateRestorePointAtUserLogonToolStripMenuItem, Me.ConfigureProxyToolStripMenuItem, Me.SetWindowsActivePowerPlanSettingsForWakeTimersBackToDefaultToolStripMenuItem, Me.KeepXAmountOfRestorePointsToolStripMenuItem, Me.DefaultCustomRestorePointNameToolStripMenuItem, Me.ToolStripMenuItem3, Me.SoftwareUpdateSettingsToolStripMenuItem, Me.NotificationOptionsToolStripMenuItem, Me.UseSSLToolStripMenuItem, Me.lineBeforeDebugMenuItem, Me.SwitchToDebugBuildToolStripMenuItem})
+        Me.OptionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveSafeModeBootOptionToolStripMenuItem, Me.InterfaceTooBigToolStripMenuItem, Me.AdditionalOptionsAndSettingsToolStripMenuItem, Me.ConfigurationBackupRestoreToolStripMenuItem, Me.ToolStripMenuItem5, Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem, Me.SetBarColorToolStripMenuItem, Me.toolStripClear, Me.toolStripMyComputer, Me.CreateRestorePointAtUserLogonToolStripMenuItem, Me.ConfigureProxyToolStripMenuItem, Me.SetWindowsActivePowerPlanSettingsForWakeTimersBackToDefaultToolStripMenuItem, Me.KeepXAmountOfRestorePointsToolStripMenuItem, Me.DefaultCustomRestorePointNameToolStripMenuItem, Me.ConfigureHTTPTimeoutToolStripMenuItem, Me.ToolStripMenuItem3, Me.SoftwareUpdateSettingsToolStripMenuItem, Me.NotificationOptionsToolStripMenuItem, Me.UseSSLToolStripMenuItem, Me.lineBeforeDebugMenuItem, Me.SwitchToDebugBuildToolStripMenuItem})
         Me.OptionsToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.settings
         Me.OptionsToolStripMenuItem.Name = "OptionsToolStripMenuItem"
         Me.OptionsToolStripMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.AsNeeded
@@ -578,6 +579,13 @@ Partial Class Form1
         Me.AskBeforeCreatingRestorePointToolStripMenuItem.Name = "AskBeforeCreatingRestorePointToolStripMenuItem"
         Me.AskBeforeCreatingRestorePointToolStripMenuItem.Size = New System.Drawing.Size(435, 22)
         Me.AskBeforeCreatingRestorePointToolStripMenuItem.Text = "Ask Before Creating Restore Point"
+        '
+        'chkShowVersionInTitleBarToolStripMenuItem
+        '
+        Me.chkShowVersionInTitleBarToolStripMenuItem.CheckOnClick = True
+        Me.chkShowVersionInTitleBarToolStripMenuItem.Name = "chkShowVersionInTitleBarToolStripMenuItem"
+        Me.chkShowVersionInTitleBarToolStripMenuItem.Size = New System.Drawing.Size(435, 22)
+        Me.chkShowVersionInTitleBarToolStripMenuItem.Text = "Show Version in Title Bar"
         '
         'ConfigurationBackupRestoreToolStripMenuItem
         '
@@ -964,12 +972,11 @@ Partial Class Form1
         '
         Me.startSystemRestorePointListLoadThreadKiller.Interval = 30000
         '
-        'chkShowVersionInTitleBarToolStripMenuItem
+        'ConfigureHTTPTimeoutToolStripMenuItem
         '
-        Me.chkShowVersionInTitleBarToolStripMenuItem.CheckOnClick = True
-        Me.chkShowVersionInTitleBarToolStripMenuItem.Name = "chkShowVersionInTitleBarToolStripMenuItem"
-        Me.chkShowVersionInTitleBarToolStripMenuItem.Size = New System.Drawing.Size(431, 22)
-        Me.chkShowVersionInTitleBarToolStripMenuItem.Text = "Show Version in Title Bar"
+        Me.ConfigureHTTPTimeoutToolStripMenuItem.Name = "ConfigureHTTPTimeoutToolStripMenuItem"
+        Me.ConfigureHTTPTimeoutToolStripMenuItem.Size = New System.Drawing.Size(431, 22)
+        Me.ConfigureHTTPTimeoutToolStripMenuItem.Text = "Configure HTTP Timeout"
         '
         'Form1
         '
@@ -1114,4 +1121,5 @@ Partial Class Form1
     Friend WithEvents RebootSystemToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents EnableExtendedLoggingToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents chkShowVersionInTitleBarToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ConfigureHTTPTimeoutToolStripMenuItem As ToolStripMenuItem
 End Class

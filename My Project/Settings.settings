@@ -206,5 +206,8 @@
     <Setting Name="notificationType2" Type="System.Int16" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
+    <Setting Name="httpTimeout" Type="System.Int16" Scope="User">
+      <Value Profile="(Default)">30</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

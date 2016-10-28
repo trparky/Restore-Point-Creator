@@ -866,6 +866,18 @@ Namespace My
                 Me("notificationType2") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("30")>  _
+        Public Property httpTimeout() As Short
+            Get
+                Return CType(Me("httpTimeout"),Short)
+            End Get
+            Set
+                Me("httpTimeout") = value
+            End Set
+        End Property
     End Class
 End Namespace
 
