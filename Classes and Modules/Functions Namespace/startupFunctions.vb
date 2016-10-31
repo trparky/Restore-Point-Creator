@@ -327,6 +327,8 @@ Namespace Functions.startupFunctions
         End Sub
 
         Public Sub performApplicationUpdate(commandLineArgument As String)
+            wait.createPleaseWaitWindowInCenterOfScreen("Updating Restore Point Creator... Please wait.", True)
+            Threading.Thread.Sleep(5000)
             Dim boolExtendedLoggingForUpdating As Boolean = True
 
             Dim registryObject As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
@@ -426,6 +428,7 @@ Namespace Functions.startupFunctions
                         If boolExtendedLoggingForUpdating = True Then
                             eventLogFunctions.writeToSystemEventLog("Rebooting system.", EventLogEntryType.Information)
                         End If
+
                         support.rebootSystem()
                         Process.GetCurrentProcess.Kill()
                     Else
