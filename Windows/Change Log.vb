@@ -13,7 +13,7 @@
 
     Sub loadChangelog()
         If loadThread Is Nothing Then
-            Functions.wait.createPleaseWaitWindow("Loading Official Change Log... Please Wait.")
+            Functions.wait.createPleaseWaitWindow("Loading Official Change Log... Please Wait.", enums.howToCenterWindow.parent)
 
             loadThread = New Threading.Thread(AddressOf loadChangelogSub)
             loadThread.Name = "Change Log Loading Thread"
