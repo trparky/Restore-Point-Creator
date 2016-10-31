@@ -176,7 +176,7 @@ End Class
 
 ''' <summary>Allows you to easily POST and upload files to a remote HTTP server without you, the programmer, knowing anything about how it all works. This class does it all for you. It handles adding a User Agent String, additional HTTP Request Headers, string data to your HTTP POST data, and files to be uploaded in the HTTP POST data.</summary>
 Public Class httpHelper
-    Private Const classVersion As String = "1.195"
+    Private Const classVersion As String = "1.200"
 
     Private strUserAgentString As String = Nothing
     Private boolUseProxy As Boolean = False
@@ -344,46 +344,40 @@ Public Class httpHelper
     ''' <summary>Gets the remote file size.</summary>
     ''' <param name="boolHumanReadable">Optional setting, normally set to True. Tells the function if it should transform the Integer representing the file size into a human readable format.</param>
     ''' <returns>Either a String or a Long containing the remote file size.</returns>
-    Public ReadOnly Property getHTTPDownloadRemoteFileSize(Optional boolHumanReadable As Boolean = True) As Object
-        Get
-            If boolHumanReadable = True Then
-                Return fileSizeToHumanReadableFormat(remoteFileSize)
-            Else
-                Return remoteFileSize
-            End If
-        End Get
-    End Property
+    Public Function getHTTPDownloadRemoteFileSize(Optional boolHumanReadable As Boolean = True) As Object
+        If boolHumanReadable = True Then
+            Return fileSizeToHumanReadableFormat(remoteFileSize)
+        Else
+            Return remoteFileSize
+        End If
+    End Function
 
     ''' <summary>This returns the SSL certificate details for the last HTTP request made by this Class instance.</summary>
     ''' <returns>System.Security.Cryptography.X509Certificates.X509Certificate2</returns>
     ''' <exception cref="noSSLCertificateFoundException">If this function throw a noSSLCertificateFoundException, it means that the Class doesn't have an SSL certificate in the memory space of the Class instance. Perhaps the last HTTP request wasn't an HTTPS request.</exception>
     ''' <param name="boolThrowException">An optional parameter that tells the function if it should throw an exception if an SSL certificate isn't found in the memory space of this Class instance.</param>
-    Public ReadOnly Property getCertificateDetails(Optional boolThrowException As Boolean = True) As X509Certificates.X509Certificate2
-        Get
-            If sslCertificate Is Nothing Then
-                If boolThrowException = True Then
-                    lastException = New noSSLCertificateFoundException("No valid SSL certificate found for the last HTTP request. Perhaps the last HTTP request wasn't an HTTPS request.")
-                    Throw lastException
-                End If
-                Return Nothing
-            Else
-                Return sslCertificate
+    Public Function getCertificateDetails(Optional boolThrowException As Boolean = True) As X509Certificates.X509Certificate2
+        If sslCertificate Is Nothing Then
+            If boolThrowException = True Then
+                lastException = New noSSLCertificateFoundException("No valid SSL certificate found for the last HTTP request. Perhaps the last HTTP request wasn't an HTTPS request.")
+                Throw lastException
             End If
-        End Get
-    End Property
+            Return Nothing
+        Else
+            Return sslCertificate
+        End If
+    End Function
 
     ''' <summary>Gets the current local file's size.</summary>
     ''' <param name="boolHumanReadable">Optional setting, normally set to True. Tells the function if it should transform the Integer representing the file size into a human readable format.</param>
     ''' <returns>Either a String or a Long containing the current local file's size.</returns>
-    Public ReadOnly Property getHTTPDownloadLocalFileSize(Optional boolHumanReadable As Boolean = True) As Object
-        Get
-            If boolHumanReadable = True Then
-                Return fileSizeToHumanReadableFormat(currentFileSize)
-            Else
-                Return currentFileSize
-            End If
-        End Get
-    End Property
+    Public Function getHTTPDownloadLocalFileSize(Optional boolHumanReadable As Boolean = True) As Object
+        If boolHumanReadable = True Then
+            Return fileSizeToHumanReadableFormat(currentFileSize)
+        Else
+            Return currentFileSize
+        End If
+    End Function
 
     ''' <summary>Creates a new instance of the HTTPPost Class. You will need to set things up for the Class instance using the setProxyMode() and setUserAgent() routines.</summary>
     ''' <example>Dim httpPostObject As New Tom.HTTPPost()</example>
@@ -1211,37 +1205,33 @@ Public Class httpHelper
         End If
     End Function
 
-    Private ReadOnly Property getPOSTDataString As String
-        Get
-            Dim postDataString As String = ""
-            For Each entry As KeyValuePair(Of String, Object) In postData
-                If (TypeOf entry.Value Is FormFile) = False Then
-                    postDataString &= entry.Key.Trim & "=" & Web.HttpUtility.UrlEncode(entry.Value.Trim) & "&"
-                End If
-            Next
-
-            If postDataString.EndsWith("&") Then
-                postDataString = postDataString.Substring(0, postDataString.Length - 1)
+    Private Function getPOSTDataString() As String
+        Dim postDataString As String = ""
+        For Each entry As KeyValuePair(Of String, Object) In postData
+            If (TypeOf entry.Value Is FormFile) = False Then
+                postDataString &= entry.Key.Trim & "=" & Web.HttpUtility.UrlEncode(entry.Value.Trim) & "&"
             End If
+        Next
 
-            Return postDataString
-        End Get
-    End Property
+        If postDataString.EndsWith("&") Then
+            postDataString = postDataString.Substring(0, postDataString.Length - 1)
+        End If
 
-    Private ReadOnly Property getGETDataString As String
-        Get
-            Dim getDataString As String = ""
-            For Each entry As KeyValuePair(Of String, String) In getData
-                getDataString &= entry.Key.Trim & "=" & Web.HttpUtility.UrlEncode(entry.Value.Trim) & "&"
-            Next
+        Return postDataString
+    End Function
 
-            If getDataString.EndsWith("&") Then
-                getDataString = getDataString.Substring(0, getDataString.Length - 1)
-            End If
+    Private Function getGETDataString() As String
+        Dim getDataString As String = ""
+        For Each entry As KeyValuePair(Of String, String) In getData
+            getDataString &= entry.Key.Trim & "=" & Web.HttpUtility.UrlEncode(entry.Value.Trim) & "&"
+        Next
 
-            Return getDataString
-        End Get
-    End Property
+        If getDataString.EndsWith("&") Then
+            getDataString = getDataString.Substring(0, getDataString.Length - 1)
+        End If
+
+        Return getDataString
+    End Function
 
     Public Function fileSizeToHumanReadableFormat(ByVal size As Long, Optional roundToNearestWholeNumber As Boolean = False) As String
         Dim result As String
@@ -1285,19 +1275,17 @@ Public Class httpHelper
         Return result
     End Function
 
-    Private ReadOnly Property doWeHaveAnInternetConnection() As Boolean
-        Get
-            Try
-                Dim ping As New Net.NetworkInformation.Ping()
+    Private Function doWeHaveAnInternetConnection() As Boolean
+        Try
+            Dim ping As New Net.NetworkInformation.Ping()
 
-                If ping.Send("8.8.8.8").Status = Net.NetworkInformation.IPStatus.Success Then
-                    Return True
-                Else
-                    Return False
-                End If
-            Catch ex As Exception
+            If ping.Send("8.8.8.8").Status = Net.NetworkInformation.IPStatus.Success Then
+                Return True
+            Else
                 Return False
-            End Try
-        End Get
-    End Property
+            End If
+        Catch ex As Exception
+            Return False
+        End Try
+    End Function
 End Class
