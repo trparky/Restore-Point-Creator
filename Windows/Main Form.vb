@@ -3020,7 +3020,7 @@ Public Class Form1
         Dim msgBoxResult As MsgBoxResult = MsgBox("The debug build is a build that's not optimized for normal use but may help in the process of debugging crashes and other issues that you may have with the program. The debug build outputs far more crash data than the release type build." & vbCrLf & vbCrLf & "Are you sure you want to switch to the debug build?", MsgBoxStyle.Question + MsgBoxStyle.YesNo)
 
         If msgBoxResult = MsgBoxResult.Yes Then
-            Functions.wait.createPleaseWaitWindow("Downloading Debug Build... Please Wait.", True)
+            Functions.wait.createPleaseWaitWindow("Downloading Debug Build... Please Wait.", enums.howToCenterWindow.parent, True)
 
             Dim downloadThread As New Threading.Thread(AddressOf switchToDebugBuildDownloadThreadSub)
             downloadThread.Name = "Debug Build Download Thread"
