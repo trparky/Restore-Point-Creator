@@ -190,7 +190,7 @@
         End If
 
         If chkSendLogs.Checked = True Then
-            Functions.wait.createPleaseWaitWindow("Compressing and Sending Data... Please Wait.")
+            Functions.wait.createPleaseWaitWindow("Compressing and Sending Data... Please Wait.", enums.howToCenterWindow.parent)
         End If
 
         Dim submitThread As New Threading.Thread(AddressOf dataSubmitThread)
