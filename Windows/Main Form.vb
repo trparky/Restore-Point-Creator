@@ -808,6 +808,7 @@ Public Class Form1
     End Sub
 
     Private Sub newFileDeleterThreadSub()
+        Threading.Thread.Sleep(5000)
         Dim strFoundFile As String = New IO.FileInfo(Application.ExecutablePath & ".new.exe").Name
 
         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
