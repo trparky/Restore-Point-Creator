@@ -12,7 +12,7 @@ Namespace Functions.startupFunctions
             Dim windowsXPVersionSHA1URL As String = "http://www.toms-world.org/download/Restore Point Creator (Windows XP).exe.sha1"
 
             If MsgBox("This version of System Restore Point Creator is NOT compatible with Windows XP and will NOT run on Windows XP." & vbCrLf & vbCrLf & "Would you like to go back to the last version that supported Windows XP?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "System Restore Point Creator Windows XP Support") = MsgBoxResult.Yes Then
-                wait.createPleaseWaitWindow("Downloading File... Please Wait.", True)
+                wait.createPleaseWaitWindow("Downloading File... Please Wait.", enums.howToCenterWindow.screen, True)
 
                 If http.downloadFile("http://www.toms-world.org/download/updater.exe", "updater.exe") = False Then
                     wait.closePleaseWaitWindow()
