@@ -38,6 +38,7 @@
 
         ''' <summary>Creates a Please Wait window.</summary>
         ''' <param name="message">Sets the message for the Please Wait window.</param>
+        ''' <param name="howToCenter">Tells the window how to center itself when it appears.</param>
         ''' <param name="openDialog">This is an optional setting, normally it's False. But if set to True, the function will show the newly created Please Wait window in a new thread. Normally, this function doesn't do that.</param>
         Public Sub createPleaseWaitWindow(message As String, howToCenter As enums.howToCenterWindow, Optional ByVal openDialog As Boolean = False)
             Try
