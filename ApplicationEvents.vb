@@ -163,7 +163,6 @@ Namespace My
                         commandLineArgument = My.Application.CommandLineArgs(0)
 
                         If commandLineArgument.stringCompare("-createtasks") Then
-                            Functions.taskStuff.createRunTimeTasksSubRoutine()
                             Process.GetCurrentProcess.Kill()
                         ElseIf commandLineArgument.stringCompare("-update") Or commandLineArgument.stringCompare("-updatewithoutuninstallinfoupdate") Then
                             Functions.startupFunctions.performApplicationUpdate(commandLineArgument)
