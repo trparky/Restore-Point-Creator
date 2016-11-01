@@ -163,6 +163,7 @@ Namespace My
                         commandLineArgument = My.Application.CommandLineArgs(0)
 
                         If commandLineArgument.stringCompare("-createtasks") Then
+                            Functions.eventLogFunctions.writeToSystemEventLog("The program was called with an obsolete command line argument, specifically ""-createtasks"". The program has ignored the command and exited.", EventLogEntryType.Information)
                             Process.GetCurrentProcess.Kill()
                         ElseIf commandLineArgument.stringCompare("-update") Or commandLineArgument.stringCompare("-updatewithoutuninstallinfoupdate") Then
                             Functions.startupFunctions.performApplicationUpdate(commandLineArgument)
