@@ -271,7 +271,7 @@ Public Class Disk_Space_Usage
         Try
             If Me.IsHandleCreated = True Then
                 If GroupBox1.IsHandleCreated = True Then
-                    Functions.wait.createPleaseWaitWindow("Loading Disk Space Usage Information... Please Wait.", enums.howToCenterWindow.parent)
+                    Functions.wait.createPleaseWaitWindow("Loading Disk Space Usage Information... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
                     Dim loadDiskSpaceUsageDataThread As New Threading.Thread(AddressOf loadDiskSpaceUsageData)
                     loadDiskSpaceUsageDataThread.Start()
@@ -335,7 +335,7 @@ Public Class Disk_Space_Usage
 
             boolLoadingDiskData = True
 
-            Functions.wait.createPleaseWaitWindow("Loading Disk Space Usage Information... Please Wait.", enums.howToCenterWindow.parent)
+            Functions.wait.createPleaseWaitWindow("Loading Disk Space Usage Information... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
             Dim loadDiskSpaceUsageDataThread As New Threading.Thread(AddressOf loadDiskSpaceUsageData)
             loadDiskSpaceUsageDataThread.Start()
