@@ -138,7 +138,7 @@ Public Class Official_Contact_Form
         disableFormElements()
 
         If listAttachedFiles.Items.Count <> 0 Then
-            Functions.wait.createPleaseWaitWindow("Compressing and Sending Data... Please Wait.", enums.howToCenterWindow.parent)
+            Functions.wait.createPleaseWaitWindow("Compressing and Sending Data... Please Wait.", False, enums.howToCenterWindow.parent, False)
         End If
 
         Dim sendingThread As New Threading.Thread(AddressOf dataSubmitThread)

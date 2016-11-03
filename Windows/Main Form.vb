@@ -1135,7 +1135,7 @@ Public Class Form1
         btnDeleteRestorePoint.Enabled = False
         stripDelete.Enabled = False
 
-        Functions.wait.createPleaseWaitWindow("Deleting Restore Points... Please Wait.", enums.howToCenterWindow.parent)
+        Functions.wait.createPleaseWaitWindow("Deleting Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
         deleteThread = New Threading.Thread(Sub()
                                                 deleteOldRestorePoints(maxAgeInput)
@@ -1449,7 +1449,7 @@ Public Class Form1
     End Sub
 
     Sub openThePleaseWaitWindowAndStartTheDownloadThread(Optional boolOverrideUserUpdateChannelPreferences As Boolean = False)
-        Functions.wait.createPleaseWaitWindow("Downloading update... Please Wait.", enums.howToCenterWindow.parent)
+        Functions.wait.createPleaseWaitWindow("Downloading update... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
         Dim downloadThread As New Threading.Thread(Sub()
                                                        Try
@@ -2379,7 +2379,7 @@ Public Class Form1
 
     Private Sub Form1_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         If e.KeyCode = Keys.F5 Then
-            Functions.wait.createPleaseWaitWindow("Loading Restore Points... Please Wait.", enums.howToCenterWindow.parent)
+            Functions.wait.createPleaseWaitWindow("Loading Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
             updateRestorePointListThread = New Threading.Thread(AddressOf loadRestorePointsFromSystemIntoList)
             updateRestorePointListThread.Name = "System Restore Point List Updating Thread"
@@ -2405,7 +2405,7 @@ Public Class Form1
         Control.CheckForIllegalCrossThreadCalls = False
 
         Threading.Thread.Sleep(750)
-        Functions.wait.createPleaseWaitWindow("Loading Restore Points... Please Wait.", enums.howToCenterWindow.parent)
+        Functions.wait.createPleaseWaitWindow("Loading Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
         startSystemRestorePointListLoadThread = New Threading.Thread(AddressOf startSystemRestorePointListLoadThreadSub)
         startSystemRestorePointListLoadThread.Name = "Start System Restore Point List Load Thread Thread"
@@ -3020,7 +3020,7 @@ Public Class Form1
         Dim msgBoxResult As MsgBoxResult = MsgBox("The debug build is a build that's not optimized for normal use but may help in the process of debugging crashes and other issues that you may have with the program. The debug build outputs far more crash data than the release type build." & vbCrLf & vbCrLf & "Are you sure you want to switch to the debug build?", MsgBoxStyle.Question + MsgBoxStyle.YesNo)
 
         If msgBoxResult = MsgBoxResult.Yes Then
-            Functions.wait.createPleaseWaitWindow("Downloading Debug Build... Please Wait.", enums.howToCenterWindow.parent, True)
+            Functions.wait.createPleaseWaitWindow("Downloading Debug Build... Please Wait.", False, enums.howToCenterWindow.parent, True)
 
             Dim downloadThread As New Threading.Thread(AddressOf switchToDebugBuildDownloadThreadSub)
             downloadThread.Name = "Debug Build Download Thread"
@@ -3392,7 +3392,7 @@ Public Class Form1
 
         If result = MsgBoxResult.Yes Then
             disableFormElements()
-            Functions.wait.createPleaseWaitWindow("Deleting Restore Points... Please Wait.", enums.howToCenterWindow.parent)
+            Functions.wait.createPleaseWaitWindow("Deleting Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
             toolStripDeleteAllRestorePoints.Enabled = False
             deleteAllRestorePointsThreadInstance = New Threading.Thread(AddressOf deleteAllRestorePointsThread)
@@ -3620,7 +3620,7 @@ Public Class Form1
             Exit Sub
         End If
 
-        Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", enums.howToCenterWindow.parent)
+        Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
         Dim createSystemRestorePointThread As New Threading.Thread(Sub() unifiedCreateSystemRestorePoint(defaultCustomRestorePointName))
         createSystemRestorePointThread.Name = "Create System Restore Point Thread"
@@ -3652,7 +3652,7 @@ Public Class Form1
         End If
 
         If msgBoxResult = MsgBoxResult.Yes Then
-            Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", enums.howToCenterWindow.parent)
+            Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
             Dim createSystemRestorePointThread As New Threading.Thread(Sub() unifiedCreateSystemRestorePoint(txtRestorePointDescription.Text))
             createSystemRestorePointThread.Name = "Create System Restore Point Thread"
@@ -3677,7 +3677,7 @@ Public Class Form1
         End If
 
         If msgBoxResult = MsgBoxResult.Yes Then
-            Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", enums.howToCenterWindow.parent)
+            Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
             Dim threadCreateSystemCheckpoint As New Threading.Thread(Sub() unifiedCreateSystemRestorePoint())
             threadCreateSystemCheckpoint.Name = "Create System Checkpoint Thread"
@@ -3707,7 +3707,7 @@ Public Class Form1
         Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot after the restoration process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, strDescription, strDate, strType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
 
         If msgboxResult = MsgBoxResult.Yes Then
-            Functions.wait.createPleaseWaitWindow("Beginning the Restore Process... Please Wait.", enums.howToCenterWindow.parent)
+            Functions.wait.createPleaseWaitWindow("Beginning the Restore Process... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
             Dim thread As New Threading.Thread(AddressOf restoreSystemRestorePoint)
             thread.Name = "Restore System Restore Point Thread"
@@ -3726,7 +3726,7 @@ Public Class Form1
 
     Private Sub btnRefreshRestorePoints_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnRefreshRestorePoints.Click
         If btnRefreshRestorePoints.Text = "Refresh List of System Restore Points" Then
-            Functions.wait.createPleaseWaitWindow("Loading Restore Points... Please Wait.", enums.howToCenterWindow.parent)
+            Functions.wait.createPleaseWaitWindow("Loading Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
             updateRestorePointListThread = New Threading.Thread(AddressOf loadRestorePointsFromSystemIntoList)
             updateRestorePointListThread.Name = "System Restore Point List Updating Thread"
@@ -3748,7 +3748,7 @@ Public Class Form1
             Exit Sub
         End If
 
-        Functions.wait.createPleaseWaitWindow("Deleting Restore Points... Please Wait.", enums.howToCenterWindow.parent)
+        Functions.wait.createPleaseWaitWindow("Deleting Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
         deleteThread = New Threading.Thread(AddressOf deleteSystemRestorePoint)
         deleteThread.Name = "System Restore Point Deletion Thread"

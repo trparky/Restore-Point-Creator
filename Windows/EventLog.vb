@@ -120,7 +120,7 @@ Public Class eventLogForm
     Private Sub eventLogForm_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         If e.KeyCode = Keys.F5 Then
             If eventLogLoadingThread Is Nothing Then
-                Functions.wait.createPleaseWaitWindow("Loading Event Log Data... Please Wait.", enums.howToCenterWindow.parent)
+                Functions.wait.createPleaseWaitWindow("Loading Event Log Data... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
                 eventLogLoadingThread = New Threading.Thread(AddressOf loadEventLog)
                 eventLogLoadingThread.Start()
@@ -269,7 +269,7 @@ Public Class eventLogForm
 
     Private Sub btnRefreshEvents_Click(sender As Object, e As EventArgs) Handles btnRefreshEvents.Click
         If eventLogLoadingThread Is Nothing Then
-            Functions.wait.createPleaseWaitWindow("Loading Event Log Data... Please Wait.", enums.howToCenterWindow.parent)
+            Functions.wait.createPleaseWaitWindow("Loading Event Log Data... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
             eventLogLoadingThread = New Threading.Thread(AddressOf loadEventLog)
             eventLogLoadingThread.Start()
@@ -326,7 +326,7 @@ Public Class eventLogForm
 
         boolDoneLoading = True
 
-        Functions.wait.createPleaseWaitWindow("Loading Event Log Data... Please Wait.", enums.howToCenterWindow.parent)
+        Functions.wait.createPleaseWaitWindow("Loading Event Log Data... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
         eventLogLoadingThread = New Threading.Thread(AddressOf loadEventLog)
         eventLogLoadingThread.Start()
