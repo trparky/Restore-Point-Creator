@@ -73,10 +73,8 @@ Partial Class Please_Wait
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "Please_Wait"
-        Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Please Wait..."
-        Me.TopMost = True
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
