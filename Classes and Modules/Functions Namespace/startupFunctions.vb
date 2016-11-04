@@ -327,8 +327,6 @@ Namespace Functions.startupFunctions
         End Sub
 
         Public Sub performApplicationUpdate(commandLineArgument As String)
-            wait.createPleaseWaitWindow("Updating Restore Point Creator... Please Wait.", True, enums.howToCenterWindow.screen, True)
-            Threading.Thread.Sleep(5000)
             Dim boolExtendedLoggingForUpdating As Boolean = True
 
             Dim registryObject As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
@@ -341,6 +339,14 @@ Namespace Functions.startupFunctions
                 registryObject.Close()
                 registryObject.Dispose()
             End If
+
+            wait.createPleaseWaitWindow("Updating Restore Point Creator... Please Wait.", True, enums.howToCenterWindow.screen, True)
+
+            If boolExtendedLoggingForUpdating = True Then
+                eventLogFunctions.writeToSystemEventLog("Update thread sleeping for 5 seconds for processes to close out before continuing with update procedure.", EventLogEntryType.Information)
+            End If
+
+            Threading.Thread.Sleep(5000)
 
             Dim boolNeedsReboot As Boolean = False
             Dim currentProcessFileName As String = New FileInfo(Application.ExecutablePath).Name

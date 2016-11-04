@@ -808,6 +808,10 @@ Public Class Form1
     End Sub
 
     Private Sub newFileDeleterThreadSub()
+        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+            Functions.eventLogFunctions.writeToSystemEventLog("New File Deleter thread sleeping for 5 seconds for processes to close out before continuing.", EventLogEntryType.Information)
+        End If
+
         Threading.Thread.Sleep(5000)
         Dim strFoundFile As String = New IO.FileInfo(Application.ExecutablePath & ".new.exe").Name
 
