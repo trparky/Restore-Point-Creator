@@ -412,7 +412,7 @@ Public Class eventLogForm
 
             For Each item As ListViewItem In eventLogList.Items
                 strEventType = item.SubItems.Item(0).Text.Trim
-                eventText = getEventLogEntryDetails(Long.Parse(item.SubItems.Item(2).Text.Trim), item.SubItems.Item(3).Text.Trim)
+                eventText = getEventLogEntryDetails(Long.Parse(item.SubItems.Item(2).Text.Replace(",", "").Trim), item.SubItems.Item(3).Text.Trim)
 
                 If boolUseRegEx = True Then
                     If searchType = Search_Event_Log.searceType.typeAny And eventText.regExSearch(searchTerms) Then
