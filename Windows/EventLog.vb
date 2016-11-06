@@ -9,7 +9,13 @@ Public Class eventLogForm
     Private cachedEventLogApplication As New Dictionary(Of Long, String)
     Private cachedEventLogCustom As New Dictionary(Of Long, String)
 
-    Private rawSearchTerms As String = Nothing, previousSearchType As Search_Event_Log.searceType
+    Private rawSearchTerms As String = Nothing
+    Private previousSearchType As Search_Event_Log.searceType
+
+    Private selectedIndex As Long
+    Private boolDidSortingChange As Boolean = False
+    Private boolDidWeDoASearch As Boolean = False
+    Private longEntriesFound As Long = 0
 
     Sub loadEventLogData(ByVal strEventLog As String, ByRef itemsToPutInToList As List(Of ListViewItem), ByRef cache As Dictionary(Of Long, String))
         Dim itemAdd As ListViewItem
@@ -338,8 +344,6 @@ Public Class eventLogForm
         My.Settings.boolAskMeToSubmitIfViewingAnExceptionEntry = chkAskMeToSubmitIfViewingAnExceptionEntry.Checked
     End Sub
 
-    Dim selectedIndex As Long
-
     Private Sub eventLogList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles eventLogList.SelectedIndexChanged
         Try
             If eventLogList.SelectedItems.Count <> 0 Then
@@ -377,16 +381,27 @@ Public Class eventLogForm
     End Sub
 
     Private Sub btnSearch_Click(sender As Object, e As EventArgs) Handles btnSearch.Click
-        For Each item As ListViewItem In eventLogList.Items
-            item.SubItems(4).Text = ""
-            item.BackColor = eventLogList.BackColor
-        Next
+        clearSearchResults()
+
+        If boolDidWeDoASearch Then
+            eventLogList.BeginUpdate()
+
+            For Each item As ListViewItem In eventLogList.Items
+                If item.SubItems(4).Text.Equals("*") Then
+                    item.SubItems(4).Text = ""
+                    item.BackColor = eventLogList.BackColor
+                End If
+            Next
+
+            eventLogList.EndUpdate()
+            boolDidWeDoASearch = False
+        End If
 
         Dim searchWindow As New Search_Event_Log
         searchWindow.StartPosition = FormStartPosition.CenterParent
         searchWindow.txtSearchTerms.Text = rawSearchTerms
         searchWindow.previousSearchType = previousSearchType
-        searchWindow.ShowDialog()
+        searchWindow.ShowDialog(Me)
 
         If searchWindow.dialogResponse = Search_Event_Log.userResponse.doSearch Then
             Dim eventText As String
@@ -408,7 +423,8 @@ Public Class eventLogForm
             searchWindow.Dispose()
             searchWindow = Nothing
 
-            Dim longEntriesFound As Long = 0
+            longEntriesFound = 0
+            boolDidWeDoASearch = True
 
             For Each item As ListViewItem In eventLogList.Items
                 strEventType = item.SubItems.Item(0).Text.Trim
@@ -445,6 +461,7 @@ Public Class eventLogForm
                 eventLogList.ListViewItemSorter = New Functions.listViewSorter.ListViewComparer(4, SortOrder.Descending)
                 eventLogList.Sort()
                 eventLogList.EnsureVisible(0)
+                boolDidSortingChange = True
 
                 Dim strEntriesFound As String
                 If longEntriesFound = 1 Then
@@ -490,14 +507,22 @@ Public Class eventLogForm
     End Sub
 
     Private Sub btnClear_Click(sender As Object, e As EventArgs) Handles btnClear.Click
-        rawSearchTerms = Nothing
+        clearSearchResults()
+    End Sub
 
-        For Each item As ListViewItem In eventLogList.Items
-            item.SubItems(4).Text = ""
-            item.BackColor = eventLogList.BackColor
-        Next
+    Sub clearSearchResults()
+        If boolDidSortingChange Then
+            rawSearchTerms = Nothing
 
-        eventLogList.ListViewItemSorter = New Functions.listViewSorter.ListViewComparer(1, SortOrder.Descending)
-        eventLogList.Sort()
+            For Each item As ListViewItem In eventLogList.Items
+                item.SubItems(4).Text = ""
+                item.BackColor = eventLogList.BackColor
+            Next
+
+            eventLogList.ListViewItemSorter = New Functions.listViewSorter.ListViewComparer(1, SortOrder.Descending)
+            eventLogList.Sort()
+
+            boolDidSortingChange = False
+        End If
     End Sub
 End Class
