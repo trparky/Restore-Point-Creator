@@ -119,7 +119,7 @@ Public Class Form1
 
                     If valueInRegistry <> Nothing Then
                         ' We check if the current Registry path is different than the current process's EXE path.
-                        If valueInRegistry.Contains(Application.ExecutablePath.ToLower) = False Then
+                        If valueInRegistry.caseInsensitiveContains(Application.ExecutablePath) = False Then
                             ' OK, it doesn't match the current process's EXE path.
 
                             ' We parse out the EXE's path out of the combined path with the argument.
@@ -154,7 +154,7 @@ Public Class Form1
 
                     If valueInRegistry <> Nothing Then
                         ' We check if the current Registry path is different than the current process's EXE path.
-                        If valueInRegistry.Contains(Application.ExecutablePath.ToLower) = False Then
+                        If valueInRegistry.caseInsensitiveContains(Application.ExecutablePath) = False Then
                             ' OK, it doesn't match the current process's EXE path.
 
                             ' We parse out the EXE's path out of the combined path with the argument.
@@ -191,7 +191,7 @@ Public Class Form1
 
                     If valueInRegistry <> Nothing Then
                         ' We check if the current Registry path is different than the current process's EXE path.
-                        If valueInRegistry.Contains(Application.ExecutablePath.ToLower) = False Then
+                        If valueInRegistry.caseInsensitiveContains(Application.ExecutablePath) = False Then
                             ' OK, it doesn't match the current process's EXE path.
 
                             ' We parse out the EXE's path out of the combined path with the argument.
@@ -245,21 +245,21 @@ Public Class Form1
 
                 If Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint") IsNot Nothing Then
                     iconPath = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint").GetValue("icon", "nothing")
-                    If iconPath.ToLower.Contains(Application.ExecutablePath.ToLower) = False Then
+                    If iconPath.caseInsensitiveContains(Application.ExecutablePath) = False Then
                         Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint", True).SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
                     End If
                 End If
 
                 If Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point") IsNot Nothing Then
                     iconPath = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point").GetValue("icon", "nothing")
-                    If iconPath.ToLower.Contains(Application.ExecutablePath.ToLower) = False Then
+                    If iconPath.caseInsensitiveContains(Application.ExecutablePath) = False Then
                         Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point", True).SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
                     End If
                 End If
 
                 If Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator") IsNot Nothing Then
                     iconPath = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator").GetValue("icon", "nothing")
-                    If iconPath.ToLower.Contains(Application.ExecutablePath.ToLower) = False Then
+                    If iconPath.caseInsensitiveContains(Application.ExecutablePath) = False Then
                         Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator", True).SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
                     End If
                 End If
@@ -275,13 +275,14 @@ Public Class Form1
 
         Try
             Dim actions As TaskScheduler.ActionCollection = task.Definition.Actions
+            Dim execActionPath As String
 
             For Each action As TaskScheduler.Action In actions
                 If action.ActionType = TaskScheduler.TaskActionType.Execute Then
-                    Dim execActionPath As String = DirectCast(action, TaskScheduler.ExecAction).Path.ToLower.Replace("""", "")
+                    execActionPath = DirectCast(action, TaskScheduler.ExecAction).Path.Replace("""", "")
 
                     ' We check if the current task ExecAction path is different than the current process's EXE path.
-                    If execActionPath <> Application.ExecutablePath.ToLower Then
+                    If execActionPath.stringCompare(Application.ExecutablePath) = False Then
                         task.Definition.Actions.Remove(action)
                         actions.Add(New TaskScheduler.ExecAction(Application.ExecutablePath, commandLineArgument))
                         task.RegisterChanges()
@@ -1856,13 +1857,13 @@ Public Class Form1
                                     listViewItem.SubItems.Add("(Error Parsing Date)")
                                 End If
 
-                                If restorePointDetails("Description").ToString.ToLower.Contains("windows update") Then
+                                If restorePointDetails("Description").ToString.caseInsensitiveContains("windows update") Then
                                     If My.Settings.debug = True Then
                                         listViewItem.SubItems.Add("Windows Update" & " (" & restorePointDetails("RestorePointType").ToString & ")")
                                     Else
                                         listViewItem.SubItems.Add("Windows Update")
                                     End If
-                                ElseIf restorePointDetails("Description").ToString.ToLower.Contains("system checkpoint") Then
+                                ElseIf restorePointDetails("Description").ToString.caseInsensitiveContains("system checkpoint") Then
                                     If My.Settings.debug = True Then
                                         listViewItem.SubItems.Add("System Checkpoint" & " (" & restorePointDetails("RestorePointType").ToString & ")")
                                     Else
@@ -3355,7 +3356,7 @@ Public Class Form1
         Dim registryShowDonationMessageValue As String = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey).GetValue("Show Donation Message", "True").ToString.Trim
         Dim boolRegistryShowDonationMessageValue As Boolean
 
-        If registryShowDonationMessageValue.ToLower = "true" Or registryShowDonationMessageValue.ToLower = "false" Then
+        If registryShowDonationMessageValue.stringCompare("true") Or registryShowDonationMessageValue.stringCompare("false") Then
             boolRegistryShowDonationMessageValue = Boolean.Parse(registryShowDonationMessageValue)
         Else
             boolRegistryShowDonationMessageValue = True

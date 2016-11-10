@@ -126,7 +126,7 @@
                     eventInstance = logReader.ReadEvent()
 
                     While eventInstance IsNot Nothing
-                        If eventInstance.ProviderName = strSystemRestorePointCreator Or eventInstance.ProviderName.ToLower.Contains(strSystemRestorePointCreator.ToLower) = True Then
+                        If eventInstance.ProviderName = strSystemRestorePointCreator Or eventInstance.ProviderName.caseInsensitiveContains(strSystemRestorePointCreator) = True Then
                             Dim logClass As New restorePointCreatorExportedLog
                             logClass.logData = eventInstance.FormatDescription
                             logClass.unixTime = eventInstance.TimeCreated.Value.ToUniversalTime.toUNIXTimestamp()
