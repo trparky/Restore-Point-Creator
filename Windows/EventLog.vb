@@ -31,7 +31,7 @@ Public Class eventLogForm
                 eventInstance = logReader.ReadEvent()
 
                 While eventInstance IsNot Nothing
-                    If eventInstance.ProviderName = globalVariables.eventLog.strSystemRestorePointCreator Or eventInstance.ProviderName.ToLower.Contains(globalVariables.eventLog.strSystemRestorePointCreator.ToLower) = True Then
+                    If eventInstance.ProviderName.stringCompare(globalVariables.eventLog.strSystemRestorePointCreator) Or eventInstance.ProviderName.caseInsensitiveContains(globalVariables.eventLog.strSystemRestorePointCreator) Then
                         cache.Add(eventInstance.RecordId, eventInstance.FormatDescription)
 
                         Try
@@ -352,7 +352,7 @@ Public Class eventLogForm
 
                 eventLogText.Text = Functions.support.removeSourceCodePathInfo(getEventLogEntryDetails(eventID, source))
 
-                If eventLogText.Text.ToLower.Contains("exception") = True And chkAskMeToSubmitIfViewingAnExceptionEntry.Checked = True And selectedIndex <> eventLogList.SelectedIndices(0) Then
+                If eventLogText.Text.caseInsensitiveContains("exception") And chkAskMeToSubmitIfViewingAnExceptionEntry.Checked And selectedIndex <> eventLogList.SelectedIndices(0) Then
                     If MsgBox("The log entry that you're looking at appears to be a program exception and stack trace. Would you like to submit it?", MsgBoxStyle.Question + MsgBoxStyle.YesNo + MsgBoxStyle.DefaultButton2, Me.Text) = MsgBoxResult.Yes Then
                         If (globalVariables.windows.frmManuallySubmitCrashDataInstance Is Nothing) Then
                             globalVariables.windows.frmManuallySubmitCrashDataInstance = New frmManuallySubmitCrashData
