@@ -67,7 +67,7 @@ Namespace Functions.registryStuff
                 If installerRegistryPath IsNot Nothing Then
                     displayName = installerRegistryPath.GetValue("DisplayName", "")
 
-                    If displayName.ToLower.Contains("restore point creator") = True Then
+                    If displayName.caseInsensitiveContains("restore point creator") = True Then
                         installerRegistryPath.SetValue("DisplayName", String.Format("Restore Point Creator version {0}", globalVariables.version.strFullVersionString), RegistryValueKind.String)
                         installerRegistryPath.SetValue("DisplayVersion", globalVariables.version.versionInfo(enums.versionPieces.major) & "." & globalVariables.version.versionInfo(enums.versionPieces.minor), RegistryValueKind.String)
                         installerRegistryPath.SetValue("DisplayIcon", Application.ExecutablePath & ",0", RegistryValueKind.String)

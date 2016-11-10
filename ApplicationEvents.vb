@@ -87,7 +87,7 @@ Namespace My
 
             ' This code is for running parts of the program that don't necessarily need Admin privs.
             If My.Application.CommandLineArgs.Count = 1 Then
-                commandLineArgument = My.Application.CommandLineArgs(0).ToLower.Trim
+                commandLineArgument = My.Application.CommandLineArgs(0).Trim
 
                 If commandLineArgument.stringCompare("-viewchangelog") Then
                     Dim changeLog As New Change_Log

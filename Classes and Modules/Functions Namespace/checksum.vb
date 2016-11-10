@@ -31,11 +31,11 @@ Namespace Functions.checksum
                     ' Checks to see if we have a valid SHA1 file.
                     If Regex.IsMatch(checksumFromWeb, "([a-zA-Z0-9]{64})") = True Then
                         ' Now that we have a valid SHA256 file we need to parse out what we want.
-                        checksumFromWeb = Regex.Match(checksumFromWeb, "([a-zA-Z0-9]{64})").Groups(1).Value().ToLower.Trim()
+                        checksumFromWeb = Regex.Match(checksumFromWeb, "([a-zA-Z0-9]{64})").Groups(1).Value.Trim
 
                         ' Now we do the actual checksum verification by passing the name of the file to the SHA256() function
                         ' which calculates the checksum of the file on disk. We then compare it to the checksum from the web.
-                        If SHA256ChecksumStream(memStream) = checksumFromWeb Then
+                        If SHA256ChecksumStream(memStream).stringCompare(checksumFromWeb) Then
                             Return True ' OK, things are good; the file passed checksum verification so we return True.
                         Else
                             ' The checksums don't match. Oops.
@@ -80,11 +80,11 @@ Namespace Functions.checksum
                     ' Checks to see if we have a valid SHA1 file.
                     If Regex.IsMatch(checksumFromWeb, "([a-zA-Z0-9]{64})") = True Then
                         ' Now that we have a valid SHA256 file we need to parse out what we want.
-                        checksumFromWeb = Regex.Match(checksumFromWeb, "([a-zA-Z0-9]{64})").Groups(1).Value().ToLower.Trim()
+                        checksumFromWeb = Regex.Match(checksumFromWeb, "([a-zA-Z0-9]{64})").Groups(1).Value.Trim
 
                         ' Now we do the actual checksum verification by passing the name of the file to the SHA256() function
                         ' which calculates the checksum of the file on disk. We then compare it to the checksum from the web.
-                        If SHA256ChecksumFile(fileToVerify) = checksumFromWeb Then
+                        If SHA256ChecksumFile(fileToVerify).stringCompare(checksumFromWeb) Then
                             Return True ' OK, things are good; the file passed checksum verification so we return True.
                         Else
                             ' The checksums don't match. Oops.

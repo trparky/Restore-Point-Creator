@@ -422,10 +422,10 @@ Namespace Functions.taskStuff
                                 ' Yes, one of the application shortcuts for this program was used.  Let's find out which one, shall we.
 
                                 ' Stores the contents of the command line argument for later use in this code.
-                                Dim commandLineArgument As String = My.Application.CommandLineArgs(0).ToLower.Trim
+                                Dim commandLineArgument As String = My.Application.CommandLineArgs(0).Trim
 
                                 ' Handles the creation of a restore point from the command line or shortcut.
-                                If commandLineArgument = "-createrestorepoint" Then
+                                If commandLineArgument.stringCompare("-createrestorepoint") Then
                                     ' Checks to see if the Task Wrapper task exists and returns both a Boolean value and a task object.
                                     If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Restore Point)", task) = True Then
                                         ' Yes, the Task Wrapper task exists so we are going to run that task.

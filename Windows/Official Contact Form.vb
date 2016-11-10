@@ -165,7 +165,7 @@ Public Class Official_Contact_Form
         If OpenFileDialog1.ShowDialog() = DialogResult.OK Then
             Dim fileInfo As New IO.FileInfo(OpenFileDialog1.FileName)
 
-            If fileInfo.Extension.ToLower = ".png" Or fileInfo.Extension.ToLower = ".jpg" Or fileInfo.Extension.ToLower = ".jpeg" Or fileInfo.Extension.ToLower = ".txt" Or fileInfo.Extension.ToLower = ".log" Or fileInfo.Extension.ToLower = ".reslog" Then
+            If fileInfo.Extension.stringCompare(".png") Or fileInfo.Extension.stringCompare(".jpg") Or fileInfo.Extension.stringCompare(".jpeg") Or fileInfo.Extension.stringCompare(".txt") Or fileInfo.Extension.stringCompare(".log") Or fileInfo.Extension.stringCompare(".reslog") Then
                 If doesFileExistInList(OpenFileDialog1.FileName.ToString) = True Then
                     MsgBox("A file by the name of " & Chr(34) & New IO.FileInfo(OpenFileDialog1.FileName.ToString).Name & Chr(34) & " already exists in the list of attached files.", MsgBoxStyle.Information, Me.Text)
                 Else
@@ -181,7 +181,7 @@ Public Class Official_Contact_Form
         Dim strFileToBeRemoved As String = listAttachedFiles.Text
         If listAttachedFiles.SelectedItems.Count <> 0 Then listAttachedFiles.Items.Remove(listAttachedFiles.SelectedItems(0))
 
-        If strFileToBeRemoved.ToLower.EndsWith(".reslog") = True Then
+        If strFileToBeRemoved.EndsWith(".reslog", StringComparison.OrdinalIgnoreCase) = True Then
             Try
                 IO.File.Delete(strFileToBeRemoved)
             Catch ex As Exception
@@ -193,11 +193,11 @@ Public Class Official_Contact_Form
         If listAttachedFiles.Items.Count = 0 Then
             Return False
         Else
-            strFileToCheckForExistanceOf = New IO.FileInfo(strFileToCheckForExistanceOf).Name.ToLower.Trim
+            strFileToCheckForExistanceOf = New IO.FileInfo(strFileToCheckForExistanceOf).Name
 
             For Each item As String In listAttachedFiles.Items
-                item = New IO.FileInfo(item).Name.ToLower.Trim
-                If item = strFileToCheckForExistanceOf Then Return True
+                item = New IO.FileInfo(item).Name
+                If item.stringCompare(strFileToCheckForExistanceOf) Then Return True
             Next
 
             Return False
