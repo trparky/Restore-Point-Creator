@@ -141,9 +141,7 @@ Public Class Official_Contact_Form
             Functions.wait.createPleaseWaitWindow("Compressing and Sending Data... Please Wait.", False, enums.howToCenterWindow.parent, False)
         End If
 
-        Dim sendingThread As New Threading.Thread(AddressOf dataSubmitThread)
-        sendingThread.Name = "Contact Form Data Sending Thread"
-        sendingThread.Start()
+        Threading.ThreadPool.QueueUserWorkItem(AddressOf dataSubmitThread)
 
         If listAttachedFiles.Items.Count <> 0 Then
             Functions.wait.openPleaseWaitWindow(Me)

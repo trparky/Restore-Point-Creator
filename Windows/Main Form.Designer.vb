@@ -90,6 +90,7 @@ Partial Class Form1
         Me.SetWindowsActivePowerPlanSettingsForWakeTimersBackToDefaultToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.KeepXAmountOfRestorePointsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DefaultCustomRestorePointNameToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ConfigureHTTPTimeoutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem3 = New System.Windows.Forms.ToolStripSeparator()
         Me.SoftwareUpdateSettingsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.toolStripAutomaticallyCheckForUpdates = New System.Windows.Forms.ToolStripMenuItem()
@@ -133,10 +134,6 @@ Partial Class Form1
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.importBackupDialog = New System.Windows.Forms.OpenFileDialog()
         Me.exportBackupDialog = New System.Windows.Forms.SaveFileDialog()
-        Me.checkForAndEnableSystemRestoreIfNeededThreadKiller = New System.Windows.Forms.Timer(Me.components)
-        Me.checkRestorePointSpaceThreadThreadKiller = New System.Windows.Forms.Timer(Me.components)
-        Me.startSystemRestorePointListLoadThreadKiller = New System.Windows.Forms.Timer(Me.components)
-        Me.ConfigureHTTPTimeoutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.restorePointListContextMenu.SuspendLayout()
         Me.buttonTableLayout.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
@@ -676,6 +673,12 @@ Partial Class Form1
         Me.DefaultCustomRestorePointNameToolStripMenuItem.Size = New System.Drawing.Size(431, 22)
         Me.DefaultCustomRestorePointNameToolStripMenuItem.Text = "Set Default Custom Restore Point Name"
         '
+        'ConfigureHTTPTimeoutToolStripMenuItem
+        '
+        Me.ConfigureHTTPTimeoutToolStripMenuItem.Name = "ConfigureHTTPTimeoutToolStripMenuItem"
+        Me.ConfigureHTTPTimeoutToolStripMenuItem.Size = New System.Drawing.Size(431, 22)
+        Me.ConfigureHTTPTimeoutToolStripMenuItem.Text = "Configure HTTP Timeout"
+        '
         'ToolStripMenuItem3
         '
         Me.ToolStripMenuItem3.Name = "ToolStripMenuItem3"
@@ -960,24 +963,6 @@ Partial Class Form1
         '
         Me.importBackupDialog.FileName = "OpenFileDialog1"
         '
-        'checkForAndEnableSystemRestoreIfNeededThreadKiller
-        '
-        Me.checkForAndEnableSystemRestoreIfNeededThreadKiller.Interval = 30000
-        '
-        'checkRestorePointSpaceThreadThreadKiller
-        '
-        Me.checkRestorePointSpaceThreadThreadKiller.Interval = 30000
-        '
-        'startSystemRestorePointListLoadThreadKiller
-        '
-        Me.startSystemRestorePointListLoadThreadKiller.Interval = 30000
-        '
-        'ConfigureHTTPTimeoutToolStripMenuItem
-        '
-        Me.ConfigureHTTPTimeoutToolStripMenuItem.Name = "ConfigureHTTPTimeoutToolStripMenuItem"
-        Me.ConfigureHTTPTimeoutToolStripMenuItem.Size = New System.Drawing.Size(431, 22)
-        Me.ConfigureHTTPTimeoutToolStripMenuItem.Text = "Configure HTTP Timeout"
-        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
@@ -1110,9 +1095,6 @@ Partial Class Form1
     Friend WithEvents lineBeforeDebugMenuItem As ToolStripSeparator
     Friend WithEvents CommandLineArgumentsToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItemPrivateForTom As ToolStripMenuItem
-    Friend WithEvents checkForAndEnableSystemRestoreIfNeededThreadKiller As Timer
-    Friend WithEvents checkRestorePointSpaceThreadThreadKiller As Timer
-    Friend WithEvents startSystemRestorePointListLoadThreadKiller As Timer
     Friend WithEvents OnlyGiveMeReleaseCandidates As ToolStripMenuItem
     Friend WithEvents lineUnderRC As ToolStripSeparator
     Friend WithEvents ExtendedLoggingForScheduledTasks As ToolStripMenuItem

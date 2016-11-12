@@ -96,10 +96,7 @@
             chkShowPartialBetaChangeLogs.Visible = False
         End If
 
-        Dim loadDetailsThread As New Threading.Thread(AddressOf loadChangeLogData)
-        loadDetailsThread.Name = "Change Log Data Loading Thread"
-        loadDetailsThread.Priority = Threading.ThreadPriority.Lowest
-        loadDetailsThread.Start()
+        Threading.ThreadPool.QueueUserWorkItem(AddressOf loadChangeLogData)
 
         Me.Icon = My.Resources.RestorePoint_noBackground_2
         Media.SystemSounds.Asterisk.Play()
@@ -166,10 +163,7 @@
     Private Sub btnReloadChangeLog_Click(sender As Object, e As EventArgs) Handles btnReloadChangeLog.Click
         disableCountdown()
         txtChanges.Text = "Loading Change Log Data... Please Wait."
-        Dim loadDetailsThread As New Threading.Thread(AddressOf loadChangeLogData)
-        loadDetailsThread.Name = "Change Log Data Loading Thread"
-        loadDetailsThread.Priority = Threading.ThreadPriority.Lowest
-        loadDetailsThread.Start()
+        Threading.ThreadPool.QueueUserWorkItem(AddressOf loadChangeLogData)
     End Sub
 
     Private Sub Update_Message_Resize(sender As Object, e As EventArgs) Handles Me.Resize
@@ -180,11 +174,7 @@
         disableCountdown()
         txtChanges.Text = "Loading Change Log Data... Please Wait."
         My.Settings.showPartialBetaChangeLogs = chkShowPartialBetaChangeLogs.Checked
-
-        Dim loadDetailsThread As New Threading.Thread(AddressOf loadChangeLogData)
-        loadDetailsThread.Name = "Change Log Data Loading Thread"
-        loadDetailsThread.Priority = Threading.ThreadPriority.Lowest
-        loadDetailsThread.Start()
+        Threading.ThreadPool.QueueUserWorkItem(AddressOf loadChangeLogData)
     End Sub
 
     Private Sub timerCountdown_Tick(sender As Object, e As EventArgs) Handles timerCountdown.Tick
