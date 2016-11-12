@@ -19,10 +19,6 @@ Public Class Form1
     Private Const strMessageBoxTitle As String = "System Restore Point Creator"
     Public defaultCustomRestorePointName As String
 
-    Private checkForAndEnableSystemRestoreIfNeeded, checkRestorePointSpaceThread, startSystemRestorePointListLoadThread As Threading.Thread
-    Private formLoadCheckForUpdatesRoutineThread, userInitiatedCheckForUpdatesThread, deleteThread, updateRestorePointListThread As Threading.Thread
-    Private deleteAllRestorePointsThreadInstance As Threading.Thread
-
     Private restorePointDateData As New Dictionary(Of String, String)
 #End Region
 
@@ -36,48 +32,6 @@ Public Class Form1
             Timer1.Enabled = False
         Catch ex As Exception
             ' Does nothing
-        End Try
-    End Sub
-
-    Private Sub startSystemRestorePointListLoadThreadKiller_Tick(sender As Object, e As EventArgs) Handles startSystemRestorePointListLoadThreadKiller.Tick
-        Try
-            If startSystemRestorePointListLoadThread IsNot Nothing Then
-                If startSystemRestorePointListLoadThread.IsAlive = True Then
-                    startSystemRestorePointListLoadThread.Abort()
-                End If
-            End If
-        Catch ex As Exception
-        Finally
-            startSystemRestorePointListLoadThreadKiller.Enabled = False
-            startSystemRestorePointListLoadThread = Nothing
-        End Try
-    End Sub
-
-    Private Sub checkRestorePointSpaceThreadThreadKiller_Tick(sender As Object, e As EventArgs) Handles checkRestorePointSpaceThreadThreadKiller.Tick
-        Try
-            If checkRestorePointSpaceThread IsNot Nothing Then
-                If checkRestorePointSpaceThread.IsAlive = True Then
-                    checkRestorePointSpaceThread.Abort()
-                End If
-            End If
-        Catch ex As Exception
-        Finally
-            checkRestorePointSpaceThreadThreadKiller.Enabled = False
-            checkRestorePointSpaceThread = Nothing
-        End Try
-    End Sub
-
-    Private Sub checkForAndEnableSystemRestoreIfNeededThreadKiller_Tick(sender As Object, e As EventArgs) Handles checkForAndEnableSystemRestoreIfNeededThreadKiller.Tick
-        Try
-            If checkForAndEnableSystemRestoreIfNeeded IsNot Nothing Then
-                If checkForAndEnableSystemRestoreIfNeeded.IsAlive = True Then
-                    checkForAndEnableSystemRestoreIfNeeded.Abort()
-                End If
-            End If
-        Catch ex As Exception
-        Finally
-            checkForAndEnableSystemRestoreIfNeededThreadKiller.Enabled = False
-            checkForAndEnableSystemRestoreIfNeeded = Nothing
         End Try
     End Sub
 #End Region
@@ -498,18 +452,12 @@ Public Class Form1
 
             If boolUpdateAtNextRunTime = True Or My.Settings.boolFirstRun = True Then
                 boolDidWeAlreadyLaunchTheCheckForUpdatesRoutine = True
-
-                formLoadCheckForUpdatesRoutineThread = New Threading.Thread(Sub() formLoadCheckForUpdatesRoutine(True))
-                formLoadCheckForUpdatesRoutineThread.Name = "Form Load Check For Updates Routine Thread"
-                formLoadCheckForUpdatesRoutineThread.Start()
+                Threading.ThreadPool.QueueUserWorkItem(Sub() formLoadCheckForUpdatesRoutine(True))
             End If
 
             If My.Settings.CheckForUpdates = True And boolDidWeAlreadyLaunchTheCheckForUpdatesRoutine = False Then
                 toolStripAutomaticallyCheckForUpdates.Checked = True
-
-                formLoadCheckForUpdatesRoutineThread = New Threading.Thread(Sub() formLoadCheckForUpdatesRoutine())
-                formLoadCheckForUpdatesRoutineThread.Name = "Form Load Check For Updates Routine Thread"
-                formLoadCheckForUpdatesRoutineThread.Start()
+                Threading.ThreadPool.QueueUserWorkItem(Sub() formLoadCheckForUpdatesRoutine())
             End If
         Catch ex As Exception
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
@@ -653,10 +601,7 @@ Public Class Form1
 
     Sub startSystemRestorePointListLoadThreadSub()
         Try
-            startSystemRestorePointListLoadThreadKiller.Enabled = True
             loadRestorePointsFromSystemIntoList()
-            startSystemRestorePointListLoadThread = Nothing
-            startSystemRestorePointListLoadThreadKiller.Enabled = False
         Catch ex As Threading.ThreadAbortException
         End Try
     End Sub
@@ -847,29 +792,20 @@ Public Class Form1
             Functions.support.searchForProcessAndKillIt("updater.exe", False)
             Threading.Thread.Sleep(250) ' We're going to sleep to give the system some time to kill the process.
             Functions.support.deleteFileWithNoException("updater.exe")
-        Catch ex As Threading.ThreadAbortException
         Catch ex As Exception
         End Try
     End Sub
 
     Private Sub checkRestorePointSpaceThreadSub()
         Try
-            checkRestorePointSpaceThreadThreadKiller.Enabled = True
             Functions.vss.checkSystemDrivesForFullShadowStorage()
-            checkRestorePointSpaceThread = Nothing
-            checkRestorePointSpaceThreadThreadKiller.Enabled = False
-        Catch ex As Threading.ThreadAbortException
         Catch ex As Exception
         End Try
     End Sub
 
     Private Sub checkForAndEnableSystemRestoreIfNeededSub()
         Try
-            checkForAndEnableSystemRestoreIfNeededThreadKiller.Enabled = True
             Functions.vss.checkForAndEnableSystemRestoreIfNeeded()
-            checkForAndEnableSystemRestoreIfNeeded = Nothing
-            checkForAndEnableSystemRestoreIfNeededThreadKiller.Enabled = False
-        Catch ex As Threading.ThreadAbortException
         Catch ex As Exception
         End Try
     End Sub
@@ -896,15 +832,6 @@ Public Class Form1
 
     Sub launchDonationURL()
         Functions.support.launchURLInWebBrowser(globalVariables.webURLs.webPages.strPayPal, "An error occurred when trying to launch the donation URL in your default browser. The donation URL has been copied to your Windows Clipboard for you to paste into the address bar in the browser of your choice.")
-    End Sub
-
-    Sub killThread(ByRef threadToKill As Threading.Thread)
-        Try
-            If threadToKill IsNot Nothing Then
-                threadToKill.Abort()
-            End If
-        Catch ex As Exception
-        End Try
     End Sub
 
     Private Function calculateConfigBackupDataPayloadChecksum(strInput As String, strSaltedString As String) As String
@@ -1141,14 +1068,7 @@ Public Class Form1
         stripDelete.Enabled = False
 
         Functions.wait.createPleaseWaitWindow("Deleting Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
-
-        deleteThread = New Threading.Thread(Sub()
-                                                deleteOldRestorePoints(maxAgeInput)
-                                            End Sub)
-        deleteThread.Name = "Delete Old Restore Points Thread"
-        deleteThread.Priority = Threading.ThreadPriority.Lowest
-        deleteThread.Start()
-
+        Threading.ThreadPool.QueueUserWorkItem(Sub() deleteOldRestorePoints(maxAgeInput))
         Functions.wait.openPleaseWaitWindow()
     End Sub
 
@@ -1456,14 +1376,12 @@ Public Class Form1
     Sub openThePleaseWaitWindowAndStartTheDownloadThread(Optional boolOverrideUserUpdateChannelPreferences As Boolean = False)
         Functions.wait.createPleaseWaitWindow("Downloading update... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
-        Dim downloadThread As New Threading.Thread(Sub()
-                                                       Try
-                                                           downloadAndDoTheUpdate(boolOverrideUserUpdateChannelPreferences)
-                                                       Catch ex As Threading.ThreadAbortException
-                                                       End Try
-                                                   End Sub)
-        downloadThread.Name = "Update Download Thread"
-        downloadThread.Start()
+        Threading.ThreadPool.QueueUserWorkItem(Sub()
+                                                   Try
+                                                       downloadAndDoTheUpdate(boolOverrideUserUpdateChannelPreferences)
+                                                   Catch ex As Threading.ThreadAbortException
+                                                   End Try
+                                               End Sub)
 
         Functions.wait.openPleaseWaitWindow(Me)
     End Sub
@@ -1485,7 +1403,6 @@ Public Class Form1
 
         If Functions.http.checkForInternetConnection() = False Then
             toolStripCheckForUpdates.Enabled = True
-            userInitiatedCheckForUpdatesThread = Nothing
             MsgBox("No Internet connection detected.", MsgBoxStyle.Information, strMessageBoxTitle)
         Else
             Try
@@ -1506,22 +1423,18 @@ Public Class Form1
                 Try
                     If httpHelper.getWebData(globalVariables.webURLs.core.strProgramUpdateChecker, strRemoteBuild) = False Then
                         MsgBox("There was an error checking for a software update; update check aborted.", MsgBoxStyle.Information, strMessageBoxTitle)
-                        userInitiatedCheckForUpdatesThread = Nothing
                         Exit Sub
                     End If
                 Catch ex As Exception
-                    userInitiatedCheckForUpdatesThread = Nothing
                     Exit Sub
                 End Try
 
                 If strRemoteBuild.caseInsensitiveContains("unknown") = True Then
                     MsgBox("There was an error checking for updates." & vbCrLf & vbCrLf & "HTTP Response: " & strRemoteBuild, MsgBoxStyle.Critical, strMessageBoxTitle)
-                    userInitiatedCheckForUpdatesThread = Nothing
                     Exit Sub
                 ElseIf strRemoteBuild.caseInsensitiveContains("newversion") = True Then
                     ' This handles entirely new versions, not just new builds.
                     giveUserNoticeAboutTotallyNewVersion(strRemoteBuild, False)
-                    userInitiatedCheckForUpdatesThread = Nothing
                     Exit Sub
                 ElseIf strRemoteBuild.caseInsensitiveContains("beta") = True Or strRemoteBuild.caseInsensitiveContains("rc") = True Then
                     Dim strRemoteBuildParts As String() = strRemoteBuild.Split("-")
@@ -1530,8 +1443,6 @@ Public Class Form1
                         If shortRemoteBuild > globalVariables.version.shortBuild Then
                             If strRemoteBuild.caseInsensitiveContains("beta") = True And My.Settings.onlyGiveMeRCs = True Then
                                 giveFeedbackToUser("You already have the latest version.")
-
-                                userInitiatedCheckForUpdatesThread = Nothing
                                 Exit Sub
                             End If
 
@@ -1547,7 +1458,6 @@ Public Class Form1
                                 openThePleaseWaitWindowAndStartTheDownloadThread()
                             End If
 
-                            userInitiatedCheckForUpdatesThread = Nothing
                             Exit Sub
                         ElseIf shortRemoteBuild < globalVariables.version.shortBuild Then
                             giveFeedbackToUser("Somehow you have a version that is newer than is listed on the product web site, weird.")
@@ -1556,8 +1466,6 @@ Public Class Form1
                         End If
                     Else
                         Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
-
-                        userInitiatedCheckForUpdatesThread = Nothing
                         MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, strMessageBoxTitle)
                         Exit Sub
                     End If
@@ -1578,23 +1486,17 @@ Public Class Form1
                             If openUpdateDialog(Update_Message.versionUpdateType.minorUpdate) = Update_Message.userResponse.doTheUpdate Then
                                 openThePleaseWaitWindowAndStartTheDownloadThread()
                             End If
-
-                            userInitiatedCheckForUpdatesThread = Nothing
                             Exit Sub
                         ElseIf shortRemoteBuild > globalVariables.version.shortBuild And minorBuildApplicables.Contains(globalVariables.version.shortBuild) = False Then
                             If openUpdateDialog(Update_Message.versionUpdateType.standardVersionUpdate) = Update_Message.userResponse.doTheUpdate Then
                                 openThePleaseWaitWindowAndStartTheDownloadThread()
                             End If
-
-                            userInitiatedCheckForUpdatesThread = Nothing
                             Exit Sub
                         ElseIf shortRemoteBuild = globalVariables.version.shortBuild Then
                             giveFeedbackToUser("You already have the latest version.")
                         End If
                     Else
                         Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
-
-                        userInitiatedCheckForUpdatesThread = Nothing
                         MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, strMessageBoxTitle)
                         Exit Sub
                     End If
@@ -1611,14 +1513,10 @@ Public Class Form1
                             If openUpdateDialog(Update_Message.versionUpdateType.standardVersionUpdate) = Update_Message.userResponse.doTheUpdate Then
                                 openThePleaseWaitWindowAndStartTheDownloadThread()
                             End If
-
-                            userInitiatedCheckForUpdatesThread = Nothing
                             Exit Sub
                         End If
                     Else
                         Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
-
-                        userInitiatedCheckForUpdatesThread = Nothing
                         MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, strMessageBoxTitle)
                         Exit Sub
                     End If
@@ -1626,12 +1524,9 @@ Public Class Form1
             Catch ex As Exception
                 Functions.eventLogFunctions.writeCrashToEventLog(ex)
             Finally
-                userInitiatedCheckForUpdatesThread = Nothing
                 toolStripCheckForUpdates.Enabled = True
             End Try
         End If
-
-        userInitiatedCheckForUpdatesThread = Nothing
     End Sub
 
     Private Sub formLoadCheckForUpdatesRoutine(Optional forceRunOfUpdate As Boolean = False)
@@ -1645,7 +1540,6 @@ Public Class Form1
 
                 If Functions.http.checkForInternetConnection() = False Then
                     MsgBox("No Internet connection detected.", MsgBoxStyle.Information, strMessageBoxTitle)
-                    formLoadCheckForUpdatesRoutineThread = Nothing
                     Exit Sub
                 Else
                     My.Settings.lastUpdateTime = Now
@@ -1669,25 +1563,18 @@ Public Class Form1
                         Try
                             If httpHelper.getWebData(globalVariables.webURLs.core.strProgramUpdateChecker, strRemoteBuild) = False Then
                                 MsgBox("There was an error checking for a software update; update check aborted. Please see the Event Log for more information regarding this error message.", MsgBoxStyle.Information, strMessageBoxTitle)
-
-                                formLoadCheckForUpdatesRoutineThread = Nothing
                                 Exit Sub
                             End If
                         Catch ex As Exception
-                            formLoadCheckForUpdatesRoutineThread = Nothing
                             Exit Sub
                         End Try
 
                         If strRemoteBuild.caseInsensitiveContains("unknown") = True Then
                             MsgBox("There was an error checking for updates." & vbCrLf & vbCrLf & "HTTP Response: " & strRemoteBuild, MsgBoxStyle.Critical, strMessageBoxTitle)
-
-                            formLoadCheckForUpdatesRoutineThread = Nothing
                             Exit Sub
                         ElseIf strRemoteBuild.caseInsensitiveContains("newversion") = True Then
                             ' This handles entirely new versions, not just new builds.
                             giveUserNoticeAboutTotallyNewVersion(strRemoteBuild, True)
-
-                            formLoadCheckForUpdatesRoutineThread = Nothing
                             Exit Sub
                         ElseIf strRemoteBuild.caseInsensitiveContains("beta") = True Or strRemoteBuild.caseInsensitiveContains("rc") = True Then
                             Dim strRemoteBuildParts As String() = strRemoteBuild.Split("-")
@@ -1697,8 +1584,6 @@ Public Class Form1
                                     If strRemoteBuild.caseInsensitiveContains("beta") = True And My.Settings.onlyGiveMeRCs = True Then
                                         My.Settings.ProgramExecutionsSinceLastUpdateCheck += 1
                                         My.Settings.Save()
-
-                                        formLoadCheckForUpdatesRoutineThread = Nothing
                                         Exit Sub
                                     End If
 
@@ -1716,13 +1601,10 @@ Public Class Form1
                                         disableAutomaticUpdatesAndNotifyUser()
                                     End If
 
-                                    formLoadCheckForUpdatesRoutineThread.Abort()
                                     Exit Sub
                                 End If
                             Else
                                 Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
-
-                                userInitiatedCheckForUpdatesThread = Nothing
                                 MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, strMessageBoxTitle)
                                 Exit Sub
                             End If
@@ -1744,13 +1626,10 @@ Public Class Form1
                                         openThePleaseWaitWindowAndStartTheDownloadThread()
                                     End If
 
-                                    formLoadCheckForUpdatesRoutineThread = Nothing
                                     Exit Sub
                                 End If
                             Else
                                 Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
-
-                                userInitiatedCheckForUpdatesThread = Nothing
                                 MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, strMessageBoxTitle)
                                 Exit Sub
                             End If
@@ -1766,13 +1645,10 @@ Public Class Form1
                                         disableAutomaticUpdatesAndNotifyUser()
                                     End If
 
-                                    formLoadCheckForUpdatesRoutineThread = Nothing
                                     Exit Sub
                                 End If
                             Else
                                 Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
-
-                                userInitiatedCheckForUpdatesThread = Nothing
                                 MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, strMessageBoxTitle)
                                 Exit Sub
                             End If
@@ -1788,8 +1664,6 @@ Public Class Form1
         Else
             toolStripAutomaticallyCheckForUpdates.Checked = False
         End If
-
-        formLoadCheckForUpdatesRoutineThread = Nothing
     End Sub
 
     Private Function calculateRestorePointAge(creationDate As Date) As Double
@@ -2364,15 +2238,8 @@ Public Class Form1
     End Sub
 
     Private Sub Form1_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        killThread(formLoadCheckForUpdatesRoutineThread)
-        killThread(userInitiatedCheckForUpdatesThread)
-
         My.Settings.mainWindowPosition = Me.Location
         saveRestorePointListColumnOrder()
-
-        If updateRestorePointListThread IsNot Nothing Then
-            updateRestorePointListThread.Abort()
-        End If
 
         If globalVariables.boolLogLoadsAndExits = True Then Functions.eventLogFunctions.writeToSystemEventLog("The user " & Environment.UserName & " closed the program.", EventLogEntryType.Information)
     End Sub
@@ -2385,12 +2252,7 @@ Public Class Form1
     Private Sub Form1_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         If e.KeyCode = Keys.F5 Then
             Functions.wait.createPleaseWaitWindow("Loading Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
-
-            updateRestorePointListThread = New Threading.Thread(AddressOf loadRestorePointsFromSystemIntoList)
-            updateRestorePointListThread.Name = "System Restore Point List Updating Thread"
-            updateRestorePointListThread.Priority = Threading.ThreadPriority.Normal
-            updateRestorePointListThread.Start()
-
+            Threading.ThreadPool.QueueUserWorkItem(AddressOf loadRestorePointsFromSystemIntoList)
             Functions.wait.openPleaseWaitWindow()
         End If
     End Sub
@@ -2412,9 +2274,7 @@ Public Class Form1
         Threading.Thread.Sleep(750)
         Functions.wait.createPleaseWaitWindow("Loading Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
-        startSystemRestorePointListLoadThread = New Threading.Thread(AddressOf startSystemRestorePointListLoadThreadSub)
-        startSystemRestorePointListLoadThread.Name = "Start System Restore Point List Load Thread Thread"
-        startSystemRestorePointListLoadThread.Start()
+        Threading.ThreadPool.QueueUserWorkItem(AddressOf startSystemRestorePointListLoadThreadSub)
 
         Functions.wait.openPleaseWaitWindow(Me)
     End Sub
@@ -2429,11 +2289,7 @@ Public Class Form1
         Try
             If globalVariables.boolLogLoadsAndExits = True Then Functions.eventLogFunctions.writeToSystemEventLog("The user " & Environment.UserName & " started the program.", EventLogEntryType.Information)
 
-            If IO.File.Exists("updater.exe") = True Then
-                Dim updaterDeleterThread As New Threading.Thread(AddressOf updaterDeleterThreadSub)
-                updaterDeleterThread.Name = "Legacy Updater File Deletion Thread"
-                updaterDeleterThread.Start()
-            End If
+            If IO.File.Exists("updater.exe") = True Then Threading.ThreadPool.QueueUserWorkItem(AddressOf updaterDeleterThreadSub)
 
             interfaceTooSmallSettingCheckFormLoadSubRoutine()
 
@@ -2473,11 +2329,7 @@ Public Class Form1
             loadRestorePointListColumnOrder()
             applySavedSorting()
 
-            If IO.File.Exists(Application.ExecutablePath & ".new.exe") = True Then
-                Dim newFileDeleterThread As New Threading.Thread(AddressOf newFileDeleterThreadSub)
-                newFileDeleterThread.Name = "New Application File Deletion Thread"
-                newFileDeleterThread.Start()
-            End If
+            If IO.File.Exists(Application.ExecutablePath & ".new.exe") = True Then Threading.ThreadPool.QueueUserWorkItem(AddressOf newFileDeleterThreadSub)
 
             If Functions.support.areWeInSafeMode() = True Then
                 toolStripScheduleRestorePoints.Enabled = False
@@ -2489,10 +2341,7 @@ Public Class Form1
             End If
 
             If My.Settings.checkSystemDrivesForFullShadowStorage = True Then
-                checkRestorePointSpaceThread = New Threading.Thread(AddressOf checkRestorePointSpaceThreadSub)
-                checkRestorePointSpaceThread.Name = "Restore Point Storage Status Checking Thread"
-                checkRestorePointSpaceThread.Priority = Threading.ThreadPriority.Lowest
-                checkRestorePointSpaceThread.Start()
+                Threading.ThreadPool.QueueUserWorkItem(AddressOf checkRestorePointSpaceThreadSub)
             End If
 
             chkShowVersionInTitleBarToolStripMenuItem.Checked = My.Settings.boolShowVersionInWindowTitle
@@ -2507,10 +2356,7 @@ Public Class Form1
                 End If
             End If
 
-            checkForAndEnableSystemRestoreIfNeeded = New Threading.Thread(AddressOf checkForAndEnableSystemRestoreIfNeededSub)
-            checkForAndEnableSystemRestoreIfNeeded.Name = "Check For and Enable System Restore if Needed Thread"
-            checkForAndEnableSystemRestoreIfNeeded.Start()
-            checkForAndEnableSystemRestoreIfNeededThreadKiller.Enabled = True
+            Threading.ThreadPool.QueueUserWorkItem(AddressOf checkForAndEnableSystemRestoreIfNeededSub)
 
             boolDoneLoading = True
             systemRestorePointsList.Select()
@@ -3026,10 +2872,7 @@ Public Class Form1
 
         If msgBoxResult = MsgBoxResult.Yes Then
             Functions.wait.createPleaseWaitWindow("Downloading Debug Build... Please Wait.", False, enums.howToCenterWindow.parent, True)
-
-            Dim downloadThread As New Threading.Thread(AddressOf switchToDebugBuildDownloadThreadSub)
-            downloadThread.Name = "Debug Build Download Thread"
-            downloadThread.Start()
+            Threading.ThreadPool.QueueUserWorkItem(AddressOf switchToDebugBuildDownloadThreadSub)
         End If
     End Sub
 
@@ -3305,10 +3148,7 @@ Public Class Form1
     End Sub
 
     Private Sub toolStripCheckForUpdates_Click(sender As Object, e As EventArgs) Handles toolStripCheckForUpdates.Click
-        userInitiatedCheckForUpdatesThread = New Threading.Thread(AddressOf userInitiatedCheckForUpdates)
-        userInitiatedCheckForUpdatesThread.Name = "User Initiated Check For Updates Thread"
-        userInitiatedCheckForUpdatesThread.Priority = Threading.ThreadPriority.Lowest
-        userInitiatedCheckForUpdatesThread.Start()
+        Threading.ThreadPool.QueueUserWorkItem(AddressOf userInitiatedCheckForUpdates)
         toolStripCheckForUpdates.Enabled = False
     End Sub
 
@@ -3400,10 +3240,7 @@ Public Class Form1
             Functions.wait.createPleaseWaitWindow("Deleting Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
             toolStripDeleteAllRestorePoints.Enabled = False
-            deleteAllRestorePointsThreadInstance = New Threading.Thread(AddressOf deleteAllRestorePointsThread)
-            deleteAllRestorePointsThreadInstance.Name = "Delete All Restore Points Thread"
-            deleteAllRestorePointsThreadInstance.Priority = Threading.ThreadPriority.Lowest
-            deleteAllRestorePointsThreadInstance.Start()
+            Threading.ThreadPool.QueueUserWorkItem(AddressOf deleteAllRestorePointsThread)
 
             Functions.wait.openPleaseWaitWindow()
         Else
@@ -3626,13 +3463,7 @@ Public Class Form1
         End If
 
         Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", False, enums.howToCenterWindow.parent, False)
-
-        Dim createSystemRestorePointThread As New Threading.Thread(Sub() unifiedCreateSystemRestorePoint(defaultCustomRestorePointName))
-        createSystemRestorePointThread.Name = "Create System Restore Point Thread"
-        createSystemRestorePointThread.Priority = Threading.ThreadPriority.Normal
-        createSystemRestorePointThread.Start()
-        createSystemRestorePointThread = Nothing
-
+        Threading.ThreadPool.QueueUserWorkItem(Sub() unifiedCreateSystemRestorePoint(defaultCustomRestorePointName))
         Functions.wait.openPleaseWaitWindow()
     End Sub
 
@@ -3658,13 +3489,7 @@ Public Class Form1
 
         If msgBoxResult = MsgBoxResult.Yes Then
             Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", False, enums.howToCenterWindow.parent, False)
-
-            Dim createSystemRestorePointThread As New Threading.Thread(Sub() unifiedCreateSystemRestorePoint(txtRestorePointDescription.Text))
-            createSystemRestorePointThread.Name = "Create System Restore Point Thread"
-            createSystemRestorePointThread.Priority = Threading.ThreadPriority.Normal
-            createSystemRestorePointThread.Start()
-            createSystemRestorePointThread = Nothing
-
+            Threading.ThreadPool.QueueUserWorkItem(Sub() unifiedCreateSystemRestorePoint(txtRestorePointDescription.Text))
             Functions.wait.openPleaseWaitWindow()
         End If
     End Sub
@@ -3683,13 +3508,7 @@ Public Class Form1
 
         If msgBoxResult = MsgBoxResult.Yes Then
             Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", False, enums.howToCenterWindow.parent, False)
-
-            Dim threadCreateSystemCheckpoint As New Threading.Thread(Sub() unifiedCreateSystemRestorePoint())
-            threadCreateSystemCheckpoint.Name = "Create System Checkpoint Thread"
-            threadCreateSystemCheckpoint.Priority = Threading.ThreadPriority.Normal
-            threadCreateSystemCheckpoint.Start()
-            threadCreateSystemCheckpoint = Nothing
-
+            Threading.ThreadPool.QueueUserWorkItem(Sub() unifiedCreateSystemRestorePoint())
             Functions.wait.openPleaseWaitWindow()
         End If
     End Sub
@@ -3713,12 +3532,7 @@ Public Class Form1
 
         If msgboxResult = MsgBoxResult.Yes Then
             Functions.wait.createPleaseWaitWindow("Beginning the Restore Process... Please Wait.", False, enums.howToCenterWindow.parent, False)
-
-            Dim thread As New Threading.Thread(AddressOf restoreSystemRestorePoint)
-            thread.Name = "Restore System Restore Point Thread"
-            thread.Priority = Threading.ThreadPriority.Normal
-            thread.Start()
-
+            Threading.ThreadPool.QueueUserWorkItem(AddressOf restoreSystemRestorePoint)
             Functions.wait.openPleaseWaitWindow()
         Else
             MsgBox("Your system has NOT been restored to the selected System Restore Point.", MsgBoxStyle.Information, strMessageBoxTitle)
@@ -3730,20 +3544,10 @@ Public Class Form1
     End Sub
 
     Private Sub btnRefreshRestorePoints_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnRefreshRestorePoints.Click
-        If btnRefreshRestorePoints.Text = "Refresh List of System Restore Points" Then
+        If btnRefreshRestorePoints.Text.stringCompare("Refresh List of System Restore Points") Then
             Functions.wait.createPleaseWaitWindow("Loading Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
-
-            updateRestorePointListThread = New Threading.Thread(AddressOf loadRestorePointsFromSystemIntoList)
-            updateRestorePointListThread.Name = "System Restore Point List Updating Thread"
-            updateRestorePointListThread.Priority = Threading.ThreadPriority.Normal
-            updateRestorePointListThread.Start()
-
+            Threading.ThreadPool.QueueUserWorkItem(AddressOf loadRestorePointsFromSystemIntoList)
             Functions.wait.openPleaseWaitWindow()
-        Else
-            If updateRestorePointListThread IsNot Nothing Then
-                updateRestorePointListThread.Abort()
-                btnRefreshRestorePoints.Text = "Refresh List of System Restore Points"
-            End If
         End If
     End Sub
 
@@ -3754,12 +3558,7 @@ Public Class Form1
         End If
 
         Functions.wait.createPleaseWaitWindow("Deleting Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
-
-        deleteThread = New Threading.Thread(AddressOf deleteSystemRestorePoint)
-        deleteThread.Name = "System Restore Point Deletion Thread"
-        deleteThread.Priority = Threading.ThreadPriority.Normal
-        deleteThread.Start()
-
+        Threading.ThreadPool.QueueUserWorkItem(AddressOf deleteSystemRestorePoint)
         Functions.wait.openPleaseWaitWindow()
     End Sub
 #End Region

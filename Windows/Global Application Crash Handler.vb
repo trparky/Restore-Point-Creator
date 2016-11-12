@@ -271,9 +271,7 @@ Public Class frmCrash
             Functions.wait.createPleaseWaitWindow("Compressing and Sending Data... Please Wait.", False, enums.howToCenterWindow.parent, False)
         End If
 
-        Dim submitThread As New Threading.Thread(AddressOf dataSubmitThread)
-        submitThread.Name = "Crash Data Submission Thread"
-        submitThread.Start()
+        Threading.ThreadPool.QueueUserWorkItem(AddressOf dataSubmitThread)
 
         If boolDoWeHaveAttachmentsInLine = True Then
             Functions.wait.openPleaseWaitWindow(Me)

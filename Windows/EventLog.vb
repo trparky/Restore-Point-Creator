@@ -127,10 +127,7 @@ Public Class eventLogForm
         If e.KeyCode = Keys.F5 Then
             If eventLogLoadingThread Is Nothing Then
                 Functions.wait.createPleaseWaitWindow("Loading Event Log Data... Please Wait.", False, enums.howToCenterWindow.parent, False)
-
-                eventLogLoadingThread = New Threading.Thread(AddressOf loadEventLog)
-                eventLogLoadingThread.Start()
-
+                Threading.ThreadPool.QueueUserWorkItem(AddressOf loadEventLog)
                 Functions.wait.openPleaseWaitWindow()
             End If
         End If
@@ -276,10 +273,7 @@ Public Class eventLogForm
     Private Sub btnRefreshEvents_Click(sender As Object, e As EventArgs) Handles btnRefreshEvents.Click
         If eventLogLoadingThread Is Nothing Then
             Functions.wait.createPleaseWaitWindow("Loading Event Log Data... Please Wait.", False, enums.howToCenterWindow.parent, False)
-
-            eventLogLoadingThread = New Threading.Thread(AddressOf loadEventLog)
-            eventLogLoadingThread.Start()
-
+            Threading.ThreadPool.QueueUserWorkItem(AddressOf loadEventLog)
             Functions.wait.openPleaseWaitWindow()
         End If
     End Sub
@@ -333,10 +327,7 @@ Public Class eventLogForm
         boolDoneLoading = True
 
         Functions.wait.createPleaseWaitWindow("Loading Event Log Data... Please Wait.", False, enums.howToCenterWindow.parent, False)
-
-        eventLogLoadingThread = New Threading.Thread(AddressOf loadEventLog)
-        eventLogLoadingThread.Start()
-
+        Threading.ThreadPool.QueueUserWorkItem(AddressOf loadEventLog)
         Functions.wait.openPleaseWaitWindow()
     End Sub
 

@@ -168,9 +168,7 @@ Public Class frmManageSystemRestoreStorageSpace
                 Exit Sub
             End If
 
-            Dim dataSavingThread As New Threading.Thread(Sub() setSize(dblSize))
-            dataSavingThread.Name = "Data Saving Thread"
-            dataSavingThread.Start()
+            Threading.ThreadPool.QueueUserWorkItem(Sub() setSize(dblSize))
         Else
             MsgBox("Invalid numerical input.", MsgBoxStyle.Critical, Me.Text)
         End If

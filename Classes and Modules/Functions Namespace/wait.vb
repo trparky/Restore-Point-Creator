@@ -51,10 +51,7 @@
                 globalVariables.windows.frmPleaseWait.howToCenter = howToCenter
                 globalVariables.windows.frmPleaseWait.ShowInTaskbar = boolShowOnTaskbar
 
-                If openDialogInNewThread = True Then
-                    globalVariables.pleaseWaitWindowThread = New Threading.Thread(AddressOf openPleaseWaitWindow)
-                    globalVariables.pleaseWaitWindowThread.Start()
-                End If
+                If openDialogInNewThread = True Then Threading.ThreadPool.QueueUserWorkItem(Sub() openPleaseWaitWindow())
             Catch ex As Exception
             End Try
         End Sub
