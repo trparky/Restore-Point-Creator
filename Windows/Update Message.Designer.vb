@@ -212,7 +212,6 @@ Partial Class Update_Message
         Me.lblTopUpdateMessage.Size = New System.Drawing.Size(388, 13)
         Me.lblTopUpdateMessage.TabIndex = 9
         Me.lblTopUpdateMessage.Text = "There is an updated Release Candidate version of System Restore Point Creator."
-        Me.lblTopUpdateMessage.Visible = False
         '
         'Update_Message
         '
