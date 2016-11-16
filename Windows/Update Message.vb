@@ -110,16 +110,15 @@
         End If
 
         If versionUpdate = versionUpdateType.standardVersionUpdate Then
-            lblStandardUpdateNotice.Visible = True
+            lblTopUpdateMessage.Text = "There is an updated version of System Restore Point Creator."
         ElseIf versionUpdate = versionUpdateType.totallyNewVersionUpdate Then
-            lblTotallyNewVersion.Visible = True
-            lblTotallyNewVersion.Text = String.Format(lblTotallyNewVersion.Text, globalVariables.version.versionStringWithoutBuild, newVersionString)
+            lblTopUpdateMessage.Text = String.Format("Restore Point Creator version {0} is no longer supported and has been replaced by version {1}. Completely new versions are more important than{2}simple new builds of an existing version.", globalVariables.version.versionStringWithoutBuild, newVersionString, vbCrLf)
         ElseIf versionUpdate = versionUpdateType.betaVersionUpdate Then
-            lblBetaNotice.Visible = True
+            lblTopUpdateMessage.Text = "There is an updated Public Beta version of System Restore Point Creator."
         ElseIf versionUpdate = versionUpdateType.releaseCandidateVersionUpdate Then
-            lblReleaseCandidateNotice.Visible = True
+            lblTopUpdateMessage.Text = "There is an updated Release Candidate version of System Restore Point Creator."
         ElseIf versionUpdate = versionUpdateType.minorUpdate Then
-            lblMinorUpdateNotice.Visible = True
+            lblTopUpdateMessage.Text = String.Format("There is an update available but it's classified as a minor update. It's not a required update so if you do not want to update the program at this time,{0}it is OK to keep using the version you have.", vbCrLf)
         End If
 
         If globalVariables.version.boolBeta = True Then

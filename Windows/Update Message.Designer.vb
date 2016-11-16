@@ -23,7 +23,6 @@ Partial Class Update_Message
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
-        Me.lblMinorUpdateNotice = New System.Windows.Forms.Label()
         Me.txtChanges = New System.Windows.Forms.TextBox()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
@@ -34,31 +33,16 @@ Partial Class Update_Message
         Me.lblCountdown = New System.Windows.Forms.Label()
         Me.btnReloadChangeLog = New System.Windows.Forms.Button()
         Me.lblChangesAsFollows = New System.Windows.Forms.Label()
-        Me.lblReleaseCandidateNotice = New System.Windows.Forms.Label()
-        Me.lblBetaNotice = New System.Windows.Forms.Label()
-        Me.lblStandardUpdateNotice = New System.Windows.Forms.Label()
-        Me.lblTotallyNewVersion = New System.Windows.Forms.Label()
         Me.lblCurrentVersion = New System.Windows.Forms.Label()
         Me.chkShowPartialBetaChangeLogs = New System.Windows.Forms.CheckBox()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.imgSSL = New System.Windows.Forms.PictureBox()
         Me.timerCountdown = New System.Windows.Forms.Timer(Me.components)
+        Me.lblTopUpdateMessage = New System.Windows.Forms.Label()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TableLayoutPanel1.SuspendLayout()
         CType(Me.imgSSL, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
-        '
-        'lblMinorUpdateNotice
-        '
-        Me.lblMinorUpdateNotice.AutoSize = True
-        Me.lblMinorUpdateNotice.Location = New System.Drawing.Point(47, 10)
-        Me.lblMinorUpdateNotice.Name = "lblMinorUpdateNotice"
-        Me.lblMinorUpdateNotice.Size = New System.Drawing.Size(694, 26)
-        Me.lblMinorUpdateNotice.TabIndex = 0
-        Me.lblMinorUpdateNotice.Text = "There is an update available but it's classified as a minor update. It's not a re" &
-    "quired update so if you do not want to update the program at this time," & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "it is O" &
-    "K to keep using the version you have."
-        Me.lblMinorUpdateNotice.Visible = False
         '
         'txtChanges
         '
@@ -184,48 +168,6 @@ Partial Class Update_Message
         Me.lblChangesAsFollows.TabIndex = 7
         Me.lblChangesAsFollows.Text = "The changes are as follows..."
         '
-        'lblReleaseCandidateNotice
-        '
-        Me.lblReleaseCandidateNotice.AutoSize = True
-        Me.lblReleaseCandidateNotice.Location = New System.Drawing.Point(47, 10)
-        Me.lblReleaseCandidateNotice.Name = "lblReleaseCandidateNotice"
-        Me.lblReleaseCandidateNotice.Size = New System.Drawing.Size(388, 13)
-        Me.lblReleaseCandidateNotice.TabIndex = 9
-        Me.lblReleaseCandidateNotice.Text = "There is an updated Release Candidate version of System Restore Point Creator."
-        Me.lblReleaseCandidateNotice.Visible = False
-        '
-        'lblBetaNotice
-        '
-        Me.lblBetaNotice.AutoSize = True
-        Me.lblBetaNotice.Location = New System.Drawing.Point(47, 10)
-        Me.lblBetaNotice.Name = "lblBetaNotice"
-        Me.lblBetaNotice.Size = New System.Drawing.Size(352, 13)
-        Me.lblBetaNotice.TabIndex = 10
-        Me.lblBetaNotice.Text = "There is an updated Public Beta version of System Restore Point Creator."
-        Me.lblBetaNotice.Visible = False
-        '
-        'lblStandardUpdateNotice
-        '
-        Me.lblStandardUpdateNotice.AutoSize = True
-        Me.lblStandardUpdateNotice.Location = New System.Drawing.Point(47, 10)
-        Me.lblStandardUpdateNotice.Name = "lblStandardUpdateNotice"
-        Me.lblStandardUpdateNotice.Size = New System.Drawing.Size(295, 13)
-        Me.lblStandardUpdateNotice.TabIndex = 11
-        Me.lblStandardUpdateNotice.Text = "There is an updated version of System Restore Point Creator."
-        Me.lblStandardUpdateNotice.Visible = False
-        '
-        'lblTotallyNewVersion
-        '
-        Me.lblTotallyNewVersion.AutoSize = True
-        Me.lblTotallyNewVersion.Location = New System.Drawing.Point(47, 10)
-        Me.lblTotallyNewVersion.Name = "lblTotallyNewVersion"
-        Me.lblTotallyNewVersion.Size = New System.Drawing.Size(685, 26)
-        Me.lblTotallyNewVersion.TabIndex = 12
-        Me.lblTotallyNewVersion.Text = "Restore Point Creator version {0} is no longer supported and has been replaced by" &
-    " version {1}. Completely new versions are more important than" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "simple new builds" &
-    " of an existing version."
-        Me.lblTotallyNewVersion.Visible = False
-        '
         'lblCurrentVersion
         '
         Me.lblCurrentVersion.AutoSize = True
@@ -262,6 +204,16 @@ Partial Class Update_Message
         '
         Me.timerCountdown.Interval = 1000
         '
+        'lblTopUpdateMessage
+        '
+        Me.lblTopUpdateMessage.AutoSize = True
+        Me.lblTopUpdateMessage.Location = New System.Drawing.Point(47, 10)
+        Me.lblTopUpdateMessage.Name = "lblTopUpdateMessage"
+        Me.lblTopUpdateMessage.Size = New System.Drawing.Size(388, 13)
+        Me.lblTopUpdateMessage.TabIndex = 9
+        Me.lblTopUpdateMessage.Text = "There is an updated Release Candidate version of System Restore Point Creator."
+        Me.lblTopUpdateMessage.Visible = False
+        '
         'Update_Message
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -270,10 +222,7 @@ Partial Class Update_Message
         Me.Controls.Add(Me.imgSSL)
         Me.Controls.Add(Me.chkShowPartialBetaChangeLogs)
         Me.Controls.Add(Me.lblCurrentVersion)
-        Me.Controls.Add(Me.lblTotallyNewVersion)
-        Me.Controls.Add(Me.lblStandardUpdateNotice)
-        Me.Controls.Add(Me.lblBetaNotice)
-        Me.Controls.Add(Me.lblReleaseCandidateNotice)
+        Me.Controls.Add(Me.lblTopUpdateMessage)
         Me.Controls.Add(Me.lblChangesAsFollows)
         Me.Controls.Add(Me.btnReloadChangeLog)
         Me.Controls.Add(Me.TableLayoutPanel1)
@@ -281,7 +230,6 @@ Partial Class Update_Message
         Me.Controls.Add(Me.PictureBox1)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.txtChanges)
-        Me.Controls.Add(Me.lblMinorUpdateNotice)
         Me.KeyPreview = True
         Me.MaximizeBox = False
         Me.MinimizeBox = False
@@ -296,8 +244,6 @@ Partial Class Update_Message
         Me.PerformLayout()
 
     End Sub
-
-    Friend WithEvents lblMinorUpdateNotice As Label
     Friend WithEvents txtChanges As TextBox
     Friend WithEvents Label2 As Label
     Friend WithEvents PictureBox1 As PictureBox
@@ -307,14 +253,11 @@ Partial Class Update_Message
     Friend WithEvents btnYes As Button
     Friend WithEvents btnReloadChangeLog As Button
     Friend WithEvents lblChangesAsFollows As Label
-    Friend WithEvents lblReleaseCandidateNotice As Label
-    Friend WithEvents lblBetaNotice As Label
-    Friend WithEvents lblStandardUpdateNotice As Label
-    Friend WithEvents lblTotallyNewVersion As Label
     Friend WithEvents lblCurrentVersion As Label
     Friend WithEvents chkShowPartialBetaChangeLogs As CheckBox
     Friend WithEvents ToolTip1 As ToolTip
     Friend WithEvents imgSSL As PictureBox
     Friend WithEvents timerCountdown As Timer
     Friend WithEvents lblCountdown As Label
+    Friend WithEvents lblTopUpdateMessage As Label
 End Class
