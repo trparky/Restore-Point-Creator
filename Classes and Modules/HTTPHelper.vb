@@ -176,7 +176,7 @@ End Class
 
 ''' <summary>Allows you to easily POST and upload files to a remote HTTP server without you, the programmer, knowing anything about how it all works. This class does it all for you. It handles adding a User Agent String, additional HTTP Request Headers, string data to your HTTP POST data, and files to be uploaded in the HTTP POST data.</summary>
 Public Class httpHelper
-    Private Const classVersion As String = "1.200"
+    Private Const classVersion As String = "1.205"
 
     Private strUserAgentString As String = Nothing
     Private boolUseProxy As Boolean = False
@@ -196,8 +196,8 @@ Public Class httpHelper
 
     Private sslCertificate As X509Certificates.X509Certificate2
     Private urlPreProcessor As Func(Of String, String)
-    Private customErrorHandler As Func(Of Exception, httpHelper, String)
-    Private downloadStatusUpdater As Func(Of downloadStatusDetails, Boolean)
+    Private customErrorHandler As [Delegate]
+    Private downloadStatusUpdater As [Delegate]
 
     ''' <summary>Retrieves the downloadStatusDetails data from within the Class instance.</summary>
     ''' <returns>A downloadStatusDetails Object.</returns>
@@ -216,7 +216,7 @@ Public Class httpHelper
     ''' OR A C# Example...
     ''' httpHelper.setCustomErrorHandler((Exception ex, httpHelper classInstance) => { }
     ''' </example>
-    Public WriteOnly Property setCustomErrorHandler As Func(Of Exception, httpHelper, String)
+    Public WriteOnly Property setCustomErrorHandler As [Delegate]
         Set
             customErrorHandler = Value
         End Set
@@ -239,7 +239,7 @@ Public Class httpHelper
     ''' OR A C# Example...
     ''' httpHelper.setDownloadStatusUpdateRoutine((downloadStatusDetails downloadStatusDetails) => { })
     ''' </example>
-    Public WriteOnly Property setDownloadStatusUpdateRoutine As Func(Of downloadStatusDetails, Boolean)
+    Public WriteOnly Property setDownloadStatusUpdateRoutine As [Delegate]
         Set
             downloadStatusUpdater = Value
         End Set
@@ -712,7 +712,7 @@ Public Class httpHelper
                 downloadStatusDetails = New downloadStatusDetails With {.remoteFileSize = remoteFileSize, .percentageDownloaded = httpDownloadProgressPercentage, .localFileSize = memStream.Length}
 
                 If downloadStatusUpdater IsNot Nothing Then
-                    downloadStatusUpdater(downloadStatusDetails)
+                    downloadStatusUpdater.DynamicInvoke(downloadStatusDetails)
                 End If
 
                 count = responseStream.Read(dataBuffer, 0, dataBuffer.Length) ' Reads more data into our data buffer.
@@ -744,7 +744,7 @@ Public Class httpHelper
             If throwExceptionIfError = False Then Return False
 
             If customErrorHandler IsNot Nothing Then
-                customErrorHandler(ex, Me)
+                customErrorHandler.DynamicInvoke(ex, Me)
                 ' Since we handled the exception with an injected custom error handler, we can now exit the function with the return of a False value.
                 Return False
             End If
@@ -851,7 +851,7 @@ Public Class httpHelper
                 downloadStatusDetails = New downloadStatusDetails With {.remoteFileSize = remoteFileSize, .percentageDownloaded = httpDownloadProgressPercentage, .localFileSize = fileWriteStream.Length}
 
                 If downloadStatusUpdater IsNot Nothing Then
-                    downloadStatusUpdater(downloadStatusDetails)
+                    downloadStatusUpdater.DynamicInvoke(downloadStatusDetails)
                 End If
 
                 count = responseStream.Read(dataBuffer, 0, dataBuffer.Length) ' Reads more data into our data buffer.
@@ -880,7 +880,7 @@ Public Class httpHelper
             If throwExceptionIfError = False Then Return False
 
             If customErrorHandler IsNot Nothing Then
-                customErrorHandler(ex, Me)
+                customErrorHandler.DynamicInvoke(ex, Me)
                 ' Since we handled the exception with an injected custom error handler, we can now exit the function with the return of a False value.
                 Return False
             End If
@@ -991,7 +991,7 @@ Public Class httpHelper
             If throwExceptionIfError = False Then Return False
 
             If customErrorHandler IsNot Nothing Then
-                customErrorHandler(ex, Me)
+                customErrorHandler.DynamicInvoke(ex, Me)
                 ' Since we handled the exception with an injected custom error handler, we can now exit the function with the return of a False value.
                 Return False
             End If
@@ -1147,7 +1147,7 @@ Public Class httpHelper
             If throwExceptionIfError = False Then Return False
 
             If customErrorHandler IsNot Nothing Then
-                customErrorHandler(ex, Me)
+                customErrorHandler.DynamicInvoke(ex, Me)
                 ' Since we handled the exception with an injected custom error handler, we can now exit the function with the return of a False value.
                 Return False
             End If

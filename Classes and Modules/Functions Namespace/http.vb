@@ -93,10 +93,9 @@
                                                 End Try
                                             End Function
 
-            httpHelper.setCustomErrorHandler = Function(ex As Exception, classInstance As httpHelper) As Boolean
+            httpHelper.setCustomErrorHandler = Sub(ex As Exception, classInstance As httpHelper)
                                                    customHTTPHelperErrorHandler(ex, classInstance)
-                                                   Return True
-                                               End Function
+                                               End Sub
 
             Return httpHelper
         End Function
