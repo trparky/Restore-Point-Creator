@@ -209,5 +209,8 @@
     <Setting Name="httpTimeout" Type="System.Int16" Scope="User">
       <Value Profile="(Default)">30</Value>
     </Setting>
+    <Setting Name="savedRestorePointFromCommandLine" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>
