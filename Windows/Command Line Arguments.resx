@@ -118,7 +118,9 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Label1.Text" xml:space="preserve">
-    <value>System Restore Point Creator has several command line arguments to facilitate actions from the command line. They are as follows...
+    <value>Please note, these commands are recommended to be ran from an elevate command prompt window.
+
+System Restore Point Creator has several command line arguments to facilitate actions from the command line. They are as follows...
 
 "-createrestorepoint" This creates a system restore point with the default name.
 

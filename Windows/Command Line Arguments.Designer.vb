@@ -33,13 +33,13 @@ Partial Class Restore_Point_Creator_Command_Line_Arguments
         Me.Label1.AutoSize = True
         Me.Label1.Location = New System.Drawing.Point(12, 9)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(628, 143)
+        Me.Label1.Size = New System.Drawing.Size(628, 169)
         Me.Label1.TabIndex = 0
         Me.Label1.Text = resources.GetString("Label1.Text")
         '
         'btnCopyToClipboard
         '
-        Me.btnCopyToClipboard.Location = New System.Drawing.Point(374, 164)
+        Me.btnCopyToClipboard.Location = New System.Drawing.Point(374, 181)
         Me.btnCopyToClipboard.Name = "btnCopyToClipboard"
         Me.btnCopyToClipboard.Size = New System.Drawing.Size(175, 23)
         Me.btnCopyToClipboard.TabIndex = 1
@@ -48,7 +48,7 @@ Partial Class Restore_Point_Creator_Command_Line_Arguments
         '
         'btnClose
         '
-        Me.btnClose.Location = New System.Drawing.Point(555, 164)
+        Me.btnClose.Location = New System.Drawing.Point(555, 181)
         Me.btnClose.Name = "btnClose"
         Me.btnClose.Size = New System.Drawing.Size(78, 23)
         Me.btnClose.TabIndex = 2
@@ -59,7 +59,7 @@ Partial Class Restore_Point_Creator_Command_Line_Arguments
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(645, 199)
+        Me.ClientSize = New System.Drawing.Size(645, 211)
         Me.Controls.Add(Me.btnClose)
         Me.Controls.Add(Me.btnCopyToClipboard)
         Me.Controls.Add(Me.Label1)
