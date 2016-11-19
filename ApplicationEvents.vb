@@ -86,7 +86,7 @@ Namespace My
             End If
 
             ' This code is for running parts of the program that don't necessarily need Admin privs.
-            If My.Application.CommandLineArgs.Count = 1 Then
+            If My.Application.CommandLineArgs.Count >= 1 Then
                 commandLineArgument = My.Application.CommandLineArgs(0).Trim
 
                 If commandLineArgument.stringCompare("-viewchangelog") Then
@@ -99,6 +99,15 @@ Namespace My
                     eventLogForm.ShowDialog()
                     e.Cancel = True
                     Exit Sub
+                ElseIf commandLineArgument.stringCompare("-createrestorepoint") Then
+                    If My.Application.CommandLineArgs.Count = 2 Then
+                        If My.Application.CommandLineArgs(1).Trim.StartsWith("-name", StringComparison.OrdinalIgnoreCase) Then
+                            My.Settings.savedRestorePointFromCommandLine = My.Application.CommandLineArgs(1).Trim.caseInsensitiveReplace("-name=", "")
+                            My.Settings.Save()
+                        End If
+                    End If
+
+                    Functions.taskStuff.runProgramUsingTaskWrapper()
                 End If
             End If
 
@@ -232,6 +241,12 @@ Namespace My
                                 If My.Application.CommandLineArgs(1).Trim.StartsWith("-name=", StringComparison.OrdinalIgnoreCase) Then
                                     strRestorePointName = Regex.Replace(My.Application.CommandLineArgs(1).Trim, "-name=", "", RegexOptions.IgnoreCase)
                                 End If
+                            End If
+
+                            If String.IsNullOrEmpty(My.Settings.savedRestorePointFromCommandLine) = False Then
+                                strRestorePointName = My.Settings.savedRestorePointFromCommandLine
+                                My.Settings.savedRestorePointFromCommandLine = Nothing
+                                My.Settings.Save()
                             End If
 
                             Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", True, enums.howToCenterWindow.screen, True)

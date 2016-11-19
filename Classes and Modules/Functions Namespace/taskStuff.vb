@@ -418,7 +418,7 @@ Namespace Functions.taskStuff
                             Dim task As TaskScheduler.Task = Nothing ' Creates a task object.
 
                             ' Checks to see if the user is running one of the application shortcuts for this program.
-                            If My.Application.CommandLineArgs.Count = 1 Then
+                            If My.Application.CommandLineArgs.Count >= 1 Then
                                 ' Yes, one of the application shortcuts for this program was used.  Let's find out which one, shall we.
 
                                 ' Stores the contents of the command line argument for later use in this code.
