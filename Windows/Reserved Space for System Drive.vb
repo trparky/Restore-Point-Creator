@@ -114,6 +114,7 @@
     End Sub
 
     Private Sub Reserved_Space_for_System_Drive_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.BringToFront()
         Label1.Text = String.Format(Label1.Text, globalVariables.systemDriveLetter)
     End Sub
 End Class

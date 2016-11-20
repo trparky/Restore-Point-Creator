@@ -105,6 +105,7 @@ Partial Class Reserved_Space_for_System_Drive
         Me.MinimizeBox = False
         Me.Name = "Reserved_Space_for_System_Drive"
         Me.Text = "Reserved System Restore Space for System Drive"
+        Me.TopMost = True
         Me.TableLayoutPanel1.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
