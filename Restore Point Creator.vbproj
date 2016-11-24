@@ -153,12 +153,6 @@
     <Compile Include="Windows\Configure HTTP Timeout.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\Confirm Restore Point Deletion.Designer.vb">
-      <DependentUpon>Confirm Restore Point Deletion.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Windows\Confirm Restore Point Deletion.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Windows\Reserved Space for System Drive.Designer.vb">
       <DependentUpon>Reserved Space for System Drive.vb</DependentUpon>
     </Compile>
@@ -334,9 +328,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Configure HTTP Timeout.resx">
       <DependentUpon>Configure HTTP Timeout.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Windows\Confirm Restore Point Deletion.resx">
-      <DependentUpon>Confirm Restore Point Deletion.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Create Restore Point at User Logon.resx">
       <DependentUpon>Create Restore Point at User Logon.vb</DependentUpon>

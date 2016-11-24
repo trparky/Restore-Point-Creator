@@ -1855,7 +1855,9 @@ Public Class Form1
             ' Now we declare some variables.
             'Dim systemRestore As New SystemRestorePointCreator.Classes.SystemRestore ' Creates an instance of the SystemRestore class.
             Dim dateData As Date
-            Dim deletionConfirmationWindow As frmConfirmDelete
+            Dim strRestorePointName, strRestorePointCreationDate As String
+            Dim confirmRestorePointDeletionMsgBoxText As StringBuilder
+            Dim msgBoxResult As MsgBoxResult
             Dim boolUserWantsToDeleteTheRestorePoint As Boolean
             Dim shortNumberOfRestorePointsDeleted As Short = 0
             Dim intNumberOfRestorePoints As Integer = Functions.wmi.getNumberOfRestorePoints()
@@ -1904,24 +1906,37 @@ Public Class Form1
                     If toolStripConfirmDeletions.Checked Then
                         If globalVariables.windows.frmPleaseWait IsNot Nothing Then
                             globalVariables.windows.frmPleaseWait.TopMost = False
-                            Functions.wait.enableFocusingOnPleaseWaitWindow()
+                            Functions.wait.disableFocusingOnPleaseWaitWindow()
                         End If
 
-                        ' Yep, so ask the user.
-                        deletionConfirmationWindow = New frmConfirmDelete
-                        deletionConfirmationWindow.lblCreatedOn.Text &= " " & item.SubItems(enums.restorePointListSubItems.restorePointDate).Text
-                        deletionConfirmationWindow.lblRestorePointName.Text &= " " & item.SubItems(enums.restorePointListSubItems.restorePointName).Text
-                        deletionConfirmationWindow.StartPosition = FormStartPosition.CenterParent
-                        deletionConfirmationWindow.ShowDialog(Me)
+                        strRestorePointName = item.SubItems(enums.restorePointListSubItems.restorePointName).Text
+                        strRestorePointCreationDate = item.SubItems(enums.restorePointListSubItems.restorePointDate).Text
 
-                        If deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.yes Then
+                        confirmRestorePointDeletionMsgBoxText = New StringBuilder
+                        confirmRestorePointDeletionMsgBoxText.AppendLine("Are you sure you want to delete this restore point?")
+                        confirmRestorePointDeletionMsgBoxText.AppendLine()
+                        confirmRestorePointDeletionMsgBoxText.AppendLine(strRestorePointName)
+                        confirmRestorePointDeletionMsgBoxText.AppendLine("Created On: " & strRestorePointCreationDate)
+                        confirmRestorePointDeletionMsgBoxText.AppendLine()
+                        confirmRestorePointDeletionMsgBoxText.AppendLine("Yes or No? Pressing Cancel will abort deleting all selected restore points.")
+
+                        ' Yep, so ask the user.
+                        msgBoxResult = MsgBox(confirmRestorePointDeletionMsgBoxText.ToString.Trim, MsgBoxStyle.Question + MsgBoxStyle.YesNoCancel, "Confirm Restore Point Deletion")
+
+                        confirmRestorePointDeletionMsgBoxText = Nothing
+                        strRestorePointName = Nothing
+                        strRestorePointCreationDate = Nothing
+
+                        If msgBoxResult = MsgBoxResult.Yes Then
                             boolUserWantsToDeleteTheRestorePoint = True
+                        ElseIf msgBoxResult = MsgBoxResult.Cancel Then
+                            msgBoxResult = Nothing
+                            Exit For
                         Else
                             boolUserWantsToDeleteTheRestorePoint = False
                         End If
 
-                        deletionConfirmationWindow.Dispose()
-                        deletionConfirmationWindow = Nothing
+                        msgBoxResult = Nothing
 
                         If globalVariables.windows.frmPleaseWait IsNot Nothing Then
                             globalVariables.windows.frmPleaseWait.TopMost = True
