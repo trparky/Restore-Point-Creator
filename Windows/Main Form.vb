@@ -1850,7 +1850,7 @@ Public Class Form1
         End Try
     End Sub
 
-    Private Sub deleteSystemRestorePoint()
+    Private Sub deleteSystemRestorePoint(parentForm As Form1)
         Try
             ' Now we declare some variables.
             'Dim systemRestore As New SystemRestorePointCreator.Classes.SystemRestore ' Creates an instance of the SystemRestore class.
@@ -1904,7 +1904,7 @@ Public Class Form1
                     If toolStripConfirmDeletions.Checked Then
                         If globalVariables.windows.frmPleaseWait IsNot Nothing Then
                             globalVariables.windows.frmPleaseWait.TopMost = False
-                            Functions.wait.enableFocusingOnPleaseWaitWindow()
+                            Functions.wait.disableFocusingOnPleaseWaitWindow()
                         End If
 
                         ' Yep, so ask the user.
@@ -1912,7 +1912,7 @@ Public Class Form1
                         deletionConfirmationWindow.lblCreatedOn.Text &= " " & item.SubItems(enums.restorePointListSubItems.restorePointDate).Text
                         deletionConfirmationWindow.lblRestorePointName.Text &= " " & item.SubItems(enums.restorePointListSubItems.restorePointName).Text
                         deletionConfirmationWindow.StartPosition = FormStartPosition.CenterParent
-                        deletionConfirmationWindow.ShowDialog(Me)
+                        deletionConfirmationWindow.ShowDialog(parentForm)
 
                         If deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.yes Then
                             boolUserWantsToDeleteTheRestorePoint = True
@@ -3558,7 +3558,7 @@ Public Class Form1
         End If
 
         Functions.wait.createPleaseWaitWindow("Deleting Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
-        Threading.ThreadPool.QueueUserWorkItem(AddressOf deleteSystemRestorePoint)
+        Threading.ThreadPool.QueueUserWorkItem(Sub() deleteSystemRestorePoint(Me))
         Functions.wait.openPleaseWaitWindow()
     End Sub
 #End Region
