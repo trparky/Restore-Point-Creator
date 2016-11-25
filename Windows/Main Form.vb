@@ -3494,6 +3494,7 @@ Public Class Form1
                     boolConfirmDeletions = False
                     boolUserWantsToDeleteTheRestorePoint = True
                 ElseIf deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.cancel Then
+                    systemRestorePointsList.Enabled = True
                     giveFeedbackToUser("Deletion of selected restore points canceled.")
                     Exit Sub
                 Else
