@@ -1878,7 +1878,7 @@ Public Class Form1
         Try
             Dim intRestorePointID As Integer
             Dim restorePointCreationDate As Date
-            Dim intNumberOfRestorePoints As Integer = Functions.wmi.getNumberOfRestorePoints()
+            Dim intOldNumberOfRestorePoints As Integer = Functions.wmi.getNumberOfRestorePoints()
             Dim boolMultiMode As Boolean = False
 
             If restorePointsToBeDeleted.Count > 1 Then boolMultiMode = True
@@ -1895,11 +1895,12 @@ Public Class Form1
                         End If
                     End If
 
+                    intOldNumberOfRestorePoints -= 1
                     Functions.support.SRRemoveRestorePoint(intRestorePointID) ' Deletes the Restore Point.
                 End If
             Next
 
-            While intNumberOfRestorePoints <> Functions.wmi.getNumberOfRestorePoints()
+            While intOldNumberOfRestorePoints <> Functions.wmi.getNumberOfRestorePoints()
                 Threading.Thread.Sleep(500)
             End While
 
