@@ -3461,6 +3461,7 @@ Public Class Form1
         Dim deletionConfirmationWindow As frmConfirmDelete
         Dim restorePointIDsToBeDeleted As New Dictionary(Of String, String)
         Dim strRestorePointName, strRestorePointDate, strRestorePointID As String
+        Dim boolConfirmDeletions As Boolean = toolStripConfirmDeletions.Checked
 
         For Each item As ListViewItem In systemRestorePointsList.SelectedItems
             If AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked = False Then
@@ -3480,7 +3481,7 @@ Public Class Form1
             strRestorePointDate = item.SubItems(enums.restorePointListSubItems.restorePointDate).Text.Trim
             strRestorePointID = item.SubItems(enums.restorePointListSubItems.restorePointID).Text.Trim
 
-            If toolStripConfirmDeletions.Checked Then
+            If boolConfirmDeletions Then
                 deletionConfirmationWindow = New frmConfirmDelete
                 deletionConfirmationWindow.lblCreatedOn.Text &= " " & item.SubItems(enums.restorePointListSubItems.restorePointDate).Text
                 deletionConfirmationWindow.lblRestorePointName.Text &= " " & item.SubItems(enums.restorePointListSubItems.restorePointName).Text
@@ -3488,6 +3489,9 @@ Public Class Form1
                 deletionConfirmationWindow.ShowDialog(ParentForm)
 
                 If deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.yes Then
+                    boolUserWantsToDeleteTheRestorePoint = True
+                ElseIf deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.yesAndDontAskAgain Then
+                    boolConfirmDeletions = False
                     boolUserWantsToDeleteTheRestorePoint = True
                 ElseIf deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.cancel Then
                     giveFeedbackToUser("Deletion of selected restore points canceled.")
