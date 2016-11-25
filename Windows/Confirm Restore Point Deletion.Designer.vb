@@ -28,6 +28,7 @@ Partial Class frmConfirmDelete
         Me.lblRestorePointName = New System.Windows.Forms.Label()
         Me.lblCreatedOn = New System.Windows.Forms.Label()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
+        Me.btnCancelDeletion = New System.Windows.Forms.Button()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -88,11 +89,22 @@ Partial Class frmConfirmDelete
         Me.PictureBox1.TabIndex = 8
         Me.PictureBox1.TabStop = False
         '
+        'btnCancelDeletion
+        '
+        Me.btnCancelDeletion.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnCancelDeletion.Location = New System.Drawing.Point(53, 99)
+        Me.btnCancelDeletion.Name = "btnCancelDeletion"
+        Me.btnCancelDeletion.Size = New System.Drawing.Size(235, 23)
+        Me.btnCancelDeletion.TabIndex = 9
+        Me.btnCancelDeletion.Text = "&Cancel Deletion of Selected Restore Points"
+        Me.btnCancelDeletion.UseVisualStyleBackColor = True
+        '
         'frmConfirmDelete
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(456, 131)
+        Me.Controls.Add(Me.btnCancelDeletion)
         Me.Controls.Add(Me.PictureBox1)
         Me.Controls.Add(Me.lblCreatedOn)
         Me.Controls.Add(Me.lblRestorePointName)
@@ -117,4 +129,5 @@ Partial Class frmConfirmDelete
     Friend WithEvents lblRestorePointName As Label
     Friend WithEvents lblCreatedOn As Label
     Friend WithEvents PictureBox1 As PictureBox
+    Friend WithEvents btnCancelDeletion As Button
 End Class

@@ -1850,172 +1850,67 @@ Public Class Form1
         End Try
     End Sub
 
-    Private Sub deleteSystemRestorePoint(parentForm As Form1)
-        Try
-            ' Now we declare some variables.
-            'Dim systemRestore As New SystemRestorePointCreator.Classes.SystemRestore ' Creates an instance of the SystemRestore class.
-            Dim dateData As Date
-            Dim deletionConfirmationWindow As frmConfirmDelete
-            Dim boolUserWantsToDeleteTheRestorePoint As Boolean
-            Dim shortNumberOfRestorePointsDeleted As Short = 0
-            Dim intNumberOfRestorePoints As Integer = Functions.wmi.getNumberOfRestorePoints()
+    Sub afterDeleteSelectedRestorePoints(restorePointsToBeDeleted As Dictionary(Of String, String))
+        Functions.wait.closePleaseWaitWindow()
 
-            systemRestorePointsList.Enabled = False
-            btnCreateSystemCheckpoint.Enabled = False
-            txtRestorePointDescription.Enabled = False
-            btnCreate.Enabled = False
-            toolStripAutomaticallyCheckForUpdates.Enabled = False
-            toolStripConfirmDeletions.Enabled = False
-            toolStripCloseAfterRestorePointIsCreated.Enabled = False
-            btnRefreshRestorePoints.Enabled = False
-            btnDeleteRestorePoint.Enabled = False
+        Dim strItemInList As String
+        Dim boolMultiMode As Boolean = False
 
-            stripRestore.Enabled = False
-            stripRestoreSafeMode.Enabled = False
-            btnRestoreToRestorePoint.Enabled = False
-            btnRestoreToRestorePointSafeMode.Enabled = False
+        If restorePointsToBeDeleted.Count > 1 Then boolMultiMode = True
 
-            toolStripAbout.Enabled = False
-            toolStripCheckForUpdates.Enabled = False
+        For Each itemInList As ListViewItem In systemRestorePointsList.Items
+            strItemInList = itemInList.SubItems(enums.restorePointListSubItems.restorePointID).Text.Trim
+            If restorePointsToBeDeleted.ContainsKey(strItemInList) Then systemRestorePointsList.Items.Remove(itemInList)
+        Next
 
-            Dim boolMultipleRestorePointsDeleted As Boolean = False
-            If systemRestorePointsList.SelectedItems.Count > 1 Then
-                boolMultipleRestorePointsDeleted = True
+        systemRestorePointsList.Enabled = True
+
+        If ShowMessageBoxAfterSuccessfulDeletionOfRestorePointsToolStripMenuItem.Checked Then
+            If boolMultiMode Then
+                giveFeedbackToUser(restorePointsToBeDeleted.Count & " System Restore Points were deleted.")
+            Else
+                giveFeedbackToUser("One System Restore Point was deleted.")
             End If
+        End If
+    End Sub
 
-            ' Get all System Restore Points from the Windows Management System and puts then in the systemRestorePoints variable.
-            Dim systemRestorePoints As New ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
-            Dim oldNumberOfRestorePoints As Integer = systemRestorePoints.Get().Count
+    Sub deleteSelectedRestorePoints(restorePointsToBeDeleted As Dictionary(Of String, String), boolEnableLogging As Boolean)
+        Try
+            Dim intRestorePointID As Integer
+            Dim restorePointCreationDate As Date
+            Dim intNumberOfRestorePoints As Integer = Functions.wmi.getNumberOfRestorePoints()
+            Dim boolMultiMode As Boolean = False
 
-            If systemRestorePointsList.SelectedItems.Count <> 0 Then
-                For Each item As ListViewItem In systemRestorePointsList.SelectedItems
-                    If AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked = False Then
-                        ' Checks to see if the user is trying to delete the newest System Restore Point based upon ID.
-                        If Integer.Parse(item.SubItems(enums.restorePointListSubItems.restorePointID).Text) = newestSystemRestoreID Then
-                            ' Yep, the user is trying to do that.  Stupid user, now we give that stupid user a message to prevent his/her stupidity.
-                            MsgBox("You can't delete the most recent System Restore Point.  This is for your own protection.", MsgBoxStyle.Information, strMessageBoxTitle)
-                            Exit Sub
-                        End If
-                    End If
+            If restorePointsToBeDeleted.Count > 1 Then boolMultiMode = True
 
-                    boolUserWantsToDeleteTheRestorePoint = False
+            For Each restorePointInfo As KeyValuePair(Of String, String) In restorePointsToBeDeleted
+                If Integer.TryParse(restorePointInfo.Key, intRestorePointID) Then
+                    If boolEnableLogging Then
+                        If restorePointDateData.ContainsKey(restorePointInfo.Key) Then
+                            If String.IsNullOrEmpty(restorePointDateData(restorePointInfo.Key)) = False Then
+                                restorePointCreationDate = Functions.support.parseSystemRestorePointCreationDate(restorePointDateData(restorePointInfo.Key))
 
-                    ' Checks to see if the user wants to confirm deletions.
-                    If toolStripConfirmDeletions.Checked Then
-                        If globalVariables.windows.frmPleaseWait IsNot Nothing Then
-                            globalVariables.windows.frmPleaseWait.TopMost = False
-                            Functions.wait.disableFocusingOnPleaseWaitWindow()
-                        End If
-
-                        ' Yep, so ask the user.
-                        deletionConfirmationWindow = New frmConfirmDelete
-                        deletionConfirmationWindow.lblCreatedOn.Text &= " " & item.SubItems(enums.restorePointListSubItems.restorePointDate).Text
-                        deletionConfirmationWindow.lblRestorePointName.Text &= " " & item.SubItems(enums.restorePointListSubItems.restorePointName).Text
-                        deletionConfirmationWindow.StartPosition = FormStartPosition.CenterParent
-                        deletionConfirmationWindow.ShowDialog(parentForm)
-
-                        If deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.yes Then
-                            boolUserWantsToDeleteTheRestorePoint = True
-                        Else
-                            boolUserWantsToDeleteTheRestorePoint = False
-                        End If
-
-                        deletionConfirmationWindow.Dispose()
-                        deletionConfirmationWindow = Nothing
-
-                        If globalVariables.windows.frmPleaseWait IsNot Nothing Then
-                            globalVariables.windows.frmPleaseWait.TopMost = True
-                            Functions.wait.enableFocusingOnPleaseWaitWindow()
-                        End If
-                    Else
-                        ' No, so we give the variable a value of Yes without asking the user.
-                        boolUserWantsToDeleteTheRestorePoint = True
-                    End If
-
-                    If boolUserWantsToDeleteTheRestorePoint = True Then
-                        shortNumberOfRestorePointsDeleted += 1
-
-                        If toolStripLogRestorePointDeletions.Checked Then
-                            If String.IsNullOrEmpty(restorePointDateData(item.SubItems(0).Text).Trim) = False And toolStripLogRestorePointDeletions.Checked Then
-                                dateData = Functions.support.parseSystemRestorePointCreationDate(restorePointDateData(item.SubItems(0).Text))
-                                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", item.SubItems(1).Text, dateData.ToShortDateString, dateData.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
-                                dateData = Nothing
+                                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", restorePointInfo.Value, restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
                             End If
                         End If
-
-                        intNumberOfRestorePoints -= 1
-                        Functions.support.SRRemoveRestorePoint(Integer.Parse(item.SubItems(0).Text)) ' Deletes the Restore Point.
-
-                        While intNumberOfRestorePoints <> Functions.wmi.getNumberOfRestorePoints()
-                            Threading.Thread.Sleep(500)
-                        End While
-
-                        systemRestorePointsList.Items.Remove(item)
-                    End If
-                Next
-            End If
-
-            Functions.wait.closePleaseWaitWindow()
-
-            If ShowMessageBoxAfterSuccessfulDeletionOfRestorePointsToolStripMenuItem.Checked = True Then
-                If shortNumberOfRestorePointsDeleted = 0 Then
-                    If globalVariables.windows.frmPleaseWait IsNot Nothing Then globalVariables.windows.frmPleaseWait.TopMost = False
-                    giveFeedbackToUser("No System Restore Points were deleted.")
-                    If globalVariables.windows.frmPleaseWait IsNot Nothing Then globalVariables.windows.frmPleaseWait.TopMost = True
-                ElseIf shortNumberOfRestorePointsDeleted > 0 Then
-                    If globalVariables.windows.frmPleaseWait IsNot Nothing Then globalVariables.windows.frmPleaseWait.TopMost = False
-
-                    ' Gives some feedback.
-                    If boolMultipleRestorePointsDeleted = True Then
-                        giveFeedbackToUser(shortNumberOfRestorePointsDeleted.ToString & " System Restore Points were deleted.")
-                    Else
-                        giveFeedbackToUser("One System Restore Point was deleted.")
                     End If
 
-                    If globalVariables.windows.frmPleaseWait IsNot Nothing Then globalVariables.windows.frmPleaseWait.TopMost = True
+                    Functions.support.SRRemoveRestorePoint(intRestorePointID) ' Deletes the Restore Point.
                 End If
-            End If
-        Catch ex As Threading.ThreadAbortException
-            MsgBox("System Restore Point Deletion Process Aborted.", MsgBoxStyle.Information, strMessageBoxTitle)
-        Catch ex3 As ArgumentOutOfRangeException
-            Functions.eventLogFunctions.writeCrashToEventLog(ex3)
-        Catch ex2 As Exception
+            Next
+
+            While intNumberOfRestorePoints <> Functions.wmi.getNumberOfRestorePoints()
+                Threading.Thread.Sleep(500)
+            End While
+
+            Invoke(Sub() afterDeleteSelectedRestorePoints(restorePointsToBeDeleted))
+        Catch ex1 As Threading.ThreadAbortException
+            Invoke(Sub() MsgBox("System Restore Point Deletion Process Aborted.", MsgBoxStyle.Information, strMessageBoxTitle))
+        Catch ex2 As ArgumentOutOfRangeException
+            Functions.eventLogFunctions.writeCrashToEventLog(ex2)
+        Catch ex3 As Exception
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
-            exceptionHandler.manuallyLoadCrashWindow(ex2, ex2.Message, ex2.StackTrace, ex2.GetType)
-        Finally
-            systemRestorePointsList.Enabled = True
-
-            If Functions.support.areWeInSafeMode() = False Then
-                btnCreateSystemCheckpoint.Enabled = True
-                btnCreate.Enabled = True
-                txtRestorePointDescription.Enabled = True
-            End If
-
-            toolStripAutomaticallyCheckForUpdates.Enabled = True
-            toolStripConfirmDeletions.Enabled = True
-            toolStripCloseAfterRestorePointIsCreated.Enabled = True
-            btnRefreshRestorePoints.Enabled = True
-            btnDeleteRestorePoint.Enabled = True
-
-            If Functions.support.areWeInSafeMode = False Then
-                stripRestoreSafeMode.Enabled = True
-                btnRestoreToRestorePointSafeMode.Enabled = True
-            End If
-
-            btnRestoreToRestorePoint.Enabled = True
-            stripRestore.Enabled = True
-
-            btnRestoreToRestorePointSafeMode.Enabled = True
-            stripRestoreSafeMode.Enabled = True
-
-            toolStripAbout.Enabled = True
-            toolStripCheckForUpdates.Enabled = True
-
-            loadRestorePointsFromSystemIntoList() ' Calls our central sub-routine to update the List of System Restore Points list on the GUI.
-
-            Functions.wait.closePleaseWaitWindow()
-
-            Threading.Thread.Sleep(4000)
+            exceptionHandler.manuallyLoadCrashWindow(ex3, ex3.Message, ex3.StackTrace, ex3.GetType)
         End Try
     End Sub
 
@@ -3557,9 +3452,70 @@ Public Class Form1
             Exit Sub
         End If
 
-        Functions.wait.createPleaseWaitWindow("Deleting Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
-        Threading.ThreadPool.QueueUserWorkItem(Sub() deleteSystemRestorePoint(Me))
-        Functions.wait.openPleaseWaitWindow()
+        systemRestorePointsList.Enabled = False
+
+        Dim boolMultipleRestorePointsDeleted As Boolean = False
+        If systemRestorePointsList.SelectedItems.Count > 1 Then boolMultipleRestorePointsDeleted = True
+
+        Dim boolUserWantsToDeleteTheRestorePoint As Boolean
+        Dim deletionConfirmationWindow As frmConfirmDelete
+        Dim restorePointIDsToBeDeleted As New Dictionary(Of String, String)
+        Dim strRestorePointName, strRestorePointDate, strRestorePointID As String
+
+        For Each item As ListViewItem In systemRestorePointsList.SelectedItems
+            If AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked = False Then
+                ' Checks to see if the user is trying to delete the newest System Restore Point based upon ID.
+                If Integer.Parse(item.SubItems(enums.restorePointListSubItems.restorePointID).Text) = newestSystemRestoreID Then
+                    systemRestorePointsList.Enabled = True
+
+                    ' Yep, the user is trying to do that.  Stupid user, now we give that stupid user a message to prevent his/her stupidity.
+                    MsgBox("You can't delete the most recent System Restore Point.  This is for your own protection.", MsgBoxStyle.Information, strMessageBoxTitle)
+                    Exit Sub
+                End If
+            End If
+
+            boolUserWantsToDeleteTheRestorePoint = False
+
+            strRestorePointName = item.SubItems(enums.restorePointListSubItems.restorePointName).Text.Trim
+            strRestorePointDate = item.SubItems(enums.restorePointListSubItems.restorePointDate).Text.Trim
+            strRestorePointID = item.SubItems(enums.restorePointListSubItems.restorePointID).Text.Trim
+
+            If toolStripConfirmDeletions.Checked Then
+                deletionConfirmationWindow = New frmConfirmDelete
+                deletionConfirmationWindow.lblCreatedOn.Text &= " " & item.SubItems(enums.restorePointListSubItems.restorePointDate).Text
+                deletionConfirmationWindow.lblRestorePointName.Text &= " " & item.SubItems(enums.restorePointListSubItems.restorePointName).Text
+                deletionConfirmationWindow.StartPosition = FormStartPosition.CenterParent
+                deletionConfirmationWindow.ShowDialog(ParentForm)
+
+                If deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.yes Then
+                    boolUserWantsToDeleteTheRestorePoint = True
+                ElseIf deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.cancel Then
+                    giveFeedbackToUser("Deletion of selected restore points canceled.")
+                    Exit Sub
+                Else
+                    boolUserWantsToDeleteTheRestorePoint = False
+                End If
+
+                deletionConfirmationWindow.Dispose()
+                deletionConfirmationWindow = Nothing
+            Else
+                boolUserWantsToDeleteTheRestorePoint = True
+            End If
+
+            If boolUserWantsToDeleteTheRestorePoint Then restorePointIDsToBeDeleted.Add(strRestorePointID, strRestorePointName)
+
+            strRestorePointName = Nothing
+            strRestorePointDate = Nothing
+            strRestorePointID = Nothing
+        Next
+
+        If restorePointIDsToBeDeleted.Count > 0 Then
+            Functions.wait.createPleaseWaitWindow("Deleting Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
+            Threading.ThreadPool.QueueUserWorkItem(Sub() deleteSelectedRestorePoints(restorePointIDsToBeDeleted, toolStripLogRestorePointDeletions.Checked))
+            Functions.wait.openPleaseWaitWindow()
+        Else
+            giveFeedbackToUser("No System Restore Points were deleted.")
+        End If
     End Sub
 #End Region
 

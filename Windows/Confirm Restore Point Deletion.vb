@@ -2,6 +2,7 @@
     Public Enum userResponseENum
         yes
         no
+        cancel
     End Enum
 
     Public userResponse As userResponseENum
@@ -34,5 +35,11 @@
 
     Private Sub frmConfirmDelete_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         If boolUserResponded = False Then userResponse = userResponseENum.no
+    End Sub
+
+    Private Sub btnCancelDeletion_Click(sender As Object, e As EventArgs) Handles btnCancelDeletion.Click
+        boolUserResponded = True
+        userResponse = userResponseENum.cancel
+        Me.Close()
     End Sub
 End Class
