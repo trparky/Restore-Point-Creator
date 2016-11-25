@@ -3,6 +3,7 @@
         yes
         no
         cancel
+        yesAndDontAskAgain
     End Enum
 
     Public userResponse As userResponseENum
@@ -16,17 +17,19 @@
 
     Private Sub btnYes_Click(sender As Object, e As EventArgs) Handles btnYes.Click
         boolUserResponded = True
-        userResponse = userResponseENum.yes
+
+        If chkDontAskAgain.Checked Then
+            userResponse = userResponseENum.yesAndDontAskAgain
+        Else
+            userResponse = userResponseENum.yes
+        End If
+
         Me.Close()
     End Sub
 
     Private Sub frmConfirmDelete_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         PictureBox1.Image = SystemIcons.Question.ToBitmap()
-
-        'If (lblRestorePointName.Width + 10) > Me.Width Then
         Me.Size = New Size(lblRestorePointName.Width + 100, Me.Height)
-        'End If
-
         Me.BringToFront()
         Me.Focus()
 

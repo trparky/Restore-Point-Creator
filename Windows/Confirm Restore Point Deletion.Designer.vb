@@ -29,6 +29,7 @@ Partial Class frmConfirmDelete
         Me.lblCreatedOn = New System.Windows.Forms.Label()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.btnCancelDeletion = New System.Windows.Forms.Button()
+        Me.chkDontAskAgain = New System.Windows.Forms.CheckBox()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -99,11 +100,24 @@ Partial Class frmConfirmDelete
         Me.btnCancelDeletion.Text = "&Cancel Deletion of Selected Restore Points"
         Me.btnCancelDeletion.UseVisualStyleBackColor = True
         '
+        'chkDontAskAgain
+        '
+        Me.chkDontAskAgain.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.chkDontAskAgain.AutoSize = True
+        Me.chkDontAskAgain.Location = New System.Drawing.Point(55, 128)
+        Me.chkDontAskAgain.Name = "chkDontAskAgain"
+        Me.chkDontAskAgain.Size = New System.Drawing.Size(395, 30)
+        Me.chkDontAskAgain.TabIndex = 10
+        Me.chkDontAskAgain.Text = "&Don't ask me again during this selected restore point deletion session" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "(The pro" &
+    "gram will ask again if you select another set of restore points to delete)"
+        Me.chkDontAskAgain.UseVisualStyleBackColor = True
+        '
         'frmConfirmDelete
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(456, 131)
+        Me.ClientSize = New System.Drawing.Size(456, 161)
+        Me.Controls.Add(Me.chkDontAskAgain)
         Me.Controls.Add(Me.btnCancelDeletion)
         Me.Controls.Add(Me.PictureBox1)
         Me.Controls.Add(Me.lblCreatedOn)
@@ -130,4 +144,5 @@ Partial Class frmConfirmDelete
     Friend WithEvents lblCreatedOn As Label
     Friend WithEvents PictureBox1 As PictureBox
     Friend WithEvents btnCancelDeletion As Button
+    Friend WithEvents chkDontAskAgain As CheckBox
 End Class
