@@ -346,13 +346,13 @@ Public Class Disk_Space_Usage
 
         If GroupBox1.VerticalScroll.Visible = True Then
             For index = (GroupBox1.Controls.Count - 1) To 0 Step -1
-                If GroupBox1.Controls(index).GetType.ToString.Equals("Tom.SmoothProgressBar", StringComparison.OrdinalIgnoreCase) Then
+                If GroupBox1.Controls(index).GetType = GetType(SmoothProgressBar) Then
                     DirectCast(GroupBox1.Controls(index), SmoothProgressBar).Width = GroupBox1.Width - 48
                 End If
             Next index
         Else
             For index = (GroupBox1.Controls.Count - 1) To 0 Step -1
-                If GroupBox1.Controls(index).GetType.ToString.Equals("Tom.SmoothProgressBar", StringComparison.OrdinalIgnoreCase) Then
+                If GroupBox1.Controls(index).GetType = GetType(SmoothProgressBar) Then
                     DirectCast(GroupBox1.Controls(index), SmoothProgressBar).Width = GroupBox1.Width - 30
                 End If
             Next index
