@@ -890,6 +890,30 @@ Namespace My
                 Me("savedRestorePointFromCommandLine") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property multiConfirmRestorePointDeletions() As Boolean
+            Get
+                Return CType(Me("multiConfirmRestorePointDeletions"),Boolean)
+            End Get
+            Set
+                Me("multiConfirmRestorePointDeletions") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("0, 0")>  _
+        Public Property batchConfirmWindowSize() As Global.System.Drawing.Size
+            Get
+                Return CType(Me("batchConfirmWindowSize"),Global.System.Drawing.Size)
+            End Get
+            Set
+                Me("batchConfirmWindowSize") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

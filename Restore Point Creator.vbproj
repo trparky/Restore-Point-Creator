@@ -131,6 +131,7 @@
     <Compile Include="Classes and Modules\Functions Namespace\osVersionInfo.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\privilegeChecks.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\registryStuff.vb" />
+    <Compile Include="Classes and Modules\restorePointInfoClass.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\support.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\supportClasses.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\taskStuff.vb" />
@@ -157,6 +158,12 @@
       <DependentUpon>Confirm Restore Point Deletion.vb</DependentUpon>
     </Compile>
     <Compile Include="Windows\Confirm Restore Point Deletion.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\Confirm Restore Point Deletions Form.Designer.vb">
+      <DependentUpon>Confirm Restore Point Deletions Form.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Confirm Restore Point Deletions Form.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Windows\Reserved Space for System Drive.Designer.vb">
@@ -337,6 +344,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Confirm Restore Point Deletion.resx">
       <DependentUpon>Confirm Restore Point Deletion.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Confirm Restore Point Deletions Form.resx">
+      <DependentUpon>Confirm Restore Point Deletions Form.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Create Restore Point at User Logon.resx">
       <DependentUpon>Create Restore Point at User Logon.vb</DependentUpon>

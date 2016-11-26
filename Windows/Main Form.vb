@@ -322,6 +322,7 @@ Public Class Form1
 
             toolStripCloseAfterRestorePointIsCreated.Checked = My.Settings.closeAfterCreatingRestorePoint
             AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked = My.Settings.allowDeleteOfAllRestorePoints
+            ConfirmRestorePointDeletionsInBatchesToolStripMenuItem.Checked = My.Settings.multiConfirmRestorePointDeletions
 
             ' This code converts the old way of saving the user feedback type preference to the new way of saving the user feedback preference.
             If String.IsNullOrEmpty(My.Settings.notificationType) = False Then
@@ -1850,7 +1851,7 @@ Public Class Form1
         End Try
     End Sub
 
-    Sub afterDeleteSelectedRestorePoints(restorePointsToBeDeleted As Dictionary(Of String, String))
+    Sub afterDeleteSelectedRestorePoints(restorePointsToBeDeleted As Dictionary(Of String, restorePointInfo))
         Functions.wait.closePleaseWaitWindow()
 
         Dim strItemInList As String
@@ -1874,7 +1875,7 @@ Public Class Form1
         End If
     End Sub
 
-    Sub deleteSelectedRestorePoints(restorePointsToBeDeleted As Dictionary(Of String, String), boolEnableLogging As Boolean)
+    Sub deleteSelectedRestorePoints(restorePointsToBeDeleted As Dictionary(Of String, restorePointInfo), boolEnableLogging As Boolean)
         Try
             Dim intRestorePointID As Integer
             Dim restorePointCreationDate As Date
@@ -1883,14 +1884,14 @@ Public Class Form1
 
             If restorePointsToBeDeleted.Count > 1 Then boolMultiMode = True
 
-            For Each restorePointInfo As KeyValuePair(Of String, String) In restorePointsToBeDeleted
+            For Each restorePointInfo As KeyValuePair(Of String, restorePointInfo) In restorePointsToBeDeleted
                 If Integer.TryParse(restorePointInfo.Key, intRestorePointID) Then
                     If boolEnableLogging Then
                         If restorePointDateData.ContainsKey(restorePointInfo.Key) Then
                             If String.IsNullOrEmpty(restorePointDateData(restorePointInfo.Key)) = False Then
                                 restorePointCreationDate = Functions.support.parseSystemRestorePointCreationDate(restorePointDateData(restorePointInfo.Key))
 
-                                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", restorePointInfo.Value, restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
+                                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", restorePointInfo.Value.strName, restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
                             End If
                         End If
                     End If
@@ -1995,6 +1996,10 @@ Public Class Form1
     Private Sub txtRestorePointDescription_Click(sender As Object, e As EventArgs) Handles txtRestorePointDescription.Click
         txtRestorePointDescription.ForeColor = Color.Black
         txtRestorePointDescription.Text = ""
+    End Sub
+
+    Private Sub ConfirmRestorePointDeletionsInBatchesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConfirmRestorePointDeletionsInBatchesToolStripMenuItem.Click
+        My.Settings.multiConfirmRestorePointDeletions = ConfirmRestorePointDeletionsInBatchesToolStripMenuItem.Checked
     End Sub
 
     Private Sub chkShowVersionInTitleBarToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles chkShowVersionInTitleBarToolStripMenuItem.Click
@@ -3460,7 +3465,7 @@ Public Class Form1
 
         Dim boolUserWantsToDeleteTheRestorePoint As Boolean
         Dim deletionConfirmationWindow As frmConfirmDelete
-        Dim restorePointIDsToBeDeleted As New Dictionary(Of String, String)
+        Dim restorePointIDsToBeDeleted As New Dictionary(Of String, restorePointInfo)
         Dim strRestorePointName, strRestorePointDate, strRestorePointID As String
         Dim boolConfirmDeletions As Boolean = toolStripConfirmDeletions.Checked
 
@@ -3482,7 +3487,9 @@ Public Class Form1
             strRestorePointDate = item.SubItems(enums.restorePointListSubItems.restorePointDate).Text.Trim
             strRestorePointID = item.SubItems(enums.restorePointListSubItems.restorePointID).Text.Trim
 
-            If boolConfirmDeletions Then
+            If boolConfirmDeletions And My.Settings.multiConfirmRestorePointDeletions And systemRestorePointsList.SelectedItems.Count > 1 Then
+                restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate})
+            ElseIf boolConfirmDeletions And (Not My.Settings.multiConfirmRestorePointDeletions Or systemRestorePointsList.SelectedItems.Count = 1) Then
                 deletionConfirmationWindow = New frmConfirmDelete
                 deletionConfirmationWindow.lblCreatedOn.Text &= " " & item.SubItems(enums.restorePointListSubItems.restorePointDate).Text
                 deletionConfirmationWindow.lblRestorePointName.Text &= " " & item.SubItems(enums.restorePointListSubItems.restorePointName).Text
@@ -3504,22 +3511,41 @@ Public Class Form1
 
                 deletionConfirmationWindow.Dispose()
                 deletionConfirmationWindow = Nothing
-            Else
-                boolUserWantsToDeleteTheRestorePoint = True
-            End If
 
-            If boolUserWantsToDeleteTheRestorePoint Then restorePointIDsToBeDeleted.Add(strRestorePointID, strRestorePointName)
+                If boolUserWantsToDeleteTheRestorePoint Then restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate})
+            Else
+                restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate})
+            End If
 
             strRestorePointName = Nothing
             strRestorePointDate = Nothing
             strRestorePointID = Nothing
         Next
 
+        If boolConfirmDeletions And My.Settings.multiConfirmRestorePointDeletions And systemRestorePointsList.SelectedItems.Count > 1 Then
+            Dim batchConfirmWindow As New Confirm_Restore_Point_Deletions_Form
+            batchConfirmWindow.restorePointIDsToBeDeleted = restorePointIDsToBeDeleted
+            batchConfirmWindow.StartPosition = FormStartPosition.CenterParent
+            batchConfirmWindow.ShowDialog(Me)
+
+            If batchConfirmWindow.userResponse = Confirm_Restore_Point_Deletions_Form.userResponseENum.cancel Then
+                systemRestorePointsList.Enabled = True
+                giveFeedbackToUser("Deletion of selected restore points canceled.")
+                Exit Sub
+            End If
+
+            restorePointIDsToBeDeleted = batchConfirmWindow.restorePointIDsToBeDeleted
+
+            batchConfirmWindow.Dispose()
+            batchConfirmWindow = Nothing
+        End If
+
         If restorePointIDsToBeDeleted.Count > 0 Then
             Functions.wait.createPleaseWaitWindow("Deleting Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
             Threading.ThreadPool.QueueUserWorkItem(Sub() deleteSelectedRestorePoints(restorePointIDsToBeDeleted, toolStripLogRestorePointDeletions.Checked))
             Functions.wait.openPleaseWaitWindow()
         Else
+            systemRestorePointsList.Enabled = True
             giveFeedbackToUser("No System Restore Points were deleted.")
         End If
     End Sub
