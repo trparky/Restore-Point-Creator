@@ -8,15 +8,12 @@
     Public userResponse As userResponseENum = userResponseENum.cancel
 
     Sub scanCheckBoxesForUncheckedBoxes()
-        Dim checkBoxObject As CheckBox
         Dim numberOfCheckboxes As Short = restorePointGroup.Controls.Count
         Dim numberOfUncheckedCheckboxes As Short = 0
 
         For index = (restorePointGroup.Controls.Count - 1) To 0 Step -1
             If restorePointGroup.Controls(index).GetType = GetType(CheckBox) Then
-                checkBoxObject = DirectCast(restorePointGroup.Controls(index), CheckBox)
-
-                If Not checkBoxObject.Checked Then numberOfUncheckedCheckboxes += 1
+                If Not DirectCast(restorePointGroup.Controls(index), CheckBox).Checked Then numberOfUncheckedCheckboxes += 1
             End If
         Next index
 
