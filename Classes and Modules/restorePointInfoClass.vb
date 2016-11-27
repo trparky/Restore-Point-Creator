@@ -1,3 +1,3 @@
 ﻿Public Class restorePointInfo
-    Public strCreatedDate As String, strName As String
+    Public strCreatedDate, strName, strRestorePointType As String
 End Class

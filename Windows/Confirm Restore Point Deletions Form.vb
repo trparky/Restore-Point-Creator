@@ -11,11 +11,11 @@
         Dim numberOfCheckboxes As Short = restorePointGroup.Controls.Count
         Dim numberOfUncheckedCheckboxes As Short = 0
 
-        For index = (restorePointGroup.Controls.Count - 1) To 0 Step -1
-            If restorePointGroup.Controls(index).GetType = GetType(myCheckbox) Then
-                If Not DirectCast(restorePointGroup.Controls(index), myCheckbox).Checked Then numberOfUncheckedCheckboxes += 1
+        For Each control As Control In restorePointGroup.Controls
+            If control.GetType = GetType(myCheckbox) Then
+                If Not DirectCast(control, myCheckbox).Checked Then numberOfUncheckedCheckboxes += 1
             End If
-        Next index
+        Next
 
         If numberOfUncheckedCheckboxes = numberOfCheckboxes Then
             btnConfirm.Enabled = False
@@ -30,7 +30,11 @@
         chkBox.restorePointID = restorePointInfo.Key
         chkBox.Name = "confirm_delete_" & restorePointInfo.Key
         chkBox.Location = New Point(xPosition, yPosition)
-        chkBox.Text = restorePointInfo.Value.strName & " (ID: " & restorePointInfo.Key & ")" & vbCrLf & "Created On: " & restorePointInfo.Value.strCreatedDate
+
+        chkBox.Text = restorePointInfo.Value.strName & String.Format(" (ID: {0})", restorePointInfo.Key)
+        chkBox.Text &= vbCrLf & String.Format("Created On: {0}", restorePointInfo.Value.strCreatedDate)
+        chkBox.Text &= vbCrLf & String.Format("Type: {0}", restorePointInfo.Value.strRestorePointType)
+
         chkBox.AutoSize = True
         chkBox.Checked = True
 
@@ -42,12 +46,12 @@
     End Sub
 
     Private Sub Confirm_Restore_Point_Deletions_Form_Shown(sender As Object, e As EventArgs) Handles Me.Shown
-        Dim yPosition As Integer = 10
-        Dim xPosition As Integer = 12
+        Dim yPosition As Integer = 5
+        Dim xPosition As Integer = 5
 
         For Each item As KeyValuePair(Of String, restorePointInfo) In restorePointIDsToBeDeleted
             createCheckbox(item, xPosition, yPosition)
-            yPosition += 40
+            yPosition += 50
         Next
     End Sub
 
@@ -60,6 +64,7 @@
     End Sub
 
     Private Sub Confirm_Restore_Point_Deletions_Form_Load(sender As Object, e As EventArgs) Handles Me.Load
+        Media.SystemSounds.Beep.Play()
         Me.Size = My.Settings.batchConfirmWindowSize
     End Sub
 
@@ -69,18 +74,17 @@
 
     Private Sub btnConfirm_Click(sender As Object, e As EventArgs) Handles btnConfirm.Click
         userResponse = userResponseENum.yes
-        Dim checkBoxObject As myCheckbox, strCheckBoxID As String
+        Dim checkBoxObject As myCheckbox
 
-        For index = (restorePointGroup.Controls.Count - 1) To 0 Step -1
-            If restorePointGroup.Controls(index).GetType = GetType(myCheckbox) Then
-                checkBoxObject = DirectCast(restorePointGroup.Controls(index), myCheckbox)
+        For Each control As Control In restorePointGroup.Controls
+            If control.GetType = GetType(myCheckbox) Then
+                checkBoxObject = DirectCast(control, myCheckbox)
 
                 If Not checkBoxObject.Checked Then
-                    strCheckBoxID = checkBoxObject.restorePointID
-                    If restorePointIDsToBeDeleted.Keys.Contains(strCheckBoxID) Then restorePointIDsToBeDeleted.Remove(strCheckBoxID)
+                    If restorePointIDsToBeDeleted.Keys.Contains(checkBoxObject.restorePointID) Then restorePointIDsToBeDeleted.Remove(checkBoxObject.restorePointID)
                 End If
             End If
-        Next index
+        Next
 
         Me.Close()
     End Sub
