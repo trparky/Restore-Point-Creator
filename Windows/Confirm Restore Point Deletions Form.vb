@@ -12,8 +12,8 @@
         Dim numberOfUncheckedCheckboxes As Short = 0
 
         For index = (restorePointGroup.Controls.Count - 1) To 0 Step -1
-            If restorePointGroup.Controls(index).GetType = GetType(CheckBox) Then
-                If Not DirectCast(restorePointGroup.Controls(index), CheckBox).Checked Then numberOfUncheckedCheckboxes += 1
+            If restorePointGroup.Controls(index).GetType = GetType(myCheckbox) Then
+                If Not DirectCast(restorePointGroup.Controls(index), myCheckbox).Checked Then numberOfUncheckedCheckboxes += 1
             End If
         Next index
 
@@ -26,7 +26,8 @@
     End Sub
 
     Sub createCheckbox(restorePointInfo As KeyValuePair(Of String, restorePointInfo), xPosition As Integer, yPosition As Integer)
-        Dim chkBox As New CheckBox
+        Dim chkBox As New myCheckbox
+        chkBox.restorePointID = restorePointInfo.Key
         chkBox.Name = "confirm_delete_" & restorePointInfo.Key
         chkBox.Location = New Point(xPosition, yPosition)
         chkBox.Text = restorePointInfo.Value.strName & " (ID: " & restorePointInfo.Key & ")" & vbCrLf & "Created On: " & restorePointInfo.Value.strCreatedDate
@@ -68,14 +69,14 @@
 
     Private Sub btnConfirm_Click(sender As Object, e As EventArgs) Handles btnConfirm.Click
         userResponse = userResponseENum.yes
-        Dim checkBoxObject As CheckBox, strCheckBoxID As String
+        Dim checkBoxObject As myCheckbox, strCheckBoxID As String
 
         For index = (restorePointGroup.Controls.Count - 1) To 0 Step -1
-            If restorePointGroup.Controls(index).GetType = GetType(CheckBox) Then
-                checkBoxObject = DirectCast(restorePointGroup.Controls(index), CheckBox)
+            If restorePointGroup.Controls(index).GetType = GetType(myCheckbox) Then
+                checkBoxObject = DirectCast(restorePointGroup.Controls(index), myCheckbox)
 
                 If Not checkBoxObject.Checked Then
-                    strCheckBoxID = checkBoxObject.Name.Replace("confirm_delete_", "").Trim
+                    strCheckBoxID = checkBoxObject.restorePointID
                     If restorePointIDsToBeDeleted.Keys.Contains(strCheckBoxID) Then restorePointIDsToBeDeleted.Remove(strCheckBoxID)
                 End If
             End If
@@ -83,4 +84,19 @@
 
         Me.Close()
     End Sub
+End Class
+
+' This class extends the checkbox so that I can add more properties to it for my purposes.
+Class myCheckbox
+    Inherits CheckBox
+    Private strRestorePointID As String
+
+    Public Property restorePointID() As String
+        Get
+            Return strRestorePointID
+        End Get
+        Set(value As String)
+            strRestorePointID = value
+        End Set
+    End Property
 End Class
