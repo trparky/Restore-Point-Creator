@@ -30,13 +30,14 @@ Partial Class frmConfirmDelete
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.btnCancelDeletion = New System.Windows.Forms.Button()
         Me.chkDontAskAgain = New System.Windows.Forms.CheckBox()
+        Me.lblType = New System.Windows.Forms.Label()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'btnYes
         '
         Me.btnYes.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnYes.Location = New System.Drawing.Point(294, 99)
+        Me.btnYes.Location = New System.Drawing.Point(292, 114)
         Me.btnYes.Name = "btnYes"
         Me.btnYes.Size = New System.Drawing.Size(75, 23)
         Me.btnYes.TabIndex = 0
@@ -46,7 +47,7 @@ Partial Class frmConfirmDelete
         'btnNo
         '
         Me.btnNo.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnNo.Location = New System.Drawing.Point(375, 99)
+        Me.btnNo.Location = New System.Drawing.Point(373, 114)
         Me.btnNo.Name = "btnNo"
         Me.btnNo.Size = New System.Drawing.Size(75, 23)
         Me.btnNo.TabIndex = 1
@@ -93,7 +94,7 @@ Partial Class frmConfirmDelete
         'btnCancelDeletion
         '
         Me.btnCancelDeletion.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnCancelDeletion.Location = New System.Drawing.Point(53, 99)
+        Me.btnCancelDeletion.Location = New System.Drawing.Point(51, 114)
         Me.btnCancelDeletion.Name = "btnCancelDeletion"
         Me.btnCancelDeletion.Size = New System.Drawing.Size(235, 23)
         Me.btnCancelDeletion.TabIndex = 9
@@ -104,7 +105,7 @@ Partial Class frmConfirmDelete
         '
         Me.chkDontAskAgain.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.chkDontAskAgain.AutoSize = True
-        Me.chkDontAskAgain.Location = New System.Drawing.Point(55, 128)
+        Me.chkDontAskAgain.Location = New System.Drawing.Point(53, 143)
         Me.chkDontAskAgain.Name = "chkDontAskAgain"
         Me.chkDontAskAgain.Size = New System.Drawing.Size(395, 30)
         Me.chkDontAskAgain.TabIndex = 10
@@ -112,11 +113,22 @@ Partial Class frmConfirmDelete
     "gram will ask again if you select another set of restore points to delete)"
         Me.chkDontAskAgain.UseVisualStyleBackColor = True
         '
+        'lblType
+        '
+        Me.lblType.AutoSize = True
+        Me.lblType.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblType.Location = New System.Drawing.Point(50, 94)
+        Me.lblType.Name = "lblType"
+        Me.lblType.Size = New System.Drawing.Size(34, 13)
+        Me.lblType.TabIndex = 11
+        Me.lblType.Text = "Type:"
+        '
         'frmConfirmDelete
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(456, 161)
+        Me.ClientSize = New System.Drawing.Size(456, 177)
+        Me.Controls.Add(Me.lblType)
         Me.Controls.Add(Me.chkDontAskAgain)
         Me.Controls.Add(Me.btnCancelDeletion)
         Me.Controls.Add(Me.PictureBox1)
@@ -145,4 +157,5 @@ Partial Class frmConfirmDelete
     Friend WithEvents PictureBox1 As PictureBox
     Friend WithEvents btnCancelDeletion As Button
     Friend WithEvents chkDontAskAgain As CheckBox
+    Friend WithEvents lblType As Label
 End Class

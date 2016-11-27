@@ -3466,7 +3466,7 @@ Public Class Form1
         Dim boolUserWantsToDeleteTheRestorePoint As Boolean
         Dim deletionConfirmationWindow As frmConfirmDelete
         Dim restorePointIDsToBeDeleted As New Dictionary(Of String, restorePointInfo)
-        Dim strRestorePointName, strRestorePointDate, strRestorePointID As String
+        Dim strRestorePointName, strRestorePointDate, strRestorePointID, strRestorePointType As String
         Dim boolConfirmDeletions As Boolean = toolStripConfirmDeletions.Checked
 
         For Each item As ListViewItem In systemRestorePointsList.SelectedItems
@@ -3486,13 +3486,17 @@ Public Class Form1
             strRestorePointName = item.SubItems(enums.restorePointListSubItems.restorePointName).Text.Trim
             strRestorePointDate = item.SubItems(enums.restorePointListSubItems.restorePointDate).Text.Trim
             strRestorePointID = item.SubItems(enums.restorePointListSubItems.restorePointID).Text.Trim
+            strRestorePointType = item.SubItems(enums.restorePointListSubItems.restorePointType).Text.Trim
 
             If boolConfirmDeletions And My.Settings.multiConfirmRestorePointDeletions And systemRestorePointsList.SelectedItems.Count > 1 Then
-                restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate})
+                restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType})
             ElseIf boolConfirmDeletions And (Not My.Settings.multiConfirmRestorePointDeletions Or systemRestorePointsList.SelectedItems.Count = 1) Then
                 deletionConfirmationWindow = New frmConfirmDelete
+
                 deletionConfirmationWindow.lblCreatedOn.Text &= " " & item.SubItems(enums.restorePointListSubItems.restorePointDate).Text
                 deletionConfirmationWindow.lblRestorePointName.Text &= " " & item.SubItems(enums.restorePointListSubItems.restorePointName).Text
+                deletionConfirmationWindow.lblType.Text &= " " & item.SubItems(enums.restorePointListSubItems.restorePointType).Text
+
                 deletionConfirmationWindow.StartPosition = FormStartPosition.CenterParent
                 deletionConfirmationWindow.ShowDialog(ParentForm)
 
@@ -3512,9 +3516,9 @@ Public Class Form1
                 deletionConfirmationWindow.Dispose()
                 deletionConfirmationWindow = Nothing
 
-                If boolUserWantsToDeleteTheRestorePoint Then restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate})
+                If boolUserWantsToDeleteTheRestorePoint Then restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType})
             Else
-                restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate})
+                restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType})
             End If
 
             strRestorePointName = Nothing

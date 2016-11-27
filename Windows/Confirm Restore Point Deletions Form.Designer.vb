@@ -44,6 +44,7 @@ Partial Class Confirm_Restore_Point_Deletions_Form
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.restorePointGroup.AutoScroll = True
+        Me.restorePointGroup.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.restorePointGroup.Location = New System.Drawing.Point(15, 38)
         Me.restorePointGroup.Name = "restorePointGroup"
         Me.restorePointGroup.Size = New System.Drawing.Size(696, 161)
