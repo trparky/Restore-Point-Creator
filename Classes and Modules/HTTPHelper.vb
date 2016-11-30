@@ -135,6 +135,21 @@ Public Class sslErrorException
     End Sub
 End Class
 
+Public Class credentialsAlreadySet
+    Inherits Exception
+
+    Public Sub New()
+    End Sub
+
+    Public Sub New(message As String)
+        MyBase.New(message)
+    End Sub
+
+    Public Sub New(message As String, inner As Exception)
+        MyBase.New(message, inner)
+    End Sub
+End Class
+
 Public Class httpProtocolException
     Inherits Exception
 
@@ -174,9 +189,13 @@ Public Class downloadStatusDetails
     Public remoteFileSize As Long, localFileSize As Long, percentageDownloaded As Short
 End Class
 
+Class credentials
+    Public strUser, strPassword As String
+End Class
+
 ''' <summary>Allows you to easily POST and upload files to a remote HTTP server without you, the programmer, knowing anything about how it all works. This class does it all for you. It handles adding a User Agent String, additional HTTP Request Headers, string data to your HTTP POST data, and files to be uploaded in the HTTP POST data.</summary>
 Public Class httpHelper
-    Private Const classVersion As String = "1.205"
+    Private Const classVersion As String = "1.215"
 
     Private strUserAgentString As String = Nothing
     Private boolUseProxy As Boolean = False
@@ -193,6 +212,7 @@ Public Class httpHelper
     Private postData As New Dictionary(Of String, Object)
     Private getData As New Dictionary(Of String, String)
     Private downloadStatusDetails As downloadStatusDetails
+    Private credentials As credentials
 
     Private sslCertificate As X509Certificates.X509Certificate2
     Private urlPreProcessor As Func(Of String, String)
@@ -221,6 +241,18 @@ Public Class httpHelper
             customErrorHandler = Value
         End Set
     End Property
+
+    ''' <summary>Adds HTTP Authentication headers to your HTTP Request in this HTTPHelper instance.</summary>
+    ''' <param name="strUsername">The username you want to pass to the server.</param>
+    ''' <param name="strPassword">The password you want to pass to the server.</param>
+    ''' <param name="throwExceptionIfAlreadySet">A Boolean value. This tells the function if it should throw an exception if HTTP Authentication settings have already been set.</param>
+    Public Sub setHTTPCredentials(strUsername As String, strPassword As String, Optional throwExceptionIfAlreadySet As Boolean = True)
+        If credentials Is Nothing Then
+            credentials = New credentials() With {.strUser = strUsername, .strPassword = strPassword}
+        Else
+            If throwExceptionIfAlreadySet Then Throw New credentialsAlreadySet("HTTP Authentication Credentials have already been set for this HTTPHelper Class Instance.")
+        End If
+    End Sub
 
     ''' <summary>Returns the last Exception that occurred within this Class instance.</summary>
     ''' <returns>An Exception Object.</returns>
@@ -327,6 +359,13 @@ Public Class httpHelper
         stringBuilder.AppendLine("Use HTTP Compression: " & boolUseHTTPCompression.ToString)
         stringBuilder.AppendLine("HTTP Time Out: " & httpTimeOut)
         stringBuilder.AppendLine("Use Proxy: " & boolUseProxy.ToString)
+
+        If credentials Is Nothing Then
+            stringBuilder.AppendLine("HTTP Authentication Enabled: False")
+        Else
+            stringBuilder.AppendLine("HTTP Authentication Enabled: True")
+            stringBuilder.AppendLine("HTTP Authentication Details: " & credentials.strUser & "|" & credentials.strPassword)
+        End If
 
         If lastException IsNot Nothing Then
             stringBuilder.AppendLine()
@@ -498,16 +537,13 @@ Public Class httpHelper
     ''' <exception cref="dataAlreadyExistsException">If this function throws a dataAlreadyExistsException, it means that the cookie already exists in this Class instance.</exception>
     Public Sub addHTTPCookie(strCookieName As String, strCookieValue As String, strDomainDomain As String, strCookiePath As String, Optional urlEncodeHeaderContent As Boolean = False)
         If doesCookieExist(strCookieName) = False Then
-            Dim cookieDetails As New cookieDetails
+            Dim cookieDetails As New cookieDetails() With {.cookieDomain = strDomainDomain, .cookiePath = strCookiePath}
 
             If urlEncodeHeaderContent = True Then
                 cookieDetails.cookieData = Web.HttpUtility.UrlEncode(strCookieValue)
             Else
                 cookieDetails.cookieData = strCookieValue
             End If
-
-            cookieDetails.cookieDomain = strDomainDomain
-            cookieDetails.cookiePath = strCookiePath
 
             httpCookies.Add(strCookieName.ToLower, cookieDetails)
         Else
@@ -524,16 +560,13 @@ Public Class httpHelper
     ''' <exception cref="dataAlreadyExistsException">If this function throws a dataAlreadyExistsException, it means that the cookie already exists in this Class instance.</exception>
     Public Sub addHTTPCookie(strCookieName As String, strCookieValue As String, strCookieDomain As String, Optional urlEncodeHeaderContent As Boolean = False)
         If doesCookieExist(strCookieName) = False Then
-            Dim cookieDetails As New cookieDetails
+            Dim cookieDetails As New cookieDetails() With {.cookieDomain = strCookieDomain, .cookiePath = "/"}
 
             If urlEncodeHeaderContent = True Then
                 cookieDetails.cookieData = Web.HttpUtility.UrlEncode(strCookieValue)
             Else
                 cookieDetails.cookieData = strCookieValue
             End If
-
-            cookieDetails.cookieDomain = strCookieDomain
-            cookieDetails.cookiePath = "/"
 
             httpCookies.Add(strCookieName.ToLower, cookieDetails)
         Else
@@ -675,6 +708,11 @@ Public Class httpHelper
             httpWebRequest.Timeout = httpTimeOut
             httpWebRequest.KeepAlive = True
 
+            If credentials IsNot Nothing Then
+                httpWebRequest.PreAuthenticate = True
+                addHTTPHeader("Authorization", "Basic " & Convert.ToBase64String(Text.Encoding.Default.GetBytes(credentials.strUser & ":" & credentials.strPassword)))
+            End If
+
             If boolUseHTTPCompression = True Then
                 ' We tell the web server that we can accept a GZIP and Deflate compressed data stream.
                 httpWebRequest.Accept = "gzip, deflate"
@@ -813,6 +851,11 @@ Public Class httpHelper
             httpWebRequest.Timeout = httpTimeOut
             httpWebRequest.KeepAlive = True
 
+            If credentials IsNot Nothing Then
+                httpWebRequest.PreAuthenticate = True
+                addHTTPHeader("Authorization", "Basic " & Convert.ToBase64String(Text.Encoding.Default.GetBytes(credentials.strUser & ":" & credentials.strPassword)))
+            End If
+
             If boolUseHTTPCompression = True Then
                 ' We tell the web server that we can accept a GZIP and Deflate compressed data stream.
                 httpWebRequest.Accept = "gzip, deflate"
@@ -938,6 +981,11 @@ Public Class httpHelper
             httpWebRequest.Timeout = httpTimeOut
             httpWebRequest.KeepAlive = True
 
+            If credentials IsNot Nothing Then
+                httpWebRequest.PreAuthenticate = True
+                addHTTPHeader("Authorization", "Basic " & Convert.ToBase64String(Text.Encoding.Default.GetBytes(credentials.strUser & ":" & credentials.strPassword)))
+            End If
+
             If boolUseHTTPCompression = True Then httpWebRequest.Accept = "gzip, deflate"
             If boolUseProxy = True Then httpWebRequest.Proxy = Net.WebRequest.DefaultWebProxy
 
@@ -1058,6 +1106,11 @@ Public Class httpHelper
             httpWebRequest = DirectCast(Net.WebRequest.Create(url), Net.HttpWebRequest)
             httpWebRequest.Timeout = httpTimeOut
             httpWebRequest.KeepAlive = True
+
+            If credentials IsNot Nothing Then
+                httpWebRequest.PreAuthenticate = True
+                addHTTPHeader("Authorization", "Basic " & Convert.ToBase64String(Text.Encoding.Default.GetBytes(credentials.strUser & ":" & credentials.strPassword)))
+            End If
 
             If boolUseHTTPCompression = True Then httpWebRequest.Accept = "gzip, deflate"
             If boolUseProxy = True Then httpWebRequest.Proxy = Net.WebRequest.DefaultWebProxy
