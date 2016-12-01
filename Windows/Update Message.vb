@@ -11,13 +11,12 @@
     Public Enum userResponse
         doTheUpdate = 1
         dontDoTheUpdate = 2
-        nullSetting = 3
     End Enum
 #End Region
 
 #Region "--== Public Variables ==--"
     ' dialogResponse is the Public Variable that exposes the user's response outside of this form.
-    Public dialogResponse As userResponse = userResponse.nullSetting
+    Public dialogResponse As userResponse = userResponse.dontDoTheUpdate
 
     ' versionUpdate is the Public Variable that is used by code outside of this form to write to it when a totally new version is released.
     ' It's only used when versionUpdate is equal to versionUpdateType.totallyNewVersionUpdate.
@@ -25,7 +24,6 @@
 #End Region
 
     Public newVersionString As String
-    Private boolButtonPushed As Boolean = False
     Private shortCountDown As Short = 30
 
     Sub loadChangeLogData()
@@ -137,26 +135,22 @@
     End Sub
 
     Private Sub btnOKButton_Click(sender As Object, e As EventArgs) Handles btnOK.Click
-        boolButtonPushed = True
         dialogResponse = userResponse.doTheUpdate
         Me.Close()
     End Sub
 
     Private Sub btnYes_Click(sender As Object, e As EventArgs) Handles btnYes.Click
-        boolButtonPushed = True
         dialogResponse = userResponse.doTheUpdate
         Me.Close()
     End Sub
 
     Private Sub btnNo_Click(sender As Object, e As EventArgs) Handles btnNo.Click
-        boolButtonPushed = True
         dialogResponse = userResponse.dontDoTheUpdate
         Me.Close()
     End Sub
 
     Private Sub Update_Message_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         My.Settings.updateMessageDialogSize = Me.Size
-        If boolButtonPushed = False Then dialogResponse = userResponse.dontDoTheUpdate
     End Sub
 
     Private Sub btnReloadChangeLog_Click(sender As Object, e As EventArgs) Handles btnReloadChangeLog.Click
@@ -206,5 +200,9 @@
 
     Private Sub txtChanges_MouseMove(sender As Object, e As MouseEventArgs) Handles txtChanges.MouseMove
         disableCountdown()
+    End Sub
+
+    Private Sub Update_Message_Shown(sender As Object, e As EventArgs) Handles Me.Shown
+        Me.BringToFront()
     End Sub
 End Class
