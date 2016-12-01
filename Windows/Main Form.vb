@@ -2463,11 +2463,11 @@ Public Class Form1
                         iniFile.SetKeyValue("Settings", settingName, settingType.ToString & "," & point.X & "|" & point.Y)
                     End If
                 End If
-            Next
 
-            settingName = Nothing
-            settingType = Nothing
-            settingValue = Nothing
+                settingName = Nothing
+                settingType = Nothing
+                settingValue = Nothing
+            Next
 
             Dim registryKeyWeAreWorkingWith As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
             Dim registryValue As String
