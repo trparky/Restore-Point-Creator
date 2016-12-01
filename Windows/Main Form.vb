@@ -641,7 +641,7 @@ Public Class Form1
         updateMessageDialog.versionUpdate = versionUpdateType
         updateMessageDialog.newVersionString = newVersionString
 
-        updateMessageDialog.ShowDialog()
+        updateMessageDialog.ShowDialog(Me)
 
         Dim response As Update_Message.userResponse = updateMessageDialog.dialogResponse
 
