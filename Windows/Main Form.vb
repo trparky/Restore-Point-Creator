@@ -1367,7 +1367,7 @@ Public Class Form1
     Sub disableAutomaticUpdatesAndNotifyUser()
         Dim msgBoxResult As MsgBoxResult = MsgBox("Since you have told the program that you didn't want to update to the newest supported version, do you want to also disable Automatic Update Checking?" & vbCrLf & vbCrLf & "By disabling Automatic Update Checking you will no longer be notified about new versions of this program, that is, unless you manually check for updates." & vbCrLf & vbCrLf & "Do you want to disable Automatic Checking for Updates?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, strMessageBoxTitle)
 
-        If msgBoxResult = MsgBoxResult.Yes Then
+        If msgBoxResult = msgBoxResult.Yes Then
             My.Settings.CheckForUpdates = False
             ConfigureAutomaticUpdatesToolStripMenuItem.Visible = False
             toolStripAutomaticallyCheckForUpdates.Checked = False
@@ -2470,39 +2470,39 @@ Public Class Form1
             Next
 
             Dim registryKeyWeAreWorkingWith As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
-            Dim registryValue As String
+                Dim registryValue As String
 
-            For Each registryValueName As String In registryKeyWeAreWorkingWith.GetValueNames
-                registryValue = registryKeyWeAreWorkingWith.GetValue(registryValueName, Nothing)
-                If registryValue IsNot Nothing Then iniFile.SetKeyValue("Registry", registryValueName.Replace(" ", "_"), registryValue)
-            Next
+                For Each registryValueName As String In registryKeyWeAreWorkingWith.GetValueNames
+                    registryValue = registryKeyWeAreWorkingWith.GetValue(registryValueName, Nothing)
+                    If registryValue IsNot Nothing Then iniFile.SetKeyValue("Registry", registryValueName.Replace(" ", "_"), registryValue)
+                Next
 
-            registryKeyWeAreWorkingWith.Close()
-            registryKeyWeAreWorkingWith.Dispose()
+                registryKeyWeAreWorkingWith.Close()
+                registryKeyWeAreWorkingWith.Dispose()
 
-            Dim fileInfo As New IO.FileInfo(exportBackupDialog.FileName)
-            Debug.WriteLine(fileInfo.Extension)
+                Dim fileInfo As New IO.FileInfo(exportBackupDialog.FileName)
+                Debug.WriteLine(fileInfo.Extension)
 
-            If fileInfo.Extension.stringCompare(".ini") Then
-                iniFile.Save(exportBackupDialog.FileName)
-            Else
-                Dim iniFileTextBase64ed As String = Functions.support.convertToBase64(iniFile.getINIText())
-                Dim randomString As String = Functions.support.randomStringGenerator((New Random).Next(100, 300))
-                Dim checksum As String = calculateConfigBackupDataPayloadChecksum(iniFileTextBase64ed, randomString)
+                If fileInfo.Extension.stringCompare(".ini") Then
+                    iniFile.Save(exportBackupDialog.FileName)
+                Else
+                    Dim iniFileTextBase64ed As String = Functions.support.convertToBase64(iniFile.getINIText())
+                    Dim randomString As String = Functions.support.randomStringGenerator((New Random).Next(100, 300))
+                    Dim checksum As String = calculateConfigBackupDataPayloadChecksum(iniFileTextBase64ed, randomString)
 
-                Dim streamWriter As New IO.StreamWriter(exportBackupDialog.FileName)
-                streamWriter.WriteLine("Payload: " & iniFileTextBase64ed)
-                streamWriter.WriteLine("Random String: " & randomString)
-                streamWriter.Write("Checksum: " & checksum)
+                    Dim streamWriter As New IO.StreamWriter(exportBackupDialog.FileName)
+                    streamWriter.WriteLine("Payload: " & iniFileTextBase64ed)
+                    streamWriter.WriteLine("Random String: " & randomString)
+                    streamWriter.Write("Checksum: " & checksum)
 
-                streamWriter.Close()
-                streamWriter.Dispose()
+                    streamWriter.Close()
+                    streamWriter.Dispose()
+                End If
+
+                iniFile = Nothing
+
+                MsgBox("Backup complete.", MsgBoxStyle.Information, strMessageBoxTitle)
             End If
-
-            iniFile = Nothing
-
-            MsgBox("Backup complete.", MsgBoxStyle.Information, strMessageBoxTitle)
-        End If
     End Sub
 
     Private Sub RestoreToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RestoreToolStripMenuItem.Click
@@ -2655,7 +2655,7 @@ Public Class Form1
     Private Sub SetWindowsActivePowerPlanSettingsForWakeTimersBackToDefaultToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetWindowsActivePowerPlanSettingsForWakeTimersBackToDefaultToolStripMenuItem.Click
         Dim msgBoxResult As MsgBoxResult = MsgBox("Setting the Windows Active Power Plan Wake Times feature back to default (Disabled) will prevent System Restore from creating restore points while your system is asleep." & vbCrLf & vbCrLf & "Are you sure you want to do this?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Are you sure?")
 
-        If msgBoxResult = MsgBoxResult.Yes Then
+        If msgBoxResult = msgBoxResult.Yes Then
             Functions.power.disablePowerPlanWakeFromSleep()
         End If
     End Sub
@@ -2664,7 +2664,7 @@ Public Class Form1
         If UseSSLToolStripMenuItem.Checked = False Then
             Dim msgBoxResult As MsgBoxResult = MsgBox("It's recommended to have SSL enabled so that downloads and data that's sent to my web site is secure. Please reconsider this." & vbCrLf & vbCrLf & "Are you sure you want to disable SSL?", MsgBoxStyle.Question + vbYesNo, "Are you sure?")
 
-            If msgBoxResult = MsgBoxResult.Yes Then
+            If msgBoxResult = msgBoxResult.Yes Then
                 My.Settings.useSSL = UseSSLToolStripMenuItem.Checked
             Else
                 UseSSLToolStripMenuItem.Checked = True
@@ -2775,7 +2775,7 @@ Public Class Form1
 
         Dim msgBoxResult As MsgBoxResult = MsgBox("The debug build is a build that's not optimized for normal use but may help in the process of debugging crashes and other issues that you may have with the program. The debug build outputs far more crash data than the release type build." & vbCrLf & vbCrLf & "Are you sure you want to switch to the debug build?", MsgBoxStyle.Question + MsgBoxStyle.YesNo)
 
-        If msgBoxResult = MsgBoxResult.Yes Then
+        If msgBoxResult = msgBoxResult.Yes Then
             Functions.wait.createPleaseWaitWindow("Downloading Debug Build... Please Wait.", False, enums.howToCenterWindow.parent, True)
             Threading.ThreadPool.QueueUserWorkItem(AddressOf switchToDebugBuildDownloadThreadSub)
         End If
@@ -3344,7 +3344,7 @@ Public Class Form1
 
         Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot into Safe Mode and perform the restore process there and reboot after the process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, strDescription, strDate, strType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
 
-        If msgboxResult = MsgBoxResult.Yes Then
+        If msgboxResult = msgboxResult.Yes Then
             savePreferenceToRegistry(globalVariables.registryValues.strSafeModeValue, "True")
             Functions.support.setSafeModeBoot() ' Set the system up for Safe Mode Boot.
 
@@ -3386,13 +3386,13 @@ Public Class Form1
 
         txtRestorePointDescription.Text = txtRestorePointDescription.Text.Trim
 
-        Dim msgBoxResult As MsgBoxResult = MsgBoxResult.Yes
+        Dim msgBoxResult As MsgBoxResult = msgBoxResult.Yes
 
         If My.Settings.askBeforeCreatingRestorePoint = True Then
             msgBoxResult = MsgBox(String.Format("Are you sure you want to create a new system restore point with the name of {0}{1}{0}?", Chr(34), txtRestorePointDescription.Text), MsgBoxStyle.Question + vbYesNo, "Restore Point Creator")
         End If
 
-        If msgBoxResult = MsgBoxResult.Yes Then
+        If msgBoxResult = msgBoxResult.Yes Then
             Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", False, enums.howToCenterWindow.parent, False)
             Threading.ThreadPool.QueueUserWorkItem(Sub() unifiedCreateSystemRestorePoint(txtRestorePointDescription.Text))
             Functions.wait.openPleaseWaitWindow()
@@ -3405,13 +3405,13 @@ Public Class Form1
             Exit Sub
         End If
 
-        Dim msgBoxResult As MsgBoxResult = MsgBoxResult.Yes
+        Dim msgBoxResult As MsgBoxResult = msgBoxResult.Yes
 
         If My.Settings.askBeforeCreatingRestorePoint = True Then
             msgBoxResult = MsgBox("Are you sure you want to create a new system restore point?", MsgBoxStyle.Question + vbYesNo, "Restore Point Creator")
         End If
 
-        If msgBoxResult = MsgBoxResult.Yes Then
+        If msgBoxResult = msgBoxResult.Yes Then
             Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", False, enums.howToCenterWindow.parent, False)
             Threading.ThreadPool.QueueUserWorkItem(Sub() unifiedCreateSystemRestorePoint())
             Functions.wait.openPleaseWaitWindow()
@@ -3435,7 +3435,7 @@ Public Class Form1
 
         Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot after the restoration process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, strDescription, strDate, strType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
 
-        If msgboxResult = MsgBoxResult.Yes Then
+        If msgboxResult = msgboxResult.Yes Then
             Functions.wait.createPleaseWaitWindow("Beginning the Restore Process... Please Wait.", False, enums.howToCenterWindow.parent, False)
             Threading.ThreadPool.QueueUserWorkItem(AddressOf restoreSystemRestorePoint)
             Functions.wait.openPleaseWaitWindow()
