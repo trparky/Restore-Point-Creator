@@ -2470,39 +2470,43 @@ Public Class Form1
             Next
 
             Dim registryKeyWeAreWorkingWith As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
-                Dim registryValue As String
+            Dim registryValue As String
 
-                For Each registryValueName As String In registryKeyWeAreWorkingWith.GetValueNames
-                    registryValue = registryKeyWeAreWorkingWith.GetValue(registryValueName, Nothing)
-                    If registryValue IsNot Nothing Then iniFile.SetKeyValue("Registry", registryValueName.Replace(" ", "_"), registryValue)
-                Next
+            For Each registryValueName As String In registryKeyWeAreWorkingWith.GetValueNames
+                registryValue = registryKeyWeAreWorkingWith.GetValue(registryValueName, Nothing)
 
-                registryKeyWeAreWorkingWith.Close()
-                registryKeyWeAreWorkingWith.Dispose()
-
-                Dim fileInfo As New IO.FileInfo(exportBackupDialog.FileName)
-                Debug.WriteLine(fileInfo.Extension)
-
-                If fileInfo.Extension.stringCompare(".ini") Then
-                    iniFile.Save(exportBackupDialog.FileName)
-                Else
-                    Dim iniFileTextBase64ed As String = Functions.support.convertToBase64(iniFile.getINIText())
-                    Dim randomString As String = Functions.support.randomStringGenerator((New Random).Next(100, 300))
-                    Dim checksum As String = calculateConfigBackupDataPayloadChecksum(iniFileTextBase64ed, randomString)
-
-                    Dim streamWriter As New IO.StreamWriter(exportBackupDialog.FileName)
-                    streamWriter.WriteLine("Payload: " & iniFileTextBase64ed)
-                    streamWriter.WriteLine("Random String: " & randomString)
-                    streamWriter.Write("Checksum: " & checksum)
-
-                    streamWriter.Close()
-                    streamWriter.Dispose()
+                If registryValue IsNot Nothing Then
+                    iniFile.SetKeyValue("Registry", registryValueName.Replace(" ", "_"), registryValue)
+                    registryValue = Nothing
                 End If
+            Next
 
-                iniFile = Nothing
+            registryKeyWeAreWorkingWith.Close()
+            registryKeyWeAreWorkingWith.Dispose()
 
-                MsgBox("Backup complete.", MsgBoxStyle.Information, strMessageBoxTitle)
+            Dim fileInfo As New IO.FileInfo(exportBackupDialog.FileName)
+            Debug.WriteLine(fileInfo.Extension)
+
+            If fileInfo.Extension.stringCompare(".ini") Then
+                iniFile.Save(exportBackupDialog.FileName)
+            Else
+                Dim iniFileTextBase64ed As String = Functions.support.convertToBase64(iniFile.getINIText())
+                Dim randomString As String = Functions.support.randomStringGenerator((New Random).Next(100, 300))
+                Dim checksum As String = calculateConfigBackupDataPayloadChecksum(iniFileTextBase64ed, randomString)
+
+                Dim streamWriter As New IO.StreamWriter(exportBackupDialog.FileName)
+                streamWriter.WriteLine("Payload: " & iniFileTextBase64ed)
+                streamWriter.WriteLine("Random String: " & randomString)
+                streamWriter.Write("Checksum: " & checksum)
+
+                streamWriter.Close()
+                streamWriter.Dispose()
             End If
+
+            iniFile = Nothing
+
+            MsgBox("Backup complete.", MsgBoxStyle.Information, strMessageBoxTitle)
+        End If
     End Sub
 
     Private Sub RestoreToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RestoreToolStripMenuItem.Click
