@@ -83,6 +83,26 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
+        Friend ReadOnly Property checkbox_no() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("checkbox_no", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property checkbox_yes() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("checkbox_yes", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
         Friend ReadOnly Property chronometer() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("chronometer", resourceCulture)

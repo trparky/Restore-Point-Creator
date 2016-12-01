@@ -88,6 +88,27 @@
 
         Me.Close()
     End Sub
+
+    Private Sub btnCheckAll_Click(sender As Object, e As EventArgs) Handles btnCheckAll.Click
+        For Each control As Control In restorePointGroup.Controls
+            If control.GetType = GetType(myCheckbox) Then
+                DirectCast(control, myCheckbox).Checked = True
+            End If
+        Next
+
+        btnConfirm.Enabled = True
+    End Sub
+
+    Private Sub btnUncheckAll_Click(sender As Object, e As EventArgs) Handles btnUncheckAll.Click
+        For Each control As Control In restorePointGroup.Controls
+            If control.GetType = GetType(myCheckbox) Then
+                DirectCast(control, myCheckbox).Checked = False
+            End If
+        Next
+
+        btnConfirm.Enabled = False
+        MsgBox("You have unchecked all of the checkboxes, you have none of your previously selected restore points queued for deletion.", MsgBoxStyle.Information, Me.Text)
+    End Sub
 End Class
 
 ' This class extends the checkbox so that I can add more properties to it for my purposes.

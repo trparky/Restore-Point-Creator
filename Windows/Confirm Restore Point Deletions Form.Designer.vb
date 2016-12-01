@@ -27,6 +27,8 @@ Partial Class Confirm_Restore_Point_Deletions_Form
         Me.restorePointGroup = New System.Windows.Forms.Panel()
         Me.btnCancel = New System.Windows.Forms.Button()
         Me.btnConfirm = New System.Windows.Forms.Button()
+        Me.btnCheckAll = New System.Windows.Forms.Button()
+        Me.btnUncheckAll = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'Label1
@@ -70,11 +72,39 @@ Partial Class Confirm_Restore_Point_Deletions_Form
         Me.btnConfirm.Text = "Confirm &Deletions"
         Me.btnConfirm.UseVisualStyleBackColor = True
         '
+        'btnCheckAll
+        '
+        Me.btnCheckAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnCheckAll.Image = Global.Restore_Point_Creator.My.Resources.Resources.checkbox_yes
+        Me.btnCheckAll.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnCheckAll.Location = New System.Drawing.Point(15, 205)
+        Me.btnCheckAll.Name = "btnCheckAll"
+        Me.btnCheckAll.Size = New System.Drawing.Size(75, 23)
+        Me.btnCheckAll.TabIndex = 4
+        Me.btnCheckAll.Text = "Check All"
+        Me.btnCheckAll.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.btnCheckAll.UseVisualStyleBackColor = True
+        '
+        'btnUncheckAll
+        '
+        Me.btnUncheckAll.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.btnUncheckAll.Image = Global.Restore_Point_Creator.My.Resources.Resources.checkbox_no
+        Me.btnUncheckAll.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnUncheckAll.Location = New System.Drawing.Point(96, 205)
+        Me.btnUncheckAll.Name = "btnUncheckAll"
+        Me.btnUncheckAll.Size = New System.Drawing.Size(87, 23)
+        Me.btnUncheckAll.TabIndex = 5
+        Me.btnUncheckAll.Text = "Uncheck All"
+        Me.btnUncheckAll.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.btnUncheckAll.UseVisualStyleBackColor = True
+        '
         'Confirm_Restore_Point_Deletions_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(723, 234)
+        Me.Controls.Add(Me.btnUncheckAll)
+        Me.Controls.Add(Me.btnCheckAll)
         Me.Controls.Add(Me.btnConfirm)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.restorePointGroup)
@@ -94,4 +124,6 @@ Partial Class Confirm_Restore_Point_Deletions_Form
     Friend WithEvents restorePointGroup As Panel
     Friend WithEvents btnCancel As Button
     Friend WithEvents btnConfirm As Button
+    Friend WithEvents btnCheckAll As Button
+    Friend WithEvents btnUncheckAll As Button
 End Class
