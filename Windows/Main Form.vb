@@ -2474,7 +2474,11 @@ Public Class Form1
 
             For Each registryValueName As String In registryKeyWeAreWorkingWith.GetValueNames
                 registryValue = registryKeyWeAreWorkingWith.GetValue(registryValueName, Nothing)
-                If registryValue IsNot Nothing Then iniFile.SetKeyValue("Registry", registryValueName.Replace(" ", "_"), registryValue)
+
+                If registryValue IsNot Nothing Then
+                    iniFile.SetKeyValue("Registry", registryValueName.Replace(" ", "_"), registryValue)
+                    registryValue = Nothing
+                End If
             Next
 
             registryKeyWeAreWorkingWith.Close()
