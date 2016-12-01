@@ -2419,43 +2419,48 @@ Public Class Form1
         exportBackupDialog.FileName = Nothing
 
         If exportBackupDialog.ShowDialog() = DialogResult.OK Then
+            If Not IO.Directory.Exists(New IO.FileInfo(exportBackupDialog.FileName).DirectoryName) Then
+                MsgBox("The directory that you are trying to write the file to doesn't exist, please double check where you are saving the file to.", MsgBoxStyle.Critical, strMessageBoxTitle)
+                Exit Sub
+            End If
+
             If IO.File.Exists(exportBackupDialog.FileName) Then
                 IO.File.Delete(exportBackupDialog.FileName)
             End If
 
             Dim iniFile As New IniFile
-            Dim settingName, settingType As String, settingValue As Object
+            Dim settingName As String, settingType As Type, settingValue As Object
             Dim stringCollection As Specialized.StringCollection
             Dim point As Point
 
             For Each settingProperty As Object In My.Settings.PropertyValues
                 If settingProperty.propertyvalue IsNot Nothing Then
                     settingName = settingProperty.name
-                    settingType = settingProperty.propertyvalue.GetType.ToString
+                    settingType = settingProperty.propertyvalue.GetType
 
-                    If settingType.stringCompare("System.Drawing.Color") Then
+                    If settingType = GetType(Color) Then
                         settingValue = DirectCast(settingProperty.propertyvalue, Color).ToArgb
                     Else
                         settingValue = settingProperty.propertyvalue.ToString
                     End If
 
-                    If settingType.stringCompare("System.Int16") Or settingType.stringCompare("System.Int32") Or settingType.stringCompare("System.Boolean") Or settingType.stringCompare("System.String") Or settingType.stringCompare("System.Drawing.Size") Or settingType.stringCompare("System.Drawing.Color") Then
-                        If settingType.stringCompare("System.String") Then
-                            If String.IsNullOrEmpty(DirectCast(settingValue, String).Trim) = False Then
-                                iniFile.SetKeyValue("Settings", settingName, settingType & "," & settingValue)
+                    If settingType = GetType(Short) Or settingType = GetType(Integer) Or settingType = GetType(Boolean) Or settingType = GetType(String) Or settingType = GetType(Size) Or settingType = GetType(Color) Then
+                        If settingType = GetType(String) Then
+                            If Not String.IsNullOrEmpty(DirectCast(settingValue, String).Trim) Then
+                                iniFile.SetKeyValue("Settings", settingName, settingType.ToString & "," & settingValue)
                             End If
                         Else
-                            iniFile.SetKeyValue("Settings", settingName, settingType & "," & settingValue)
+                            iniFile.SetKeyValue("Settings", settingName, settingType.ToString & "," & settingValue)
                         End If
-                    ElseIf settingType.stringCompare("System.Collections.Specialized.StringCollection") Then
+                    ElseIf settingType = GetType(Specialized.StringCollection) Then
                         stringCollection = DirectCast(settingProperty.propertyvalue, Specialized.StringCollection)
 
                         Dim tempArray(stringCollection.Count - 1) As String
                         stringCollection.CopyTo(tempArray, 0)
-                        iniFile.SetKeyValue("Settings", settingName, settingType & "," & (New Web.Script.Serialization.JavaScriptSerializer).Serialize(tempArray))
-                    ElseIf settingType.stringCompare("System.Drawing.Point") Then
+                        iniFile.SetKeyValue("Settings", settingName, settingType.ToString & "," & (New Web.Script.Serialization.JavaScriptSerializer).Serialize(tempArray))
+                    ElseIf settingType = GetType(Point) Then
                         point = DirectCast(settingProperty.propertyvalue, Point)
-                        iniFile.SetKeyValue("Settings", settingName, settingType & "," & point.X & "|" & point.Y)
+                        iniFile.SetKeyValue("Settings", settingName, settingType.ToString & "," & point.X & "|" & point.Y)
                     End If
                 End If
             Next
@@ -2552,28 +2557,27 @@ Public Class Form1
                         iniFileValue = valueObject.value
 
                         If iniFileValue.StartsWith("System.Int16") Then
-                            iniFileValue = iniFileValue.Replace("System.Int16,", "")
+                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Int16,", "")
 
                             If Short.TryParse(iniFileValue, tempShort) Then
                                 My.Settings(iniFileKeyName) = tempShort
                             End If
                         ElseIf iniFileValue.StartsWith("System.Int32") Then
-                            iniFileValue = iniFileValue.Replace("System.Int32,", "")
+                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Int32,", "")
 
                             If Integer.TryParse(iniFileValue, tempInteger) Then
                                 My.Settings(iniFileKeyName) = tempInteger
                             End If
                         ElseIf iniFileValue.StartsWith("System.Boolean") Then
-                            iniFileValue = iniFileValue.Replace("System.Boolean,", "")
+                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Boolean,", "")
 
                             If Boolean.TryParse(iniFileValue, tempBoolean) Then
                                 My.Settings(iniFileKeyName) = tempBoolean
                             End If
                         ElseIf iniFileValue.StartsWith("System.String") Then
-                            iniFileValue = iniFileValue.Replace("System.String,", "")
-                            My.Settings(iniFileKeyName) = iniFileValue
+                            My.Settings(iniFileKeyName) = iniFileValue.caseInsensitiveReplace("System.String,", "")
                         ElseIf iniFileValue.StartsWith("System.Drawing.Size") Then
-                            iniFileValue = iniFileValue.Replace("System.Drawing.Size,", "")
+                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Drawing.Size,", "")
 
                             If systemDrawingSizeRegexObject.IsMatch(iniFileValue) = True Then
                                 regExMatches = systemDrawingSizeRegexObject.Match(iniFileValue)
@@ -2585,13 +2589,13 @@ Public Class Form1
                                 My.Settings(iniFileKeyName) = New Size(tempWidth, tempHeight)
                             End If
                         ElseIf iniFileValue.StartsWith("System.Drawing.Color") Then
-                            iniFileValue = iniFileValue.Replace("System.Drawing.Color,", "")
+                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Drawing.Color,", "")
 
                             If Integer.TryParse(iniFileValue, tempInteger) Then
                                 My.Settings(iniFileKeyName) = Color.FromArgb(tempInteger)
                             End If
                         ElseIf iniFileValue.StartsWith("System.Collections.Specialized.StringCollection") Then
-                            iniFileValue = iniFileValue.Replace("System.Collections.Specialized.StringCollection,", "")
+                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Collections.Specialized.StringCollection,", "")
                             Dim deJSONedObject As String() = (New Web.Script.Serialization.JavaScriptSerializer).Deserialize(iniFileValue, GetType(String()))
 
                             Dim tempStringCollection As New Specialized.StringCollection
@@ -2600,7 +2604,7 @@ Public Class Form1
                             Next
                             My.Settings(iniFileKeyName) = tempStringCollection
                         ElseIf iniFileValue.StartsWith("System.Drawing.Point") Then
-                            iniFileValue = iniFileValue.Replace("System.Drawing.Point,", "").Trim
+                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Drawing.Point,", "").Trim
                             Dim pointParts() As String = iniFileValue.Split("|")
                             My.Settings(iniFileKeyName) = New Point(pointParts(0), pointParts(1))
                         End If
