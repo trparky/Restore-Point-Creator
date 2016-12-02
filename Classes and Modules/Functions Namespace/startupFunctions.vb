@@ -69,14 +69,14 @@ Namespace Functions.startupFunctions
                 taskStuff.deleteTask(task)
                 task.Dispose()
 
-                taskStuff.addRunTimeTask("Restore Point Creator -- Run with no UAC (Create Restore Point)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, "-createrestorepoint")
+                taskStuff.addRunTimeTask("Restore Point Creator -- Run with no UAC (Create Restore Point)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, globalVariables.commandLineSwitches.createRestorePoint)
             End If
 
             If taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Custom Restore Point)", task) = True Then
                 taskStuff.deleteTask(task)
                 task.Dispose()
 
-                taskStuff.addRunTimeTask("Restore Point Creator -- Run with no UAC (Create Custom Restore Point)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, "-createrestorepointcustomname")
+                taskStuff.addRunTimeTask("Restore Point Creator -- Run with no UAC (Create Custom Restore Point)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, globalVariables.commandLineSwitches.createCustomRestorePoint)
             End If
 
             If taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC", task) = True Then

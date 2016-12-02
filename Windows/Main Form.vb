@@ -265,11 +265,11 @@ Public Class Form1
 
             For Each task As TaskScheduler.Task In taskService.RootFolder.Tasks
                 If task.Name = "System Restore Checkpoint by System Restore Point Creator" Then
-                    checkScheduledTaskEXEPathsSubRoutine(taskService, task, "-createscheduledrestorepoint")
+                    checkScheduledTaskEXEPathsSubRoutine(taskService, task, globalVariables.commandLineSwitches.scheduledRestorePoint)
                 ElseIf task.Name = "Delete Old Restore Points" Then
                     checkScheduledTaskEXEPathsSubRoutine(taskService, task, "-deleteoldrestorepoints")
                 ElseIf task.Name = "Create a Restore Point at User Logon" Then
-                    checkScheduledTaskEXEPathsSubRoutine(taskService, task, "-createscheduledrestorepoint")
+                    checkScheduledTaskEXEPathsSubRoutine(taskService, task, globalVariables.commandLineSwitches.scheduledRestorePoint)
                 End If
             Next
 
@@ -703,7 +703,7 @@ Public Class Form1
                 Dim pathOfShortcutWeAreGoingToMake As String = IO.Path.Combine(pathInStartMenu, "Restore Point Creator Event Log Viewer.lnk")
 
                 If IO.File.Exists(pathOfShortcutWeAreGoingToMake) = False Then
-                    Functions.support.createShortcut(pathOfShortcutWeAreGoingToMake, Application.ExecutablePath, Application.ExecutablePath, "Restore Point Creator Event Log Viewer", "-eventlog")
+                    Functions.support.createShortcut(pathOfShortcutWeAreGoingToMake, Application.ExecutablePath, Application.ExecutablePath, "Restore Point Creator Event Log Viewer", globalVariables.commandLineSwitches.viewEventLog)
                 End If
             End If
         End If
@@ -2357,14 +2357,14 @@ Public Class Form1
             Functions.taskStuff.deleteTask(task)
             task.Dispose()
 
-            Functions.taskStuff.addRunTimeTask("Restore Point Creator -- Run with no UAC (Create Restore Point)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, "-createrestorepoint")
+            Functions.taskStuff.addRunTimeTask("Restore Point Creator -- Run with no UAC (Create Restore Point)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, globalVariables.commandLineSwitches.createRestorePoint)
         End If
 
         If Functions.taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Custom Restore Point)", task) = True Then
             Functions.taskStuff.deleteTask(task)
             task.Dispose()
 
-            Functions.taskStuff.addRunTimeTask("Restore Point Creator -- Run with no UAC (Create Custom Restore Point)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, "-createrestorepointcustomname")
+            Functions.taskStuff.addRunTimeTask("Restore Point Creator -- Run with no UAC (Create Custom Restore Point)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, globalVariables.commandLineSwitches.createCustomRestorePoint)
         End If
 
         If Functions.taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC", task) = True Then

@@ -89,17 +89,17 @@ Namespace My
             If My.Application.CommandLineArgs.Count >= 1 Then
                 commandLineArgument = My.Application.CommandLineArgs(0).Trim
 
-                If commandLineArgument.stringCompare("-viewchangelog") Then
+                If commandLineArgument.stringCompare(globalVariables.commandLineSwitches.viewChangeLog) Then
                     Dim changeLog As New Change_Log
                     changeLog.ShowDialog()
                     e.Cancel = True
                     Exit Sub
-                ElseIf commandLineArgument.stringCompare("-eventlog") Then
+                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.viewEventLog) Then
                     Dim eventLogForm As New eventLogForm
                     eventLogForm.ShowDialog()
                     e.Cancel = True
                     Exit Sub
-                ElseIf commandLineArgument.stringCompare("-createrestorepoint") Then
+                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.createRestorePoint) Then
                     If My.Application.CommandLineArgs.Count = 2 Then
                         If My.Application.CommandLineArgs(1).Trim.StartsWith("-name", StringComparison.OrdinalIgnoreCase) Then
                             My.Settings.savedRestorePointFromCommandLine = My.Application.CommandLineArgs(1).Trim.caseInsensitiveReplace("-name=", "")
@@ -231,7 +231,7 @@ Namespace My
                     If My.Application.CommandLineArgs.Count >= 1 Then
                         commandLineArgument = My.Application.CommandLineArgs(0)
 
-                        If commandLineArgument.stringCompare("-createrestorepoint") Then
+                        If commandLineArgument.stringCompare(globalVariables.commandLineSwitches.createRestorePoint) Then
                             Functions.startupFunctions.giveSafeModeErrorMessage(boolAreWeInSafeMode)
                             Functions.eventLogFunctions.writeToSystemEventLog("Activated JumpList Task.", EventLogEntryType.Information)
 
@@ -260,7 +260,7 @@ Namespace My
 
                             e.Cancel = True
                             Exit Sub
-                        ElseIf commandLineArgument.stringCompare("-createrestorepointcustomname") Then
+                        ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.createCustomRestorePoint) Then
                             Functions.startupFunctions.giveSafeModeErrorMessage(boolAreWeInSafeMode)
                             Functions.eventLogFunctions.writeToSystemEventLog("Activated JumpList Task.", EventLogEntryType.Information)
 
@@ -290,7 +290,7 @@ Namespace My
 
                             e.Cancel = True
                             Exit Sub
-                        ElseIf commandLineArgument.stringCompare("-createscheduledrestorepoint") Then
+                        ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.scheduledRestorePoint) Then
                             Dim restorePointNameForScheduledTasks As String = globalVariables.strDefaultNameForScheduledTasks
                             Dim boolExtendedLoggingForScheduledTasks As Boolean = True
                             Dim oldNewestRestorePointID As Integer

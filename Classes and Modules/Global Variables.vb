@@ -1,6 +1,17 @@
 ﻿Imports System.Text.RegularExpressions
 
 Namespace globalVariables
+    Namespace commandLineSwitches
+        Module commandLineSwitches
+            Public Const scheduledRestorePoint As String = "-createscheduledrestorepoint"
+            Public Const createCustomRestorePoint As String = "-createrestorepointcustomname"
+            Public Const createRestorePoint As String = "-createrestorepoint"
+            Public Const viewChangeLog As String = "-viewchangelog"
+            Public Const viewEventLog As String = "-eventlog"
+            Public Const forceUAC As String = "-forceuac"
+        End Module
+    End Namespace
+
     Namespace booleans
         Module booleans
             Public Const strTrue As String = "True"
