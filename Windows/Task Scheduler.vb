@@ -317,7 +317,7 @@ Public Class frmTaskScheduler
             newTask.RegistrationInfo.Description = strCheckPointTaskName
 
             Dim exePathInfo As New IO.FileInfo(Application.ExecutablePath)
-            newTask.Actions.Add(New ExecAction(Chr(34) & exePathInfo.FullName & Chr(34), "-createscheduledrestorepoint", exePathInfo.DirectoryName))
+            newTask.Actions.Add(New ExecAction(Chr(34) & exePathInfo.FullName & Chr(34), globalVariables.commandLineSwitches.scheduledRestorePoint, exePathInfo.DirectoryName))
             exePathInfo = Nothing
 
             If radDaily.Checked Then

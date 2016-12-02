@@ -34,10 +34,10 @@ Module keepThisVeryImportantStuff
         Try
             Dim jumpList As New Windows.Shell.JumpList
 
-            createJumpListItem(jumpList, "Create System Checkpoint", "Create System Restore Point", "-createrestorepoint")
-            createJumpListItem(jumpList, "Create Custom Named", "Create System Restore Point", "-createrestorepointcustomname")
-            createJumpListItem(jumpList, "Restore Point Creator Event Log", "Utilities", "-eventlog")
-            createJumpListItem(jumpList, "Launch with forced UAC prompt", "Utilities", "-forceuac")
+            createJumpListItem(jumpList, "Create System Checkpoint", "Create System Restore Point", globalVariables.commandLineSwitches.createRestorePoint)
+            createJumpListItem(jumpList, "Create Custom Named", "Create System Restore Point", globalVariables.commandLineSwitches.createCustomRestorePoint)
+            createJumpListItem(jumpList, "Restore Point Creator Event Log", "Utilities", globalVariables.commandLineSwitches.viewEventLog)
+            createJumpListItem(jumpList, "Launch with forced UAC prompt", "Utilities", globalVariables.commandLineSwitches.forceUAC)
 
             Dim app As New MyApp
 

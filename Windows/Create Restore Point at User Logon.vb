@@ -40,7 +40,7 @@ Public Class Create_Restore_Point_at_User_Logon
                     newTask.Principal.LogonType = TaskLogonType.InteractiveToken
 
                     Dim exePathInfo As New IO.FileInfo(Application.ExecutablePath)
-                    newTask.Actions.Add(New ExecAction(exePathInfo.FullName, "-createscheduledrestorepoint", exePathInfo.DirectoryName))
+                    newTask.Actions.Add(New ExecAction(exePathInfo.FullName, globalVariables.commandLineSwitches.scheduledRestorePoint, exePathInfo.DirectoryName))
                     exePathInfo = Nothing
 
                     With newTask.Settings
@@ -167,7 +167,7 @@ Public Class Create_Restore_Point_at_User_Logon
         newTask.Principal.LogonType = TaskLogonType.InteractiveToken
 
         Dim exePathInfo As New IO.FileInfo(Application.ExecutablePath)
-        newTask.Actions.Add(New ExecAction(exePathInfo.FullName, "-createscheduledrestorepoint", exePathInfo.DirectoryName))
+        newTask.Actions.Add(New ExecAction(exePathInfo.FullName, globalVariables.commandLineSwitches.scheduledRestorePoint, exePathInfo.DirectoryName))
         exePathInfo = Nothing
 
         With newTask.Settings
