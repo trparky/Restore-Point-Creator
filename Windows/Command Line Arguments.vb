@@ -4,7 +4,6 @@
     End Sub
 
     Private Sub btnCopyToClipboard_Click(sender As Object, e As EventArgs) Handles btnCopyToClipboard.Click
-        Clipboard.SetText(Label1.Text)
-        MsgBox("The above text has been copied to the Windows Clipboard.", MsgBoxStyle.Information, Me.Text)
+        If Functions.support.copyTextToWindowsClipboard(Label1.Text) Then MsgBox("The above text has been copied to the Windows Clipboard.", MsgBoxStyle.Information, Me.Text)
     End Sub
 End Class
