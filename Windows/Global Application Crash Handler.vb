@@ -103,8 +103,7 @@ Public Class frmCrash
     End Sub
 
     Sub copyTextToWindowsClipboard(text As String)
-        Clipboard.SetText(text)
-        MsgBox("Copied to Windows Clipboard.", MsgBoxStyle.Information, Me.Text)
+        If Functions.support.copyTextToWindowsClipboard(text) Then MsgBox("Copied to Windows Clipboard.", MsgBoxStyle.Information, Me.Text)
     End Sub
 
     Private boolSubmitted As Boolean = False

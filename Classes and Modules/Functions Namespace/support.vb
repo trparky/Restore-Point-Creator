@@ -3,6 +3,16 @@ Imports ICSharpCode.SharpZipLib.Zip
 
 Namespace Functions.support
     Module support
+        Public Function copyTextToWindowsClipboard(strTextToBeCopiedToClipboard As String) As Boolean
+            Try
+                Clipboard.SetDataObject(strTextToBeCopiedToClipboard, True, 5, 200)
+                Return True
+            Catch ex As Exception
+                MsgBox("Unable to open Windows Clipboard to copy text to it.", MsgBoxStyle.Critical, "Restore Point Creator")
+                Return False
+            End Try
+        End Function
+
         ''' <summary>Gets a setting from the application's Registry key.</summary>
         ''' <param name="registryObject">This is Registry Key Object that will be used in this function to pull the Registry value from.</param>
         ''' <param name="valueToGetFromRegistry">The name of the Registry Value we will be pulling from.</param>
@@ -707,7 +717,7 @@ Namespace Functions.support
                 eventLogFunctions.writeCrashToEventLog(ex2)
                 MsgBox("There was an error attempting to launch your web browser. Perhaps rebooting your system will correct this issue.", MsgBoxStyle.Information, "Restore Point Creator")
             Catch ex As Exception
-                Clipboard.SetText(url)
+                copyTextToWindowsClipboard(url)
                 MsgBox(errorMessage, MsgBoxStyle.Information, "Restore Point Creator")
             End Try
         End Sub
