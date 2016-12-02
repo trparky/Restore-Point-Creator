@@ -1,6 +1,4 @@
-﻿Imports System.Text
-
-Public Class eventLogForm
+﻿Public Class eventLogForm
     Private m_SortingColumn As ColumnHeader
     Private eventLogLoadingThread As Threading.Thread
     Private boolDoneLoading As Boolean = False
@@ -18,7 +16,7 @@ Public Class eventLogForm
     Private longEntriesFound As Long = 0
 
     Sub loadEventLogData(ByVal strEventLog As String, ByRef itemsToPutInToList As List(Of ListViewItem), ByRef cache As Dictionary(Of Long, String))
-        Dim itemAdd As ListViewItem
+        Dim itemAdd As eventLogListEntry
         Dim eventLogQuery As Eventing.Reader.EventLogQuery
         Dim logReader As Eventing.Reader.EventLogReader
         Dim eventInstance As Eventing.Reader.EventRecord
@@ -34,10 +32,11 @@ Public Class eventLogForm
                     If eventInstance.ProviderName.stringCompare(globalVariables.eventLog.strSystemRestorePointCreator) Or eventInstance.ProviderName.caseInsensitiveContains(globalVariables.eventLog.strSystemRestorePointCreator) Then
                         cache.Add(eventInstance.RecordId, eventInstance.FormatDescription)
 
+                        itemAdd = New eventLogListEntry()
                         Try
-                            itemAdd = New ListViewItem(eventInstance.LevelDisplayName)
+                            itemAdd.Text = eventInstance.LevelDisplayName
                         Catch ex As Eventing.Reader.EventLogNotFoundException
-                            itemAdd = New ListViewItem("Unknown")
+                            itemAdd.Text = "Unknown"
                         End Try
 
                         ' 0 = "Error"
@@ -56,6 +55,10 @@ Public Class eventLogForm
                         itemAdd.SubItems.Add(Long.Parse(eventInstance.RecordId).ToString("N0"))
                         itemAdd.SubItems.Add(strEventLog)
                         itemAdd.SubItems.Add("")
+
+                        itemAdd.eventLogEntryID = Long.Parse(eventInstance.RecordId)
+                        itemAdd.eventLogSource = strEventLog
+                        itemAdd.eventLogLevel = eventInstance.Level
 
                         itemsToPutInToList.Add(itemAdd)
                         itemAdd = Nothing
@@ -338,8 +341,8 @@ Public Class eventLogForm
     Private Sub eventLogList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles eventLogList.SelectedIndexChanged
         Try
             If eventLogList.SelectedItems.Count <> 0 Then
-                Dim eventID As Long = Long.Parse(eventLogList.SelectedItems(0).SubItems(2).Text.Replace(",", ""))
-                Dim source As String = eventLogList.SelectedItems(0).SubItems(3).Text
+                Dim eventID As Long = DirectCast(eventLogList.SelectedItems(0), eventLogListEntry).eventLogEntryID
+                Dim source As String = DirectCast(eventLogList.SelectedItems(0), eventLogListEntry).eventLogSource
 
                 eventLogText.Text = Functions.support.removeSourceCodePathInfo(getEventLogEntryDetails(eventID, source))
 
@@ -516,4 +519,37 @@ Public Class eventLogForm
             boolDidSortingChange = False
         End If
     End Sub
+End Class
+
+' This class extends the ListViewItem so that I can add more properties to it for my purposes.
+Class eventLogListEntry
+    Inherits ListViewItem
+    Private longEventLogEntryID As Long, strEventLogSource As String, levelType As Byte
+
+    Public Property eventLogEntryID() As String
+        Get
+            Return longEventLogEntryID
+        End Get
+        Set(value As String)
+            longEventLogEntryID = value
+        End Set
+    End Property
+
+    Public Property eventLogSource() As String
+        Get
+            Return strEventLogSource
+        End Get
+        Set(value As String)
+            strEventLogSource = value
+        End Set
+    End Property
+
+    Public Property eventLogLevel() As String
+        Get
+            Return levelType
+        End Get
+        Set(value As String)
+            levelType = value
+        End Set
+    End Property
 End Class
