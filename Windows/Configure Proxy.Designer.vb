@@ -141,8 +141,8 @@ Partial Class Configure_Proxy
         '
         'Configure_Proxy
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.ClientSize = New System.Drawing.Size(383, 196)
         Me.Controls.Add(Me.btnSave)
         Me.Controls.Add(Me.Label5)
@@ -157,10 +157,10 @@ Partial Class Configure_Proxy
         Me.Controls.Add(Me.chkUseProxy)
         Me.Controls.Add(Me.chkUseSystemProxy)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
+        Me.Icon = Global.Restore_Point_Creator.My.Resources.Resources.RestorePoint_noBackground_2
         Me.MaximizeBox = False
         Me.Name = "Configure_Proxy"
         Me.Text = "Configure HTTP Proxy Settings"
-        Me.Icon = Global.Restore_Point_Creator.My.Resources.RestorePoint_noBackground_2
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

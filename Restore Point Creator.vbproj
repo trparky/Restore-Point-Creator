@@ -336,11 +336,17 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Change Log.resx">
+      <DependentUpon>Change Log.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Windows\Check for Updates Every.resx">
       <DependentUpon>Check for Updates Every.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Configure HTTP Timeout.resx">
       <DependentUpon>Configure HTTP Timeout.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Configure Proxy.resx">
+      <DependentUpon>Configure Proxy.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Confirm Restore Point Deletion.resx">
       <DependentUpon>Confirm Restore Point Deletion.vb</DependentUpon>
@@ -351,6 +357,12 @@
     <EmbeddedResource Include="Windows\Create Restore Point at User Logon.resx">
       <DependentUpon>Create Restore Point at User Logon.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Custom Named Restore Point.resx">
+      <DependentUpon>Custom Named Restore Point.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Delete Old System Restore Points Dialog.resx">
+      <DependentUpon>Delete Old System Restore Points Dialog.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Windows\Disk Space Usage.resx">
       <DependentUpon>Disk Space Usage.vb</DependentUpon>
     </EmbeddedResource>
@@ -359,6 +371,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Global Application Crash Handler.resx">
       <DependentUpon>Global Application Crash Handler.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Keep X Amount of Restore Points.resx">
+      <DependentUpon>Keep X Amount of Restore Points.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Main Form.resx">
       <DependentUpon>Main Form.vb</DependentUpon>
@@ -389,6 +404,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Search Event Log.resx">
       <DependentUpon>Search Event Log.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Set Custom Restore Point Name for Scheduled Restore Points.resx">
+      <DependentUpon>Set Custom Restore Point Name for Scheduled Restore Points.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Set Default Custom Restore Point Name.resx">
       <DependentUpon>Set Default Custom Restore Point Name.vb</DependentUpon>

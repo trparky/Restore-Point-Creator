@@ -265,8 +265,8 @@ Partial Class eventLogForm
         '
         'eventLogForm
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.ClientSize = New System.Drawing.Size(860, 332)
         Me.Controls.Add(Me.chkAskMeToSubmitIfViewingAnExceptionEntry)
         Me.Controls.Add(Me.SplitContainer1)
