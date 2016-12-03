@@ -76,7 +76,7 @@ Namespace globalVariables
             Public Const boolDebugBuild As Boolean = True
 
             Public Const boolBeta As Boolean = True
-            Public Const shortBetaVersion As Short = 3
+            Public Const shortBetaVersion As Short = 4
 
             Public Const boolReleaseCandidate As Boolean = False
             Public Const shortReleaseCandidateVersion As Short = 0
