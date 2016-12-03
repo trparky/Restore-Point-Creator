@@ -1786,9 +1786,9 @@ Public Class Form1
                             newestSystemRestoreID = DirectCast(systemRestoreIDs.ToArray(GetType(Integer)), Integer()).Max
                         End If
 
-                        For i = 0 To systemRestorePointsList.Items.Count - 1
-                            If Integer.Parse(systemRestorePointsList.Items.Item(i).SubItems(0).Text) = newestSystemRestoreID Then
-                                systemRestorePointsList.Items.Item(i).Font = New Font(btnCreate.Font.FontFamily, btnCreate.Font.SizeInPoints, FontStyle.Bold)
+                        For Each itemInList As restorePointEntryItem In systemRestorePointsList.Items
+                            If Integer.Parse(itemInList.restorePointID) = newestSystemRestoreID Then
+                                itemInList.Font = New Font(btnCreate.Font.FontFamily, btnCreate.Font.SizeInPoints, FontStyle.Bold)
                             End If
                         Next
                     Else
@@ -1864,14 +1864,12 @@ Public Class Form1
     Sub afterDeleteSelectedRestorePoints(restorePointsToBeDeleted As Dictionary(Of String, restorePointInfo))
         Functions.wait.closePleaseWaitWindow()
 
-        Dim strItemInList As String
         Dim boolMultiMode As Boolean = False
 
         If restorePointsToBeDeleted.Count > 1 Then boolMultiMode = True
 
-        For Each itemInList As ListViewItem In systemRestorePointsList.Items
-            strItemInList = itemInList.SubItems(enums.restorePointListSubItems.restorePointID).Text.Trim
-            If restorePointsToBeDeleted.ContainsKey(strItemInList) Then systemRestorePointsList.Items.Remove(itemInList)
+        For Each itemInList As restorePointEntryItem In systemRestorePointsList.Items
+            If restorePointsToBeDeleted.ContainsKey(itemInList.restorePointID) Then systemRestorePointsList.Items.Remove(itemInList)
         Next
 
         systemRestorePointsList.Enabled = True
@@ -2137,8 +2135,8 @@ Public Class Form1
         End If
 
         If AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked = False Then
-            For i = 0 To systemRestorePointsList.SelectedItems.Count - 1
-                If Integer.Parse(systemRestorePointsList.SelectedItems(i).SubItems(enums.restorePointListSubItems.restorePointID).Text) = newestSystemRestoreID Then
+            For Each iteminlist As restorePointEntryItem In systemRestorePointsList.SelectedItems
+                If Integer.Parse(iteminlist.restorePointID) = newestSystemRestoreID Then
                     btnDeleteRestorePoint.Enabled = False
                     stripDelete.Enabled = False
                     ToolTip.SetToolTip(btnDeleteRestorePoint, "Disabled because you have the latest System Restore Point selected as part of the group of selected System Restore Points.")
@@ -3486,11 +3484,8 @@ Public Class Form1
         Dim restorePointIDsToBeDeleted As New Dictionary(Of String, restorePointInfo)
         Dim strRestorePointName, strRestorePointDate, strRestorePointID, strRestorePointType As String
         Dim boolConfirmDeletions As Boolean = toolStripConfirmDeletions.Checked
-        Dim restorePointEntryItem As restorePointEntryItem
 
-        For Each item As ListViewItem In systemRestorePointsList.SelectedItems
-            restorePointEntryItem = DirectCast(item, restorePointEntryItem)
-
+        For Each restorePointEntryItem As restorePointEntryItem In systemRestorePointsList.SelectedItems
             If AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked = False Then
                 ' Checks to see if the user is trying to delete the newest System Restore Point based upon ID.
                 If Integer.Parse(restorePointEntryItem.restorePointID) = newestSystemRestoreID Then
