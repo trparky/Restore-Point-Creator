@@ -99,7 +99,7 @@ Partial Class Create_Restore_Point_at_User_Logon
         'Create_Restore_Point_at_User_Logon
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.ClientSize = New System.Drawing.Size(441, 205)
         Me.Controls.Add(Me.lblIndication)
         Me.Controls.Add(Me.btnDeleteTask)

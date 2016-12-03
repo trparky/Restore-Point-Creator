@@ -58,7 +58,7 @@ Partial Class Restore_Point_Creator_Command_Line_Arguments
         'Restore_Point_Creator_Command_Line_Arguments
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.ClientSize = New System.Drawing.Size(645, 211)
         Me.Controls.Add(Me.btnClose)
         Me.Controls.Add(Me.btnCopyToClipboard)

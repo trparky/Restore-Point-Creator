@@ -75,7 +75,7 @@ Partial Class Custom_Named_Restore_Point
         'Custom_Named_Restore_Point
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.ClientSize = New System.Drawing.Size(356, 117)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnOK)

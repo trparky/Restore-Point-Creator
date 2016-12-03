@@ -630,7 +630,7 @@ Partial Class frmTaskScheduler
         'frmTaskScheduler
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.ClientSize = New System.Drawing.Size(492, 575)
         Me.Controls.Add(Me.lblRunTimes)
         Me.Controls.Add(Me.chkWake)
