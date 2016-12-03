@@ -1,8 +1,6 @@
 ﻿Imports System.Management
 
 Public Class Mount_Volume_Shadow_Copy
-    Private shadowCopyCache As New Dictionary(Of Integer, String)
-
     Private Sub Mount_Volume_Shadow_Copy_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         My.Settings.mountVolumeShadowCopyWindowPosition = Me.Location
         If IO.Directory.Exists(globalVariables.shadowCopyMountFolder) Then IO.Directory.Delete(globalVariables.shadowCopyMountFolder)
@@ -15,15 +13,13 @@ Public Class Mount_Volume_Shadow_Copy
         Dim searcher As New ManagementObjectSearcher("root\CIMV2", "SELECT * FROM Win32_ShadowCopy")
 
         listShadowCopyIDs.Items.Clear()
-        shadowCopyCache.Clear()
 
         Dim timeCreated As Date, index As Integer
 
         For Each queryObj As ManagementObject In searcher.Get()
             timeCreated = Functions.support.parseSystemRestorePointCreationDate(queryObj("InstallDate").ToString).ToUniversalTime
 
-            index = listShadowCopyIDs.Items.Add((timeCreated.ToLongDateString & " at " & timeCreated.ToLongTimeString).Trim)
-            shadowCopyCache.Add(index, queryObj("DeviceObject").ToString)
+            listShadowCopyIDs.Items.Add(New volumeShadowCopyListItem() With {.Text = (timeCreated.ToLongDateString & " at " & timeCreated.ToLongTimeString).Trim, .deviceID = queryObj("DeviceObject").ToString})
 
             Debug.WriteLine("shadow copy info | " & index & " | " & queryObj("DeviceObject").ToString)
 
@@ -32,6 +28,10 @@ Public Class Mount_Volume_Shadow_Copy
 
         searcher.Dispose()
         searcher = Nothing
+
+        For Each item As ListViewItem In listShadowCopyIDs.Items
+            Debug.WriteLine(item.Text)
+        Next
     End Sub
 
     Private Sub Mount_Volume_Shadow_Copy_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -45,32 +45,28 @@ Public Class Mount_Volume_Shadow_Copy
         btnUnmount.Enabled = False
         btnMount.Enabled = True
 
-        Debug.WriteLine("shadow copy info | " & listShadowCopyIDs.SelectedIndex & " | " & shadowCopyCache(listShadowCopyIDs.SelectedIndex))
+        If listShadowCopyIDs.SelectedItems.Count <> 0 Then Debug.WriteLine("shadow copy info | " & DirectCast(listShadowCopyIDs.SelectedItems(0), volumeShadowCopyListItem).deviceID)
     End Sub
 
     Private Sub btnMount_Click(sender As Object, e As EventArgs) Handles btnMount.Click
         Try
             If IO.Directory.Exists(globalVariables.shadowCopyMountFolder) Then IO.Directory.Delete(globalVariables.shadowCopyMountFolder)
 
-            If shadowCopyCache.ContainsKey(listShadowCopyIDs.SelectedIndex) = True Then
-                Dim deviceID As String = shadowCopyCache(listShadowCopyIDs.SelectedIndex) & "\"
+            Dim deviceID As String = DirectCast(listShadowCopyIDs.SelectedItems(0), volumeShadowCopyListItem).deviceID & "\"
 
-                Dim mountProcessInfo As New ProcessStartInfo
-                mountProcessInfo.FileName = IO.Path.Combine(GlobalVariables.strPathToSystemFolder, "cmd.exe")
-                mountProcessInfo.Arguments = String.Format("/c mklink /d {0}{1}{0} {0}{2}{0}", Chr(34), globalVariables.shadowCopyMountFolder, deviceID) '"/c mklink /d C:\shadowcopy """ & deviceID & """"
-                mountProcessInfo.Verb = "runas"
-                mountProcessInfo.CreateNoWindow = True
-                mountProcessInfo.WindowStyle = ProcessWindowStyle.Hidden
+            Dim mountProcessInfo As New ProcessStartInfo
+            mountProcessInfo.FileName = IO.Path.Combine(globalVariables.strPathToSystemFolder, "cmd.exe")
+            mountProcessInfo.Arguments = String.Format("/c mklink /d {0}{1}{0} {0}{2}{0}", Chr(34), globalVariables.shadowCopyMountFolder, deviceID) '"/c mklink /d C:\shadowcopy """ & deviceID & """"
+            mountProcessInfo.Verb = "runas"
+            mountProcessInfo.CreateNoWindow = True
+            mountProcessInfo.WindowStyle = ProcessWindowStyle.Hidden
 
-                Dim mountProcess As Process = Process.Start(mountProcessInfo)
-                mountProcess.WaitForExit()
-                mountProcessInfo = Nothing
+            Dim mountProcess As Process = Process.Start(mountProcessInfo)
+            mountProcess.WaitForExit()
+            mountProcessInfo = Nothing
 
-                Process.Start(IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe"), globalVariables.shadowCopyMountFolder)
-                btnUnmount.Enabled = True
-            Else
-                MsgBox("Something went wrong, unable to find entry in shadowCopyCache Object.", MsgBoxStyle.Critical, Me.Text)
-            End If
+            Process.Start(IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe"), globalVariables.shadowCopyMountFolder)
+            btnUnmount.Enabled = True
         Catch ex As NullReferenceException
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
             Functions.eventLogFunctions.writeToSystemEventLog("Something went wrong, unable to find entry in shadowCopyCache Object.", EventLogEntryType.Error)
@@ -87,4 +83,19 @@ Public Class Mount_Volume_Shadow_Copy
     Private Sub btnRefreshList_Click(sender As Object, e As EventArgs) Handles btnRefreshList.Click
         loadSnapshots()
     End Sub
+End Class
+
+' This class extends the ListViewItem so that I can add more properties to it for my purposes.
+Class volumeShadowCopyListItem
+    Inherits ListViewItem
+    Private strDeviceID As String
+
+    Public Property deviceID() As String
+        Get
+            Return strDeviceID
+        End Get
+        Set(value As String)
+            strDeviceID = value
+        End Set
+    End Property
 End Class
