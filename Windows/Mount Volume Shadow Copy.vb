@@ -19,7 +19,7 @@ Public Class Mount_Volume_Shadow_Copy
         For Each queryObj As ManagementObject In searcher.Get()
             timeCreated = Functions.support.parseSystemRestorePointCreationDate(queryObj("InstallDate").ToString).ToUniversalTime
 
-            listShadowCopyIDs.Items.Add(New volumeShadowCopyListItem() With {.Text = (timeCreated.ToLongDateString & " at " & timeCreated.ToLongTimeString).Trim, .deviceID = queryObj("DeviceObject").ToString})
+            listShadowCopyIDs.Items.Add(New myListViewItemTypes.volumeShadowCopyListItem() With {.Text = (timeCreated.ToLongDateString & " at " & timeCreated.ToLongTimeString).Trim, .deviceID = queryObj("DeviceObject").ToString})
 
             Debug.WriteLine("shadow copy info | " & index & " | " & queryObj("DeviceObject").ToString)
 
@@ -45,14 +45,14 @@ Public Class Mount_Volume_Shadow_Copy
         btnUnmount.Enabled = False
         btnMount.Enabled = True
 
-        If listShadowCopyIDs.SelectedItems.Count <> 0 Then Debug.WriteLine("shadow copy info | " & DirectCast(listShadowCopyIDs.SelectedItems(0), volumeShadowCopyListItem).deviceID)
+        If listShadowCopyIDs.SelectedItems.Count <> 0 Then Debug.WriteLine("shadow copy info | " & DirectCast(listShadowCopyIDs.SelectedItems(0), myListViewItemTypes.volumeShadowCopyListItem).deviceID)
     End Sub
 
     Private Sub btnMount_Click(sender As Object, e As EventArgs) Handles btnMount.Click
         Try
             If IO.Directory.Exists(globalVariables.shadowCopyMountFolder) Then IO.Directory.Delete(globalVariables.shadowCopyMountFolder)
 
-            Dim deviceID As String = DirectCast(listShadowCopyIDs.SelectedItems(0), volumeShadowCopyListItem).deviceID & "\"
+            Dim deviceID As String = DirectCast(listShadowCopyIDs.SelectedItems(0), myListViewItemTypes.volumeShadowCopyListItem).deviceID & "\"
 
             Dim mountProcessInfo As New ProcessStartInfo
             mountProcessInfo.FileName = IO.Path.Combine(globalVariables.strPathToSystemFolder, "cmd.exe")
@@ -83,19 +83,4 @@ Public Class Mount_Volume_Shadow_Copy
     Private Sub btnRefreshList_Click(sender As Object, e As EventArgs) Handles btnRefreshList.Click
         loadSnapshots()
     End Sub
-End Class
-
-' This class extends the ListViewItem so that I can add more properties to it for my purposes.
-Class volumeShadowCopyListItem
-    Inherits ListViewItem
-    Private strDeviceID As String
-
-    Public Property deviceID() As String
-        Get
-            Return strDeviceID
-        End Get
-        Set(value As String)
-            strDeviceID = value
-        End Set
-    End Property
 End Class
