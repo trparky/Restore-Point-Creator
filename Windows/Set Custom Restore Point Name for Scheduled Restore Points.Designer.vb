@@ -79,8 +79,8 @@ Partial Class Set_Custom_Restore_Point_Name_for_Scheduled_Restore_Points
         '
         'Set_Custom_Restore_Point_Name_for_Scheduled_Restore_Points
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.ClientSize = New System.Drawing.Size(392, 133)
         Me.Controls.Add(Me.btnDelete)
         Me.Controls.Add(Me.btnCancel)
@@ -88,11 +88,11 @@ Partial Class Set_Custom_Restore_Point_Name_for_Scheduled_Restore_Points
         Me.Controls.Add(Me.txtRestorePointName)
         Me.Controls.Add(Me.Label1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
+        Me.Icon = Global.Restore_Point_Creator.My.Resources.Resources.RestorePoint_noBackground_2
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "Set_Custom_Restore_Point_Name_for_Scheduled_Restore_Points"
         Me.Text = "Set Custom Name for Scheduled Restore Points"
-        Me.Icon = Global.Restore_Point_Creator.My.Resources.RestorePoint_noBackground_2
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

@@ -135,8 +135,8 @@ Partial Class Search_Event_Log
         '
         'Search_Event_Log
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.ClientSize = New System.Drawing.Size(399, 75)
         Me.Controls.Add(Me.radError)
         Me.Controls.Add(Me.Label2)

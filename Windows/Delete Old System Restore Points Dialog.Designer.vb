@@ -78,8 +78,8 @@ Partial Class frmDeleteOldSystemRestorePoints
         '
         'frmDeleteOldSystemRestorePoints
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.ClientSize = New System.Drawing.Size(356, 117)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnOK)
@@ -87,11 +87,11 @@ Partial Class frmDeleteOldSystemRestorePoints
         Me.Controls.Add(Me.txtMaxAge)
         Me.Controls.Add(Me.Label1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
+        Me.Icon = Global.Restore_Point_Creator.My.Resources.Resources.RestorePoint_noBackground_2
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "frmDeleteOldSystemRestorePoints"
         Me.Text = "Delete Old System Restore Points"
-        Me.Icon = Global.Restore_Point_Creator.My.Resources.RestorePoint_noBackground_2
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

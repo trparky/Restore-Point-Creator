@@ -80,8 +80,8 @@ Partial Class Set_Default_Custom_Restore_Point_Name
         '
         'Set_Default_Custom_Restore_Point_Name
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.ClientSize = New System.Drawing.Size(354, 183)
         Me.Controls.Add(Me.btnDelete)
         Me.Controls.Add(Me.btnCancel)
@@ -89,11 +89,11 @@ Partial Class Set_Default_Custom_Restore_Point_Name
         Me.Controls.Add(Me.txtName)
         Me.Controls.Add(Me.Label1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
+        Me.Icon = Global.Restore_Point_Creator.My.Resources.Resources.RestorePoint_noBackground_2
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "Set_Default_Custom_Restore_Point_Name"
         Me.Text = "Set Default Custom Restore Point Name"
-        Me.Icon = Global.Restore_Point_Creator.My.Resources.RestorePoint_noBackground_2
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

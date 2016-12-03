@@ -67,6 +67,7 @@ Partial Class frmTaskScheduler
         Me.txtEveryDay = New System.Windows.Forms.TextBox()
         Me.lblDays = New System.Windows.Forms.Label()
         Me.deleteOldRestorePointsTaskSettings = New System.Windows.Forms.GroupBox()
+        Me.lblRunTimesDelete = New System.Windows.Forms.Label()
         Me.chkWakeDelete = New System.Windows.Forms.CheckBox()
         Me.chkRunMissedTaskDelete = New System.Windows.Forms.CheckBox()
         Me.Label8 = New System.Windows.Forms.Label()
@@ -74,7 +75,6 @@ Partial Class frmTaskScheduler
         Me.btnSetCustomName = New System.Windows.Forms.Button()
         Me.chkWake = New System.Windows.Forms.CheckBox()
         Me.lblRunTimes = New System.Windows.Forms.Label()
-        Me.lblRunTimesDelete = New System.Windows.Forms.Label()
         Me.grpDaysOfTheWeek.SuspendLayout()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
@@ -549,6 +549,15 @@ Partial Class frmTaskScheduler
         Me.deleteOldRestorePointsTaskSettings.TabStop = False
         Me.deleteOldRestorePointsTaskSettings.Text = "Delete Old Restore Points Task Settings"
         '
+        'lblRunTimesDelete
+        '
+        Me.lblRunTimesDelete.AutoSize = True
+        Me.lblRunTimesDelete.Location = New System.Drawing.Point(207, 16)
+        Me.lblRunTimesDelete.Name = "lblRunTimesDelete"
+        Me.lblRunTimesDelete.Size = New System.Drawing.Size(81, 26)
+        Me.lblRunTimesDelete.TabIndex = 44
+        Me.lblRunTimesDelete.Text = "Last Run Time:" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Next Run Time:"
+        '
         'chkWakeDelete
         '
         Me.chkWakeDelete.AutoSize = True
@@ -618,19 +627,10 @@ Partial Class frmTaskScheduler
         Me.lblRunTimes.TabIndex = 39
         Me.lblRunTimes.Text = "Last Run Time:" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Next Run Time:"
         '
-        'lblRunTimesDelete
-        '
-        Me.lblRunTimesDelete.AutoSize = True
-        Me.lblRunTimesDelete.Location = New System.Drawing.Point(207, 16)
-        Me.lblRunTimesDelete.Name = "lblRunTimesDelete"
-        Me.lblRunTimesDelete.Size = New System.Drawing.Size(81, 26)
-        Me.lblRunTimesDelete.TabIndex = 44
-        Me.lblRunTimesDelete.Text = "Last Run Time:" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Next Run Time:"
-        '
         'frmTaskScheduler
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.ClientSize = New System.Drawing.Size(492, 575)
         Me.Controls.Add(Me.lblRunTimes)
         Me.Controls.Add(Me.chkWake)
