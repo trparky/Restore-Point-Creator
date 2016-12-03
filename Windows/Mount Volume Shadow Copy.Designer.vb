@@ -23,32 +23,15 @@ Partial Class Mount_Volume_Shadow_Copy
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Mount_Volume_Shadow_Copy))
-        Me.Label1 = New System.Windows.Forms.Label()
-        Me.listShadowCopyIDs = New System.Windows.Forms.ComboBox()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.btnUnmount = New System.Windows.Forms.Button()
         Me.btnMount = New System.Windows.Forms.Button()
         Me.btnRefreshList = New System.Windows.Forms.Button()
         Me.lblMainLabel = New System.Windows.Forms.Label()
+        Me.listShadowCopyIDs = New System.Windows.Forms.ListView()
+        Me.ColumnHeader1 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.TableLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(12, 187)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(81, 13)
-        Me.Label1.TabIndex = 0
-        Me.Label1.Text = "Snapshot Time:"
-        '
-        'listShadowCopyIDs
-        '
-        Me.listShadowCopyIDs.FormattingEnabled = True
-        Me.listShadowCopyIDs.Location = New System.Drawing.Point(99, 184)
-        Me.listShadowCopyIDs.Name = "listShadowCopyIDs"
-        Me.listShadowCopyIDs.Size = New System.Drawing.Size(327, 21)
-        Me.listShadowCopyIDs.TabIndex = 1
         '
         'TableLayoutPanel1
         '
@@ -58,7 +41,7 @@ Partial Class Mount_Volume_Shadow_Copy
         Me.TableLayoutPanel1.Controls.Add(Me.btnUnmount, 1, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.btnMount, 0, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.btnRefreshList, 0, 1)
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(13, 211)
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(12, 324)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 2
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
@@ -106,15 +89,29 @@ Partial Class Mount_Volume_Shadow_Copy
         Me.lblMainLabel.TabIndex = 3
         Me.lblMainLabel.Text = resources.GetString("lblMainLabel.Text")
         '
+        'listShadowCopyIDs
+        '
+        Me.listShadowCopyIDs.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader1})
+        Me.listShadowCopyIDs.Location = New System.Drawing.Point(16, 181)
+        Me.listShadowCopyIDs.Name = "listShadowCopyIDs"
+        Me.listShadowCopyIDs.Size = New System.Drawing.Size(409, 137)
+        Me.listShadowCopyIDs.TabIndex = 4
+        Me.listShadowCopyIDs.UseCompatibleStateImageBehavior = False
+        Me.listShadowCopyIDs.View = System.Windows.Forms.View.Details
+        '
+        'ColumnHeader1
+        '
+        Me.ColumnHeader1.Text = "Snapshot Time"
+        Me.ColumnHeader1.Width = 382
+        '
         'Mount_Volume_Shadow_Copy
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(435, 280)
+        Me.ClientSize = New System.Drawing.Size(435, 396)
+        Me.Controls.Add(Me.listShadowCopyIDs)
         Me.Controls.Add(Me.lblMainLabel)
         Me.Controls.Add(Me.TableLayoutPanel1)
-        Me.Controls.Add(Me.listShadowCopyIDs)
-        Me.Controls.Add(Me.Label1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
         Me.Icon = Global.Restore_Point_Creator.My.Resources.Resources.RestorePoint_noBackground_2
         Me.Name = "Mount_Volume_Shadow_Copy"
@@ -124,12 +121,11 @@ Partial Class Mount_Volume_Shadow_Copy
         Me.PerformLayout()
 
     End Sub
-
-    Friend WithEvents Label1 As Label
-    Friend WithEvents listShadowCopyIDs As ComboBox
     Friend WithEvents TableLayoutPanel1 As TableLayoutPanel
     Friend WithEvents btnUnmount As Button
     Friend WithEvents btnMount As Button
     Friend WithEvents lblMainLabel As Label
     Friend WithEvents btnRefreshList As Button
+    Friend WithEvents listShadowCopyIDs As ListView
+    Friend WithEvents ColumnHeader1 As ColumnHeader
 End Class
