@@ -59,7 +59,7 @@ Partial Class Windows_XP_Notice
         'Windows_XP_Notice
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(347, 235)
         Me.Controls.Add(Me.btnOK)
         Me.Controls.Add(Me.PictureBox1)

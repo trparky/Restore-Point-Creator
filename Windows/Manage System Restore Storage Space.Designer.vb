@@ -109,7 +109,7 @@ Partial Class frmManageSystemRestoreStorageSpace
         'frmManageSystemRestoreStorageSpace
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(385, 145)
         Me.Controls.Add(Me.percentageIndicator)
         Me.Controls.Add(Me.lblDriveLabel)

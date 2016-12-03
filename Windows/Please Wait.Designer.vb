@@ -65,7 +65,7 @@ Partial Class Please_Wait
         'Please_Wait
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(292, 65)
         Me.Controls.Add(Me.pleaseWaitlblLabel)
         Me.Controls.Add(Me.SmoothProgressBar1)

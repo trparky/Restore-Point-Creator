@@ -107,7 +107,7 @@ Partial Class Mount_Volume_Shadow_Copy
         'Mount_Volume_Shadow_Copy
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(435, 396)
         Me.Controls.Add(Me.listShadowCopyIDs)
         Me.Controls.Add(Me.lblMainLabel)
