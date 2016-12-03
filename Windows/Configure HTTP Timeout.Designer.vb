@@ -59,7 +59,7 @@ Partial Class Configure_HTTP_Timeout
         'Configure_HTTP_Timeout
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(283, 69)
         Me.Controls.Add(Me.btnSave)
         Me.Controls.Add(Me.Label1)

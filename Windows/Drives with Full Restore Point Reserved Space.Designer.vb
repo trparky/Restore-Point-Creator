@@ -49,7 +49,7 @@ Partial Class Drives_with_Full_Restore_Point_Reserved_Space
         'Drives_with_Full_Restore_Point_Reserved_Space
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(884, 262)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.Label1)

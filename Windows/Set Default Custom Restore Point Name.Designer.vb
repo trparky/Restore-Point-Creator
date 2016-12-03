@@ -81,7 +81,7 @@ Partial Class Set_Default_Custom_Restore_Point_Name
         'Set_Default_Custom_Restore_Point_Name
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(354, 183)
         Me.Controls.Add(Me.btnDelete)
         Me.Controls.Add(Me.btnCancel)

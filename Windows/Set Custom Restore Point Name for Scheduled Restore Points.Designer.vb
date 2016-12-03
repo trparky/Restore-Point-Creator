@@ -80,7 +80,7 @@ Partial Class Set_Custom_Restore_Point_Name_for_Scheduled_Restore_Points
         'Set_Custom_Restore_Point_Name_for_Scheduled_Restore_Points
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(392, 133)
         Me.Controls.Add(Me.btnDelete)
         Me.Controls.Add(Me.btnCancel)
