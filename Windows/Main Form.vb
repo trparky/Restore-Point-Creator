@@ -1367,7 +1367,7 @@ Public Class Form1
     Sub disableAutomaticUpdatesAndNotifyUser()
         Dim msgBoxResult As MsgBoxResult = MsgBox("Since you have told the program that you didn't want to update to the newest supported version, do you want to also disable Automatic Update Checking?" & vbCrLf & vbCrLf & "By disabling Automatic Update Checking you will no longer be notified about new versions of this program, that is, unless you manually check for updates." & vbCrLf & vbCrLf & "Do you want to disable Automatic Checking for Updates?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, strMessageBoxTitle)
 
-        If msgBoxResult = msgBoxResult.Yes Then
+        If msgBoxResult = MsgBoxResult.Yes Then
             My.Settings.CheckForUpdates = False
             ConfigureAutomaticUpdatesToolStripMenuItem.Visible = False
             toolStripAutomaticallyCheckForUpdates.Checked = False
@@ -1786,9 +1786,9 @@ Public Class Form1
                             newestSystemRestoreID = DirectCast(systemRestoreIDs.ToArray(GetType(Integer)), Integer()).Max
                         End If
 
-                        For i = 0 To systemRestorePointsList.Items.Count - 1
-                            If Integer.Parse(systemRestorePointsList.Items.Item(i).SubItems(0).Text) = newestSystemRestoreID Then
-                                systemRestorePointsList.Items.Item(i).Font = New Font(btnCreate.Font.FontFamily, btnCreate.Font.SizeInPoints, FontStyle.Bold)
+                        For Each itemInList As restorePointEntryItem In systemRestorePointsList.Items
+                            If Integer.Parse(itemInList.restorePointID) = newestSystemRestoreID Then
+                                itemInList.Font = New Font(btnCreate.Font.FontFamily, btnCreate.Font.SizeInPoints, FontStyle.Bold)
                             End If
                         Next
                     Else
@@ -1864,14 +1864,12 @@ Public Class Form1
     Sub afterDeleteSelectedRestorePoints(restorePointsToBeDeleted As Dictionary(Of String, restorePointInfo))
         Functions.wait.closePleaseWaitWindow()
 
-        Dim strItemInList As String
         Dim boolMultiMode As Boolean = False
 
         If restorePointsToBeDeleted.Count > 1 Then boolMultiMode = True
 
-        For Each itemInList As ListViewItem In systemRestorePointsList.Items
-            strItemInList = itemInList.SubItems(enums.restorePointListSubItems.restorePointID).Text.Trim
-            If restorePointsToBeDeleted.ContainsKey(strItemInList) Then systemRestorePointsList.Items.Remove(itemInList)
+        For Each itemInList As restorePointEntryItem In systemRestorePointsList.Items
+            If restorePointsToBeDeleted.ContainsKey(itemInList.restorePointID) Then systemRestorePointsList.Items.Remove(itemInList)
         Next
 
         systemRestorePointsList.Enabled = True
@@ -2137,8 +2135,8 @@ Public Class Form1
         End If
 
         If AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked = False Then
-            For i = 0 To systemRestorePointsList.SelectedItems.Count - 1
-                If Integer.Parse(systemRestorePointsList.SelectedItems(i).SubItems(enums.restorePointListSubItems.restorePointID).Text) = newestSystemRestoreID Then
+            For Each iteminlist As restorePointEntryItem In systemRestorePointsList.SelectedItems
+                If Integer.Parse(iteminlist.restorePointID) = newestSystemRestoreID Then
                     btnDeleteRestorePoint.Enabled = False
                     stripDelete.Enabled = False
                     ToolTip.SetToolTip(btnDeleteRestorePoint, "Disabled because you have the latest System Restore Point selected as part of the group of selected System Restore Points.")
@@ -2669,7 +2667,7 @@ Public Class Form1
     Private Sub SetWindowsActivePowerPlanSettingsForWakeTimersBackToDefaultToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetWindowsActivePowerPlanSettingsForWakeTimersBackToDefaultToolStripMenuItem.Click
         Dim msgBoxResult As MsgBoxResult = MsgBox("Setting the Windows Active Power Plan Wake Times feature back to default (Disabled) will prevent System Restore from creating restore points while your system is asleep." & vbCrLf & vbCrLf & "Are you sure you want to do this?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Are you sure?")
 
-        If msgBoxResult = msgBoxResult.Yes Then
+        If msgBoxResult = MsgBoxResult.Yes Then
             Functions.power.disablePowerPlanWakeFromSleep()
         End If
     End Sub
@@ -2678,7 +2676,7 @@ Public Class Form1
         If UseSSLToolStripMenuItem.Checked = False Then
             Dim msgBoxResult As MsgBoxResult = MsgBox("It's recommended to have SSL enabled so that downloads and data that's sent to my web site is secure. Please reconsider this." & vbCrLf & vbCrLf & "Are you sure you want to disable SSL?", MsgBoxStyle.Question + vbYesNo, "Are you sure?")
 
-            If msgBoxResult = msgBoxResult.Yes Then
+            If msgBoxResult = MsgBoxResult.Yes Then
                 My.Settings.useSSL = UseSSLToolStripMenuItem.Checked
             Else
                 UseSSLToolStripMenuItem.Checked = True
@@ -2789,7 +2787,7 @@ Public Class Form1
 
         Dim msgBoxResult As MsgBoxResult = MsgBox("The debug build is a build that's not optimized for normal use but may help in the process of debugging crashes and other issues that you may have with the program. The debug build outputs far more crash data than the release type build." & vbCrLf & vbCrLf & "Are you sure you want to switch to the debug build?", MsgBoxStyle.Question + MsgBoxStyle.YesNo)
 
-        If msgBoxResult = msgBoxResult.Yes Then
+        If msgBoxResult = MsgBoxResult.Yes Then
             Functions.wait.createPleaseWaitWindow("Downloading Debug Build... Please Wait.", False, enums.howToCenterWindow.parent, True)
             Threading.ThreadPool.QueueUserWorkItem(AddressOf switchToDebugBuildDownloadThreadSub)
         End If
@@ -3358,7 +3356,7 @@ Public Class Form1
 
         Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot into Safe Mode and perform the restore process there and reboot after the process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, strDescription, strDate, strType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
 
-        If msgboxResult = msgboxResult.Yes Then
+        If msgboxResult = MsgBoxResult.Yes Then
             savePreferenceToRegistry(globalVariables.registryValues.strSafeModeValue, "True")
             Functions.support.setSafeModeBoot() ' Set the system up for Safe Mode Boot.
 
@@ -3400,13 +3398,13 @@ Public Class Form1
 
         txtRestorePointDescription.Text = txtRestorePointDescription.Text.Trim
 
-        Dim msgBoxResult As MsgBoxResult = msgBoxResult.Yes
+        Dim msgBoxResult As MsgBoxResult = MsgBoxResult.Yes
 
         If My.Settings.askBeforeCreatingRestorePoint = True Then
             msgBoxResult = MsgBox(String.Format("Are you sure you want to create a new system restore point with the name of {0}{1}{0}?", Chr(34), txtRestorePointDescription.Text), MsgBoxStyle.Question + vbYesNo, "Restore Point Creator")
         End If
 
-        If msgBoxResult = msgBoxResult.Yes Then
+        If msgBoxResult = MsgBoxResult.Yes Then
             Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", False, enums.howToCenterWindow.parent, False)
             Threading.ThreadPool.QueueUserWorkItem(Sub() unifiedCreateSystemRestorePoint(txtRestorePointDescription.Text))
             Functions.wait.openPleaseWaitWindow()
@@ -3419,13 +3417,13 @@ Public Class Form1
             Exit Sub
         End If
 
-        Dim msgBoxResult As MsgBoxResult = msgBoxResult.Yes
+        Dim msgBoxResult As MsgBoxResult = MsgBoxResult.Yes
 
         If My.Settings.askBeforeCreatingRestorePoint = True Then
             msgBoxResult = MsgBox("Are you sure you want to create a new system restore point?", MsgBoxStyle.Question + vbYesNo, "Restore Point Creator")
         End If
 
-        If msgBoxResult = msgBoxResult.Yes Then
+        If msgBoxResult = MsgBoxResult.Yes Then
             Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", False, enums.howToCenterWindow.parent, False)
             Threading.ThreadPool.QueueUserWorkItem(Sub() unifiedCreateSystemRestorePoint())
             Functions.wait.openPleaseWaitWindow()
@@ -3449,7 +3447,7 @@ Public Class Form1
 
         Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot after the restoration process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, strDescription, strDate, strType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
 
-        If msgboxResult = msgboxResult.Yes Then
+        If msgboxResult = MsgBoxResult.Yes Then
             Functions.wait.createPleaseWaitWindow("Beginning the Restore Process... Please Wait.", False, enums.howToCenterWindow.parent, False)
             Threading.ThreadPool.QueueUserWorkItem(AddressOf restoreSystemRestorePoint)
             Functions.wait.openPleaseWaitWindow()
@@ -3486,11 +3484,8 @@ Public Class Form1
         Dim restorePointIDsToBeDeleted As New Dictionary(Of String, restorePointInfo)
         Dim strRestorePointName, strRestorePointDate, strRestorePointID, strRestorePointType As String
         Dim boolConfirmDeletions As Boolean = toolStripConfirmDeletions.Checked
-        Dim restorePointEntryItem As restorePointEntryItem
 
-        For Each item As ListViewItem In systemRestorePointsList.SelectedItems
-            restorePointEntryItem = DirectCast(item, restorePointEntryItem)
-
+        For Each restorePointEntryItem As restorePointEntryItem In systemRestorePointsList.SelectedItems
             If AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked = False Then
                 ' Checks to see if the user is trying to delete the newest System Restore Point based upon ID.
                 If Integer.Parse(restorePointEntryItem.restorePointID) = newestSystemRestoreID Then
