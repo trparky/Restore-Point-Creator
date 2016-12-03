@@ -16,7 +16,7 @@
     Private longEntriesFound As Long = 0
 
     Sub loadEventLogData(ByVal strEventLog As String, ByRef itemsToPutInToList As List(Of ListViewItem), ByRef cache As Dictionary(Of Long, String))
-        Dim itemAdd As eventLogListEntry
+        Dim itemAdd As myListViewItemTypes.eventLogListEntry
         Dim eventLogQuery As Eventing.Reader.EventLogQuery
         Dim logReader As Eventing.Reader.EventLogReader
         Dim eventInstance As Eventing.Reader.EventRecord
@@ -32,7 +32,7 @@
                     If eventInstance.ProviderName.stringCompare(globalVariables.eventLog.strSystemRestorePointCreator) Or eventInstance.ProviderName.caseInsensitiveContains(globalVariables.eventLog.strSystemRestorePointCreator) Then
                         cache.Add(eventInstance.RecordId, eventInstance.FormatDescription)
 
-                        itemAdd = New eventLogListEntry()
+                        itemAdd = New myListViewItemTypes.eventLogListEntry()
                         Try
                             itemAdd.Text = eventInstance.LevelDisplayName
                         Catch ex As Eventing.Reader.EventLogNotFoundException
@@ -341,8 +341,8 @@
     Private Sub eventLogList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles eventLogList.SelectedIndexChanged
         Try
             If eventLogList.SelectedItems.Count <> 0 Then
-                Dim eventID As Long = DirectCast(eventLogList.SelectedItems(0), eventLogListEntry).eventLogEntryID
-                Dim source As String = DirectCast(eventLogList.SelectedItems(0), eventLogListEntry).eventLogSource
+                Dim eventID As Long = DirectCast(eventLogList.SelectedItems(0), myListViewItemTypes.eventLogListEntry).eventLogEntryID
+                Dim source As String = DirectCast(eventLogList.SelectedItems(0), myListViewItemTypes.eventLogListEntry).eventLogSource
 
                 eventLogText.Text = Functions.support.removeSourceCodePathInfo(getEventLogEntryDetails(eventID, source))
 
@@ -519,37 +519,4 @@
             boolDidSortingChange = False
         End If
     End Sub
-End Class
-
-' This class extends the ListViewItem so that I can add more properties to it for my purposes.
-Class eventLogListEntry
-    Inherits ListViewItem
-    Private longEventLogEntryID As Long, strEventLogSource As String, levelType As Byte
-
-    Public Property eventLogEntryID() As String
-        Get
-            Return longEventLogEntryID
-        End Get
-        Set(value As String)
-            longEventLogEntryID = value
-        End Set
-    End Property
-
-    Public Property eventLogSource() As String
-        Get
-            Return strEventLogSource
-        End Get
-        Set(value As String)
-            strEventLogSource = value
-        End Set
-    End Property
-
-    Public Property eventLogLevel() As String
-        Get
-            Return levelType
-        End Get
-        Set(value As String)
-            levelType = value
-        End Set
-    End Property
 End Class

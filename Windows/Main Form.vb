@@ -1675,8 +1675,8 @@ Public Class Form1
         ' Declares some variables.
         Dim systemRestoreIDs As New ArrayList ' Creates an ArrayList for us to put our System Restore IDs into for later checking for the newest System Restore Point ID.
         Dim systemRestorePointsManagementObjectSearcher As ManagementObjectSearcher
-        Dim listViewItem As restorePointEntryItem
-        Dim listOfRestorePoints As New List(Of restorePointEntryItem)
+        Dim listViewItem As myListViewItemTypes.restorePointEntryItem
+        Dim listOfRestorePoints As New List(Of myListViewItemTypes.restorePointEntryItem)
         Dim restorePointCreationDate As Date
         Dim restorePointAge As Double
 
@@ -1710,7 +1710,7 @@ Public Class Form1
                                 'index += 1
 
                                 ' Adds a System Restore Point to a list of System Restore Points with the Restore Point ID as a Key
-                                listViewItem = New restorePointEntryItem()
+                                listViewItem = New myListViewItemTypes.restorePointEntryItem()
                                 listViewItem.Text = restorePointDetails("SequenceNumber").ToString
                                 listViewItem.restorePointID = restorePointDetails("SequenceNumber").ToString
 
@@ -1786,7 +1786,7 @@ Public Class Form1
                             newestSystemRestoreID = DirectCast(systemRestoreIDs.ToArray(GetType(Integer)), Integer()).Max
                         End If
 
-                        For Each itemInList As restorePointEntryItem In systemRestorePointsList.Items
+                        For Each itemInList As myListViewItemTypes.restorePointEntryItem In systemRestorePointsList.Items
                             If Integer.Parse(itemInList.restorePointID) = newestSystemRestoreID Then
                                 itemInList.Font = New Font(btnCreate.Font.FontFamily, btnCreate.Font.SizeInPoints, FontStyle.Bold)
                             End If
@@ -1847,7 +1847,7 @@ Public Class Form1
         Try
             disableFormElements()
 
-            Dim systemRestorePointIndex As Integer = Integer.Parse(DirectCast(systemRestorePointsList.SelectedItems(0), restorePointEntryItem).restorePointID)
+            Dim systemRestorePointIndex As Integer = Integer.Parse(DirectCast(systemRestorePointsList.SelectedItems(0), myListViewItemTypes.restorePointEntryItem).restorePointID)
             'systemRestorePointClass = New SystemRestorePointCreator.Classes.SystemRestore
             Functions.wmi.restoreToSystemRestorePoint(systemRestorePointIndex)
 
@@ -1868,7 +1868,7 @@ Public Class Form1
 
         If restorePointsToBeDeleted.Count > 1 Then boolMultiMode = True
 
-        For Each itemInList As restorePointEntryItem In systemRestorePointsList.Items
+        For Each itemInList As myListViewItemTypes.restorePointEntryItem In systemRestorePointsList.Items
             If restorePointsToBeDeleted.ContainsKey(itemInList.restorePointID) Then systemRestorePointsList.Items.Remove(itemInList)
         Next
 
@@ -2135,7 +2135,7 @@ Public Class Form1
         End If
 
         If AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked = False Then
-            For Each iteminlist As restorePointEntryItem In systemRestorePointsList.SelectedItems
+            For Each iteminlist As myListViewItemTypes.restorePointEntryItem In systemRestorePointsList.SelectedItems
                 If Integer.Parse(iteminlist.restorePointID) = newestSystemRestoreID Then
                     btnDeleteRestorePoint.Enabled = False
                     stripDelete.Enabled = False
@@ -3348,7 +3348,7 @@ Public Class Form1
             Exit Sub
         End If
 
-        Dim selectedRestorePoint As restorePointEntryItem = DirectCast(systemRestorePointsList.SelectedItems(0), restorePointEntryItem)
+        Dim selectedRestorePoint As myListViewItemTypes.restorePointEntryItem = DirectCast(systemRestorePointsList.SelectedItems(0), myListViewItemTypes.restorePointEntryItem)
 
         Dim strDescription As String = selectedRestorePoint.restorePointName
         Dim strDate As String = selectedRestorePoint.restorePointDate
@@ -3439,7 +3439,7 @@ Public Class Form1
             Exit Sub
         End If
 
-        Dim selectedRestorePoint As restorePointEntryItem = DirectCast(systemRestorePointsList.SelectedItems(0), restorePointEntryItem)
+        Dim selectedRestorePoint As myListViewItemTypes.restorePointEntryItem = DirectCast(systemRestorePointsList.SelectedItems(0), myListViewItemTypes.restorePointEntryItem)
 
         Dim strDescription As String = selectedRestorePoint.restorePointName
         Dim strDate As String = selectedRestorePoint.restorePointDate
@@ -3485,7 +3485,7 @@ Public Class Form1
         Dim strRestorePointName, strRestorePointDate, strRestorePointID, strRestorePointType As String
         Dim boolConfirmDeletions As Boolean = toolStripConfirmDeletions.Checked
 
-        For Each restorePointEntryItem As restorePointEntryItem In systemRestorePointsList.SelectedItems
+        For Each restorePointEntryItem As myListViewItemTypes.restorePointEntryItem In systemRestorePointsList.SelectedItems
             If AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked = False Then
                 ' Checks to see if the user is trying to delete the newest System Restore Point based upon ID.
                 If Integer.Parse(restorePointEntryItem.restorePointID) = newestSystemRestoreID Then
@@ -3579,65 +3579,4 @@ Public Class Form1
         ' Add any initialization after the InitializeComponent() call.
     End Sub
 #End Region
-End Class
-
-' This class extends the ListViewItem so that I can add more properties to it for my purposes.
-Class restorePointEntryItem
-    Inherits ListViewItem
-    Private strRestorePointID, strRestorePointName, strRestorePointDate, strRestorePointType, strRestorePointAge As String
-    Private dateRestorePointDate As Date
-
-    Public Property restorePointID() As String
-        Get
-            Return strRestorePointID
-        End Get
-        Set(value As String)
-            strRestorePointID = value
-        End Set
-    End Property
-
-    Public Property restorePointAge() As String
-        Get
-            Return strRestorePointAge
-        End Get
-        Set(value As String)
-            strRestorePointAge = value
-        End Set
-    End Property
-
-    Public Property restorePointName() As String
-        Get
-            Return strRestorePointName
-        End Get
-        Set(value As String)
-            strRestorePointName = value
-        End Set
-    End Property
-
-    Public Property restorePointDate() As String
-        Get
-            Return strRestorePointDate
-        End Get
-        Set(value As String)
-            strRestorePointDate = value
-        End Set
-    End Property
-
-    Public Property restorePointType() As String
-        Get
-            Return strRestorePointType
-        End Get
-        Set(value As String)
-            strRestorePointType = value
-        End Set
-    End Property
-
-    Public Property rawRestorePointDate() As Date
-        Get
-            Return dateRestorePointDate
-        End Get
-        Set(value As Date)
-            dateRestorePointDate = value
-        End Set
-    End Property
 End Class

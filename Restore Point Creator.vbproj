@@ -131,6 +131,7 @@
     <Compile Include="Classes and Modules\Functions Namespace\osVersionInfo.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\privilegeChecks.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\registryStuff.vb" />
+    <Compile Include="Classes and Modules\My ListViewItem Types.vb" />
     <Compile Include="Classes and Modules\restorePointInfoClass.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\support.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\supportClasses.vb" />
