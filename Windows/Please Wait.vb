@@ -61,7 +61,9 @@
 
     Private Sub Please_Wait_LostFocus(sender As Object, e As EventArgs) Handles Me.LostFocus
         Try
-            If allowAutoFocus = True Then Me.Focus()
+            If allowAutoFocus = True Then
+                If Me IsNot Nothing Then Me.Focus()
+            End If
         Catch ex As Exception
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
         End Try
