@@ -4,9 +4,6 @@
     Private boolDoneLoading As Boolean = False
     Private oldSplitterDifference As Integer
 
-    Private cachedEventLogApplication As New Dictionary(Of Long, String)
-    Private cachedEventLogCustom As New Dictionary(Of Long, String)
-
     Private rawSearchTerms As String = Nothing
     Private previousSearchType As Search_Event_Log.searceType
 
@@ -15,7 +12,7 @@
     Private boolDidWeDoASearch As Boolean = False
     Private longEntriesFound As Long = 0
 
-    Sub loadEventLogData(ByVal strEventLog As String, ByRef itemsToPutInToList As List(Of ListViewItem), ByRef cache As Dictionary(Of Long, String))
+    Sub loadEventLogData(ByVal strEventLog As String, ByRef itemsToPutInToList As List(Of myListViewItemTypes.eventLogListEntry))
         Dim itemAdd As myListViewItemTypes.eventLogListEntry
         Dim eventLogQuery As Eventing.Reader.EventLogQuery
         Dim logReader As Eventing.Reader.EventLogReader
@@ -30,13 +27,14 @@
 
                 While eventInstance IsNot Nothing
                     If eventInstance.ProviderName.stringCompare(globalVariables.eventLog.strSystemRestorePointCreator) Or eventInstance.ProviderName.caseInsensitiveContains(globalVariables.eventLog.strSystemRestorePointCreator) Then
-                        cache.Add(eventInstance.RecordId, eventInstance.FormatDescription)
 
                         itemAdd = New myListViewItemTypes.eventLogListEntry()
                         Try
                             itemAdd.Text = eventInstance.LevelDisplayName
+                            itemAdd.strEventLogLevel = eventInstance.LevelDisplayName
                         Catch ex As Eventing.Reader.EventLogNotFoundException
                             itemAdd.Text = "Unknown"
+                            itemAdd.strEventLogLevel = "Unknown"
                         End Try
 
                         ' 0 = "Error"
@@ -56,6 +54,7 @@
                         itemAdd.SubItems.Add(strEventLog)
                         itemAdd.SubItems.Add("")
 
+                        itemAdd.eventLogText = Functions.support.removeSourceCodePathInfo(eventInstance.FormatDescription)
                         itemAdd.eventLogEntryID = Long.Parse(eventInstance.RecordId)
                         itemAdd.eventLogSource = strEventLog
                         itemAdd.eventLogLevel = eventInstance.Level
@@ -81,17 +80,13 @@
 
     Sub loadEventLog()
         Me.Cursor = Cursors.WaitCursor
-        Dim itemsToPutInToList As New List(Of ListViewItem)
-
-        ' Cleans any possible existing data.
-        cachedEventLogApplication.Clear()
-        cachedEventLogCustom.Clear()
+        Dim itemsToPutInToList As New List(Of myListViewItemTypes.eventLogListEntry)
 
         Dim timeStamp As New Stopwatch
         timeStamp.Start()
 
-        loadEventLogData(globalVariables.eventLog.strApplication, itemsToPutInToList, cachedEventLogApplication)
-        loadEventLogData(globalVariables.eventLog.strSystemRestorePointCreator, itemsToPutInToList, cachedEventLogCustom)
+        loadEventLogData(globalVariables.eventLog.strApplication, itemsToPutInToList)
+        loadEventLogData(globalVariables.eventLog.strSystemRestorePointCreator, itemsToPutInToList)
 
         lblLogEntryCount.Text = "Entries in Event Log: " & itemsToPutInToList.Count.ToString("N0")
         eventLogList.Items.Clear()
@@ -109,12 +104,6 @@
 
     Private Sub eventLogForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         My.Settings.eventLogFormWindowLocation = Me.Location
-
-        ' Cleans any possible existing data.
-        cachedEventLogApplication.Clear()
-        cachedEventLogApplication = Nothing
-        cachedEventLogCustom.Clear()
-        cachedEventLogCustom = Nothing
 
         If globalVariables.windows.eventLogForm IsNot Nothing Then
             globalVariables.windows.eventLogForm.Dispose()
@@ -193,26 +182,6 @@
         Control.CheckForIllegalCrossThreadCalls = False
         applySavedSorting()
     End Sub
-
-    Function getEventLogEntryDetails(id As Long, source As String) As String
-        source = source.Trim
-
-        If source = globalVariables.eventLog.strRestorePointCreator Then
-            If cachedEventLogCustom.Keys.Contains(id) Then
-                Return cachedEventLogCustom(id)
-            Else
-                Return Nothing
-            End If
-        ElseIf source = globalVariables.eventLog.strApplication Then
-            If cachedEventLogApplication.Keys.Contains(id) Then
-                Return cachedEventLogApplication(id)
-            Else
-                Return Nothing
-            End If
-        End If
-
-        Return Nothing
-    End Function
 
     Private Sub eventLogList_ColumnClick(sender As Object, e As ColumnClickEventArgs) Handles eventLogList.ColumnClick
         ' Get the new sorting column.
@@ -341,10 +310,7 @@
     Private Sub eventLogList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles eventLogList.SelectedIndexChanged
         Try
             If eventLogList.SelectedItems.Count <> 0 Then
-                Dim eventID As Long = DirectCast(eventLogList.SelectedItems(0), myListViewItemTypes.eventLogListEntry).eventLogEntryID
-                Dim source As String = DirectCast(eventLogList.SelectedItems(0), myListViewItemTypes.eventLogListEntry).eventLogSource
-
-                eventLogText.Text = Functions.support.removeSourceCodePathInfo(getEventLogEntryDetails(eventID, source))
+                eventLogText.Text = DirectCast(eventLogList.SelectedItems(0), myListViewItemTypes.eventLogListEntry).eventLogText
 
                 If eventLogText.Text.caseInsensitiveContains("exception") And chkAskMeToSubmitIfViewingAnExceptionEntry.Checked And selectedIndex <> eventLogList.SelectedIndices(0) Then
                     If MsgBox("The log entry that you're looking at appears to be a program exception and stack trace. Would you like to submit it?", MsgBoxStyle.Question + MsgBoxStyle.YesNo + MsgBoxStyle.DefaultButton2, Me.Text) = MsgBoxResult.Yes Then
@@ -420,9 +386,9 @@
             longEntriesFound = 0
             boolDidWeDoASearch = True
 
-            For Each item As ListViewItem In eventLogList.Items
-                strEventType = item.SubItems.Item(0).Text.Trim
-                eventText = getEventLogEntryDetails(Long.Parse(item.SubItems.Item(2).Text.Replace(",", "").Trim), item.SubItems.Item(3).Text.Trim)
+            For Each item As myListViewItemTypes.eventLogListEntry In eventLogList.Items
+                strEventType = item.eventLogLevel
+                eventText = item.eventLogText
 
                 If boolUseRegEx = True Then
                     If searchType = Search_Event_Log.searceType.typeAny And eventText.regExSearch(searchTerms) Then

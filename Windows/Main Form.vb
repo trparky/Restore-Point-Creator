@@ -19,7 +19,7 @@ Public Class Form1
     Private Const strMessageBoxTitle As String = "System Restore Point Creator"
     Public defaultCustomRestorePointName As String
 
-    Private restorePointDateData As New Dictionary(Of String, String)
+    'Private restorePointDateData As New Dictionary(Of String, String)
 #End Region
 
 #Region "--== Timers ==--"
@@ -1677,13 +1677,7 @@ Public Class Form1
         Dim systemRestorePointsManagementObjectSearcher As ManagementObjectSearcher
         Dim listViewItem As myListViewItemTypes.restorePointEntryItem
         Dim listOfRestorePoints As New List(Of myListViewItemTypes.restorePointEntryItem)
-        Dim restorePointCreationDate As Date
         Dim restorePointAge As Double
-
-        ' We need to check if we have
-        If restorePointDateData.Count() <> 0 Then
-            restorePointDateData.Clear()
-        End If
 
         Try
             btnRefreshRestorePoints.Text = "Abort Refreshing System Restore Points"
@@ -1714,11 +1708,6 @@ Public Class Form1
                                 listViewItem.Text = restorePointDetails("SequenceNumber").ToString
                                 listViewItem.restorePointID = restorePointDetails("SequenceNumber").ToString
 
-                                If restorePointDateData.Keys.Contains(restorePointDetails("SequenceNumber")) = False Then
-                                    restorePointDateData.Add(restorePointDetails("SequenceNumber"), restorePointDetails("CreationTime"))
-                                    'debug.writeline("Added restore point id " & systemRestorePoint("SequenceNumber").ToString)
-                                End If
-
                                 ' Adds the System Restore Point ID to our list of System Restore Point IDs to calculate the newest System Restore Point.
                                 systemRestoreIDs.Add(Integer.Parse(restorePointDetails("SequenceNumber")))
 
@@ -1726,15 +1715,12 @@ Public Class Form1
                                 listViewItem.restorePointName = restorePointDetails("Description").ToString
 
                                 If String.IsNullOrEmpty(restorePointDetails("CreationTime").ToString.Trim) = False Then
-                                    restorePointCreationDate = Functions.support.parseSystemRestorePointCreationDate(restorePointDetails("CreationTime"))
+                                    listViewItem.rawRestorePointDate = Functions.support.parseSystemRestorePointCreationDate(restorePointDetails("CreationTime"))
+                                    listViewItem.restorePointDate = String.Format("{0} {1}", listViewItem.rawRestorePointDate.ToShortDateString, listViewItem.rawRestorePointDate.ToLongTimeString)
 
-                                    listViewItem.rawRestorePointDate = restorePointCreationDate
-                                    listViewItem.restorePointDate = String.Format("{0} {1}", restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToLongTimeString)
+                                    listViewItem.SubItems.Add(listViewItem.restorePointDate)
 
-                                    listViewItem.SubItems.Add(String.Format("{0} {1}", restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToLongTimeString))
-
-                                    restorePointAge = calculateRestorePointAge(restorePointCreationDate)
-                                    restorePointCreationDate = Nothing
+                                    restorePointAge = calculateRestorePointAge(listViewItem.rawRestorePointDate)
                                 Else
                                     restorePointAge = 0
                                     listViewItem.SubItems.Add("(Error Parsing Date)")
@@ -1757,7 +1743,6 @@ Public Class Form1
                                         listViewItem.restorePointType = Functions.support.whatTypeOfRestorePointIsIt(Integer.Parse(restorePointDetails("RestorePointType").ToString)) & " (" & restorePointDetails("RestorePointType").ToString & ")"
                                     Else
                                         listViewItem.restorePointType = Functions.support.whatTypeOfRestorePointIsIt(Integer.Parse(restorePointDetails("RestorePointType").ToString))
-                                        'MsgBox(systemRestorePoint("Description") & " -- " & systemRestorePoint("EventType"))
                                     End If
                                 End If
 
@@ -1843,14 +1828,10 @@ Public Class Form1
         End Try
     End Sub
 
-    Sub restoreSystemRestorePoint()
+    Sub restoreSystemRestorePoint(systemRestorePointIndex As Integer)
         Try
             disableFormElements()
-
-            Dim systemRestorePointIndex As Integer = Integer.Parse(DirectCast(systemRestorePointsList.SelectedItems(0), myListViewItemTypes.restorePointEntryItem).restorePointID)
-            'systemRestorePointClass = New SystemRestorePointCreator.Classes.SystemRestore
             Functions.wmi.restoreToSystemRestorePoint(systemRestorePointIndex)
-
             Functions.wait.closePleaseWaitWindow()
         Catch ex2 As Threading.ThreadAbortException
             ' Does nothing.
@@ -1895,13 +1876,9 @@ Public Class Form1
             For Each restorePointInfo As KeyValuePair(Of String, restorePointInfo) In restorePointsToBeDeleted
                 If Integer.TryParse(restorePointInfo.Key, intRestorePointID) Then
                     If boolEnableLogging Then
-                        If restorePointDateData.ContainsKey(restorePointInfo.Key) Then
-                            If String.IsNullOrEmpty(restorePointDateData(restorePointInfo.Key)) = False Then
-                                restorePointCreationDate = Functions.support.parseSystemRestorePointCreationDate(restorePointDateData(restorePointInfo.Key))
+                        restorePointCreationDate = restorePointInfo.Value.dateCreated
 
-                                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", restorePointInfo.Value.strName, restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
-                            End If
-                        End If
+                        Functions.eventLogFunctions.writeToSystemEventLog(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", restorePointInfo.Value.strName, restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
                     End If
 
                     intOldNumberOfRestorePoints -= 1
@@ -3350,18 +3327,14 @@ Public Class Form1
 
         Dim selectedRestorePoint As myListViewItemTypes.restorePointEntryItem = DirectCast(systemRestorePointsList.SelectedItems(0), myListViewItemTypes.restorePointEntryItem)
 
-        Dim strDescription As String = selectedRestorePoint.restorePointName
-        Dim strDate As String = selectedRestorePoint.restorePointDate
-        Dim strType As String = selectedRestorePoint.restorePointType
-
-        Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot into Safe Mode and perform the restore process there and reboot after the process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, strDescription, strDate, strType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
+        Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot into Safe Mode and perform the restore process there and reboot after the process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, selectedRestorePoint.restorePointName, selectedRestorePoint.restorePointDate, selectedRestorePoint.restorePointType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
 
         If msgboxResult = MsgBoxResult.Yes Then
             savePreferenceToRegistry(globalVariables.registryValues.strSafeModeValue, "True")
             Functions.support.setSafeModeBoot() ' Set the system up for Safe Mode Boot.
 
             ' Set the restore point that we're going to restore back to.
-            savePreferenceToRegistry("Preselected Restore Point for Restore in Safe Mode", Integer.Parse(systemRestorePointsList.SelectedItems(0).SubItems(0).Text))
+            savePreferenceToRegistry("Preselected Restore Point for Restore in Safe Mode", selectedRestorePoint.restorePointID.Trim)
 
             ' Set this program up to launch at user logon.
             Registry.LocalMachine.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\RunOnce", True).SetValue("*Restore To Restore Point", String.Format("{0}{1}{0} -restoretopoint", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
@@ -3441,15 +3414,11 @@ Public Class Form1
 
         Dim selectedRestorePoint As myListViewItemTypes.restorePointEntryItem = DirectCast(systemRestorePointsList.SelectedItems(0), myListViewItemTypes.restorePointEntryItem)
 
-        Dim strDescription As String = selectedRestorePoint.restorePointName
-        Dim strDate As String = selectedRestorePoint.restorePointDate
-        Dim strType As String = selectedRestorePoint.restorePointType
-
-        Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot after the restoration process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, strDescription, strDate, strType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
+        Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot after the restoration process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, selectedRestorePoint.restorePointName, selectedRestorePoint.restorePointDate, selectedRestorePoint.restorePointType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
 
         If msgboxResult = MsgBoxResult.Yes Then
             Functions.wait.createPleaseWaitWindow("Beginning the Restore Process... Please Wait.", False, enums.howToCenterWindow.parent, False)
-            Threading.ThreadPool.QueueUserWorkItem(AddressOf restoreSystemRestorePoint)
+            Threading.ThreadPool.QueueUserWorkItem(Sub() restoreSystemRestorePoint(Integer.Parse(selectedRestorePoint.restorePointID)))
             Functions.wait.openPleaseWaitWindow()
         Else
             MsgBox("Your system has NOT been restored to the selected System Restore Point.", MsgBoxStyle.Information, strMessageBoxTitle)
@@ -3484,6 +3453,7 @@ Public Class Form1
         Dim restorePointIDsToBeDeleted As New Dictionary(Of String, restorePointInfo)
         Dim strRestorePointName, strRestorePointDate, strRestorePointID, strRestorePointType As String
         Dim boolConfirmDeletions As Boolean = toolStripConfirmDeletions.Checked
+        Dim dateRestorePointCreated As Date
 
         For Each restorePointEntryItem As myListViewItemTypes.restorePointEntryItem In systemRestorePointsList.SelectedItems
             If AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked = False Then
@@ -3503,9 +3473,10 @@ Public Class Form1
             strRestorePointDate = restorePointEntryItem.restorePointDate
             strRestorePointID = restorePointEntryItem.restorePointID
             strRestorePointType = restorePointEntryItem.restorePointType
+            dateRestorePointCreated = restorePointEntryItem.rawRestorePointDate
 
             If boolConfirmDeletions And My.Settings.multiConfirmRestorePointDeletions And systemRestorePointsList.SelectedItems.Count > 1 Then
-                restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType})
+                restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
             ElseIf boolConfirmDeletions And (Not My.Settings.multiConfirmRestorePointDeletions Or systemRestorePointsList.SelectedItems.Count = 1) Then
                 deletionConfirmationWindow = New frmConfirmDelete
 
@@ -3532,9 +3503,9 @@ Public Class Form1
                 deletionConfirmationWindow.Dispose()
                 deletionConfirmationWindow = Nothing
 
-                If boolUserWantsToDeleteTheRestorePoint Then restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType})
+                If boolUserWantsToDeleteTheRestorePoint Then restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
             Else
-                restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType})
+                restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
             End If
 
             strRestorePointName = Nothing

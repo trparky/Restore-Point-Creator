@@ -17,7 +17,25 @@
     ' This class extends the ListViewItem so that I can add more properties to it for my purposes.
     Public Class eventLogListEntry
         Inherits ListViewItem
-        Private longEventLogEntryID As Long, strEventLogSource As String, levelType As Byte
+        Private longEventLogEntryID As Long, strEventLogSource, strEventLogText, _strLevel As String, levelType As Byte
+
+        Public Property strEventLogLevel() As String
+            Get
+                Return _strLevel
+            End Get
+            Set(value As String)
+                _strLevel = value
+            End Set
+        End Property
+
+        Public Property eventLogText() As String
+            Get
+                Return strEventLogText
+            End Get
+            Set(value As String)
+                strEventLogText = value
+            End Set
+        End Property
 
         Public Property eventLogEntryID() As String
             Get
