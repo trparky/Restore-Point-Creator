@@ -348,19 +348,15 @@ Namespace Functions.support
         End Function
 
         Public Sub setSafeModeBoot()
-            Dim bcdEditor As New editBCDStore.editBCDStore()
-            bcdEditor.SetSafeboot()
+            Dim bcdEditor As New BCD.bcdEditor()
+            bcdEditor.setSafeModeBootFlag()
             bcdEditor = Nothing
         End Sub
 
-        Public Sub doTheActualSafeModeBootRemoval()
-            Try
-                Dim bcdEditor As New editBCDStore.editBCDStore()
-                bcdEditor.RemoveSafeboot()
-                bcdEditor = Nothing
-            Catch ex As Exception
-                ' We don't care if it crashes here, just let it do it silently.
-            End Try
+        Public Sub removeSafeModeBoot()
+            Dim bcdEditor As New BCD.bcdEditor()
+            bcdEditor.removeSafeModeBootFlag()
+            bcdEditor = Nothing
         End Sub
 
         Public Sub executeCommand(pathToExecutable As String, arguments As String, Optional runAsAdmin As Boolean = False)

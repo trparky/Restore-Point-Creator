@@ -151,7 +151,6 @@ Namespace globalVariables
         Module registryValues
             Public Const strKey As String = "SOFTWARE\Restore Point Creator"
             Public Const strKeyInsideSoftware As String = "Restore Point Creator"
-            Public Const strSafeModeValue As String = "Safe Mode Boot Set"
         End Module
     End Namespace
 

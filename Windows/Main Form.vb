@@ -2678,7 +2678,7 @@ Public Class Form1
     End Sub
 
     Private Sub RemoveSafeModeBootOptionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RemoveSafeModeBootOptionToolStripMenuItem.Click
-        Functions.registryStuff.removeSafeModeBoot(True)
+        Functions.support.removeSafeModeBoot()
         MsgBox("The setting to boot your system into Safe Mode has been removed. Your system will now reboot.", MsgBoxStyle.Information, strMessageBoxTitle)
         Functions.support.rebootSystem()
     End Sub
@@ -3330,7 +3330,6 @@ Public Class Form1
         Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot into Safe Mode and perform the restore process there and reboot after the process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, selectedRestorePoint.restorePointName, selectedRestorePoint.restorePointDate, selectedRestorePoint.restorePointType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
 
         If msgboxResult = MsgBoxResult.Yes Then
-            savePreferenceToRegistry(globalVariables.registryValues.strSafeModeValue, "True")
             Functions.support.setSafeModeBoot() ' Set the system up for Safe Mode Boot.
 
             ' Set the restore point that we're going to restore back to.
