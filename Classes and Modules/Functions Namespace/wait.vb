@@ -7,29 +7,14 @@
             Return icon
         End Function
 
-        Public Sub disableFocusingOnPleaseWaitWindow()
-            Try
-                If globalVariables.windows.frmPleaseWait IsNot Nothing Then
-                    globalVariables.windows.frmPleaseWait.allowAutoFocus = False
-                End If
-            Catch ex As Exception
-            End Try
-        End Sub
-
-        Public Sub enableFocusingOnPleaseWaitWindow()
-            Try
-                If globalVariables.windows.frmPleaseWait IsNot Nothing Then globalVariables.windows.frmPleaseWait.allowAutoFocus = True
-            Catch ex As Exception
-            End Try
-        End Sub
-
         Public Sub openPleaseWaitWindow(Optional ByRef parentForm As Form = Nothing)
             Try
                 If globalVariables.windows.frmPleaseWait IsNot Nothing Then
                     If parentForm Is Nothing Then
                         globalVariables.windows.frmPleaseWait.ShowDialog()
                     Else
-                        globalVariables.windows.frmPleaseWait.ShowDialog(parentForm)
+                        Dim _parentForm As Form = parentForm
+                        parentForm.Invoke(Sub() globalVariables.windows.frmPleaseWait.ShowDialog(_parentForm))
                     End If
                 End If
             Catch ex As Exception

@@ -4,7 +4,6 @@ Public Class Disk_Space_Usage
     Private pleaseWaitInstance As Please_Wait
     Private formLoadDiskDataAttempts As Short = 0
     Private boldFont As New Font("Microsoft Sans Serif", 8.25, FontStyle.Bold)
-    Private boolLoadingDiskData As Boolean = False
 
     Sub manualFixSub(Optional drive As String = "C:")
         If (globalVariables.windows.frmManageSystemRestoreStorageSpace Is Nothing) Then
@@ -243,7 +242,7 @@ Public Class Disk_Space_Usage
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
         Finally
-            boolLoadingDiskData = False
+            btnRefresh.Invoke(Sub() btnRefresh.Enabled = True)
             Functions.wait.closePleaseWaitWindow()
             doTheResizingOfTheBars()
             GC.Collect()
@@ -289,34 +288,11 @@ Public Class Disk_Space_Usage
         End Try
     End Sub
 
-    Private Sub Disk_Space_Usage_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        If Me.IsHandleCreated = False Then Me.CreateHandle()
-
-        Try
-            Control.CheckForIllegalCrossThreadCalls = False
-            Me.Size = My.Settings.diskUsageWindowSize
-            chkShowFullDisksAsRed.Checked = My.Settings.ShowFullDisksAsRed
-
-            If Me.Size.Width <> 859 Then
-                Me.Size = New Size(859, Me.Size.Height)
-                My.Settings.diskUsageWindowSize = Me.Size
-            End If
-        Catch ex As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
-            exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
-        End Try
-    End Sub
-
     Private Sub btnRefresh_Click(sender As Object, e As EventArgs) Handles btnRefresh.Click
+        btnRefresh.Enabled = False
+
         Try
-            If boolLoadingDiskData = True Then
-                MsgBox("Please wait until the loading of the disk data is complete before you try again.", MsgBoxStyle.Information, Me.Text)
-                Exit Sub
-            End If
-
             GroupBox1.Controls.Clear()
-
-            boolLoadingDiskData = True
 
             Functions.wait.createPleaseWaitWindow("Loading Disk Space Usage Information... Please Wait.", False, enums.howToCenterWindow.parent, False)
             Threading.ThreadPool.QueueUserWorkItem(AddressOf loadDiskSpaceUsageData)
@@ -409,6 +385,21 @@ Public Class Disk_Space_Usage
 
     Private Sub Disk_Space_Usage_Shown(sender As Object, e As EventArgs) Handles Me.Shown
         If Me.IsHandleCreated = False Then Me.CreateHandle()
+
+        Try
+            Me.Size = My.Settings.diskUsageWindowSize
+            chkShowFullDisksAsRed.Checked = My.Settings.ShowFullDisksAsRed
+
+            If Me.Size.Width <> 859 Then
+                Me.Size = New Size(859, Me.Size.Height)
+                My.Settings.diskUsageWindowSize = Me.Size
+            End If
+        Catch ex As Exception
+            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
+            exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
+        End Try
+
+        btnRefresh.Enabled = False
         formLoadDiskData()
     End Sub
 

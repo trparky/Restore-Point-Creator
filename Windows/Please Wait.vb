@@ -1,6 +1,5 @@
 ﻿Public Class Please_Wait
     Public allowClose As Boolean = False
-    Public allowAutoFocus As Boolean = True
     Public lblLabelText As String
     Public myParentForm As Form
     Public howToCenter As Short = enums.howToCenterWindow.parent
@@ -57,15 +56,5 @@
         MsgBox("Something went wrong, this window should have been closed by the processing thread on the main window. If this window closes in this way, something seriously went wrong.", MsgBoxStyle.Critical, "Something went wrong...")
         allowClose = True
         Me.Close()
-    End Sub
-
-    Private Sub Please_Wait_LostFocus(sender As Object, e As EventArgs) Handles Me.LostFocus
-        Try
-            If allowAutoFocus = True Then
-                If Me IsNot Nothing Then Me.Focus()
-            End If
-        Catch ex As Exception
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
-        End Try
     End Sub
 End Class
