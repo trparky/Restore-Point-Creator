@@ -28,36 +28,35 @@
                 While eventInstance IsNot Nothing
                     If eventInstance.ProviderName.stringCompare(globalVariables.eventLog.strSystemRestorePointCreator) Or eventInstance.ProviderName.caseInsensitiveContains(globalVariables.eventLog.strSystemRestorePointCreator) Then
 
-                        itemAdd = New myListViewItemTypes.eventLogListEntry()
                         Try
-                            itemAdd.Text = eventInstance.LevelDisplayName
-                            itemAdd.strEventLogLevel = eventInstance.LevelDisplayName
+                            itemAdd = New myListViewItemTypes.eventLogListEntry(eventInstance.LevelDisplayName)
                         Catch ex As Eventing.Reader.EventLogNotFoundException
-                            itemAdd.Text = "Unknown"
-                            itemAdd.strEventLogLevel = "Unknown"
+                            itemAdd = New myListViewItemTypes.eventLogListEntry("Unknown")
                         End Try
 
-                        ' 0 = "Error"
-                        ' 1 = "Information"
-                        ' 2 = "Warning"
-                        Select Case eventInstance.Level
-                            Case Eventing.Reader.StandardEventLevel.Error ' Error
-                                itemAdd.ImageIndex = 0
-                            Case Eventing.Reader.StandardEventLevel.Informational ' Information
-                                itemAdd.ImageIndex = 1
-                            Case Eventing.Reader.StandardEventLevel.Warning ' Warning
-                                itemAdd.ImageIndex = 2
-                        End Select
+                        With itemAdd
+                            ' 0 = "Error"
+                            ' 1 = "Information"
+                            ' 2 = "Warning"
+                            Select Case eventInstance.Level
+                                Case Eventing.Reader.StandardEventLevel.Error ' Error
+                                    .ImageIndex = 0
+                                Case Eventing.Reader.StandardEventLevel.Informational ' Information
+                                    .ImageIndex = 1
+                                Case Eventing.Reader.StandardEventLevel.Warning ' Warning
+                                    .ImageIndex = 2
+                            End Select
 
-                        itemAdd.SubItems.Add(eventInstance.TimeCreated.Value.ToLocalTime.ToString)
-                        itemAdd.SubItems.Add(Long.Parse(eventInstance.RecordId).ToString("N0"))
-                        itemAdd.SubItems.Add(strEventLog)
-                        itemAdd.SubItems.Add("")
+                            .SubItems.Add(eventInstance.TimeCreated.Value.ToLocalTime.ToString)
+                            .SubItems.Add(Long.Parse(eventInstance.RecordId).ToString("N0"))
+                            .SubItems.Add(strEventLog)
+                            .SubItems.Add("")
 
-                        itemAdd.eventLogText = Functions.support.removeSourceCodePathInfo(eventInstance.FormatDescription)
-                        itemAdd.eventLogEntryID = Long.Parse(eventInstance.RecordId)
-                        itemAdd.eventLogSource = strEventLog
-                        itemAdd.eventLogLevel = eventInstance.Level
+                            .eventLogText = Functions.support.removeSourceCodePathInfo(eventInstance.FormatDescription)
+                            .eventLogEntryID = Long.Parse(eventInstance.RecordId)
+                            .eventLogSource = strEventLog
+                            .eventLogLevel = Short.Parse(eventInstance.Level)
+                        End With
 
                         itemsToPutInToList.Add(itemAdd)
                         itemAdd = Nothing
@@ -364,7 +363,6 @@
         searchWindow.ShowDialog(Me)
 
         If searchWindow.dialogResponse = Search_Event_Log.userResponse.doSearch Then
-            Dim eventText As String
             Dim searchTerms As String = searchWindow.searchTerms
 
             rawSearchTerms = searchWindow.searchTerms
@@ -373,7 +371,6 @@
             Dim boolCaseInsensitive As Boolean = searchWindow.boolCaseInsensitive
             Dim boolUseRegEx As Boolean = searchWindow.boolUseRegEx
             Dim searchType As Search_Event_Log.searceType = searchWindow.searchType
-            Dim strEventType As String
 
             If boolUseRegEx = True And Functions.support.boolTestRegExPattern(searchTerms) = False Then
                 MsgBox("Invalid RegEx Pattern.", MsgBoxStyle.Critical, Me.Text)
@@ -387,34 +384,34 @@
             boolDidWeDoASearch = True
 
             For Each item As myListViewItemTypes.eventLogListEntry In eventLogList.Items
-                strEventType = item.eventLogLevel
-                eventText = item.eventLogText
+                With item
+                    If boolUseRegEx = True Then
+                        If searchType = Search_Event_Log.searceType.typeAny And .eventLogText.regExSearch(searchTerms) Then
+                            highlightItemInList(item, longEntriesFound)
+                        ElseIf searchType = Search_Event_Log.searceType.typeError And .eventLogLevel = EventLogEntryType.Error And .eventLogText.regExSearch(searchTerms) Then
+                            highlightItemInList(item, longEntriesFound)
+                        ElseIf searchType = Search_Event_Log.searceType.typeInfo And .eventLogLevel = EventLogEntryType.Information And .eventLogText.regExSearch(searchTerms) Then
+                            highlightItemInList(item, longEntriesFound)
+                        End If
+                    ElseIf boolCaseInsensitive = True Then
+                        If searchType = Search_Event_Log.searceType.typeAny And .eventLogText.caseInsensitiveContains(searchTerms) Then
+                            highlightItemInList(item, longEntriesFound)
+                        ElseIf searchType = Search_Event_Log.searceType.typeError And .eventLogLevel = EventLogEntryType.Error And .eventLogText.caseInsensitiveContains(searchTerms) Then
+                            highlightItemInList(item, longEntriesFound)
+                        ElseIf searchType = Search_Event_Log.searceType.typeInfo And .eventLogLevel = EventLogEntryType.Information And .eventLogText.caseInsensitiveContains(searchTerms) Then
+                            highlightItemInList(item, longEntriesFound)
+                        End If
+                    Else
+                        If searchType = Search_Event_Log.searceType.typeAny And .eventLogText.Contains(searchTerms) Then
+                            highlightItemInList(item, longEntriesFound)
+                        ElseIf searchType = Search_Event_Log.searceType.typeError And .eventLogLevel = EventLogEntryType.Error And .eventLogText.Contains(searchTerms) Then
+                            highlightItemInList(item, longEntriesFound)
+                        ElseIf searchType = Search_Event_Log.searceType.typeInfo And .eventLogLevel = EventLogEntryType.Information And .eventLogText.Contains(searchTerms) Then
+                            highlightItemInList(item, longEntriesFound)
+                        End If
+                    End If
+                End With
 
-                If boolUseRegEx = True Then
-                    If searchType = Search_Event_Log.searceType.typeAny And eventText.regExSearch(searchTerms) Then
-                        highlightItemInList(item, longEntriesFound)
-                    ElseIf searchType = Search_Event_Log.searceType.typeError And strEventType = EventLogEntryType.Error.ToString And eventText.regExSearch(searchTerms) Then
-                        highlightItemInList(item, longEntriesFound)
-                    ElseIf searchType = Search_Event_Log.searceType.typeInfo And strEventType = EventLogEntryType.Information.ToString And eventText.regExSearch(searchTerms) Then
-                        highlightItemInList(item, longEntriesFound)
-                    End If
-                ElseIf boolCaseInsensitive = True Then
-                    If searchType = Search_Event_Log.searceType.typeAny And eventText.caseInsensitiveContains(searchTerms) Then
-                        highlightItemInList(item, longEntriesFound)
-                    ElseIf searchType = Search_Event_Log.searceType.typeError And strEventType = EventLogEntryType.Error.ToString And eventText.caseInsensitiveContains(searchTerms) Then
-                        highlightItemInList(item, longEntriesFound)
-                    ElseIf searchType = Search_Event_Log.searceType.typeInfo And strEventType = EventLogEntryType.Information.ToString And eventText.caseInsensitiveContains(searchTerms) Then
-                        highlightItemInList(item, longEntriesFound)
-                    End If
-                Else
-                    If searchType = Search_Event_Log.searceType.typeAny And eventText.Contains(searchTerms) Then
-                        highlightItemInList(item, longEntriesFound)
-                    ElseIf searchType = Search_Event_Log.searceType.typeError And strEventType = EventLogEntryType.Error.ToString And eventText.Contains(searchTerms) Then
-                        highlightItemInList(item, longEntriesFound)
-                    ElseIf searchType = Search_Event_Log.searceType.typeInfo And strEventType = EventLogEntryType.Information.ToString And eventText.Contains(searchTerms) Then
-                        highlightItemInList(item, longEntriesFound)
-                    End If
-                End If
             Next
 
             If longEntriesFound <> 0 Then
