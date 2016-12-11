@@ -394,11 +394,11 @@ Public Class Form1
                 boolShowDonationMessage = Functions.support.getBooleanValueFromRegistry(registryObject, "Show Donation Message", True)
 
                 ' Converts some settings over to Registry-based Settings.
-                If registryObject.GetValue("Log Restore Point Deletions", Nothing) = Nothing Then
+                If registryObject.GetValue("Log Restore Point Deletions", Nothing) Is Nothing Then
                     registryObject.SetValue("Log Restore Point Deletions", My.Settings.boolLogDeletedRestorePoints.ToString)
                 End If
 
-                If registryObject.GetValue("Delete Old Restore Points", Nothing) = Nothing Then
+                If registryObject.GetValue("Delete Old Restore Points", Nothing) Is Nothing Then
                     registryObject.SetValue("Delete Old Restore Points", My.Settings.deleteOldRestorePoints2)
                 End If
                 ' Converts some settings over to Registry-based Settings.
@@ -430,7 +430,7 @@ Public Class Form1
                 boolLogRestorePointDeletions = Functions.support.getBooleanValueFromRegistry(registryObject, "Log Restore Point Deletions", True)
                 toolStripLogRestorePointDeletions.Checked = boolLogRestorePointDeletions
 
-                globalVariables.boolExtendedLoggingDuringUpdating = Functions.support.getBooleanValueFromRegistry(registryObject, "Enable Extended Logging During Updating", "True")
+                globalVariables.boolExtendedLoggingDuringUpdating = Functions.support.getBooleanValueFromRegistry(registryObject, "Enable Extended Logging During Updating", True)
                 EnableExtendedLoggingToolStripMenuItem.Checked = globalVariables.boolExtendedLoggingDuringUpdating
 
                 registryObject.Close()
@@ -658,10 +658,12 @@ Public Class Form1
 
                 Dim value As Object = regKey.GetValue("RPSessionInterval", Nothing)
 
-                If value = Nothing Then
+                If value Is Nothing Then
                     regKey.SetValue("RPSessionInterval", 1, RegistryValueKind.DWord)
-                ElseIf value <> 1 Then
-                    regKey.SetValue("RPSessionInterval", 1, RegistryValueKind.DWord)
+                Else
+                    If value <> 1 Then
+                        regKey.SetValue("RPSessionInterval", 1, RegistryValueKind.DWord)
+                    End If
                 End If
 
                 regKey.Close()
@@ -679,10 +681,12 @@ Public Class Form1
 
                 Dim value As Object = regKey.GetValue("RPGlobalInterval", Nothing)
 
-                If value = Nothing Then
+                If value Is Nothing Then
                     regKey.SetValue("RPGlobalInterval", 1, RegistryValueKind.DWord)
-                ElseIf value <> 1 Then
-                    regKey.SetValue("RPGlobalInterval", 1, RegistryValueKind.DWord)
+                Else
+                    If value <> 1 Then
+                        regKey.SetValue("RPGlobalInterval", 1, RegistryValueKind.DWord)
+                    End If
                 End If
 
                 regKey.Close()
@@ -1005,7 +1009,7 @@ Public Class Form1
                             numberOfOldRestorePointsDeleted += 1
 
                             If String.IsNullOrEmpty(systemRestorePoint("CreationTime").ToString.Trim) = False Then
-                                dateTime = Functions.support.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime"))
+                                dateTime = Functions.support.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime").ToString)
 
                                 If toolStripLogRestorePointDeletions.Checked Then
                                     Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deleted Restore Point named ""{0}"" which was created on {1} at {2}.", systemRestorePoint("Description").ToString, dateTime.ToShortDateString, dateTime.ToLongTimeString), EventLogEntryType.Information)
@@ -1483,12 +1487,12 @@ Public Class Form1
 
                     If Short.TryParse(strRemoteBuildParts(1).Trim, shortRemoteBuild) = True Then
                         ' If the current build is found in the minorBuildApplicables it means that the new update is a minor update to the current build that the user has installed. If the current build is NOT found then that means that the update is mandatory for the build that the user has installed.
-                        If shortRemoteBuild > globalVariables.version.shortBuild And minorBuildApplicables.Contains(globalVariables.version.shortBuild) = True Then
+                        If shortRemoteBuild > globalVariables.version.shortBuild And minorBuildApplicables.Contains(globalVariables.version.shortBuild.ToString) Then
                             If openUpdateDialog(Update_Message.versionUpdateType.minorUpdate) = Update_Message.userResponse.doTheUpdate Then
                                 openThePleaseWaitWindowAndStartTheDownloadThread()
                             End If
                             Exit Sub
-                        ElseIf shortRemoteBuild > globalVariables.version.shortBuild And minorBuildApplicables.Contains(globalVariables.version.shortBuild) = False Then
+                        ElseIf shortRemoteBuild > globalVariables.version.shortBuild And minorBuildApplicables.Contains(globalVariables.version.shortBuild.ToString) = False Then
                             If openUpdateDialog(Update_Message.versionUpdateType.standardVersionUpdate) = Update_Message.userResponse.doTheUpdate Then
                                 openThePleaseWaitWindowAndStartTheDownloadThread()
                             End If
@@ -1622,7 +1626,7 @@ Public Class Form1
 
                             If Short.TryParse(strRemoteBuildParts(1).Trim, shortRemoteParts) Then
                                 ' If the current build is found in the minorBuildApplicables it means that the new update is a minor update to the current build that the user has installed. If the current build is NOT found then that means that the update is mandatory for the build that the user has installed.
-                                If shortRemoteParts > globalVariables.version.shortBuild And minorBuildApplicables.Contains(globalVariables.version.shortBuild) = False Then
+                                If shortRemoteParts > globalVariables.version.shortBuild And minorBuildApplicables.Contains(globalVariables.version.shortBuild.ToString) = False Then
                                     If openUpdateDialog(Update_Message.versionUpdateType.standardVersionUpdate) = Update_Message.userResponse.doTheUpdate Then
                                         openThePleaseWaitWindowAndStartTheDownloadThread()
                                     End If
