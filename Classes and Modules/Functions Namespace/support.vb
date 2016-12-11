@@ -348,15 +348,31 @@ Namespace Functions.support
         End Function
 
         Public Sub setSafeModeBoot()
-            Dim bcdEditor As New BCD.bcdEditor()
-            bcdEditor.setSafeModeBootFlag()
-            bcdEditor = Nothing
+            Try
+                Dim bcdEditor As New BCD.bcdEditor()
+                bcdEditor.setSafeModeBootFlag()
+                bcdEditor.dispose()
+                bcdEditor = Nothing
+
+                eventLogFunctions.writeToSystemEventLog("Successfully set Safe Mode Boot flag.", EventLogEntryType.Information)
+            Catch ex As Exception
+                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeToSystemEventLog("Unable to set Safe Mode Boot flag.", EventLogEntryType.Error)
+            End Try
         End Sub
 
         Public Sub removeSafeModeBoot()
-            Dim bcdEditor As New BCD.bcdEditor()
-            bcdEditor.removeSafeModeBootFlag()
-            bcdEditor = Nothing
+            Try
+                Dim bcdEditor As New BCD.bcdEditor()
+                bcdEditor.removeSafeModeBootFlag()
+                bcdEditor.dispose()
+                bcdEditor = Nothing
+
+                eventLogFunctions.writeToSystemEventLog("Successfully removed Safe Mode Boot flag.", EventLogEntryType.Information)
+            Catch ex As Exception
+                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeToSystemEventLog("Unable to remove Safe Mode Boot flag.", EventLogEntryType.Error)
+            End Try
         End Sub
 
         Public Sub executeCommand(pathToExecutable As String, arguments As String, Optional runAsAdmin As Boolean = False)
