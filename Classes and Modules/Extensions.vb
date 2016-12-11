@@ -49,7 +49,7 @@ Module StringExtensions
     End Function
 
     <Extension()>
-    Public Function stringCompare(str1 As String, str2 As String, Optional boolCaseInsensitive As Boolean = True)
+    Public Function stringCompare(str1 As String, str2 As String, Optional boolCaseInsensitive As Boolean = True) As Boolean
         If boolCaseInsensitive = True Then
             Return str1.Trim.Equals(str2.Trim, StringComparison.OrdinalIgnoreCase)
         Else
