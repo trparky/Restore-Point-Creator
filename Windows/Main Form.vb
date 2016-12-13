@@ -1447,6 +1447,7 @@ Public Class Form1
                     If Short.TryParse(strRemoteBuildParts(1).Trim, shortRemoteBuild) = True Then
                         If shortRemoteBuild > globalVariables.version.shortBuild Then
                             If strRemoteBuild.caseInsensitiveContains("beta") = True And My.Settings.onlyGiveMeRCs = True Then
+                                Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and it's been determined that you already have the latest version.")
                                 giveFeedbackToUser("You already have the latest version.")
                                 Exit Sub
                             End If
@@ -1467,6 +1468,7 @@ Public Class Form1
                         ElseIf shortRemoteBuild < globalVariables.version.shortBuild Then
                             giveFeedbackToUser("Somehow you have a version that is newer than is listed on the product web site, weird.")
                         ElseIf shortRemoteBuild = globalVariables.version.shortBuild Then
+                            Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and it's been determined that you already have the latest version.")
                             giveFeedbackToUser("You already have the latest version.")
                         End If
                     Else
@@ -1498,6 +1500,7 @@ Public Class Form1
                             End If
                             Exit Sub
                         ElseIf shortRemoteBuild = globalVariables.version.shortBuild Then
+                            Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and it's been determined that you already have the latest version.")
                             giveFeedbackToUser("You already have the latest version.")
                         End If
                     Else
@@ -1513,6 +1516,7 @@ Public Class Form1
                         If shortRemoteBuild < globalVariables.version.shortBuild Then
                             giveFeedbackToUser("Somehow you have a version that is newer than is listed on the product web site, weird.")
                         ElseIf shortRemoteBuild = globalVariables.version.shortBuild Then
+                            Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and it's been determined that you already have the latest version.")
                             giveFeedbackToUser("You already have the latest version.")
                         ElseIf shortRemoteBuild > globalVariables.version.shortBuild Then
                             If openUpdateDialog(Update_Message.versionUpdateType.standardVersionUpdate) = Update_Message.userResponse.doTheUpdate Then
@@ -1587,6 +1591,7 @@ Public Class Form1
                             If Short.TryParse(strRemoteBuildParts(1).Trim, shortRemoteParts) Then
                                 If shortRemoteParts > globalVariables.version.shortBuild Then
                                     If strRemoteBuild.caseInsensitiveContains("beta") = True And My.Settings.onlyGiveMeRCs = True Then
+                                        Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and it's been determined that you already have the latest version.")
                                         My.Settings.ProgramExecutionsSinceLastUpdateCheck += 1
                                         My.Settings.Save()
                                         Exit Sub
@@ -1607,6 +1612,8 @@ Public Class Form1
                                     End If
 
                                     Exit Sub
+                                Else
+                                    Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and it's been determined that you already have the latest version.")
                                 End If
                             Else
                                 Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
@@ -1632,6 +1639,8 @@ Public Class Form1
                                     End If
 
                                     Exit Sub
+                                Else
+                                    Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and it's been determined that you already have the latest version.")
                                 End If
                             Else
                                 Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
@@ -1651,6 +1660,8 @@ Public Class Form1
                                     End If
 
                                     Exit Sub
+                                Else
+                                    Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and it's been determined that you already have the latest version.")
                                 End If
                             Else
                                 Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
