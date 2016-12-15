@@ -354,7 +354,7 @@ Namespace My
                             Exit Sub
                         ElseIf commandLineArgument.stringCompare("-restoretopoint") Then
                             ' The first thing we do is disable Safe Mode boot so the user doesn't get trapped in Safe Mode.
-                            Functions.registryStuff.removeSafeModeBoot(True)
+                            Functions.support.removeSafeModeBoot()
 
                             ' Now let's delete that Registry setting that tells the program that a Safe Mode boot was set up.
                             If Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey) IsNot Nothing Then
@@ -404,10 +404,10 @@ Namespace My
                             Functions.startupFunctions.prefsCleanup()
                         End If
                     Else
-                        Functions.registryStuff.removeSafeModeBoot()
+                        Functions.support.removeSafeModeBoot()
                     End If
                 Else
-                    Functions.registryStuff.removeSafeModeBoot()
+                    Functions.support.removeSafeModeBoot()
                 End If
 
                 If (Functions.osVersionInfo.isThisWindows10() = True Or Functions.osVersionInfo.isThisWindows8x() = True) And boolAreWeAnAdministrator = True And Functions.support.areWeInSafeMode() = False Then

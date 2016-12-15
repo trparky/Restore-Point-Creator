@@ -22,23 +22,6 @@ Namespace Functions.registryStuff
             End Try
         End Function
 
-        Public Sub removeSafeModeBoot(Optional boolBypassRegCheck As Boolean = False)
-            If boolBypassRegCheck = True Then
-                support.doTheActualSafeModeBootRemoval()
-            Else
-                If Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey) IsNot Nothing Then
-                    Dim strRegValue As String = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey).GetValue(globalVariables.registryValues.strSafeModeValue, "False")
-                    Dim boolRegValue As Boolean
-
-                    If Boolean.TryParse(strRegValue, boolRegValue) = True Then
-                        If boolRegValue = True Then
-                            support.doTheActualSafeModeBootRemoval()
-                        End If
-                    End If
-                End If
-            End If
-        End Sub
-
         Public Function getFileAssociation(ByVal fileExtension As String, ByRef associatedApplication As String) As Boolean
             Try
                 fileExtension = fileExtension.ToLower.Trim

@@ -75,8 +75,8 @@ Namespace globalVariables
 #If DEBUG Then
             Public Const boolDebugBuild As Boolean = True
 
-            Public Const boolBeta As Boolean = True
-            Public Const shortBetaVersion As Short = 7
+            Public Const boolBeta As Boolean = False
+            Public Const shortBetaVersion As Short = 0
 
             Public Const boolReleaseCandidate As Boolean = False
             Public Const shortReleaseCandidateVersion As Short = 0
@@ -151,7 +151,6 @@ Namespace globalVariables
         Module registryValues
             Public Const strKey As String = "SOFTWARE\Restore Point Creator"
             Public Const strKeyInsideSoftware As String = "Restore Point Creator"
-            Public Const strSafeModeValue As String = "Safe Mode Boot Set"
         End Module
     End Namespace
 

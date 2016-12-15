@@ -19,7 +19,7 @@ Public Class Form1
     Private Const strMessageBoxTitle As String = "System Restore Point Creator"
     Public defaultCustomRestorePointName As String
 
-    Private restorePointDateData As New Dictionary(Of String, String)
+    'Private restorePointDateData As New Dictionary(Of String, String)
 #End Region
 
 #Region "--== Timers ==--"
@@ -394,11 +394,11 @@ Public Class Form1
                 boolShowDonationMessage = Functions.support.getBooleanValueFromRegistry(registryObject, "Show Donation Message", True)
 
                 ' Converts some settings over to Registry-based Settings.
-                If registryObject.GetValue("Log Restore Point Deletions", Nothing) = Nothing Then
+                If registryObject.GetValue("Log Restore Point Deletions", Nothing) Is Nothing Then
                     registryObject.SetValue("Log Restore Point Deletions", My.Settings.boolLogDeletedRestorePoints.ToString)
                 End If
 
-                If registryObject.GetValue("Delete Old Restore Points", Nothing) = Nothing Then
+                If registryObject.GetValue("Delete Old Restore Points", Nothing) Is Nothing Then
                     registryObject.SetValue("Delete Old Restore Points", My.Settings.deleteOldRestorePoints2)
                 End If
                 ' Converts some settings over to Registry-based Settings.
@@ -430,7 +430,7 @@ Public Class Form1
                 boolLogRestorePointDeletions = Functions.support.getBooleanValueFromRegistry(registryObject, "Log Restore Point Deletions", True)
                 toolStripLogRestorePointDeletions.Checked = boolLogRestorePointDeletions
 
-                globalVariables.boolExtendedLoggingDuringUpdating = Functions.support.getBooleanValueFromRegistry(registryObject, "Enable Extended Logging During Updating", "True")
+                globalVariables.boolExtendedLoggingDuringUpdating = Functions.support.getBooleanValueFromRegistry(registryObject, "Enable Extended Logging During Updating", True)
                 EnableExtendedLoggingToolStripMenuItem.Checked = globalVariables.boolExtendedLoggingDuringUpdating
 
                 registryObject.Close()
@@ -658,10 +658,12 @@ Public Class Form1
 
                 Dim value As Object = regKey.GetValue("RPSessionInterval", Nothing)
 
-                If value = Nothing Then
+                If value Is Nothing Then
                     regKey.SetValue("RPSessionInterval", 1, RegistryValueKind.DWord)
-                ElseIf value <> 1 Then
-                    regKey.SetValue("RPSessionInterval", 1, RegistryValueKind.DWord)
+                Else
+                    If value <> 1 Then
+                        regKey.SetValue("RPSessionInterval", 1, RegistryValueKind.DWord)
+                    End If
                 End If
 
                 regKey.Close()
@@ -679,10 +681,12 @@ Public Class Form1
 
                 Dim value As Object = regKey.GetValue("RPGlobalInterval", Nothing)
 
-                If value = Nothing Then
+                If value Is Nothing Then
                     regKey.SetValue("RPGlobalInterval", 1, RegistryValueKind.DWord)
-                ElseIf value <> 1 Then
-                    regKey.SetValue("RPGlobalInterval", 1, RegistryValueKind.DWord)
+                Else
+                    If value <> 1 Then
+                        regKey.SetValue("RPGlobalInterval", 1, RegistryValueKind.DWord)
+                    End If
                 End If
 
                 regKey.Close()
@@ -1005,7 +1009,7 @@ Public Class Form1
                             numberOfOldRestorePointsDeleted += 1
 
                             If String.IsNullOrEmpty(systemRestorePoint("CreationTime").ToString.Trim) = False Then
-                                dateTime = Functions.support.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime"))
+                                dateTime = Functions.support.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime").ToString)
 
                                 If toolStripLogRestorePointDeletions.Checked Then
                                     Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deleted Restore Point named ""{0}"" which was created on {1} at {2}.", systemRestorePoint("Description").ToString, dateTime.ToShortDateString, dateTime.ToLongTimeString), EventLogEntryType.Information)
@@ -1399,20 +1403,24 @@ Public Class Form1
     End Sub
 
     Sub userInitiatedCheckForUpdates()
-        My.Settings.ProgramExecutionsSinceLastUpdateCheck = 0
-        My.Settings.Save()
+        My.Settings.ProgramExecutionsSinceLastUpdateCheck = 0 ' We reset the number of program executions since last update to 0.
+        My.Settings.Save() ' And save the settings to disk.
 
+        ' First we check to see if we have an Internet connection because if we don't then why even bother trying to check for updates.
         If Functions.http.checkForInternetConnection() = False Then
-            toolStripCheckForUpdates.Enabled = True
-            MsgBox("No Internet connection detected.", MsgBoxStyle.Information, strMessageBoxTitle)
+            toolStripCheckForUpdates.Enabled = True ' Re-Enable the toolStripCheckForUpdates button.
+            MsgBox("No Internet connection detected.", MsgBoxStyle.Information, strMessageBoxTitle) ' Tell the user that we don't have an Internet connection.
         Else
             Try
+                ' Create some variables.
                 Dim strRemoteBuild As String = Nothing
                 Dim shortRemoteBuild As Short, changeLog As String = Nothing
 
+                ' Now let's set up an httpHelper Class Instance to check for updates with, we will use this Class instance for all HTTP operations in this routine
                 Dim httpHelper As httpHelper = Functions.http.createNewHTTPHelperObject()
-                httpHelper.addPOSTData("version", globalVariables.version.versionStringWithoutBuild)
+                httpHelper.addPOSTData("version", globalVariables.version.versionStringWithoutBuild) ' Add the current program version to the HTTP Class instance as HTTP POST data.
 
+                ' Add the update channel information as POST data.
                 If My.Settings.updateChannel = globalVariables.updateChannels.beta Then
                     httpHelper.addPOSTData("program", globalVariables.programCodeNames.beta)
                 ElseIf My.Settings.updateChannel = globalVariables.updateChannels.stable Then
@@ -1420,9 +1428,12 @@ Public Class Form1
                 ElseIf My.Settings.updateChannel = globalVariables.updateChannels.tom Then
                     httpHelper.addPOSTData("program", globalVariables.programCodeNames.tom)
                 End If
+                ' Add the update channel information as POST data.
 
+                ' And let's get the info from my web site.
                 Try
                     If httpHelper.getWebData(globalVariables.webURLs.core.strProgramUpdateChecker, strRemoteBuild) = False Then
+                        ' Something went wrong, checking for updates failed. Let's tell the user that and abort the routine.
                         MsgBox("There was an error checking for a software update; update check aborted.", MsgBoxStyle.Information, strMessageBoxTitle)
                         Exit Sub
                     End If
@@ -1430,7 +1441,9 @@ Public Class Form1
                     Exit Sub
                 End Try
 
+                ' This checks to see if the update script on my web site returned an unknown error.
                 If strRemoteBuild.caseInsensitiveContains("unknown") = True Then
+                    ' Yep, it did so let's tell the user that.
                     MsgBox("There was an error checking for updates." & vbCrLf & vbCrLf & "HTTP Response: " & strRemoteBuild, MsgBoxStyle.Critical, strMessageBoxTitle)
                     Exit Sub
                 ElseIf strRemoteBuild.caseInsensitiveContains("newversion") = True Then
@@ -1438,121 +1451,170 @@ Public Class Form1
                     giveUserNoticeAboutTotallyNewVersion(strRemoteBuild, False)
                     Exit Sub
                 ElseIf strRemoteBuild.caseInsensitiveContains("beta") = True Or strRemoteBuild.caseInsensitiveContains("rc") = True Then
+                    ' This code handles public beta and release candidate builds.
+
+                    ' This gets the new build numbers from the beta/rc data string.
                     Dim strRemoteBuildParts As String() = strRemoteBuild.Split("-")
 
+                    ' We now try and parse the remote build number into a 16-bit Integer.
                     If Short.TryParse(strRemoteBuildParts(1).Trim, shortRemoteBuild) = True Then
+                        ' This checks to see if the remote beta/rc build is newer than the current build.
                         If shortRemoteBuild > globalVariables.version.shortBuild Then
+                            ' This checks to see if the new build is a beta and if the user wants betas.
                             If strRemoteBuild.caseInsensitiveContains("beta") = True And My.Settings.onlyGiveMeRCs = True Then
-                                giveFeedbackToUser("You already have the latest version.")
-                                Exit Sub
+                                ' The user doesn't want betas and the current new build is a beta so we're going to stop checking for updates.
+                                Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and it's been determined that you already have the latest version.") ' Log it.
+                                giveFeedbackToUser("You already have the latest version.") ' Gives feedback.
+                                Exit Sub ' Exits the routine.
                             End If
 
+                            ' Creates a variable to store the user's response to the update notification window.
                             Dim updateDialogResponse As Update_Message.userResponse
 
+                            ' Opens an update notification window appropriate for the new build be it a beta or RC build.
                             If strRemoteBuild.caseInsensitiveContains("beta") = True Then
                                 updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.betaVersionUpdate)
                             ElseIf strRemoteBuild.caseInsensitiveContains("rc") = True Then
                                 updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.releaseCandidateVersionUpdate)
                             End If
 
+                            ' Checks to see if the user said yes to update.
                             If updateDialogResponse = Update_Message.userResponse.doTheUpdate Then
-                                openThePleaseWaitWindowAndStartTheDownloadThread()
+                                ' The user said yes.
+                                openThePleaseWaitWindowAndStartTheDownloadThread() ' Starts the download and update thread.
                             End If
 
-                            Exit Sub
+                            Exit Sub ' Exit the routine.
                         ElseIf shortRemoteBuild < globalVariables.version.shortBuild Then
+                            ' OK, this is weird. Somehow the user has a version that's newer than what's listed on the web site.
                             giveFeedbackToUser("Somehow you have a version that is newer than is listed on the product web site, weird.")
                         ElseIf shortRemoteBuild = globalVariables.version.shortBuild Then
-                            giveFeedbackToUser("You already have the latest version.")
+                            ' OK, the new build matches that of the current build so let's log it.
+                            Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and it's been determined that you already have the latest version.")
+                            giveFeedbackToUser("You already have the latest version.") ' Tell the user that they already have the latest version.
                         End If
                     Else
+                        ' OK, something bad happened while trying to parse the build string into a 16-bit Integer. Let's log the server output.
                         Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
-                        MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, strMessageBoxTitle)
-                        Exit Sub
+                        MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, strMessageBoxTitle) ' Tell the user that the server responded with invalid data.
+                        Exit Sub ' Exit the routine.
                     End If
                 ElseIf strRemoteBuild.caseInsensitiveContains("minor") = True Then
+                    ' This code handles minor updates, not important updates.
+
+                    ' Takes the build number string part off of the remote build string.
                     Dim strRemoteBuildParts As String() = strRemoteBuild.Split("-")
 
+                    ' Creates an array of minor build applicables.
                     Dim minorBuildApplicables As New Specialized.StringCollection
 
+                    ' This checks to see if the build applicable string contains a comma thus applying to multiple builds.
                     If strRemoteBuildParts(2).Contains(",") Then
+                        ' Yes it does so let's split the string by the comma and add it to the applicables array.
                         minorBuildApplicables.AddRange(strRemoteBuildParts(2).ToString.Trim.Split(","))
                     Else
+                        ' Nope so we just add the one build number to the applicables array.
                         minorBuildApplicables.Add(strRemoteBuildParts(2).ToString.Trim)
                     End If
 
                     If Short.TryParse(strRemoteBuildParts(1).Trim, shortRemoteBuild) = True Then
                         ' If the current build is found in the minorBuildApplicables it means that the new update is a minor update to the current build that the user has installed. If the current build is NOT found then that means that the update is mandatory for the build that the user has installed.
-                        If shortRemoteBuild > globalVariables.version.shortBuild And minorBuildApplicables.Contains(globalVariables.version.shortBuild) = True Then
+                        If shortRemoteBuild > globalVariables.version.shortBuild And minorBuildApplicables.Contains(globalVariables.version.shortBuild.ToString) Then
+                            ' Let's ask the user if they want to update to the new version.
                             If openUpdateDialog(Update_Message.versionUpdateType.minorUpdate) = Update_Message.userResponse.doTheUpdate Then
-                                openThePleaseWaitWindowAndStartTheDownloadThread()
+                                ' The user said yes.
+                                openThePleaseWaitWindowAndStartTheDownloadThread() ' Starts the download and update thread.
                             End If
-                            Exit Sub
-                        ElseIf shortRemoteBuild > globalVariables.version.shortBuild And minorBuildApplicables.Contains(globalVariables.version.shortBuild) = False Then
+                            Exit Sub ' Exit the routine.
+                        ElseIf shortRemoteBuild > globalVariables.version.shortBuild And minorBuildApplicables.Contains(globalVariables.version.shortBuild.ToString) = False Then
+                            ' OK, this is a mandatory update.
+
+                            ' Let's ask the user if they want to update to the new version.
                             If openUpdateDialog(Update_Message.versionUpdateType.standardVersionUpdate) = Update_Message.userResponse.doTheUpdate Then
-                                openThePleaseWaitWindowAndStartTheDownloadThread()
+                                ' The user said yes.
+                                openThePleaseWaitWindowAndStartTheDownloadThread() ' Starts the download and update thread.
                             End If
-                            Exit Sub
+                            Exit Sub ' Exit the routine.
                         ElseIf shortRemoteBuild = globalVariables.version.shortBuild Then
-                            giveFeedbackToUser("You already have the latest version.")
+                            ' OK, the new minor update build doesn't apply to this current build so let's log it.
+                            Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and it's been determined that you already have the latest version.")
+                            giveFeedbackToUser("You already have the latest version.") ' Let's tell the user that they already have the latest version.
                         End If
                     Else
+                        ' OK, something bad happened while trying to parse the build string into a 16-bit Integer. Let's log the server output.
                         Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
-                        MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, strMessageBoxTitle)
-                        Exit Sub
+                        MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, strMessageBoxTitle) ' Tell the user that the server responded with invalid data.
+                        Exit Sub ' Exit the routine.
                     End If
 
+                    ' Cleans the applicables array.
                     minorBuildApplicables.Clear()
                     minorBuildApplicables = Nothing
                 Else
-                    If Short.TryParse(strRemoteBuild, shortRemoteBuild) = True Then
+                    ' This code handles regular build updates.
+                    If Short.TryParse(strRemoteBuild, shortRemoteBuild) = True Then ' We then parse the build string into a 16-bit Integer.
                         If shortRemoteBuild < globalVariables.version.shortBuild Then
+                            ' OK, this is weird. Somehow the user has a version that's newer than what's listed on the web site.
                             giveFeedbackToUser("Somehow you have a version that is newer than is listed on the product web site, weird.")
                         ElseIf shortRemoteBuild = globalVariables.version.shortBuild Then
-                            giveFeedbackToUser("You already have the latest version.")
+                            ' OK, the new build matches that of the current build so let's log it.
+                            Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and it's been determined that you already have the latest version.")
+                            giveFeedbackToUser("You already have the latest version.") ' Let's tell the user that they already have the latest version.
                         ElseIf shortRemoteBuild > globalVariables.version.shortBuild Then
+                            ' Let's ask the user if they want to update to the new version.
                             If openUpdateDialog(Update_Message.versionUpdateType.standardVersionUpdate) = Update_Message.userResponse.doTheUpdate Then
-                                openThePleaseWaitWindowAndStartTheDownloadThread()
+                                ' The user said yes.
+                                openThePleaseWaitWindowAndStartTheDownloadThread() ' Starts the download and update thread.
                             End If
-                            Exit Sub
+                            Exit Sub ' Exit the routine.
                         End If
                     Else
+                        ' OK, something bad happened while trying to parse the build string into a 16-bit Integer. Let's log the server output.
                         Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
-                        MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, strMessageBoxTitle)
-                        Exit Sub
+                        MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, strMessageBoxTitle) ' Tell the user that the server responded with invalid data.
+                        Exit Sub ' Exit the routine.
                     End If
                 End If
             Catch ex As Exception
-                Functions.eventLogFunctions.writeCrashToEventLog(ex)
+                Functions.eventLogFunctions.writeCrashToEventLog(ex) ' If anything goes wrong during this routine, handle it as an exception.
             Finally
                 toolStripCheckForUpdates.Enabled = True
             End Try
         End If
     End Sub
 
+    ''' <summary>This function runs at window load time to check for updates.</summary>
+    ''' <param name="forceRunOfUpdate">This tells the routine if it should run the routine even if the user has automatic checking for updates disabled.</param>
     Private Sub formLoadCheckForUpdatesRoutine(Optional forceRunOfUpdate As Boolean = False)
+        ' This checks to see if automatic checking for updates is enabled or not, if so this routine runs. There's also
+        ' a way to force this routine to run and that is by passing a True value for the forceRunOfUpdate variable.
         If My.Settings.CheckForUpdates = True Or forceRunOfUpdate = True Then
-            toolStripAutomaticallyCheckForUpdates.Checked = True
-            Dim longDateDiff As Long = Math.Abs(DateDiff(DateInterval.Day, Now, My.Settings.lastUpdateTime))
+            toolStripAutomaticallyCheckForUpdates.Checked = True ' This puts a checkbox for the toolStripAutomaticallyCheckForUpdates checkbox.
+            Dim longDateDiff As Long = Math.Abs(DateDiff(DateInterval.Day, Now, My.Settings.lastUpdateTime)) ' This determinds the amount of days since the last update check.
 
+            ' This checks to see if the number of executions of the program has exceeded 50 times or if the days since last update is greater than the user specified days interval for update checking. It also has the ability to bypass this check by setting the forceRunOfUpdate variable to True.
             If My.Settings.ProgramExecutionsSinceLastUpdateCheck >= 50 Or longDateDiff >= My.Settings.checkForUpdatesEveryInDays Or forceRunOfUpdate = True Then
-                My.Settings.ProgramExecutionsSinceLastUpdateCheck = 0
-                My.Settings.Save()
+                My.Settings.ProgramExecutionsSinceLastUpdateCheck = 0 ' We reset the number of program executions since last update to 0.
+                My.Settings.Save() ' And save the settings to disk.
 
+                ' First we check to see if we have an Internet connection because if we don't then why even bother trying to check for updates.
                 If Functions.http.checkForInternetConnection() = False Then
-                    MsgBox("No Internet connection detected.", MsgBoxStyle.Information, strMessageBoxTitle)
-                    Exit Sub
+                    MsgBox("No Internet connection detected.", MsgBoxStyle.Information, strMessageBoxTitle) ' Tell the user that we don't have an Internet connection.
+                    Exit Sub ' And exit this routine.
                 Else
-                    My.Settings.lastUpdateTime = Now
-                    My.Settings.Save()
+                    My.Settings.lastUpdateTime = Now ' Set the last update time to the current time.
+                    My.Settings.Save() ' And save the settings to disk.
 
                     Try
+                        ' Create some variables.
                         Dim strRemoteBuild As String = Nothing, changeLog As String = Nothing
                         Dim shortRemoteBuild, shortRemoteParts As Short
 
+                        ' Now let's set up an httpHelper Class Instance to check for updates with, we will use this Class instance for all HTTP operations in this routine
                         Dim httpHelper As httpHelper = Functions.http.createNewHTTPHelperObject()
-                        httpHelper.addPOSTData("version", globalVariables.version.versionStringWithoutBuild)
+                        httpHelper.addPOSTData("version", globalVariables.version.versionStringWithoutBuild) ' Add the current program version to the HTTP Class instance as HTTP POST data.
 
+                        ' Add the update channel information as POST data.
                         If My.Settings.updateChannel = globalVariables.updateChannels.beta Then
                             httpHelper.addPOSTData("program", globalVariables.programCodeNames.beta)
                         ElseIf My.Settings.updateChannel = globalVariables.updateChannels.stable Then
@@ -1560,9 +1622,12 @@ Public Class Form1
                         ElseIf My.Settings.updateChannel = globalVariables.updateChannels.tom Then
                             httpHelper.addPOSTData("program", globalVariables.programCodeNames.tom)
                         End If
+                        ' Add the update channel information as POST data.
 
+                        ' And let's get the info from my web site.
                         Try
                             If httpHelper.getWebData(globalVariables.webURLs.core.strProgramUpdateChecker, strRemoteBuild) = False Then
+                                ' Something went wrong, checking for updates failed. Let's tell the user that and abort the routine.
                                 MsgBox("There was an error checking for a software update; update check aborted. Please see the Event Log for more information regarding this error message.", MsgBoxStyle.Information, strMessageBoxTitle)
                                 Exit Sub
                             End If
@@ -1570,7 +1635,9 @@ Public Class Form1
                             Exit Sub
                         End Try
 
+                        ' This checks to see if the update script on my web site returned an unknown error.
                         If strRemoteBuild.caseInsensitiveContains("unknown") = True Then
+                            ' Yep, it did so let's tell the user that.
                             MsgBox("There was an error checking for updates." & vbCrLf & vbCrLf & "HTTP Response: " & strRemoteBuild, MsgBoxStyle.Critical, strMessageBoxTitle)
                             Exit Sub
                         ElseIf strRemoteBuild.caseInsensitiveContains("newversion") = True Then
@@ -1578,89 +1645,131 @@ Public Class Form1
                             giveUserNoticeAboutTotallyNewVersion(strRemoteBuild, True)
                             Exit Sub
                         ElseIf strRemoteBuild.caseInsensitiveContains("beta") = True Or strRemoteBuild.caseInsensitiveContains("rc") = True Then
+                            ' This code handles public beta and release candidate builds.
+
+                            ' This gets the new build numbers from the beta/rc data string.
                             Dim strRemoteBuildParts As String() = strRemoteBuild.Split("-")
 
+                            ' We now try and parse the remote build number into a 16-bit Integer.
                             If Short.TryParse(strRemoteBuildParts(1).Trim, shortRemoteParts) Then
+                                ' This checks to see if the remote beta/rc build is newer than the current build.
                                 If shortRemoteParts > globalVariables.version.shortBuild Then
+                                    ' This checks to see if the new build is a beta and if the user wants betas.
                                     If strRemoteBuild.caseInsensitiveContains("beta") = True And My.Settings.onlyGiveMeRCs = True Then
-                                        My.Settings.ProgramExecutionsSinceLastUpdateCheck += 1
-                                        My.Settings.Save()
-                                        Exit Sub
+                                        ' The user doesn't want betas and the current new build is a beta so we're going to stop checking for updates.
+                                        Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and it's been determined that you already have the latest version.") ' Log it.
+                                        My.Settings.ProgramExecutionsSinceLastUpdateCheck += 1 ' Increments the ProgramExecutionsSinceLastUpdateCheck counter.
+                                        My.Settings.Save() ' Saves to disk.
+                                        Exit Sub ' Exits the routine.
                                     End If
 
+                                    ' Creates a variable to store the user's response to the update notification window.
                                     Dim updateDialogResponse As Update_Message.userResponse
 
+                                    ' Opens an update notification window appropriate for the new build be it a beta or RC build.
                                     If strRemoteBuild.caseInsensitiveContains("beta") = True Then
                                         updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.betaVersionUpdate)
                                     ElseIf strRemoteBuild.caseInsensitiveContains("rc") = True Then
                                         updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.releaseCandidateVersionUpdate)
                                     End If
 
+                                    ' Checks to see if the user said yes to update.
                                     If updateDialogResponse = Update_Message.userResponse.doTheUpdate Then
-                                        openThePleaseWaitWindowAndStartTheDownloadThread()
+                                        ' The user said yes.
+                                        openThePleaseWaitWindowAndStartTheDownloadThread() ' Starts the download and update thread.
                                     Else
-                                        disableAutomaticUpdatesAndNotifyUser()
+                                        ' The user said no.
+                                        disableAutomaticUpdatesAndNotifyUser() ' Asks the user if he/she want to disable automatic updates.
                                     End If
 
-                                    Exit Sub
+                                    Exit Sub ' Exit the routine.
+                                Else
+                                    ' OK, the new build matches that of the current build so let's log it.
+                                    Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and it's been determined that you already have the latest version.")
                                 End If
                             Else
+                                ' OK, something bad happened while trying to parse the build string into a 16-bit Integer. Let's log the server output.
                                 Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
-                                MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, strMessageBoxTitle)
-                                Exit Sub
+                                MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, strMessageBoxTitle) ' Tell the user that the server responded with invalid data.
+                                Exit Sub ' Exit the routine.
                             End If
                         ElseIf strRemoteBuild.caseInsensitiveContains("minor") = True Then
+                            ' This code handles minor updates, not important updates.
+
+                            ' Takes the build number string part off of the remote build string.
                             Dim strRemoteBuildParts As String() = strRemoteBuild.Split("-")
 
+                            ' Creates an array of minor build applicables.
                             Dim minorBuildApplicables As New Specialized.StringCollection
 
+                            ' This checks to see if the build applicable string contains a comma thus applying to multiple builds.
                             If strRemoteBuildParts(2).Contains(",") Then
+                                ' Yes it does so let's split the string by the comma and add it to the applicables array.
                                 minorBuildApplicables.AddRange(strRemoteBuildParts(2).ToString.Trim.Split(","))
                             Else
+                                ' Nope so we just add the one build number to the applicables array.
                                 minorBuildApplicables.Add(strRemoteBuildParts(2).ToString.Trim)
                             End If
 
                             If Short.TryParse(strRemoteBuildParts(1).Trim, shortRemoteParts) Then
                                 ' If the current build is found in the minorBuildApplicables it means that the new update is a minor update to the current build that the user has installed. If the current build is NOT found then that means that the update is mandatory for the build that the user has installed.
-                                If shortRemoteParts > globalVariables.version.shortBuild And minorBuildApplicables.Contains(globalVariables.version.shortBuild) = False Then
+                                If shortRemoteParts > globalVariables.version.shortBuild And minorBuildApplicables.Contains(globalVariables.version.shortBuild.ToString) = False Then
+                                    ' This is a mandatory update.
+
+                                    ' Let's ask the user if they want to update to the new version.
                                     If openUpdateDialog(Update_Message.versionUpdateType.standardVersionUpdate) = Update_Message.userResponse.doTheUpdate Then
-                                        openThePleaseWaitWindowAndStartTheDownloadThread()
+                                        ' The user said yes.
+                                        openThePleaseWaitWindowAndStartTheDownloadThread() ' Starts the download and update thread.
                                     End If
 
-                                    Exit Sub
+                                    Exit Sub ' Exit the routine.
+                                Else
+                                    ' OK, the new minor update build doesn't apply to this current build so let's log it.
+                                    Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and it's been determined that you already have the latest version.")
+                                    Exit Sub ' Exit the routine.
                                 End If
                             Else
+                                ' OK, something bad happened while trying to parse the build string into a 16-bit Integer. Let's log the server output.
                                 Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
-                                MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, strMessageBoxTitle)
-                                Exit Sub
+                                MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, strMessageBoxTitle) ' Tell the user that the server responded with invalid data.
+                                Exit Sub ' Exit the routine.
                             End If
 
+                            ' Cleans the applicables array.
                             minorBuildApplicables.Clear()
                             minorBuildApplicables = Nothing
                         Else
-                            If Short.TryParse(strRemoteBuild, shortRemoteBuild) = True Then
+                            ' This code handles regular build updates.
+                            If Short.TryParse(strRemoteBuild, shortRemoteBuild) = True Then ' We then parse the build string into a 16-bit Integer.
                                 If shortRemoteBuild > globalVariables.version.shortBuild Then
+                                    ' Let's ask the user if they want to update to the new version.
                                     If openUpdateDialog(Update_Message.versionUpdateType.standardVersionUpdate) = Update_Message.userResponse.doTheUpdate Then
-                                        openThePleaseWaitWindowAndStartTheDownloadThread()
+                                        ' The user said yes.
+                                        openThePleaseWaitWindowAndStartTheDownloadThread() ' Starts the download and update thread.
                                     Else
-                                        disableAutomaticUpdatesAndNotifyUser()
+                                        ' The user said no.
+                                        disableAutomaticUpdatesAndNotifyUser() ' Asks the user if he/she want to disable automatic updates.
                                     End If
 
-                                    Exit Sub
+                                    Exit Sub ' Exit the routine.
+                                Else
+                                    ' OK, the new build matches that of the current build so let's log it.
+                                    Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and it's been determined that you already have the latest version.")
                                 End If
                             Else
+                                ' OK, something bad happened while trying to parse the build string into a 16-bit Integer. Let's log the server output.
                                 Functions.eventLogFunctions.writeToSystemEventLog("Error parsing server output. The output that the server gave was """ & strRemoteBuild & """.", EventLogEntryType.Error)
-                                MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, strMessageBoxTitle)
-                                Exit Sub
+                                MsgBox("There was an error parsing server output. Please see the Event Log for more details.", MsgBoxStyle.Information, strMessageBoxTitle) ' Tell the user that the server responded with invalid data.
+                                Exit Sub ' Exits the routine.
                             End If
                         End If
                     Catch ex As Exception
-                        Functions.eventLogFunctions.writeCrashToEventLog(ex)
+                        Functions.eventLogFunctions.writeCrashToEventLog(ex) ' If anything goes wrong during this routine, handle it as an exception.
                     End Try
                 End If
             Else
-                My.Settings.ProgramExecutionsSinceLastUpdateCheck += 1
-                My.Settings.Save()
+                My.Settings.ProgramExecutionsSinceLastUpdateCheck += 1 ' Increments the ProgramExecutionsSinceLastUpdateCheck counter.
+                My.Settings.Save() ' Saves to disk.
             End If
         Else
             toolStripAutomaticallyCheckForUpdates.Checked = False
@@ -1677,13 +1786,7 @@ Public Class Form1
         Dim systemRestorePointsManagementObjectSearcher As ManagementObjectSearcher
         Dim listViewItem As myListViewItemTypes.restorePointEntryItem
         Dim listOfRestorePoints As New List(Of myListViewItemTypes.restorePointEntryItem)
-        Dim restorePointCreationDate As Date
         Dim restorePointAge As Double
-
-        ' We need to check if we have
-        If restorePointDateData.Count() <> 0 Then
-            restorePointDateData.Clear()
-        End If
 
         Try
             btnRefreshRestorePoints.Text = "Abort Refreshing System Restore Points"
@@ -1714,11 +1817,6 @@ Public Class Form1
                                 listViewItem.Text = restorePointDetails("SequenceNumber").ToString
                                 listViewItem.restorePointID = restorePointDetails("SequenceNumber").ToString
 
-                                If restorePointDateData.Keys.Contains(restorePointDetails("SequenceNumber")) = False Then
-                                    restorePointDateData.Add(restorePointDetails("SequenceNumber"), restorePointDetails("CreationTime"))
-                                    'debug.writeline("Added restore point id " & systemRestorePoint("SequenceNumber").ToString)
-                                End If
-
                                 ' Adds the System Restore Point ID to our list of System Restore Point IDs to calculate the newest System Restore Point.
                                 systemRestoreIDs.Add(Integer.Parse(restorePointDetails("SequenceNumber")))
 
@@ -1726,15 +1824,12 @@ Public Class Form1
                                 listViewItem.restorePointName = restorePointDetails("Description").ToString
 
                                 If String.IsNullOrEmpty(restorePointDetails("CreationTime").ToString.Trim) = False Then
-                                    restorePointCreationDate = Functions.support.parseSystemRestorePointCreationDate(restorePointDetails("CreationTime"))
+                                    listViewItem.rawRestorePointDate = Functions.support.parseSystemRestorePointCreationDate(restorePointDetails("CreationTime"))
+                                    listViewItem.restorePointDate = String.Format("{0} {1}", listViewItem.rawRestorePointDate.ToShortDateString, listViewItem.rawRestorePointDate.ToLongTimeString)
 
-                                    listViewItem.rawRestorePointDate = restorePointCreationDate
-                                    listViewItem.restorePointDate = String.Format("{0} {1}", restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToLongTimeString)
+                                    listViewItem.SubItems.Add(listViewItem.restorePointDate)
 
-                                    listViewItem.SubItems.Add(String.Format("{0} {1}", restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToLongTimeString))
-
-                                    restorePointAge = calculateRestorePointAge(restorePointCreationDate)
-                                    restorePointCreationDate = Nothing
+                                    restorePointAge = calculateRestorePointAge(listViewItem.rawRestorePointDate)
                                 Else
                                     restorePointAge = 0
                                     listViewItem.SubItems.Add("(Error Parsing Date)")
@@ -1757,7 +1852,6 @@ Public Class Form1
                                         listViewItem.restorePointType = Functions.support.whatTypeOfRestorePointIsIt(Integer.Parse(restorePointDetails("RestorePointType").ToString)) & " (" & restorePointDetails("RestorePointType").ToString & ")"
                                     Else
                                         listViewItem.restorePointType = Functions.support.whatTypeOfRestorePointIsIt(Integer.Parse(restorePointDetails("RestorePointType").ToString))
-                                        'MsgBox(systemRestorePoint("Description") & " -- " & systemRestorePoint("EventType"))
                                     End If
                                 End If
 
@@ -1843,14 +1937,10 @@ Public Class Form1
         End Try
     End Sub
 
-    Sub restoreSystemRestorePoint()
+    Sub restoreSystemRestorePoint(systemRestorePointIndex As Integer)
         Try
             disableFormElements()
-
-            Dim systemRestorePointIndex As Integer = Integer.Parse(DirectCast(systemRestorePointsList.SelectedItems(0), myListViewItemTypes.restorePointEntryItem).restorePointID)
-            'systemRestorePointClass = New SystemRestorePointCreator.Classes.SystemRestore
             Functions.wmi.restoreToSystemRestorePoint(systemRestorePointIndex)
-
             Functions.wait.closePleaseWaitWindow()
         Catch ex2 As Threading.ThreadAbortException
             ' Does nothing.
@@ -1895,13 +1985,9 @@ Public Class Form1
             For Each restorePointInfo As KeyValuePair(Of String, restorePointInfo) In restorePointsToBeDeleted
                 If Integer.TryParse(restorePointInfo.Key, intRestorePointID) Then
                     If boolEnableLogging Then
-                        If restorePointDateData.ContainsKey(restorePointInfo.Key) Then
-                            If String.IsNullOrEmpty(restorePointDateData(restorePointInfo.Key)) = False Then
-                                restorePointCreationDate = Functions.support.parseSystemRestorePointCreationDate(restorePointDateData(restorePointInfo.Key))
+                        restorePointCreationDate = restorePointInfo.Value.dateCreated
 
-                                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", restorePointInfo.Value.strName, restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
-                            End If
-                        End If
+                        Functions.eventLogFunctions.writeToSystemEventLog(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", restorePointInfo.Value.strName, restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
                     End If
 
                     intOldNumberOfRestorePoints -= 1
@@ -2701,7 +2787,7 @@ Public Class Form1
     End Sub
 
     Private Sub RemoveSafeModeBootOptionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RemoveSafeModeBootOptionToolStripMenuItem.Click
-        Functions.registryStuff.removeSafeModeBoot(True)
+        Functions.support.removeSafeModeBoot()
         MsgBox("The setting to boot your system into Safe Mode has been removed. Your system will now reboot.", MsgBoxStyle.Information, strMessageBoxTitle)
         Functions.support.rebootSystem()
     End Sub
@@ -3350,18 +3436,13 @@ Public Class Form1
 
         Dim selectedRestorePoint As myListViewItemTypes.restorePointEntryItem = DirectCast(systemRestorePointsList.SelectedItems(0), myListViewItemTypes.restorePointEntryItem)
 
-        Dim strDescription As String = selectedRestorePoint.restorePointName
-        Dim strDate As String = selectedRestorePoint.restorePointDate
-        Dim strType As String = selectedRestorePoint.restorePointType
-
-        Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot into Safe Mode and perform the restore process there and reboot after the process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, strDescription, strDate, strType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
+        Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot into Safe Mode and perform the restore process there and reboot after the process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, selectedRestorePoint.restorePointName, selectedRestorePoint.restorePointDate, selectedRestorePoint.restorePointType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
 
         If msgboxResult = MsgBoxResult.Yes Then
-            savePreferenceToRegistry(globalVariables.registryValues.strSafeModeValue, "True")
             Functions.support.setSafeModeBoot() ' Set the system up for Safe Mode Boot.
 
             ' Set the restore point that we're going to restore back to.
-            savePreferenceToRegistry("Preselected Restore Point for Restore in Safe Mode", Integer.Parse(systemRestorePointsList.SelectedItems(0).SubItems(0).Text))
+            savePreferenceToRegistry("Preselected Restore Point for Restore in Safe Mode", selectedRestorePoint.restorePointID.Trim)
 
             ' Set this program up to launch at user logon.
             Registry.LocalMachine.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\RunOnce", True).SetValue("*Restore To Restore Point", String.Format("{0}{1}{0} -restoretopoint", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
@@ -3441,15 +3522,11 @@ Public Class Form1
 
         Dim selectedRestorePoint As myListViewItemTypes.restorePointEntryItem = DirectCast(systemRestorePointsList.SelectedItems(0), myListViewItemTypes.restorePointEntryItem)
 
-        Dim strDescription As String = selectedRestorePoint.restorePointName
-        Dim strDate As String = selectedRestorePoint.restorePointDate
-        Dim strType As String = selectedRestorePoint.restorePointType
-
-        Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot after the restoration process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, strDescription, strDate, strType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
+        Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot after the restoration process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, selectedRestorePoint.restorePointName, selectedRestorePoint.restorePointDate, selectedRestorePoint.restorePointType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
 
         If msgboxResult = MsgBoxResult.Yes Then
             Functions.wait.createPleaseWaitWindow("Beginning the Restore Process... Please Wait.", False, enums.howToCenterWindow.parent, False)
-            Threading.ThreadPool.QueueUserWorkItem(AddressOf restoreSystemRestorePoint)
+            Threading.ThreadPool.QueueUserWorkItem(Sub() restoreSystemRestorePoint(Integer.Parse(selectedRestorePoint.restorePointID)))
             Functions.wait.openPleaseWaitWindow()
         Else
             MsgBox("Your system has NOT been restored to the selected System Restore Point.", MsgBoxStyle.Information, strMessageBoxTitle)
@@ -3484,6 +3561,7 @@ Public Class Form1
         Dim restorePointIDsToBeDeleted As New Dictionary(Of String, restorePointInfo)
         Dim strRestorePointName, strRestorePointDate, strRestorePointID, strRestorePointType As String
         Dim boolConfirmDeletions As Boolean = toolStripConfirmDeletions.Checked
+        Dim dateRestorePointCreated As Date
 
         For Each restorePointEntryItem As myListViewItemTypes.restorePointEntryItem In systemRestorePointsList.SelectedItems
             If AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked = False Then
@@ -3503,9 +3581,10 @@ Public Class Form1
             strRestorePointDate = restorePointEntryItem.restorePointDate
             strRestorePointID = restorePointEntryItem.restorePointID
             strRestorePointType = restorePointEntryItem.restorePointType
+            dateRestorePointCreated = restorePointEntryItem.rawRestorePointDate
 
             If boolConfirmDeletions And My.Settings.multiConfirmRestorePointDeletions And systemRestorePointsList.SelectedItems.Count > 1 Then
-                restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType})
+                restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
             ElseIf boolConfirmDeletions And (Not My.Settings.multiConfirmRestorePointDeletions Or systemRestorePointsList.SelectedItems.Count = 1) Then
                 deletionConfirmationWindow = New frmConfirmDelete
 
@@ -3532,9 +3611,9 @@ Public Class Form1
                 deletionConfirmationWindow.Dispose()
                 deletionConfirmationWindow = Nothing
 
-                If boolUserWantsToDeleteTheRestorePoint Then restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType})
+                If boolUserWantsToDeleteTheRestorePoint Then restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
             Else
-                restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType})
+                restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
             End If
 
             strRestorePointName = Nothing
