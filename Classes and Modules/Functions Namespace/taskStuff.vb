@@ -200,6 +200,9 @@ Namespace Functions.taskStuff
                 If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC", task) = False Then
                     addRunTimeTask("Restore Point Creator -- Run with no UAC", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, "", True)
                 End If
+                If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Delete old Restore Points)", task) = False Then
+                    addRunTimeTask("Restore Point Creator -- Run with no UAC (Delete old Restore Points)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, globalVariables.commandLineSwitches.deleteOldRestorePoints)
+                End If
             Catch ex As Exception
                 eventLogFunctions.writeCrashToEventLog(ex)
                 ' Silently handle the exception.
@@ -437,6 +440,15 @@ Namespace Functions.taskStuff
                                 ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.createCustomRestorePoint) Then
                                     ' Checks to see if the Task Wrapper task exists and returns both a Boolean value and a task object.
                                     If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Custom Restore Point)", task) = True Then
+                                        ' Yes, the Task Wrapper task exists so we are going to run that task.
+                                        runTheTask(task)
+                                    Else
+                                        ' OK, we relaunch the process with full Administrator privileges with a UAC prompt.
+                                        support.reRunWithAdminUserRights()
+                                    End If
+                                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.deleteOldRestorePoints) Then
+                                    ' Checks to see if the Task Wrapper task exists and returns both a Boolean value and a task object.
+                                    If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Delete old Restore Points)", task) = True Then
                                         ' Yes, the Task Wrapper task exists so we are going to run that task.
                                         runTheTask(task)
                                     Else

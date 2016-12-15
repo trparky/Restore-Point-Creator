@@ -108,6 +108,8 @@ Namespace My
                     End If
 
                     Functions.taskStuff.runProgramUsingTaskWrapper()
+                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.deleteOldRestorePoints) Then
+                    Functions.taskStuff.runProgramUsingTaskWrapper()
                 End If
             End If
 
@@ -396,7 +398,7 @@ Namespace My
 
                             e.Cancel = True
                             Exit Sub
-                        ElseIf commandLineArgument.stringCompare("-deleteoldrestorepoints") Then
+                        ElseIf commandLineArgument.stringCompare(globalvariables.commandLineSwitches.deleteOldRestorePoints) Then
                             Functions.startupFunctions.deleteOldRestorePoints()
                             e.Cancel = True
                             Exit Sub
