@@ -131,6 +131,9 @@ It is important to put the "-name" argument AFTER the "-createrestorepoint" argu
 "-createrestorepointcustomname" This creates a system restore point but prompts the user for a name for it.
 "-viewchangelog" This loads the official change log.
 "-eventlog" This loads program's Event Log viewer.
-"-deleteoldrestorepoints" "This deletes old restore points as per your user preferences.</value>
+"-deleteoldrestorepoints" This deletes old restore points as per your user preferences.
+
+"-keepxnumberofrestorepoints -count=(0-9)" This tells the program how many restore points to keep and it deletes any older restore
+points to meet that number.</value>
   </data>
 </root>

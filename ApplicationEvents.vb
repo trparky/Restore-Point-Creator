@@ -110,6 +110,29 @@ Namespace My
                     Functions.taskStuff.runProgramUsingTaskWrapper()
                 ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.deleteOldRestorePoints) Then
                     Functions.taskStuff.runProgramUsingTaskWrapper()
+                    e.Cancel = True
+                    Exit Sub
+                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints) Then
+                    If My.Application.CommandLineArgs.Count <> 2 Then
+                        Console.WriteLine("ERROR: You must include a ""-count=(0-9)"" to your invokation of this program with this command line argument. For instance... ""-count=9"".")
+                        Process.GetCurrentProcess.Kill()
+                    End If
+
+                    If My.Application.CommandLineArgs.Count = 2 Then
+                        If My.Application.CommandLineArgs(1).Trim.StartsWith("-count", StringComparison.OrdinalIgnoreCase) Then
+                            Dim deleteOldRestorePointCommandLineCount As Short
+
+                            If Short.TryParse(My.Application.CommandLineArgs(1).Trim.caseInsensitiveReplace("-count=", "").Trim, deleteOldRestorePointCommandLineCount) Then
+                                My.Settings.deleteOldRestorePointCommandLineCount = deleteOldRestorePointCommandLineCount
+                                My.Settings.Save()
+                            Else
+                                Console.WriteLine("ERROR: You have provided an invalid numeric input, please try again.")
+                                Process.GetCurrentProcess.Kill()
+                            End If
+                        End If
+                    End If
+
+                    Functions.taskStuff.runProgramUsingTaskWrapper()
                 End If
             End If
 
@@ -400,6 +423,40 @@ Namespace My
                             Exit Sub
                         ElseIf commandLineArgument.stringCompare(globalvariables.commandLineSwitches.deleteOldRestorePoints) Then
                             Functions.startupFunctions.deleteOldRestorePoints()
+                            e.Cancel = True
+                            Exit Sub
+                        ElseIf commandLineArgument.stringCompare(globalvariables.commandLineSwitches.keepXNumberOfRestorePoints) Then
+                            Dim deleteOldRestorePointCommandLineCount As Short
+
+                            If My.Application.CommandLineArgs.Count <> 2 And My.Settings.deleteOldRestorePointCommandLineCount = 0 Then
+                                Console.WriteLine("ERROR: You must include a ""-count=(0-9)"" to your invokation of this program with this command line argument. For instance... ""-count=9"".")
+                                Process.GetCurrentProcess.Kill()
+                            End If
+
+                            If My.Application.CommandLineArgs.Count = 2 Then
+                                If My.Application.CommandLineArgs(1).Trim.StartsWith("-count", StringComparison.OrdinalIgnoreCase) Then
+                                    If Not Short.TryParse(My.Application.CommandLineArgs(1).Trim.caseInsensitiveReplace("-count=", "").Trim, deleteOldRestorePointCommandLineCount) Then
+                                        Console.WriteLine("ERROR: You have provided an invalid numeric input, please try again.")
+                                        Process.GetCurrentProcess.Kill()
+                                    End If
+                                End If
+                            Else
+                                deleteOldRestorePointCommandLineCount = My.Settings.deleteOldRestorePointCommandLineCount
+                            End If
+
+                            Dim numberOfRestorePoints As Integer = Functions.wmi.getNumberOfRestorePoints()
+
+                            Functions.wmi.doDeletingOfXNumberOfRestorePoints(deleteOldRestorePointCommandLineCount)
+
+                            While numberOfRestorePoints = Functions.wmi.getNumberOfRestorePoints()
+                                Threading.Thread.Sleep(500)
+                            End While
+
+                            Functions.support.writeSystemRestorePointsToApplicationLogs()
+
+                            My.Settings.deleteOldRestorePointCommandLineCount = 0
+                            My.Settings.Save()
+
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.stringCompare("-prefscleanup") Then

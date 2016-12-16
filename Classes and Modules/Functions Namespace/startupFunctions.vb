@@ -93,6 +93,13 @@ Namespace Functions.startupFunctions
                 taskStuff.addRunTimeTask("Restore Point Creator -- Run with no UAC (Delete old Restore Points)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, globalVariables.commandLineSwitches.deleteOldRestorePoints)
             End If
 
+            If taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Keep X Number of Restore Points)", task) = True Then
+                taskStuff.deleteTask(task)
+                task.Dispose()
+
+                taskStuff.addRunTimeTask("Restore Point Creator -- Run with no UAC (Delete old Restore Points)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, globalVariables.commandLineSwitches.keepXNumberOfRestorePoints)
+            End If
+
             MsgBox("Some required system configurations for normal operation of the program needed to be repaired. Those repairs have been completed." & vbCrLf & vbCrLf & "Please relaunch the program as normal.", MsgBoxStyle.Information, "Restore Point Creator")
         End Sub
 
