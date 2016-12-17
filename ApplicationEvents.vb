@@ -113,9 +113,25 @@ Namespace My
                     e.Cancel = True
                     Exit Sub
                 ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints) Then
-                    If My.Application.CommandLineArgs.Count <> 2 Then
+                    Dim local_KeepXAmountofRestorePointsValue As Short
+                    registryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+
+                    If registryKey IsNot Nothing Then
+                        If Not Short.TryParse(registryKey.GetValue("Keep X Amount of Restore Points Value", "-10"), local_KeepXAmountofRestorePointsValue) Then
+                            Console.WriteLine("ERROR: You must include a ""-count=(0-9)"" to your invokation of this program with this command line argument. For instance... ""-count=9"".")
+                            Process.GetCurrentProcess.Kill()
+                        End If
+
+                        registryKey.Close()
+                        registryKey.Dispose()
+                    End If
+
+                    If local_KeepXAmountofRestorePointsValue = -10 And My.Application.CommandLineArgs.Count <> 2 Then
                         Console.WriteLine("ERROR: You must include a ""-count=(0-9)"" to your invokation of this program with this command line argument. For instance... ""-count=9"".")
                         Process.GetCurrentProcess.Kill()
+                    Else
+                        My.Settings.deleteOldRestorePointCommandLineCount = local_KeepXAmountofRestorePointsValue
+                        My.Settings.Save()
                     End If
 
                     If My.Application.CommandLineArgs.Count = 2 Then
@@ -446,13 +462,23 @@ Namespace My
 
                             Dim numberOfRestorePoints As Integer = Functions.wmi.getNumberOfRestorePoints()
 
-                            Functions.wmi.doDeletingOfXNumberOfRestorePoints(deleteOldRestorePointCommandLineCount)
+                            If deleteOldRestorePointCommandLineCount < numberOfRestorePoints Then
+                                Dim numberOfRestorePointsToDelete As Short = numberOfRestorePoints - deleteOldRestorePointCommandLineCount
 
-                            While numberOfRestorePoints = Functions.wmi.getNumberOfRestorePoints()
-                                Threading.Thread.Sleep(500)
-                            End While
+                                If numberOfRestorePointsToDelete = 1 Then
+                                    Functions.eventLogFunctions.writeToSystemEventLog("Preparing to delete 1 restore point.")
+                                Else
+                                    Functions.eventLogFunctions.writeToSystemEventLog("Preparing to delete " & numberOfRestorePointsToDelete & " restore points.")
+                                End If
 
-                            Functions.support.writeSystemRestorePointsToApplicationLogs()
+                                Functions.wmi.doDeletingOfXNumberOfRestorePoints(deleteOldRestorePointCommandLineCount)
+
+                                While numberOfRestorePoints = Functions.wmi.getNumberOfRestorePoints()
+                                    Threading.Thread.Sleep(500)
+                                End While
+
+                                Functions.support.writeSystemRestorePointsToApplicationLogs()
+                            End If
 
                             My.Settings.deleteOldRestorePointCommandLineCount = 0
                             My.Settings.Save()
