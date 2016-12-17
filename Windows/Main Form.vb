@@ -18,6 +18,7 @@ Public Class Form1
     Private Const strTypeYourRestorePointName As String = "Type in a name for your custom-named System Restore Point and press Enter..."
     Private Const strMessageBoxTitle As String = "System Restore Point Creator"
     Public defaultCustomRestorePointName As String
+    Private boolHaveWeTriedToCreateTheRestorePointAgain As Boolean = False
 
     'Private restorePointDateData As New Dictionary(Of String, String)
 #End Region
@@ -1158,6 +1159,30 @@ Public Class Form1
             Dim oldNewestRestorePointID As Integer = Functions.wmi.getNewestSystemRestorePointID()
 
             result = Functions.wmi.createRestorePoint(stringRestorePointName, Functions.support.RestoreType.WindowsType, sequenceNumber)
+
+            If result = Functions.APIs.errorCodes.ERROR_SERVICE_DISABLED Then
+                If boolHaveWeTriedToCreateTheRestorePointAgain Then
+                    Functions.eventLogFunctions.writeToSystemEventLog("Auto-corrections to system configuration has failed. Unable to create restore point.", EventLogEntryType.Error)
+                    Exit Sub
+                Else
+                    Dim gigabytesInBytes As Long = 1073741824
+                    Dim newSize As Long = gigabytesInBytes * 20 ' Sets the size to 20 GBs.
+
+                    Functions.eventLogFunctions.writeToSystemEventLog("The system returned error code 1058 (ERROR_SERVICE_DISABLED). Attempting to correct it by setting up reserved system restore point space and enabling system restore on the system drive.")
+
+                    Functions.vss.setShadowStorageSize(globalVariables.systemDriveLetter, newSize)
+                    Functions.vss.enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
+                    boolHaveWeTriedToCreateTheRestorePointAgain = True
+
+                    Functions.eventLogFunctions.writeToSystemEventLog("Attempting to create the restore point after system configuration corrections.")
+                    unifiedCreateSystemRestorePoint(stringRestorePointName)
+                    Exit Sub
+                End If
+            End If
+
+            If result = Functions.APIs.errorCodes.ERROR_SUCCESS Then
+                boolHaveWeTriedToCreateTheRestorePointAgain = False
+            End If
 
             If result <> Functions.APIs.errorCodes.ERROR_SUCCESS Then
                 MsgBox(String.Format("There was an error while attempting to creating the restore point. The error code returned from the system was {0}{1}{0}.", Chr(34), result), MsgBoxStyle.Critical, strMessageBoxTitle)
