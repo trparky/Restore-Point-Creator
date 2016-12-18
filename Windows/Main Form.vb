@@ -1161,22 +1161,31 @@ Public Class Form1
             result = Functions.wmi.createRestorePoint(stringRestorePointName, Functions.support.RestoreType.WindowsType, sequenceNumber)
 
             If result = Functions.APIs.errorCodes.ERROR_SERVICE_DISABLED Then
-                If boolHaveWeTriedToCreateTheRestorePointAgain Then
-                    Functions.eventLogFunctions.writeToSystemEventLog("Auto-corrections to system configuration has failed. Unable to create restore point.", EventLogEntryType.Error)
-                    Exit Sub
+                Dim reservedSpaceSize As ULong = Functions.vss.getMaxSize(globalVariables.systemDriveLetter)
+
+                Functions.eventLogFunctions.writeToSystemEventLog("The system restore point API returned error code 1058 (ERROR_SERVICE_DISABLED). Attempting to auto-correct this issue.", EventLogEntryType.Warning)
+
+                If reservedSpaceSize = 0 Then
+                    If boolHaveWeTriedToCreateTheRestorePointAgain Then
+                        Functions.eventLogFunctions.writeToSystemEventLog("Auto-corrections to system configuration has failed. Unable to create restore point.", EventLogEntryType.Error)
+                        Exit Sub
+                    Else
+                        Dim gigabytesInBytes As Long = 1073741824
+                        Dim newSize As Long = gigabytesInBytes * 20 ' Sets the size to 20 GBs.
+
+                        Functions.eventLogFunctions.writeToSystemEventLog("The system returned error code 1058 (ERROR_SERVICE_DISABLED). Attempting to correct it by setting up reserved system restore point space and enabling system restore on the system drive.")
+
+                        Functions.vss.executeVSSAdminCommand(globalVariables.systemDriveLetter)
+                        Functions.vss.setShadowStorageSize(globalVariables.systemDriveLetter, newSize)
+                        Functions.vss.enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
+                        boolHaveWeTriedToCreateTheRestorePointAgain = True
+
+                        Functions.eventLogFunctions.writeToSystemEventLog("Attempting to create the restore point after system configuration corrections.")
+                        unifiedCreateSystemRestorePoint(stringRestorePointName)
+                        Exit Sub
+                    End If
                 Else
-                    Dim gigabytesInBytes As Long = 1073741824
-                    Dim newSize As Long = gigabytesInBytes * 20 ' Sets the size to 20 GBs.
-
-                    Functions.eventLogFunctions.writeToSystemEventLog("The system returned error code 1058 (ERROR_SERVICE_DISABLED). Attempting to correct it by setting up reserved system restore point space and enabling system restore on the system drive.")
-
-                    Functions.vss.setShadowStorageSize(globalVariables.systemDriveLetter, newSize)
-                    Functions.vss.enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
-                    boolHaveWeTriedToCreateTheRestorePointAgain = True
-
-                    Functions.eventLogFunctions.writeToSystemEventLog("Attempting to create the restore point after system configuration corrections.")
-                    unifiedCreateSystemRestorePoint(stringRestorePointName)
-                    Exit Sub
+                    Functions.eventLogFunctions.writeToSystemEventLog("The reserved space for restore points on the system drive appears to be set correctly, something else appears to be wrong. Auto-correction of system configurations may cause unintended side-effects. The auto-correction routine has halted.", EventLogEntryType.Error)
                 End If
             End If
 
@@ -1185,6 +1194,12 @@ Public Class Form1
             End If
 
             If result <> Functions.APIs.errorCodes.ERROR_SUCCESS Then
+                If result <> Functions.APIs.errorCodes.ERROR_SERVICE_DISABLED Then
+                    Functions.eventLogFunctions.writeToSystemEventLog("The system restore point API returned an error code (" & result & ").", EventLogEntryType.Warning)
+                End If
+
+                Functions.wait.closePleaseWaitWindow()
+
                 MsgBox(String.Format("There was an error while attempting to creating the restore point. The error code returned from the system was {0}{1}{0}.", Chr(34), result), MsgBoxStyle.Critical, strMessageBoxTitle)
                 Exit Sub
             End If
