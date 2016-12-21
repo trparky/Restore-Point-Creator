@@ -556,6 +556,7 @@
     <Content Include="FodyWeavers.xml">
       <SubType>Designer</SubType>
     </Content>
+    <None Include="Resources\yes.png" />
     <None Include="Resources\checkbox_yes.png" />
     <None Include="Resources\checkbox_no.png" />
     <None Include="Resources\reboot.png" />
