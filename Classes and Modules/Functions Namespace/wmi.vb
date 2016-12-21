@@ -214,6 +214,10 @@ Namespace Functions.wmi
                 MsgBox("Unable to restore system to selected restore point, a COM Exception has occurred. Restore process aborted.", MsgBoxStyle.Critical, "Restore Point Creator")
             Catch ex3 As Runtime.InteropServices.COMException
                 giveComExceptionCrashMessage()
+            Catch ex2 As IO.FileLoadException
+                eventLogFunctions.writeCrashToEventLog(ex2)
+                MsgBox("Unable to load required system assemblies to perform system operation. Please refer to the Application Event Log for more details and to submit the crash event to me." & vbCrLf & vbCrLf & "This program will now close.", MsgBoxStyle.Critical, "Restore Point Creator FileLoadException Handler")
+                Process.GetCurrentProcess.Kill()
             Catch ex As Exception
                 Threading.Thread.CurrentThread.CurrentUICulture = New System.Globalization.CultureInfo("en-US")
                 exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
