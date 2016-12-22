@@ -117,7 +117,7 @@ Namespace My
                     Functions.taskStuff.runProgramUsingTaskWrapper()
                     e.Cancel = True
                     Exit Sub
-                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints) Then
+                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints) And Not boolAreWeAnAdministrator Then
                     ' Let's put the setting back to the default value of 0.
                     My.Settings.deleteOldRestorePointCommandLineCount = 0
                     My.Settings.Save()
@@ -174,6 +174,8 @@ Namespace My
                             giveNoCountGivenError()
                         End If
                     End If
+
+                    MsgBox("count = " & My.Settings.deleteOldRestorePointCommandLineCount)
 
                     Functions.taskStuff.runProgramUsingTaskWrapper()
                 End If
@@ -525,26 +527,29 @@ Namespace My
                                 End If
                             End If
 
+                            MsgBox("count = " & deleteOldRestorePointCommandLineCount)
                             ' If all things passed the checks above this code will now execute.
 
-                            Dim numberOfRestorePoints As Integer = Functions.wmi.getNumberOfRestorePoints()
+                            If deleteOldRestorePointCommandLineCount <> 0 Then
+                                Dim numberOfRestorePoints As Integer = Functions.wmi.getNumberOfRestorePoints()
 
-                            If deleteOldRestorePointCommandLineCount < numberOfRestorePoints Then
-                                Dim numberOfRestorePointsToDelete As Short = numberOfRestorePoints - deleteOldRestorePointCommandLineCount
+                                If deleteOldRestorePointCommandLineCount < numberOfRestorePoints Then
+                                    Dim numberOfRestorePointsToDelete As Short = numberOfRestorePoints - deleteOldRestorePointCommandLineCount
 
-                                If numberOfRestorePointsToDelete = 1 Then
-                                    Functions.eventLogFunctions.writeToSystemEventLog("Preparing to delete 1 restore point.")
-                                Else
-                                    Functions.eventLogFunctions.writeToSystemEventLog("Preparing to delete " & numberOfRestorePointsToDelete & " restore points.")
+                                    If numberOfRestorePointsToDelete = 1 Then
+                                        Functions.eventLogFunctions.writeToSystemEventLog("Preparing to delete 1 restore point.")
+                                    Else
+                                        Functions.eventLogFunctions.writeToSystemEventLog("Preparing to delete " & numberOfRestorePointsToDelete & " restore points.")
+                                    End If
+
+                                    Functions.wmi.doDeletingOfXNumberOfRestorePoints(deleteOldRestorePointCommandLineCount)
+
+                                    While numberOfRestorePoints = Functions.wmi.getNumberOfRestorePoints()
+                                        Threading.Thread.Sleep(500)
+                                    End While
+
+                                    Functions.support.writeSystemRestorePointsToApplicationLogs()
                                 End If
-
-                                Functions.wmi.doDeletingOfXNumberOfRestorePoints(deleteOldRestorePointCommandLineCount)
-
-                                While numberOfRestorePoints = Functions.wmi.getNumberOfRestorePoints()
-                                    Threading.Thread.Sleep(500)
-                                End While
-
-                                Functions.support.writeSystemRestorePointsToApplicationLogs()
                             End If
 
                             My.Settings.deleteOldRestorePointCommandLineCount = 0
