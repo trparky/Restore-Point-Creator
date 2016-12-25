@@ -90,6 +90,12 @@ Namespace Functions.wmi
                     systemRestorePoints = Nothing
                     Exit Sub
                 Else
+                    If numberOfRestorePointsToBeDeleted = 1 Then
+                        eventLogFunctions.writeToSystemEventLog("Preparing to delete 1 restore point.")
+                    Else
+                        eventLogFunctions.writeToSystemEventLog("Preparing to delete " & numberOfRestorePointsToBeDeleted & " restore points.")
+                    End If
+
                     For Each systemRestorePoint As Management.ManagementObject In systemRestorePoints.Get()
                         If numberOfRestorePointsToBeDeleted = 0 Then
                             Exit For
