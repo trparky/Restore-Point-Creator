@@ -192,7 +192,12 @@ Public Class frmTaskScheduler
                         If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Saturday)) Then chkSaturdayDelete.Checked = True
                     End If
 
-                    timePickerDelete.Value = .StartBoundary
+                    Try
+                        timePickerDelete.Value = .StartBoundary
+                    Catch ex As ArgumentOutOfRangeException
+                        Functions.eventLogFunctions.writeToSystemEventLog("There was an error loading the scheduled task's start time. The value that was returned was """ & .StartBoundary.ToString & """ which is invalid.", EventLogEntryType.Warning)
+                        timePickerDelete.Value = Now
+                    End Try
                 End With
 
                 taskTriggers.Dispose()
@@ -247,7 +252,12 @@ Public Class frmTaskScheduler
                         If .ToString.caseInsensitiveContains(DateTimeFormatInfo.CurrentInfo.GetDayName(DayOfWeek.Saturday)) Then chkSaturday.Checked = True
                     End If
 
-                    timePicker.Value = .StartBoundary
+                    Try
+                        timePicker.Value = .StartBoundary
+                    Catch ex As ArgumentOutOfRangeException
+                        Functions.eventLogFunctions.writeToSystemEventLog("There was an error loading the scheduled task's start time. The value that was returned was """ & .StartBoundary.ToString & """ which is invalid.", EventLogEntryType.Warning)
+                        timePicker.Value = Now
+                    End Try
                 End With
 
                 taskTriggers.Dispose()
