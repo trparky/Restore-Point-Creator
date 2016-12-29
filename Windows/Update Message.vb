@@ -205,4 +205,8 @@
     Private Sub Update_Message_Shown(sender As Object, e As EventArgs) Handles Me.Shown
         Me.BringToFront()
     End Sub
+
+    Private Sub txtChanges_MouseWheel(sender As Object, e As MouseEventArgs) Handles txtChanges.MouseWheel
+        disableCountdown()
+    End Sub
 End Class
