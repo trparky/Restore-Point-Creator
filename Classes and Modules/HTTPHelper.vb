@@ -152,6 +152,7 @@ End Class
 
 Public Class httpProtocolException
     Inherits Exception
+    Private _httpStatusCode As Net.HttpStatusCode = Net.HttpStatusCode.NoContent
 
     Public Sub New()
     End Sub
@@ -163,6 +164,15 @@ Public Class httpProtocolException
     Public Sub New(message As String, inner As Exception)
         MyBase.New(message, inner)
     End Sub
+
+    Public Property httpStatusCode As Net.HttpStatusCode
+        Get
+            Return _httpStatusCode
+        End Get
+        Set(value As Net.HttpStatusCode)
+            _httpStatusCode = value
+        End Set
+    End Property
 End Class
 
 Public Class noSSLCertificateFoundException
@@ -195,7 +205,7 @@ End Class
 
 ''' <summary>Allows you to easily POST and upload files to a remote HTTP server without you, the programmer, knowing anything about how it all works. This class does it all for you. It handles adding a User Agent String, additional HTTP Request Headers, string data to your HTTP POST data, and files to be uploaded in the HTTP POST data.</summary>
 Public Class httpHelper
-    Private Const classVersion As String = "1.215"
+    Private Const classVersion As String = "1.225"
 
     Private strUserAgentString As String = Nothing
     Private boolUseProxy As Boolean = False
@@ -791,14 +801,7 @@ Public Class httpHelper
                 Dim ex2 As Net.WebException = DirectCast(ex, Net.WebException)
 
                 If ex2.Status = Net.WebExceptionStatus.ProtocolError Then
-                    If ex2.Message.Contains("(500)") = True Then
-                        lastException = New httpProtocolException("HTTP Protocol Error (Server 500 Error) while accessing " & fileDownloadURL, ex2)
-                        Throw lastException
-                    Else
-                        lastException = New httpProtocolException("HTTP Protocol Error while accessing " & fileDownloadURL, ex2)
-                        Throw lastException
-                    End If
-
+                    Throw handleWebExceptionProtocolError(fileDownloadURL, ex2)
                     Return False
                 ElseIf ex2.Status = Net.WebExceptionStatus.TrustFailure Then
                     lastException = New sslErrorException("There was an error establishing an SSL connection.", ex2)
@@ -932,14 +935,7 @@ Public Class httpHelper
                 Dim ex2 As Net.WebException = DirectCast(ex, Net.WebException)
 
                 If ex2.Status = Net.WebExceptionStatus.ProtocolError Then
-                    If ex2.Message.Contains("(500)") = True Then
-                        lastException = New httpProtocolException("HTTP Protocol Error (Server 500 Error) while accessing " & fileDownloadURL, ex2)
-                        Throw lastException
-                    Else
-                        lastException = New httpProtocolException("HTTP Protocol Error while accessing " & fileDownloadURL, ex2)
-                        Throw lastException
-                    End If
-
+                    Throw handleWebExceptionProtocolError(fileDownloadURL, ex2)
                     Return False
                 ElseIf ex2.Status = Net.WebExceptionStatus.TrustFailure Then
                     lastException = New sslErrorException("There was an error establishing an SSL connection.", ex2)
@@ -1048,14 +1044,7 @@ Public Class httpHelper
                 Dim ex2 As Net.WebException = DirectCast(ex, Net.WebException)
 
                 If ex2.Status = Net.WebExceptionStatus.ProtocolError Then
-                    If ex2.Message.Contains("(500)") = True Then
-                        lastException = New httpProtocolException("HTTP Protocol Error (Server 500 Error) while accessing " & url, ex2)
-                        Throw lastException
-                    Else
-                        lastException = New httpProtocolException("HTTP Protocol Error while accessing " & url, ex2)
-                        Throw lastException
-                    End If
-
+                    Throw handleWebExceptionProtocolError(url, ex2)
                     Return False
                 ElseIf ex2.Status = Net.WebExceptionStatus.TrustFailure Then
                     lastException = New sslErrorException("There was an error establishing an SSL connection.", ex2)
@@ -1209,14 +1198,7 @@ Public Class httpHelper
                 Dim ex2 As Net.WebException = DirectCast(ex, Net.WebException)
 
                 If ex2.Status = Net.WebExceptionStatus.ProtocolError Then
-                    If ex2.Message.Contains("(500)") = True Then
-                        lastException = New httpProtocolException("HTTP Protocol Error (Server 500 Error) while accessing " & url, ex2)
-                        Throw lastException
-                    Else
-                        lastException = New httpProtocolException("HTTP Protocol Error while accessing " & url, ex2)
-                        Throw lastException
-                    End If
-
+                    Throw handleWebExceptionProtocolError(url, ex2)
                     Return False
                 ElseIf ex2.Status = Net.WebExceptionStatus.TrustFailure Then
                     lastException = New sslErrorException("There was an error establishing an SSL connection.", ex2)
@@ -1284,6 +1266,24 @@ Public Class httpHelper
         End If
 
         Return getDataString
+    End Function
+
+    Private Function handleWebExceptionProtocolError(url As String, ex As Net.WebException) As httpProtocolException
+        Dim httpErrorResponse As Net.HttpWebResponse = TryCast(ex.Response, Net.HttpWebResponse)
+
+        If httpErrorResponse IsNot Nothing Then
+            If httpErrorResponse.StatusCode = Net.HttpStatusCode.InternalServerError Then
+                lastException = New httpProtocolException("HTTP Protocol Error (Server 500 Error) while accessing " & url, ex) With {.httpStatusCode = httpErrorResponse.StatusCode}
+            ElseIf httpErrorResponse.StatusCode = Net.HttpStatusCode.NotFound Then
+                lastException = New httpProtocolException("HTTP Protocol Error (404 File Not Found) while accessing " & url, ex) With {.httpStatusCode = httpErrorResponse.StatusCode}
+            Else
+                lastException = New httpProtocolException("HTTP Protocol Error while accessing " & url, ex) With {.httpStatusCode = httpErrorResponse.StatusCode}
+            End If
+        Else
+            lastException = New httpProtocolException("HTTP Protocol Error while accessing " & url, ex)
+        End If
+
+        Return lastException
     End Function
 
     Public Function fileSizeToHumanReadableFormat(ByVal size As Long, Optional roundToNearestWholeNumber As Boolean = False) As String
