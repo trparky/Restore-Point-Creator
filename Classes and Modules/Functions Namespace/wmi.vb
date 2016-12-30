@@ -90,12 +90,22 @@ Namespace Functions.wmi
                     systemRestorePoints = Nothing
                     Exit Sub
                 Else
+                    If numberOfRestorePointsToBeDeleted = 1 Then
+                        eventLogFunctions.writeToSystemEventLog("Preparing to delete 1 restore point.")
+                    Else
+                        eventLogFunctions.writeToSystemEventLog("Preparing to delete " & numberOfRestorePointsToBeDeleted & " restore points.")
+                    End If
+
                     For Each systemRestorePoint As Management.ManagementObject In systemRestorePoints.Get()
                         If numberOfRestorePointsToBeDeleted = 0 Then
                             Exit For
                         Else
                             numberOfRestorePointsToBeDeleted -= 1
-                            support.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber")))
+
+                            Dim restorePointCreationDate As Date = support.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime").ToString)
+                            eventLogFunctions.writeToSystemEventLog(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", systemRestorePoint("Description").ToString, restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
+
+                            support.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber").ToString))
                         End If
                     Next
                 End If
@@ -210,6 +220,10 @@ Namespace Functions.wmi
                 MsgBox("Unable to restore system to selected restore point, a COM Exception has occurred. Restore process aborted.", MsgBoxStyle.Critical, "Restore Point Creator")
             Catch ex3 As Runtime.InteropServices.COMException
                 giveComExceptionCrashMessage()
+            Catch ex2 As IO.FileLoadException
+                eventLogFunctions.writeCrashToEventLog(ex2)
+                MsgBox("Unable to load required system assemblies to perform system operation. Please refer to the Application Event Log for more details and to submit the crash event to me." & vbCrLf & vbCrLf & "This program will now close.", MsgBoxStyle.Critical, "Restore Point Creator FileLoadException Handler")
+                Process.GetCurrentProcess.Kill()
             Catch ex As Exception
                 Threading.Thread.CurrentThread.CurrentUICulture = New System.Globalization.CultureInfo("en-US")
                 exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)

@@ -13,6 +13,11 @@ Namespace My
     Partial Friend Class MyApplication
         Private pleaseWaitInstance As Please_Wait
 
+        Private Sub giveNoCountGivenError()
+            Console.WriteLine("ERROR: You must include a ""-count=(0-9)"" to your invokation of this program with this command line argument. For instance... ""-count=9"".")
+            Process.GetCurrentProcess.Kill()
+        End Sub
+
         Private Sub MyApplication_Startup(sender As Object, e As ApplicationServices.StartupEventArgs) Handles Me.Startup
             exceptionHandler.loadExceptionHandler()
             Functions.startupFunctions.validateSettings()
@@ -104,6 +109,69 @@ Namespace My
                         If My.Application.CommandLineArgs(1).Trim.StartsWith("-name", StringComparison.OrdinalIgnoreCase) Then
                             My.Settings.savedRestorePointFromCommandLine = My.Application.CommandLineArgs(1).Trim.caseInsensitiveReplace("-name=", "")
                             My.Settings.Save()
+                        End If
+                    End If
+
+                    Functions.taskStuff.runProgramUsingTaskWrapper()
+                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.deleteOldRestorePoints) Then
+                    Functions.taskStuff.runProgramUsingTaskWrapper()
+                    e.Cancel = True
+                    Exit Sub
+                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints) And Not boolAreWeAnAdministrator Then
+                    ' Let's put the setting back to the default value of 0.
+                    My.Settings.deleteOldRestorePointCommandLineCount = 0
+                    My.Settings.Save()
+
+                    Dim local_KeepXAmountofRestorePointsValue As Short
+
+                    ' This checks if the user provided a "-count" argument.
+                    If My.Application.CommandLineArgs.Count <> 2 Then
+                        ' No, the user didn't so let's do some stuff in the Registry. We open the program's Registry Key here.
+                        registryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+
+                        ' This checks to see if the Registry Key exists by doing a Null check.
+                        If registryKey IsNot Nothing Then
+                            ' The key does exist so let's pull our value from the Registry.
+                            Dim stringlocal_KeepXAmountofRestorePointsValue As String = registryKey.GetValue("Keep X Amount of Restore Points Value", "")
+
+                            ' And let's close the Registry Object.
+                            registryKey.Close()
+                            registryKey.Dispose()
+
+                            ' OK, let's check to see if the value we pulled from the Registry is null.
+                            If String.IsNullOrEmpty(stringlocal_KeepXAmountofRestorePointsValue) Then
+                                giveNoCountGivenError() ' OK, it is so we give the user an error message.
+                            Else
+                                ' OK, the value we got from the Registry isn't null so we try to parse it now.
+                                If Short.TryParse(stringlocal_KeepXAmountofRestorePointsValue, local_KeepXAmountofRestorePointsValue) Then
+                                    ' OK, we were able to parse it so we save it to the application's settings to use it in the relaunch.
+                                    My.Settings.deleteOldRestorePointCommandLineCount = local_KeepXAmountofRestorePointsValue
+                                    My.Settings.Save()
+                                Else
+                                    giveNoCountGivenError() ' We tried to parse it and we failed so we give the user an error message.
+                                End If
+                            End If
+                        Else
+                            ' OK, the registry key doesn't exist so we give the user an error message.
+                            giveNoCountGivenError()
+                        End If
+                    Else
+                        ' OK, the user provided a second command line argument so let's check it out.
+                        If My.Application.CommandLineArgs(1).Trim.StartsWith("-count", StringComparison.OrdinalIgnoreCase) Then
+                            Dim deleteOldRestorePointCommandLineCount As Short
+
+                            ' Let's try and parse the value that the user gave us.
+                            If Short.TryParse(My.Application.CommandLineArgs(1).Trim.caseInsensitiveReplace("-count=", "").Trim, deleteOldRestorePointCommandLineCount) Then
+                                ' Good, we could parse it so let's save it in the application's settings to use it in the relaunch.
+                                My.Settings.deleteOldRestorePointCommandLineCount = deleteOldRestorePointCommandLineCount
+                                My.Settings.Save()
+                            Else
+                                Console.WriteLine("ERROR: You have provided an invalid numeric input, please try again.")
+                                Process.GetCurrentProcess.Kill()
+                            End If
+                        Else
+                            ' No, the second command line argument isn't a "-count" like we are expecting so give the user an error message.
+                            giveNoCountGivenError()
                         End If
                     End If
 
@@ -396,8 +464,88 @@ Namespace My
 
                             e.Cancel = True
                             Exit Sub
-                        ElseIf commandLineArgument.stringCompare("-deleteoldrestorepoints") Then
+                        ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.deleteOldRestorePoints) Then
                             Functions.startupFunctions.deleteOldRestorePoints()
+                            e.Cancel = True
+                            Exit Sub
+                        ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints) Then
+                            Dim deleteOldRestorePointCommandLineCount As Short
+
+                            ' This checks if the user provided a "-count" argument.
+                            If My.Application.CommandLineArgs.Count <> 2 Then
+                                ' No, the user didn't provide a "-count" command line argument.
+
+                                ' First, let's see if the user provided a setting in an un-elevated execution of this program.
+                                If My.Settings.deleteOldRestorePointCommandLineCount = 0 Then
+                                    ' The user didn't so let's see if there's a setting in the Registry. We open the program's Registry Key here.
+                                    registryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+
+                                    ' This checks to see if the Registry Key exists by doing a Null check.
+                                    If registryKey IsNot Nothing Then
+                                        ' The key does exist so let's pull our value from the Registry.
+                                        Dim stringlocal_KeepXAmountofRestorePointsValue As String = registryKey.GetValue("Keep X Amount of Restore Points Value", "")
+
+                                        ' And let's close the Registry Object.
+                                        registryKey.Close()
+                                        registryKey.Dispose()
+
+                                        ' OK, let's check to see if the value we pulled from the Registry is null.
+                                        If String.IsNullOrEmpty(stringlocal_KeepXAmountofRestorePointsValue) Then
+                                            giveNoCountGivenError() ' OK, it is so we give the user an error message.
+                                        Else
+                                            ' OK, the value we got from the Registry isn't null so we try to parse it. If it parses then what's inside the IF statement will not execute and this is just fine; things are OK so we can continue as normal.
+                                            If Not Short.TryParse(stringlocal_KeepXAmountofRestorePointsValue, deleteOldRestorePointCommandLineCount) Then
+                                                giveNoCountGivenError() ' We tried to parse it and we failed so we give the user an error message.
+                                            End If
+                                        End If
+                                    Else
+                                        ' OK, the registry key doesn't exist so we give the user an error message.
+                                        giveNoCountGivenError()
+                                    End If
+                                Else
+                                    ' Yes, the user did so let's work with it.
+                                    deleteOldRestorePointCommandLineCount = My.Settings.deleteOldRestorePointCommandLineCount
+
+                                    ' Now let's reset the saved setting back to the default value of 0.
+                                    My.Settings.deleteOldRestorePointCommandLineCount = 0
+                                    My.Settings.Save()
+                                End If
+                            Else
+                                ' OK, the user provided a second command line argument so let's check it out.
+                                If My.Application.CommandLineArgs(1).Trim.StartsWith("-count", StringComparison.OrdinalIgnoreCase) Then
+                                    ' Let's try and parse the value that the user gave us. If it parses then what's inside the IF statement will not execute and this is just fine; things are OK so we can continue as normal.
+                                    If Not Short.TryParse(My.Application.CommandLineArgs(1).Trim.caseInsensitiveReplace("-count=", "").Trim, deleteOldRestorePointCommandLineCount) Then
+                                        ' We tried to parse it and we failed so we give the user an error message.
+                                        Console.WriteLine("ERROR: You have provided an invalid numeric input, please try again.")
+                                        Process.GetCurrentProcess.Kill()
+                                    End If
+                                Else
+                                    ' No, the second command line argument isn't a "-count" like we are expecting so give the user an error message.
+                                    giveNoCountGivenError()
+                                End If
+                            End If
+
+                            ' If all things passed the checks above this code will now execute.
+
+                            If deleteOldRestorePointCommandLineCount <> 0 Then
+                                Dim numberOfRestorePoints As Integer = Functions.wmi.getNumberOfRestorePoints()
+
+                                If deleteOldRestorePointCommandLineCount < numberOfRestorePoints Then
+                                    Functions.support.writeSystemRestorePointsToApplicationLogs()
+
+                                    Functions.wmi.doDeletingOfXNumberOfRestorePoints(deleteOldRestorePointCommandLineCount)
+
+                                    While numberOfRestorePoints = Functions.wmi.getNumberOfRestorePoints()
+                                        Threading.Thread.Sleep(500)
+                                    End While
+
+                                    Functions.support.writeSystemRestorePointsToApplicationLogs()
+                                End If
+                            End If
+
+                            My.Settings.deleteOldRestorePointCommandLineCount = 0
+                            My.Settings.Save()
+
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.stringCompare("-prefscleanup") Then

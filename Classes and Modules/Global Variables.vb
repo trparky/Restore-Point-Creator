@@ -9,6 +9,8 @@ Namespace globalVariables
             Public Const viewChangeLog As String = "-viewchangelog"
             Public Const viewEventLog As String = "-eventlog"
             Public Const forceUAC As String = "-forceuac"
+            Public Const deleteOldRestorePoints As String = "-deleteoldrestorepoints"
+            Public Const keepXNumberOfRestorePoints As String = "-keepxnumberofrestorepoints"
         End Module
     End Namespace
 

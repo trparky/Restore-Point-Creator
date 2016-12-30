@@ -364,11 +364,14 @@ Namespace Functions.support
         Public Sub removeSafeModeBoot()
             Try
                 Dim bcdEditor As New BCD.bcdEditor()
-                bcdEditor.removeSafeModeBootFlag()
+
+                If bcdEditor.getSafeModeBootStatus() Then
+                    bcdEditor.removeSafeModeBootFlag()
+                    eventLogFunctions.writeToSystemEventLog("Successfully removed Safe Mode Boot flag.", EventLogEntryType.Information)
+                End If
+
                 bcdEditor.dispose()
                 bcdEditor = Nothing
-
-                eventLogFunctions.writeToSystemEventLog("Successfully removed Safe Mode Boot flag.", EventLogEntryType.Information)
             Catch ex As Exception
                 eventLogFunctions.writeCrashToEventLog(ex)
                 eventLogFunctions.writeToSystemEventLog("Unable to remove Safe Mode Boot flag.", EventLogEntryType.Error)

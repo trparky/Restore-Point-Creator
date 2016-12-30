@@ -46,8 +46,16 @@
                 Dim ex2 As Net.WebException = DirectCast(ex, Net.WebException)
 
                 If ex2.Status = Net.WebExceptionStatus.ProtocolError Then
-                    If ex2.Message.Contains("(500)") = True Then
-                        eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP Protocol Error (Server 500 Error) while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
+                    Dim httpErrorResponse As Net.HttpWebResponse = TryCast(ex2.Response, Net.HttpWebResponse)
+
+                    If httpErrorResponse IsNot Nothing Then
+                        If httpErrorResponse.StatusCode = Net.HttpStatusCode.InternalServerError Then
+                            eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP Protocol Error (Server 500 Error) while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
+                        ElseIf httpErrorResponse.StatusCode = Net.HttpStatusCode.NotFound Then
+                            eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP Protocol Error (HTTP 404 File Not Found) while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
+                        Else
+                            eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP Protocol Error while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
+                        End If
                     Else
                         eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP Protocol Error while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
                     End If

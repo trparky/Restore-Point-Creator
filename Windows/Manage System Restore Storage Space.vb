@@ -145,13 +145,16 @@ Public Class frmManageSystemRestoreStorageSpace
 
         Dim size As ULong = Functions.vss.getMaxSize(globalVariables.systemDriveLetter)
 
+        If newSize < size And MsgBox("Your new size (" & Functions.support.bytesToHumanSize(newSize) & ") is smaller than your old specified (" & Functions.support.bytesToHumanSize(size) & ") size. This may cause your system to lose restore points." & vbCrLf & vbCrLf & "Are you sure you want to do this?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Set New Size") = MsgBoxResult.No Then
+            Exit Sub
+        End If
+
         If size = 0 Then
             Functions.vss.executeVSSAdminCommand(globalVariables.systemDriveLetter)
             Functions.vss.setShadowStorageSize(globalVariables.systemDriveLetter, newSize)
             Functions.vss.enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
         Else
             Functions.vss.setShadowStorageSize(globalVariables.systemDriveLetter, newSize)
-            Functions.vss.enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
         End If
 
         getSize(globalVariables.systemDriveLetter)

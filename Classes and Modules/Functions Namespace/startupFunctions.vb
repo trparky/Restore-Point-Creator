@@ -86,6 +86,20 @@ Namespace Functions.startupFunctions
                 taskStuff.addRunTimeTask("Restore Point Creator -- Run with no UAC", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, "", True)
             End If
 
+            If taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Delete old Restore Points)", task) = True Then
+                taskStuff.deleteTask(task)
+                task.Dispose()
+
+                taskStuff.addRunTimeTask("Restore Point Creator -- Run with no UAC (Delete old Restore Points)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, globalVariables.commandLineSwitches.deleteOldRestorePoints)
+            End If
+
+            If taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Keep X Number of Restore Points)", task) = True Then
+                taskStuff.deleteTask(task)
+                task.Dispose()
+
+                taskStuff.addRunTimeTask("Restore Point Creator -- Run with no UAC (Delete old Restore Points)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, globalVariables.commandLineSwitches.keepXNumberOfRestorePoints)
+            End If
+
             MsgBox("Some required system configurations for normal operation of the program needed to be repaired. Those repairs have been completed." & vbCrLf & vbCrLf & "Please relaunch the program as normal.", MsgBoxStyle.Information, "Restore Point Creator")
         End Sub
 
@@ -296,23 +310,36 @@ Namespace Functions.startupFunctions
             MsgBox("Unable to create Registry Key for program in HKEY_LOCAL_MACHINE\SOFTWARE. Restore Point Creator can't continue. Please check with your System Administrator to see if you have access rights to HKEY_LOCAL_MACHINE.", MsgBoxStyle.Critical, "Restore Point Creator")
         End Sub
 
+        Private Sub handleLockedSettingsFile(ex As IOException)
+            eventLogFunctions.writeCrashToEventLog(ex)
+            eventLogFunctions.writeToSystemEventLog("Unable to open application settings file, it appears to be locked by another process.", EventLogEntryType.Error)
+            MsgBox("Unable to open application settings file, it appears to be locked by another process." & vbCrLf & vbCrLf & "The program will now close.", MsgBoxStyle.Critical, "Restore Point Creator")
+            Process.GetCurrentProcess.Kill()
+        End Sub
+
         Public Sub validateSettings()
             Try
                 ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal)
             Catch ex As ConfigurationErrorsException
                 support.deleteFileWithNoException(ex.Filename)
+            Catch ex2 As IOException
+                handleLockedSettingsFile(ex2)
             End Try
 
             Try
                 ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoaming)
             Catch ex As ConfigurationErrorsException
                 support.deleteFileWithNoException(ex.Filename)
+            Catch ex2 As IOException
+                handleLockedSettingsFile(ex2)
             End Try
 
             Try
                 ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None)
             Catch ex As ConfigurationErrorsException
                 support.deleteFileWithNoException(ex.Filename)
+            Catch ex2 As IOException
+                handleLockedSettingsFile(ex2)
             End Try
         End Sub
 
