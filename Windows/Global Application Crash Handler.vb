@@ -4,6 +4,7 @@ Public Class frmCrash
     Property exceptionMessage As String
     Property exceptionStackTrace As String
     Property exceptionType As String
+    Property rawExceptionObject As Exception
 
     Private strFileToHaveDataExportedTo As String = IO.Path.Combine(IO.Path.GetTempPath(), "event log entries.reslog")
     Private strTempZIPFile As String = IO.Path.Combine(IO.Path.GetTempPath(), "attachments.zip")
@@ -32,6 +33,40 @@ Public Class frmCrash
         End If
 
         Process.GetCurrentProcess.Kill()
+    End Sub
+
+    Sub addExtendedCrashData(ByRef stringBuilder As StringBuilder)
+        Try
+            If rawExceptionObject.GetType.Equals(GetType(IO.FileNotFoundException)) Then
+                Dim exceptionObject2 As IO.FileNotFoundException = DirectCast(rawExceptionObject, IO.FileNotFoundException)
+                stringBuilder.AppendLine("Unable to Load Assembly File: " & exceptionObject2.FileName)
+                stringBuilder.AppendLine("Reason why assembly couldn't be loaded: " & exceptionObject2.FusionLog)
+
+                Try
+                    stringBuilder.AppendLine("Additional FileLoadException Data: " & Functions.support.jsonObject(exceptionObject2.Data))
+                Catch ex As Exception
+                End Try
+            ElseIf rawExceptionObject.GetType.Equals(GetType(IO.FileLoadException)) Then
+                Dim exceptionObject2 As IO.FileLoadException = DirectCast(rawExceptionObject, IO.FileLoadException)
+                stringBuilder.AppendLine("Unable to Load Assembly File: " & exceptionObject2.FileName)
+                stringBuilder.AppendLine("Reason why assembly couldn't be loaded: " & exceptionObject2.FusionLog)
+
+                Try
+                    stringBuilder.AppendLine("Additional FileLoadException Data: " & Functions.support.jsonObject(exceptionObject2.Data))
+                Catch ex As Exception
+                End Try
+            ElseIf rawExceptionObject.GetType.Equals(GetType(Runtime.InteropServices.COMException)) Then
+                Dim exceptionObject2 As Runtime.InteropServices.COMException = DirectCast(rawExceptionObject, Runtime.InteropServices.COMException)
+                stringBuilder.AppendLine("Source: " & exceptionObject2.Source)
+                stringBuilder.AppendLine("Error Code: " & exceptionObject2.ErrorCode)
+
+                Try
+                    stringBuilder.AppendLine("Additional FileLoadException Data: " & Functions.support.jsonObject(exceptionObject2.Data))
+                Catch ex As Exception
+                End Try
+            End If
+        Catch ex As Exception
+        End Try
     End Sub
 
     Private Sub frmCrash_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -69,6 +104,8 @@ Public Class frmCrash
         Else
             stringBuilder.AppendLine("Debug Build: No")
         End If
+
+        addExtendedCrashData(stringBuilder)
 
         stringBuilder.AppendLine("Running As: " & Environment.UserName)
         stringBuilder.AppendLine("Exception Type: " & exceptionType)
@@ -366,15 +403,15 @@ Namespace exceptionHandler
         End Sub
 
         Public Sub manuallyLoadCrashWindow(exceptionObject As Exception, exceptionMessage As String, exceptionStackTrace As String, exceptionType As Type)
-            exceptionMessage = Functions.support.removeSourceCodePathInfo(exceptionMessage)
-            exceptionStackTrace = Functions.support.removeSourceCodePathInfo(exceptionStackTrace)
+            exceptionMessage = Functions.support.removeSourceCodePathInfo(exceptionMessage).Trim
+            exceptionStackTrace = Functions.support.removeSourceCodePathInfo(exceptionStackTrace).Trim
 
             If handleCrashWithAnErrorOrRedirectUserInstead(exceptionType, exceptionObject) = True Then
-            	Try
-                	Functions.miniDump.MiniDump.MiniDumpToFile(globalVariables.strDumpFilePath)
-            	Catch Ex As Exception
-            		' Does nothing
-            	End Try
+                Try
+                    Functions.miniDump.MiniDump.MiniDumpToFile(globalVariables.strDumpFilePath)
+                Catch Ex As Exception
+                    ' Does nothing
+                End Try
 
                 Dim crashWindow As New frmCrash
                 crashWindow.Text = "Critical Application Error Detected!"
@@ -382,6 +419,7 @@ Namespace exceptionHandler
                 crashWindow.exceptionStackTrace = exceptionStackTrace
                 crashWindow.exceptionMessage = exceptionMessage
                 crashWindow.exceptionType = exceptionType.ToString
+                crashWindow.rawExceptionObject = exceptionObject
                 crashWindow.ShowDialog()
 
                 Process.GetCurrentProcess.Kill()
