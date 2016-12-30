@@ -3,6 +3,15 @@ Imports ICSharpCode.SharpZipLib.Zip
 
 Namespace Functions.support
     Module support
+        Public Function jsonObject(input As Object) As String
+            Try
+                Dim jsonEngine As New Web.Script.Serialization.JavaScriptSerializer
+                Return jsonEngine.Serialize(input)
+            Catch ex As Exception
+                Return "{}"
+            End Try
+        End Function
+
         Public Function copyTextToWindowsClipboard(strTextToBeCopiedToClipboard As String) As Boolean
             Try
                 Clipboard.SetDataObject(strTextToBeCopiedToClipboard, True, 5, 200)
