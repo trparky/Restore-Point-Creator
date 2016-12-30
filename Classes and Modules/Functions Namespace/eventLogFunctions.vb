@@ -69,7 +69,7 @@
             End If
         End Sub
 
-        ''' <summary>Writes the IO.FileLoadException event to the System Log File. This exception logger is different than the universal exception logger in the sense that it's written specifically to handle the IO.FileLoadException type.</summary>
+        ''' <summary>Writes the IO.FileLoadException event to the System Log File. This exception logger is different than the universal exception logger in the sense that it's written specifically to handle the Runtime.InteropServices.COMException type.</summary>
         ''' <param name="exceptionObject">The exception object.</param>
         ''' <example>functions.eventLogFunctions.writeCrashToEventLog(ex)</example>
         Public Sub writeCrashToEventLog(exceptionObject As Runtime.InteropServices.COMException)
@@ -103,7 +103,7 @@
                     stringBuilder.AppendLine("Error Code: " & exceptionObject.ErrorCode)
 
                     Try
-                        stringBuilder.AppendLine("Additional FileLoadException Data: " & support.jsonObject(exceptionObject.Data))
+                        stringBuilder.AppendLine("Additional COMException Data: " & support.jsonObject(exceptionObject.Data))
                     Catch ex As Exception ' We do nothing here.
                     End Try
                 Catch ex As Exception
@@ -125,7 +125,7 @@
             End Try
         End Sub
 
-        ''' <summary>Writes the IO.FileLoadException event to the System Log File. This exception logger is different than the universal exception logger in the sense that it's written specifically to handle the IO.FileLoadException type.</summary>
+        ''' <summary>Writes the IO.FileLoadException event to the System Log File. This exception logger is different than the universal exception logger in the sense that it's written specifically to handle the IO.FileNotFoundException type.</summary>
         ''' <param name="exceptionObject">The exception object.</param>
         ''' <example>functions.eventLogFunctions.writeCrashToEventLog(ex)</example>
         Public Sub writeCrashToEventLog(exceptionObject As IO.FileNotFoundException)
@@ -156,10 +156,10 @@
 
                 Try
                     stringBuilder.AppendLine("File that was not found: " & exceptionObject.FileName)
-                    stringBuilder.AppendLine("Reason why assembly couldn't be loaded: " & exceptionObject.FusionLog)
+                    stringBuilder.AppendLine("Fusion Log: " & exceptionObject.FusionLog)
 
                     Try
-                        stringBuilder.AppendLine("Additional FileLoadException Data: " & support.jsonObject(exceptionObject.Data))
+                        stringBuilder.AppendLine("Additional FileNotFoundException Data: " & support.jsonObject(exceptionObject.Data))
                     Catch ex As Exception ' We do nothing here.
                     End Try
                 Catch ex As Exception
@@ -212,7 +212,7 @@
 
                 Try
                     stringBuilder.AppendLine("Unable to Load Assembly File: " & exceptionObject.FileName)
-                    stringBuilder.AppendLine("Reason why assembly couldn't be loaded: " & exceptionObject.FusionLog)
+                    stringBuilder.AppendLine("Fusion Log: " & exceptionObject.FusionLog)
 
                     Try
                         stringBuilder.AppendLine("Additional FileLoadException Data: " & support.jsonObject(exceptionObject.Data))
