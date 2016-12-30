@@ -98,12 +98,15 @@
                 stringBuilder.AppendLine("Running As: " & Environment.UserName)
                 stringBuilder.AppendLine("Exception Type: " & exceptionObject.GetType.ToString)
 
-                stringBuilder.AppendLine("Source: " & exceptionObject.Source)
-                stringBuilder.AppendLine("Error Code: " & exceptionObject.ErrorCode)
-
                 Try
-                    stringBuilder.AppendLine("Additional FileLoadException Data: " & support.jsonObject(exceptionObject.Data))
-                Catch ex As Exception ' We do nothing here.
+                    stringBuilder.AppendLine("Source: " & exceptionObject.Source)
+                    stringBuilder.AppendLine("Error Code: " & exceptionObject.ErrorCode)
+
+                    Try
+                        stringBuilder.AppendLine("Additional FileLoadException Data: " & support.jsonObject(exceptionObject.Data))
+                    Catch ex As Exception ' We do nothing here.
+                    End Try
+                Catch ex As Exception
                 End Try
 
                 stringBuilder.AppendLine()
@@ -151,12 +154,15 @@
                 stringBuilder.AppendLine("Running As: " & Environment.UserName)
                 stringBuilder.AppendLine("Exception Type: " & exceptionObject.GetType.ToString)
 
-                stringBuilder.AppendLine("File that was not found: " & exceptionObject.FileName)
-                stringBuilder.AppendLine("Reason why assembly couldn't be loaded: " & exceptionObject.FusionLog)
-
                 Try
-                    stringBuilder.AppendLine("Additional FileLoadException Data: " & support.jsonObject(exceptionObject.Data))
-                Catch ex As Exception ' We do nothing here.
+                    stringBuilder.AppendLine("File that was not found: " & exceptionObject.FileName)
+                    stringBuilder.AppendLine("Reason why assembly couldn't be loaded: " & exceptionObject.FusionLog)
+
+                    Try
+                        stringBuilder.AppendLine("Additional FileLoadException Data: " & support.jsonObject(exceptionObject.Data))
+                    Catch ex As Exception ' We do nothing here.
+                    End Try
+                Catch ex As Exception
                 End Try
 
                 stringBuilder.AppendLine()
@@ -204,12 +210,15 @@
                 stringBuilder.AppendLine("Running As: " & Environment.UserName)
                 stringBuilder.AppendLine("Exception Type: " & exceptionObject.GetType.ToString)
 
-                stringBuilder.AppendLine("Unable to Load Assembly File: " & exceptionObject.FileName)
-                stringBuilder.AppendLine("Reason why assembly couldn't be loaded: " & exceptionObject.FusionLog)
-
                 Try
-                    stringBuilder.AppendLine("Additional FileLoadException Data: " & support.jsonObject(exceptionObject.Data))
-                Catch ex As Exception ' We do nothing here.
+                    stringBuilder.AppendLine("Unable to Load Assembly File: " & exceptionObject.FileName)
+                    stringBuilder.AppendLine("Reason why assembly couldn't be loaded: " & exceptionObject.FusionLog)
+
+                    Try
+                        stringBuilder.AppendLine("Additional FileLoadException Data: " & support.jsonObject(exceptionObject.Data))
+                    Catch ex As Exception ' We do nothing here.
+                    End Try
+                Catch ex As Exception
                 End Try
 
                 stringBuilder.AppendLine()
