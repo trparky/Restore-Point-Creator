@@ -69,147 +69,6 @@
             End If
         End Sub
 
-        ''' <summary>Writes the IO.FileLoadException event to the System Log File. This exception logger is different than the universal exception logger in the sense that it's written specifically to handle the Runtime.InteropServices.COMException type.</summary>
-        ''' <param name="exceptionObject">The exception object.</param>
-        ''' <example>functions.eventLogFunctions.writeCrashToEventLog(ex)</example>
-        Public Sub writeCrashToEventLog(exceptionObject As Runtime.InteropServices.COMException)
-            Try
-                Dim stringBuilder As New Text.StringBuilder
-
-                stringBuilder.AppendLine("System Information")
-                stringBuilder.AppendLine("Time of Crash: " & Now.ToString)
-                stringBuilder.AppendLine("Operating System: " & osVersionInfo.getFullOSVersionString())
-                stringBuilder.AppendLine("System RAM: " & wmi.getSystemRAM())
-
-                Dim processorInfo As supportClasses.processorInfoClass = wmi.getSystemProcessor()
-                stringBuilder.AppendLine("CPU: " & processorInfo.strProcessor)
-                stringBuilder.AppendLine("Number of Cores: " & processorInfo.strNumberOfCores.ToString)
-
-                stringBuilder.AppendLine()
-
-                If globalVariables.version.boolBeta = True Then
-                    stringBuilder.AppendLine("Program Version: " & String.Format("{0} Public Beta {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion))
-                ElseIf globalVariables.version.boolReleaseCandidate = True Then
-                    stringBuilder.AppendLine("Program Version: " & String.Format("{0} Release Candidate {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion))
-                Else
-                    stringBuilder.AppendLine("Program Version: " & globalVariables.version.strFullVersionString)
-                End If
-
-                support.addExtendedCrashData(stringBuilder, exceptionObject)
-
-                stringBuilder.AppendLine("Running As: " & Environment.UserName)
-                stringBuilder.AppendLine("Exception Type: " & exceptionObject.GetType.ToString)
-
-                stringBuilder.AppendLine()
-                stringBuilder.AppendLine("Message: " & support.removeSourceCodePathInfo(exceptionObject.Message))
-
-                stringBuilder.AppendLine()
-
-                stringBuilder.Append("The exception occurred ")
-
-                stringBuilder.AppendLine(support.removeSourceCodePathInfo(exceptionObject.StackTrace.Trim))
-
-                writeToSystemEventLog(stringBuilder.ToString.Trim, EventLogEntryType.Error)
-                stringBuilder = Nothing
-            Catch ex2 As Exception
-                ' Does nothing
-            End Try
-        End Sub
-
-        ''' <summary>Writes the IO.FileLoadException event to the System Log File. This exception logger is different than the universal exception logger in the sense that it's written specifically to handle the IO.FileNotFoundException type.</summary>
-        ''' <param name="exceptionObject">The exception object.</param>
-        ''' <example>functions.eventLogFunctions.writeCrashToEventLog(ex)</example>
-        Public Sub writeCrashToEventLog(exceptionObject As IO.FileNotFoundException)
-            Try
-                Dim stringBuilder As New Text.StringBuilder
-
-                stringBuilder.AppendLine("System Information")
-                stringBuilder.AppendLine("Time of Crash: " & Now.ToString)
-                stringBuilder.AppendLine("Operating System: " & osVersionInfo.getFullOSVersionString())
-                stringBuilder.AppendLine("System RAM: " & wmi.getSystemRAM())
-
-                Dim processorInfo As supportClasses.processorInfoClass = wmi.getSystemProcessor()
-                stringBuilder.AppendLine("CPU: " & processorInfo.strProcessor)
-                stringBuilder.AppendLine("Number of Cores: " & processorInfo.strNumberOfCores.ToString)
-
-                stringBuilder.AppendLine()
-
-                If globalVariables.version.boolBeta = True Then
-                    stringBuilder.AppendLine("Program Version: " & String.Format("{0} Public Beta {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion))
-                ElseIf globalVariables.version.boolReleaseCandidate = True Then
-                    stringBuilder.AppendLine("Program Version: " & String.Format("{0} Release Candidate {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion))
-                Else
-                    stringBuilder.AppendLine("Program Version: " & globalVariables.version.strFullVersionString)
-                End If
-
-                support.addExtendedCrashData(stringBuilder, exceptionObject)
-
-                stringBuilder.AppendLine("Running As: " & Environment.UserName)
-                stringBuilder.AppendLine("Exception Type: " & exceptionObject.GetType.ToString)
-
-                stringBuilder.AppendLine()
-                stringBuilder.AppendLine("Message: " & support.removeSourceCodePathInfo(exceptionObject.Message))
-
-                stringBuilder.AppendLine()
-
-                stringBuilder.Append("The exception occurred ")
-
-                stringBuilder.AppendLine(support.removeSourceCodePathInfo(exceptionObject.StackTrace.Trim))
-
-                writeToSystemEventLog(stringBuilder.ToString.Trim, EventLogEntryType.Error)
-                stringBuilder = Nothing
-            Catch ex2 As Exception
-                ' Does nothing
-            End Try
-        End Sub
-
-        ''' <summary>Writes the IO.FileLoadException event to the System Log File. This exception logger is different than the universal exception logger in the sense that it's written specifically to handle the IO.FileLoadException type.</summary>
-        ''' <param name="exceptionObject">The exception object.</param>
-        ''' <example>functions.eventLogFunctions.writeCrashToEventLog(ex)</example>
-        Public Sub writeCrashToEventLog(exceptionObject As IO.FileLoadException)
-            Try
-                Dim stringBuilder As New Text.StringBuilder
-
-                stringBuilder.AppendLine("System Information")
-                stringBuilder.AppendLine("Time of Crash: " & Now.ToString)
-                stringBuilder.AppendLine("Operating System: " & osVersionInfo.getFullOSVersionString())
-                stringBuilder.AppendLine("System RAM: " & wmi.getSystemRAM())
-
-                Dim processorInfo As supportClasses.processorInfoClass = wmi.getSystemProcessor()
-                stringBuilder.AppendLine("CPU: " & processorInfo.strProcessor)
-                stringBuilder.AppendLine("Number of Cores: " & processorInfo.strNumberOfCores.ToString)
-
-                stringBuilder.AppendLine()
-
-                If globalVariables.version.boolBeta = True Then
-                    stringBuilder.AppendLine("Program Version: " & String.Format("{0} Public Beta {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion))
-                ElseIf globalVariables.version.boolReleaseCandidate = True Then
-                    stringBuilder.AppendLine("Program Version: " & String.Format("{0} Release Candidate {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion))
-                Else
-                    stringBuilder.AppendLine("Program Version: " & globalVariables.version.strFullVersionString)
-                End If
-
-                support.addExtendedCrashData(stringBuilder, exceptionObject)
-
-                stringBuilder.AppendLine("Running As: " & Environment.UserName)
-                stringBuilder.AppendLine("Exception Type: " & exceptionObject.GetType.ToString)
-
-                stringBuilder.AppendLine()
-                stringBuilder.AppendLine("Message: " & support.removeSourceCodePathInfo(exceptionObject.Message))
-
-                stringBuilder.AppendLine()
-
-                stringBuilder.Append("The exception occurred ")
-
-                stringBuilder.AppendLine(support.removeSourceCodePathInfo(exceptionObject.StackTrace.Trim))
-
-                writeToSystemEventLog(stringBuilder.ToString.Trim, EventLogEntryType.Error)
-                stringBuilder = Nothing
-            Catch ex2 As Exception
-                ' Does nothing
-            End Try
-        End Sub
-
         ''' <summary>Writes the exception event to the System Log File. This is a universal exception logging function that's built to handle various forms of exceptions and not not any particular type.</summary>
         ''' <param name="exceptionObject">The exception object.</param>
         ''' <param name="errorType">The type of Event Log you want the Exception Event to be recorded to the Application Event Log as.</param>
@@ -236,6 +95,8 @@
                 Else
                     stringBuilder.AppendLine("Program Version: " & globalVariables.version.strFullVersionString)
                 End If
+
+                support.addExtendedCrashData(stringBuilder, exceptionObject)
 
                 stringBuilder.AppendLine("Running As: " & Environment.UserName)
                 stringBuilder.AppendLine("Exception Type: " & exceptionObject.GetType.ToString)
