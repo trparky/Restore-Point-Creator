@@ -35,40 +35,6 @@ Public Class frmCrash
         Process.GetCurrentProcess.Kill()
     End Sub
 
-    Sub addExtendedCrashData(ByRef stringBuilder As StringBuilder)
-        Try
-            If rawExceptionObject.GetType.Equals(GetType(IO.FileNotFoundException)) Then
-                Dim exceptionObject2 As IO.FileNotFoundException = DirectCast(rawExceptionObject, IO.FileNotFoundException)
-                stringBuilder.AppendLine("Unable to Load Assembly File: " & exceptionObject2.FileName)
-                stringBuilder.AppendLine("Reason why assembly couldn't be loaded: " & exceptionObject2.FusionLog)
-
-                Try
-                    stringBuilder.AppendLine("Additional FileLoadException Data: " & Functions.support.jsonObject(exceptionObject2.Data))
-                Catch ex As Exception
-                End Try
-            ElseIf rawExceptionObject.GetType.Equals(GetType(IO.FileLoadException)) Then
-                Dim exceptionObject2 As IO.FileLoadException = DirectCast(rawExceptionObject, IO.FileLoadException)
-                stringBuilder.AppendLine("Unable to Load Assembly File: " & exceptionObject2.FileName)
-                stringBuilder.AppendLine("Reason why assembly couldn't be loaded: " & exceptionObject2.FusionLog)
-
-                Try
-                    stringBuilder.AppendLine("Additional FileLoadException Data: " & Functions.support.jsonObject(exceptionObject2.Data))
-                Catch ex As Exception
-                End Try
-            ElseIf rawExceptionObject.GetType.Equals(GetType(Runtime.InteropServices.COMException)) Then
-                Dim exceptionObject2 As Runtime.InteropServices.COMException = DirectCast(rawExceptionObject, Runtime.InteropServices.COMException)
-                stringBuilder.AppendLine("Source: " & exceptionObject2.Source)
-                stringBuilder.AppendLine("Error Code: " & exceptionObject2.ErrorCode)
-
-                Try
-                    stringBuilder.AppendLine("Additional FileLoadException Data: " & Functions.support.jsonObject(exceptionObject2.Data))
-                Catch ex As Exception
-                End Try
-            End If
-        Catch ex As Exception
-        End Try
-    End Sub
-
     Private Sub frmCrash_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Control.CheckForIllegalCrossThreadCalls = False
         Media.SystemSounds.Hand.Play()
@@ -105,7 +71,7 @@ Public Class frmCrash
             stringBuilder.AppendLine("Debug Build: No")
         End If
 
-        addExtendedCrashData(stringBuilder)
+        Functions.support.addExtendedCrashData(stringBuilder, rawExceptionObject)
 
         stringBuilder.AppendLine("Running As: " & Environment.UserName)
         stringBuilder.AppendLine("Exception Type: " & exceptionType)

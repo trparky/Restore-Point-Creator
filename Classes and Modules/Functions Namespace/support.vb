@@ -3,6 +3,75 @@ Imports ICSharpCode.SharpZipLib.Zip
 
 Namespace Functions.support
     Module support
+        Public Sub addExtendedCrashData(ByRef stringBuilder As System.Text.StringBuilder, rawExceptionObject As Exception)
+            Dim jsonTemp As String
+
+            Try
+                If rawExceptionObject.GetType.Equals(GetType(IO.FileNotFoundException)) Then
+                    stringBuilder.AppendLine()
+                    stringBuilder.AppendLine("Additional IO.FileNotFoundException Data")
+
+                    Dim FileNotFoundExceptionObject As IO.FileNotFoundException = DirectCast(rawExceptionObject, IO.FileNotFoundException)
+                    stringBuilder.AppendLine("Name of File: " & FileNotFoundExceptionObject.FileName)
+
+                    If Not String.IsNullOrEmpty(FileNotFoundExceptionObject.FusionLog) Then
+                        stringBuilder.AppendLine("Reason: " & FileNotFoundExceptionObject.FusionLog)
+                    End If
+
+                    Try
+                        jsonTemp = jsonObject(FileNotFoundExceptionObject.Data)
+
+                        If Not jsonTemp.Equals("{}") Then
+                            stringBuilder.AppendLine("Additional FileLoadException Data: " & jsonTemp)
+                        End If
+                    Catch ex As Exception
+                    End Try
+
+                    stringBuilder.AppendLine()
+                ElseIf rawExceptionObject.GetType.Equals(GetType(IO.FileLoadException)) Then
+                    stringBuilder.AppendLine()
+                    stringBuilder.AppendLine("Additional IO.FileLoadException Data")
+
+                    Dim FileLoadExceptionObject As IO.FileLoadException = DirectCast(rawExceptionObject, IO.FileLoadException)
+                    stringBuilder.AppendLine("Unable to Load Assembly File: " & FileLoadExceptionObject.FileName)
+
+                    If Not String.IsNullOrEmpty(FileLoadExceptionObject.FusionLog) Then
+                        stringBuilder.AppendLine("Reason why assembly couldn't be loaded: " & FileLoadExceptionObject.FusionLog)
+                    End If
+
+                    Try
+                        jsonTemp = jsonObject(FileLoadExceptionObject.Data)
+
+                        If Not jsonTemp.Equals("{}") Then
+                            stringBuilder.AppendLine("Additional FileLoadException Data: " & jsonTemp)
+                        End If
+                    Catch ex As Exception
+                    End Try
+
+                    stringBuilder.AppendLine()
+                ElseIf rawExceptionObject.GetType.Equals(GetType(Runtime.InteropServices.COMException)) Then
+                    stringBuilder.AppendLine()
+                    stringBuilder.AppendLine("Additional Runtime.InteropServices.COMException Data")
+
+                    Dim COMExceptionObject As Runtime.InteropServices.COMException = DirectCast(rawExceptionObject, Runtime.InteropServices.COMException)
+                    stringBuilder.AppendLine("Source: " & COMExceptionObject.Source)
+                    stringBuilder.AppendLine("Error Code: " & COMExceptionObject.ErrorCode)
+
+                    Try
+                        jsonTemp = jsonObject(COMExceptionObject.Data)
+
+                        If Not jsonTemp.Equals("{}") Then
+                            stringBuilder.AppendLine("Additional FileLoadException Data: " & jsonTemp)
+                        End If
+                    Catch ex As Exception
+                    End Try
+
+                    stringBuilder.AppendLine()
+                End If
+            Catch ex As Exception
+            End Try
+        End Sub
+
         Public Function jsonObject(input As Object) As String
             Try
                 Dim jsonEngine As New Web.Script.Serialization.JavaScriptSerializer
