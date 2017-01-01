@@ -95,19 +95,10 @@
                     stringBuilder.AppendLine("Program Version: " & globalVariables.version.strFullVersionString)
                 End If
 
+                support.addExtendedCrashData(stringBuilder, exceptionObject)
+
                 stringBuilder.AppendLine("Running As: " & Environment.UserName)
                 stringBuilder.AppendLine("Exception Type: " & exceptionObject.GetType.ToString)
-
-                Try
-                    stringBuilder.AppendLine("Source: " & exceptionObject.Source)
-                    stringBuilder.AppendLine("Error Code: " & exceptionObject.ErrorCode)
-
-                    Try
-                        stringBuilder.AppendLine("Additional COMException Data: " & support.jsonObject(exceptionObject.Data))
-                    Catch ex As Exception ' We do nothing here.
-                    End Try
-                Catch ex As Exception
-                End Try
 
                 stringBuilder.AppendLine()
                 stringBuilder.AppendLine("Message: " & support.removeSourceCodePathInfo(exceptionObject.Message))
@@ -151,19 +142,10 @@
                     stringBuilder.AppendLine("Program Version: " & globalVariables.version.strFullVersionString)
                 End If
 
+                support.addExtendedCrashData(stringBuilder, exceptionObject)
+
                 stringBuilder.AppendLine("Running As: " & Environment.UserName)
                 stringBuilder.AppendLine("Exception Type: " & exceptionObject.GetType.ToString)
-
-                Try
-                    stringBuilder.AppendLine("File that was not found: " & exceptionObject.FileName)
-                    stringBuilder.AppendLine("Fusion Log: " & exceptionObject.FusionLog)
-
-                    Try
-                        stringBuilder.AppendLine("Additional FileNotFoundException Data: " & support.jsonObject(exceptionObject.Data))
-                    Catch ex As Exception ' We do nothing here.
-                    End Try
-                Catch ex As Exception
-                End Try
 
                 stringBuilder.AppendLine()
                 stringBuilder.AppendLine("Message: " & support.removeSourceCodePathInfo(exceptionObject.Message))
@@ -207,19 +189,10 @@
                     stringBuilder.AppendLine("Program Version: " & globalVariables.version.strFullVersionString)
                 End If
 
+                support.addExtendedCrashData(stringBuilder, exceptionObject)
+
                 stringBuilder.AppendLine("Running As: " & Environment.UserName)
                 stringBuilder.AppendLine("Exception Type: " & exceptionObject.GetType.ToString)
-
-                Try
-                    stringBuilder.AppendLine("Unable to Load Assembly File: " & exceptionObject.FileName)
-                    stringBuilder.AppendLine("Fusion Log: " & exceptionObject.FusionLog)
-
-                    Try
-                        stringBuilder.AppendLine("Additional FileLoadException Data: " & support.jsonObject(exceptionObject.Data))
-                    Catch ex As Exception ' We do nothing here.
-                    End Try
-                Catch ex As Exception
-                End Try
 
                 stringBuilder.AppendLine()
                 stringBuilder.AppendLine("Message: " & support.removeSourceCodePathInfo(exceptionObject.Message))
