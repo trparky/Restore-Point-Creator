@@ -53,6 +53,12 @@
                             eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP Protocol Error (Server 500 Error) while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
                         ElseIf httpErrorResponse.StatusCode = Net.HttpStatusCode.NotFound Then
                             eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP Protocol Error (HTTP 404 File Not Found) while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
+                        ElseIf httpErrorResponse.StatusCode = Net.HttpStatusCode.Unauthorized Then
+                            eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP Protocol Error (HTTP 401 Unauthorized) while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
+                        ElseIf httpErrorResponse.StatusCode = Net.HttpStatusCode.ServiceUnavailable Then
+                            eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP Protocol Error (HTTP 503 Service Unavailable) while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
+                        ElseIf httpErrorResponse.StatusCode = Net.HttpStatusCode.Forbidden Then
+                            eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP Protocol Error (HTTP 403 Forbidden) while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
                         Else
                             eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP Protocol Error while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
                         End If
