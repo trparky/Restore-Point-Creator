@@ -205,7 +205,7 @@ End Class
 
 ''' <summary>Allows you to easily POST and upload files to a remote HTTP server without you, the programmer, knowing anything about how it all works. This class does it all for you. It handles adding a User Agent String, additional HTTP Request Headers, string data to your HTTP POST data, and files to be uploaded in the HTTP POST data.</summary>
 Public Class httpHelper
-    Private Const classVersion As String = "1.225"
+    Private Const classVersion As String = "1.230"
 
     Private strUserAgentString As String = Nothing
     Private boolUseProxy As Boolean = False
@@ -1276,6 +1276,12 @@ Public Class httpHelper
                 lastException = New httpProtocolException("HTTP Protocol Error (Server 500 Error) while accessing " & url, ex) With {.httpStatusCode = httpErrorResponse.StatusCode}
             ElseIf httpErrorResponse.StatusCode = Net.HttpStatusCode.NotFound Then
                 lastException = New httpProtocolException("HTTP Protocol Error (404 File Not Found) while accessing " & url, ex) With {.httpStatusCode = httpErrorResponse.StatusCode}
+            ElseIf httpErrorResponse.StatusCode = Net.HttpStatusCode.Unauthorized Then
+                lastException = New httpProtocolException("HTTP Protocol Error (401 Unauthorized) while accessing " & url, ex) With {.httpStatusCode = httpErrorResponse.StatusCode}
+            ElseIf httpErrorResponse.StatusCode = Net.HttpStatusCode.ServiceUnavailable Then
+                lastException = New httpProtocolException("HTTP Protocol Error (503 Service Unavailable) while accessing " & url, ex) With {.httpStatusCode = httpErrorResponse.StatusCode}
+            ElseIf httpErrorResponse.StatusCode = Net.HttpStatusCode.Forbidden Then
+                lastException = New httpProtocolException("HTTP Protocol Error (403 Forbidden) while accessing " & url, ex) With {.httpStatusCode = httpErrorResponse.StatusCode}
             Else
                 lastException = New httpProtocolException("HTTP Protocol Error while accessing " & url, ex) With {.httpStatusCode = httpErrorResponse.StatusCode}
             End If
