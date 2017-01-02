@@ -206,7 +206,7 @@
         Me.BringToFront()
     End Sub
 
-    Private Sub txtChanges_MouseWheel(sender As Object, e As MouseEventArgs) Handles txtChanges.MouseWheel
-        disableCountdown()
+    Private Sub txtChanges_Click(sender As Object, e As EventArgs) Handles txtChanges.Click
+        Me.BringToFront()
     End Sub
 End Class
