@@ -36,8 +36,13 @@ Public Class Mount_Volume_Shadow_Copy
     Private Sub listShadowCopyIDs_SelectedIndexChanged(sender As Object, e As EventArgs) Handles listShadowCopyIDs.SelectedIndexChanged
         If IO.Directory.Exists(globalVariables.shadowCopyMountFolder) Then IO.Directory.Delete(globalVariables.shadowCopyMountFolder)
 
+        If listShadowCopyIDs.SelectedItems.Count = 0 Then
+            btnMount.Enabled = False
+        Else
+            btnMount.Enabled = True
+        End If
+
         btnUnmount.Enabled = False
-        btnMount.Enabled = True
     End Sub
 
     Private Sub btnMount_Click(sender As Object, e As EventArgs) Handles btnMount.Click

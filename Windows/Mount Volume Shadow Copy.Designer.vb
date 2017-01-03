@@ -92,6 +92,7 @@ Partial Class Mount_Volume_Shadow_Copy
         'listShadowCopyIDs
         '
         Me.listShadowCopyIDs.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader1})
+        Me.listShadowCopyIDs.FullRowSelect = True
         Me.listShadowCopyIDs.Location = New System.Drawing.Point(16, 181)
         Me.listShadowCopyIDs.Name = "listShadowCopyIDs"
         Me.listShadowCopyIDs.Size = New System.Drawing.Size(409, 137)
