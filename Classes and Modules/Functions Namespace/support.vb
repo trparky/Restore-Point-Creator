@@ -3,6 +3,14 @@ Imports ICSharpCode.SharpZipLib.Zip
 
 Namespace Functions.support
     Module support
+        Public Function convertErrorCodeToHex(input As Long) As String
+            Try
+                Return input.ToString("x").caseInsensitiveReplace("ffffffff", "0x").ToString.ToUpper
+            Catch ex As Exception
+                Return Nothing
+            End Try
+        End Function
+
         Public Sub addExtendedCrashData(ByRef stringBuilder As System.Text.StringBuilder, rawExceptionObject As Exception)
             Dim jsonTemp As String
 
