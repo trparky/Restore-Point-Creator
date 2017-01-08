@@ -116,17 +116,11 @@ Namespace Functions.wmi
         End Sub
 
         Public Function checkToSeeIfSystemRestoreIsEnabledOnSystemDrive() As Boolean
-            Try
-                Dim systemRestorePoints As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
-
-                If systemRestorePoints.Get().Count = 0 Then
-                    Return False
-                Else
-                    Return True
-                End If
-            Catch ex As Exception
+            If getNumberOfRestorePoints() = 0 Then
                 Return False
-            End Try
+            Else
+                Return True
+            End If
         End Function
 
         Public Function getNumberOfRestorePoints() As Integer
