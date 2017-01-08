@@ -1205,7 +1205,7 @@ Public Class Form1
 
                 Functions.wait.closePleaseWaitWindow()
 
-                MsgBox(String.Format("There was an error while attempting to creating the restore point. The error code returned from the system was {0}{1}{0}.", Chr(34), result), MsgBoxStyle.Critical, strMessageBoxTitle)
+                MsgBox(String.Format("There was an error while attempting to creating the restore point. The error code returned from the system was ""{0}"" ({1}).", result, Functions.support.convertErrorCodeToHex(result)), MsgBoxStyle.Critical, strMessageBoxTitle)
                 Exit Sub
             End If
 
