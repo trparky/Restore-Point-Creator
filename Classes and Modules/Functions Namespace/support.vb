@@ -31,6 +31,7 @@ Namespace Functions.support
                     exceptionType.Equals(GetType(Runtime.InteropServices.COMException)) Or
                     exceptionType.Equals(GetType(IO.IOException)) Or
                     exceptionType.Equals(GetType(ArgumentOutOfRangeException)) Or
+                    exceptionType.Equals(GetType(FormatException)) Or
                     exceptionType.Equals(GetType(ObjectDisposedException)) Then
 
                     stringBuilder.AppendLine()
