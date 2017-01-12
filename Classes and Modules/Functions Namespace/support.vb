@@ -42,8 +42,6 @@ Namespace Functions.support
                         If Not String.IsNullOrEmpty(FileNotFoundExceptionObject.FusionLog) Then
                             stringBuilder.AppendLine("Reason: " & FileNotFoundExceptionObject.FusionLog)
                         End If
-
-                        addJSONedExtendedExceptionDataPackage(rawExceptionObject, stringBuilder)
                     ElseIf exceptionType.Equals(GetType(IO.FileLoadException)) Then
                         Dim FileLoadExceptionObject As IO.FileLoadException = DirectCast(rawExceptionObject, IO.FileLoadException)
                         stringBuilder.AppendLine("Unable to Load Assembly File: " & FileLoadExceptionObject.FileName)
@@ -51,25 +49,19 @@ Namespace Functions.support
                         If Not String.IsNullOrEmpty(FileLoadExceptionObject.FusionLog) Then
                             stringBuilder.AppendLine("Reason why assembly couldn't be loaded: " & FileLoadExceptionObject.FusionLog)
                         End If
-
-                        addJSONedExtendedExceptionDataPackage(rawExceptionObject, stringBuilder)
                     ElseIf exceptionType.Equals(GetType(Runtime.InteropServices.COMException)) Then
                         Dim COMExceptionObject As Runtime.InteropServices.COMException = DirectCast(rawExceptionObject, Runtime.InteropServices.COMException)
                         stringBuilder.AppendLine("Source: " & COMExceptionObject.Source)
                         stringBuilder.AppendLine("Error Code: " & COMExceptionObject.ErrorCode)
-
-                        addJSONedExtendedExceptionDataPackage(rawExceptionObject, stringBuilder)
                     ElseIf exceptionType.Equals(GetType(ObjectDisposedException)) Then
                         Dim ObjectDisposedExceptionObject As ObjectDisposedException = DirectCast(rawExceptionObject, ObjectDisposedException)
                         stringBuilder.AppendLine("Source: " & ObjectDisposedExceptionObject.Source)
                         stringBuilder.AppendLine("Object Name: " & ObjectDisposedExceptionObject.ObjectName)
-
-                        addJSONedExtendedExceptionDataPackage(rawExceptionObject, stringBuilder)
                     ElseIf exceptionType.Equals(GetType(IO.IOException)) Then
                         stringBuilder.AppendLine("Source: " & DirectCast(rawExceptionObject, IO.IOException).Source)
-                        addJSONedExtendedExceptionDataPackage(rawExceptionObject, stringBuilder)
                     End If
 
+                    addJSONedExtendedExceptionDataPackage(rawExceptionObject, stringBuilder)
                     stringBuilder.AppendLine()
                 End If
             Catch ex As Exception
