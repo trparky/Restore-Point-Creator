@@ -30,6 +30,7 @@ Namespace Functions.support
                     exceptionType.Equals(GetType(IO.FileLoadException)) Or
                     exceptionType.Equals(GetType(Runtime.InteropServices.COMException)) Or
                     exceptionType.Equals(GetType(IO.IOException)) Or
+                    exceptionType.Equals(GetType(ArgumentOutOfRangeException)) Or
                     exceptionType.Equals(GetType(ObjectDisposedException)) Then
 
                     stringBuilder.AppendLine()
@@ -59,6 +60,10 @@ Namespace Functions.support
                         stringBuilder.AppendLine("Object Name: " & ObjectDisposedExceptionObject.ObjectName)
                     ElseIf exceptionType.Equals(GetType(IO.IOException)) Then
                         stringBuilder.AppendLine("Source: " & DirectCast(rawExceptionObject, IO.IOException).Source)
+                    ElseIf exceptionType.Equals(GetType(ArgumentOutOfRangeException)) Then
+                        Dim ArgumentOutOfRangeExceptionObject As ArgumentOutOfRangeException = DirectCast(rawExceptionObject, ArgumentOutOfRangeException)
+                        stringBuilder.AppendLine("Parameter Name: " & ArgumentOutOfRangeExceptionObject.ParamName)
+                        stringBuilder.AppendLine("Parameter Value: " & ArgumentOutOfRangeExceptionObject.ActualValue)
                     End If
 
                     addJSONedExtendedExceptionDataPackage(rawExceptionObject, stringBuilder)
