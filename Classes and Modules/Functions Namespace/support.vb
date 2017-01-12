@@ -75,6 +75,24 @@ Namespace Functions.support
                     End Try
 
                     stringBuilder.AppendLine()
+                ElseIf rawExceptionObject.GetType.Equals(GetType(ObjectDisposedException)) Then
+                    stringBuilder.AppendLine()
+                    stringBuilder.AppendLine("Additional ObjectDisposedException Data")
+
+                    Dim ObjectDisposedExceptionObject As ObjectDisposedException = DirectCast(rawExceptionObject, ObjectDisposedException)
+                    stringBuilder.AppendLine("Source: " & ObjectDisposedExceptionObject.Source)
+                    stringBuilder.AppendLine("Object Name: " & ObjectDisposedExceptionObject.ObjectName)
+
+                    Try
+                        jsonTemp = jsonObject(ObjectDisposedExceptionObject.Data)
+
+                        If Not jsonTemp.Equals("{}") Then
+                            stringBuilder.AppendLine("Additional FileLoadException Data: " & jsonTemp)
+                        End If
+                    Catch ex As Exception
+                    End Try
+
+                    stringBuilder.AppendLine()
                 End If
             Catch ex As Exception
             End Try
