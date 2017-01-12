@@ -11,9 +11,18 @@ Namespace Functions.support
             End Try
         End Function
 
-        Public Sub addExtendedCrashData(ByRef stringBuilder As System.Text.StringBuilder, rawExceptionObject As Exception)
-            Dim jsonTemp As String
+        Private Sub addJSONedExtendedExceptionDataPackage(ByVal exceptionObject As Exception, ByRef stringBuilder As System.Text.StringBuilder)
+            Try
+                Dim jsonTemp As String = jsonObject(exceptionObject.Data)
 
+                If Not jsonTemp.Equals("{}") Then
+                    stringBuilder.AppendLine(String.Format("Additional {0} Data: {1}", exceptionObject.GetType.ToString, jsonTemp))
+                End If
+            Catch ex As Exception
+            End Try
+        End Sub
+
+        Public Sub addExtendedCrashData(ByRef stringBuilder As System.Text.StringBuilder, rawExceptionObject As Exception)
             Try
                 If rawExceptionObject.GetType.Equals(GetType(IO.FileNotFoundException)) Then
                     stringBuilder.AppendLine()
@@ -26,14 +35,7 @@ Namespace Functions.support
                         stringBuilder.AppendLine("Reason: " & FileNotFoundExceptionObject.FusionLog)
                     End If
 
-                    Try
-                        jsonTemp = jsonObject(FileNotFoundExceptionObject.Data)
-
-                        If Not jsonTemp.Equals("{}") Then
-                            stringBuilder.AppendLine("Additional FileLoadException Data: " & jsonTemp)
-                        End If
-                    Catch ex As Exception
-                    End Try
+                    addJSONedExtendedExceptionDataPackage(rawExceptionObject, stringBuilder)
 
                     stringBuilder.AppendLine()
                 ElseIf rawExceptionObject.GetType.Equals(GetType(IO.FileLoadException)) Then
@@ -47,14 +49,7 @@ Namespace Functions.support
                         stringBuilder.AppendLine("Reason why assembly couldn't be loaded: " & FileLoadExceptionObject.FusionLog)
                     End If
 
-                    Try
-                        jsonTemp = jsonObject(FileLoadExceptionObject.Data)
-
-                        If Not jsonTemp.Equals("{}") Then
-                            stringBuilder.AppendLine("Additional FileLoadException Data: " & jsonTemp)
-                        End If
-                    Catch ex As Exception
-                    End Try
+                    addJSONedExtendedExceptionDataPackage(rawExceptionObject, stringBuilder)
 
                     stringBuilder.AppendLine()
                 ElseIf rawExceptionObject.GetType.Equals(GetType(Runtime.InteropServices.COMException)) Then
@@ -65,14 +60,7 @@ Namespace Functions.support
                     stringBuilder.AppendLine("Source: " & COMExceptionObject.Source)
                     stringBuilder.AppendLine("Error Code: " & COMExceptionObject.ErrorCode)
 
-                    Try
-                        jsonTemp = jsonObject(COMExceptionObject.Data)
-
-                        If Not jsonTemp.Equals("{}") Then
-                            stringBuilder.AppendLine("Additional FileLoadException Data: " & jsonTemp)
-                        End If
-                    Catch ex As Exception
-                    End Try
+                    addJSONedExtendedExceptionDataPackage(rawExceptionObject, stringBuilder)
 
                     stringBuilder.AppendLine()
                 ElseIf rawExceptionObject.GetType.Equals(GetType(ObjectDisposedException)) Then
@@ -83,14 +71,7 @@ Namespace Functions.support
                     stringBuilder.AppendLine("Source: " & ObjectDisposedExceptionObject.Source)
                     stringBuilder.AppendLine("Object Name: " & ObjectDisposedExceptionObject.ObjectName)
 
-                    Try
-                        jsonTemp = jsonObject(ObjectDisposedExceptionObject.Data)
-
-                        If Not jsonTemp.Equals("{}") Then
-                            stringBuilder.AppendLine("Additional FileLoadException Data: " & jsonTemp)
-                        End If
-                    Catch ex As Exception
-                    End Try
+                    addJSONedExtendedExceptionDataPackage(rawExceptionObject, stringBuilder)
 
                     stringBuilder.AppendLine()
                 End If
