@@ -32,6 +32,7 @@ Namespace Functions.support
                     exceptionType.Equals(GetType(IO.IOException)) Or
                     exceptionType.Equals(GetType(ArgumentOutOfRangeException)) Or
                     exceptionType.Equals(GetType(FormatException)) Or
+                    exceptionType.Equals(GetType(ComponentModel.Win32Exception)) Or
                     exceptionType.Equals(GetType(ObjectDisposedException)) Then
 
                     stringBuilder.AppendLine()
@@ -67,6 +68,10 @@ Namespace Functions.support
                         stringBuilder.AppendLine("Parameter Value: " & ArgumentOutOfRangeExceptionObject.ActualValue)
                     ElseIf exceptionType.Equals(GetType(ArgumentException)) Then
                         stringBuilder.AppendLine("Parameter Name: " & DirectCast(rawExceptionObject, ArgumentException).ParamName)
+                    ElseIf exceptionType.Equals(GetType(ComponentModel.Win32Exception)) Then
+                        Dim Win32ExceptionObject As ComponentModel.Win32Exception = DirectCast(rawExceptionObject, ComponentModel.Win32Exception)
+                        stringBuilder.AppendLine(String.Format("Error Code: {0} ({1})", Win32ExceptionObject.ErrorCode, convertErrorCodeToHex(Win32ExceptionObject.ErrorCode)))
+                        stringBuilder.AppendLine(String.Format("Native Error Code: {0} ({1})", Win32ExceptionObject.NativeErrorCode, convertErrorCodeToHex(Win32ExceptionObject.NativeErrorCode)))
                     End If
 
                     addJSONedExtendedExceptionDataPackage(rawExceptionObject, stringBuilder)
