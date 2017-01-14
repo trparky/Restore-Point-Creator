@@ -512,6 +512,11 @@ Public Class Form1
 #End Region
 
 #Region "--== Functions and Sub-Routines ==--"
+    Sub startCheckForUpdatesThread()
+        Threading.ThreadPool.QueueUserWorkItem(AddressOf userInitiatedCheckForUpdates)
+        toolStripCheckForUpdates.Enabled = False
+    End Sub
+
     Public Enum userFeedbackType As Short
         typeError = 0
         typeInfo = 1
@@ -3196,8 +3201,7 @@ Public Class Form1
     End Sub
 
     Private Sub toolStripCheckForUpdates_Click(sender As Object, e As EventArgs) Handles toolStripCheckForUpdates.Click
-        Threading.ThreadPool.QueueUserWorkItem(AddressOf userInitiatedCheckForUpdates)
-        toolStripCheckForUpdates.Enabled = False
+        startCheckForUpdatesThread()
     End Sub
 
     Private Sub ProductWebSiteToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ProductWebSiteToolStripMenuItem.Click
@@ -3320,6 +3324,8 @@ Public Class Form1
                 Functions.APIs.MoveFileEx(globalVariables.pdbFileNameInZIP, vbNullString, 4)
             End Try
         End If
+
+        startCheckForUpdatesThread()
     End Sub
 
     Private Sub toolStripBetaChannel_Click(sender As Object, e As EventArgs) Handles toolStripBetaChannel.Click
@@ -3333,6 +3339,8 @@ Public Class Form1
 
             My.Settings.updateChannel = globalVariables.updateChannels.beta
             My.Settings.Save()
+
+            startCheckForUpdatesThread()
         Else
             toolStripBetaChannel.Checked = False
             toolStripStableChannel.Checked = True
