@@ -212,14 +212,16 @@ Public Class Official_Contact_Form
             Dim timeStamp As New Stopwatch
             timeStamp.Start()
 
-            Functions.eventLogFunctions.exportLogsToFile(strFileToHaveDataExportedTo, logCount)
+            If Functions.eventLogFunctions.exportLogsToFile(strFileToHaveDataExportedTo, logCount) Then
+                timeStamp.Stop()
 
-            timeStamp.Stop()
+                btnAttachEventLogs.Enabled = False
+                listAttachedFiles.Items.Add(strFileToHaveDataExportedTo)
 
-            btnAttachEventLogs.Enabled = False
-            listAttachedFiles.Items.Add(strFileToHaveDataExportedTo)
-
-            MsgBox(String.Format("{0} log entries have been successfully exported and added to the list of attached files.{1}{1}Application Event Log exported in {2}ms ({3} seconds).", logCount, vbCrLf, timeStamp.ElapsedMilliseconds, Math.Round(timeStamp.Elapsed.TotalSeconds, 3)), MsgBoxStyle.Information, Me.Text)
+                MsgBox(String.Format("{0} log entries have been successfully exported and added to the list of attached files.{1}{1}Application Event Log exported in {2}ms ({3} seconds).", logCount, vbCrLf, timeStamp.ElapsedMilliseconds, Math.Round(timeStamp.Elapsed.TotalSeconds, 3)), MsgBoxStyle.Information, Me.Text)
+            Else
+                MsgBox("There was an error while attempting to export the program's event log entries.", MsgBoxStyle.Critical, Me.Text)
+            End If
         Catch ex As Exception
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
             Functions.eventLogFunctions.writeToSystemEventLog("There was an error while attempting to export the program's event log entries.", EventLogEntryType.Error)
