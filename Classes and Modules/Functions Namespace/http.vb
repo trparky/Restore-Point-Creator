@@ -23,7 +23,7 @@
         Public Function downloadFile(ByVal urlToDownloadFrom As String, ByRef memStream As IO.MemoryStream) As Boolean
             Try
                 Dim httpHelper As httpHelper = createNewHTTPHelperObject()
-                Return httpHelper.getDownloadDataStream(urlToDownloadFrom, memStream, False)
+                Return httpHelper.downloadFile(urlToDownloadFrom, memStream, False)
             Catch ex As Exception
                 Return False
             End Try

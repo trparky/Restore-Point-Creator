@@ -205,13 +205,13 @@ End Class
 
 ''' <summary>Allows you to easily POST and upload files to a remote HTTP server without you, the programmer, knowing anything about how it all works. This class does it all for you. It handles adding a User Agent String, additional HTTP Request Headers, string data to your HTTP POST data, and files to be uploaded in the HTTP POST data.</summary>
 Public Class httpHelper
-    Private Const classVersion As String = "1.230"
+    Private Const classVersion As String = "1.235"
 
     Private strUserAgentString As String = Nothing
     Private boolUseProxy As Boolean = False
     Private httpResponseHeaders As Net.WebHeaderCollection = Nothing
     Private httpDownloadProgressPercentage As Short = 0
-    Private remoteFileSize, currentFileSize, bytesPerSecond As Long
+    Private remoteFileSize, currentFileSize, bytesPerSecond As ULong
     Private httpTimeOut As Long = 5000
     Private boolUseHTTPCompression As Boolean = True
     Private lastAccessedURL As String = Nothing
@@ -702,8 +702,9 @@ Public Class httpHelper
     ''' <exception cref="Exception">If this function throws a general Exception, something really went wrong; something that the function normally doesn't handle.</exception>
     ''' <exception cref="httpProtocolException">This exception is thrown if the server responds with an HTTP Error.</exception>
     ''' <exception cref="sslErrorException">If this function throws an sslErrorException, an error occurred while negotiating an SSL connection.</exception>
-    Public Function getDownloadDataStream(ByVal fileDownloadURL As String, ByRef memStream As MemoryStream, Optional ByVal throwExceptionIfError As Boolean = True) As Boolean
+    Public Function downloadFile(ByVal fileDownloadURL As String, ByRef memStream As MemoryStream, Optional ByVal throwExceptionIfError As Boolean = True) As Boolean
         Dim httpWebRequest As Net.HttpWebRequest = Nothing
+        currentFileSize = 0
 
         Try
             If urlPreProcessor IsNot Nothing Then
@@ -753,11 +754,13 @@ Public Class httpHelper
 
             ' We keep looping until all of the data has been downloaded.
             While count <> 0
+                ' We calculate the current file size by adding the amount of data that we've so far
+                ' downloaded from the server repeatedly to a variable called "currentFileSize".
+                currentFileSize += count
                 memStream.Write(dataBuffer, 0, count) ' Writes the data directly to disk.
-                currentFileSize = memStream.Length
                 httpDownloadProgressPercentage = Math.Round((memStream.Length / remoteFileSize) * 100, 0)
 
-                downloadStatusDetails = New downloadStatusDetails With {.remoteFileSize = remoteFileSize, .percentageDownloaded = httpDownloadProgressPercentage, .localFileSize = memStream.Length}
+                downloadStatusDetails = New downloadStatusDetails With {.remoteFileSize = remoteFileSize, .percentageDownloaded = httpDownloadProgressPercentage, .localFileSize = currentFileSize}
 
                 If downloadStatusUpdater IsNot Nothing Then
                     downloadStatusUpdater.DynamicInvoke(downloadStatusDetails)
@@ -831,6 +834,7 @@ Public Class httpHelper
     Public Function downloadFile(fileDownloadURL As String, localFileName As String, throwExceptionIfLocalFileExists As Boolean, Optional throwExceptionIfError As Boolean = True) As Boolean
         Dim fileWriteStream As FileStream = Nothing
         Dim httpWebRequest As Net.HttpWebRequest = Nothing
+        currentFileSize = 0
 
         Try
             If urlPreProcessor IsNot Nothing Then
@@ -890,11 +894,13 @@ Public Class httpHelper
 
             ' We keep looping until all of the data has been downloaded.
             While count <> 0
+                ' We calculate the current file size by adding the amount of data that we've so far
+                ' downloaded from the server repeatedly to a variable called "currentFileSize".
+                currentFileSize += count
                 fileWriteStream.Write(dataBuffer, 0, count) ' Writes the data directly to disk.
-                currentFileSize = fileWriteStream.Length
                 httpDownloadProgressPercentage = Math.Round((fileWriteStream.Length / remoteFileSize) * 100, 0)
 
-                downloadStatusDetails = New downloadStatusDetails With {.remoteFileSize = remoteFileSize, .percentageDownloaded = httpDownloadProgressPercentage, .localFileSize = fileWriteStream.Length}
+                downloadStatusDetails = New downloadStatusDetails With {.remoteFileSize = remoteFileSize, .percentageDownloaded = httpDownloadProgressPercentage, .localFileSize = currentFileSize}
 
                 If downloadStatusUpdater IsNot Nothing Then
                     downloadStatusUpdater.DynamicInvoke(downloadStatusDetails)
