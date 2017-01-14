@@ -2,9 +2,10 @@
     Module eventLogFunctions
         Private Const strSystemRestorePointCreator As String = "System Restore Point Creator"
 
-        ''' <summary>Exports the application logs a file.</summary>
+        ''' <summary>Exports the application logs to a file.</summary>
         ''' <param name="strLogFile">The path to the file we will be exporting the data to.</param>
-        ''' <returns>Returns a Boolean value.</returns>
+        ''' <param name="logCount">This is a ByRef argument which passes back the number of logs that this function exported.</param>
+        ''' <returns>Returns a Boolean value. If True the logs were successfully exported, if False then something went wrong.</returns>
         Public Function exportLogsToFile(ByVal strLogFile As String, ByRef logCount As ULong) As Boolean
             Try
                 Dim jsonEngine As New Web.Script.Serialization.JavaScriptSerializer
@@ -115,6 +116,11 @@
             End Try
         End Sub
 
+        ''' <summary>This sub-routine is called by the exportLogsToFile() sub-routine, this is not intended to be called outside of this module.</summary>
+        ''' <param name="logCount">This is a ByRef argument which passes back the number of logs that this function exported.</param>
+        ''' <param name="fileHandle">The file handle that we're writing to data to.</param>
+        ''' <param name="strEventLog">The log that we're exporting.</param>
+        ''' <param name="jsonEngine">The JSON engine we're using to encode the data with.</param>
         Private Sub exportApplicationEventLogEntriesToFile(ByVal strEventLog As String, ByRef fileHandle As IO.StreamWriter, ByRef jsonEngine As Web.Script.Serialization.JavaScriptSerializer, ByRef logCount As ULong)
             Dim eventLogQuery As Eventing.Reader.EventLogQuery
             Dim logReader As Eventing.Reader.EventLogReader
