@@ -208,8 +208,6 @@ Public Class Official_Contact_Form
 
     Private Sub btnAttachEventLogs_Click(sender As Object, e As EventArgs) Handles btnAttachEventLogs.Click
         Try
-            Dim jsonEngine As New Web.Script.Serialization.JavaScriptSerializer
-
             Dim logCount As ULong = 0
             Dim timeStamp As New Stopwatch
             timeStamp.Start()
