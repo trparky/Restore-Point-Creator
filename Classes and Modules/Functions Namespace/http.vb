@@ -87,6 +87,18 @@
             httpHelper.setProxyMode = My.Settings.useHTTPProxy
             httpHelper.setHTTPTimeout = My.Settings.httpTimeout
 
+            If My.Settings.useSystemProxyConfig Then
+                httpHelper.useSystemProxy = True
+            Else
+                httpHelper.useSystemProxy = False
+
+                If String.IsNullOrEmpty(My.Settings.proxyUser) Then
+                    httpHelper.setProxy(My.Settings.proxyAddress, My.Settings.proxyPort, True)
+                Else
+                    httpHelper.setProxy(My.Settings.proxyAddress, My.Settings.proxyPort, My.Settings.proxyUser, support.convertFromBase64(My.Settings.proxyPass), True)
+                End If
+            End If
+
             If IO.File.Exists("tom") = True Then
                 httpHelper.addPOSTData("dontcount", "True")
             End If
