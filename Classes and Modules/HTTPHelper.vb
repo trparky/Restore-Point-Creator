@@ -105,6 +105,21 @@ Public Class dataAlreadyExistsException
     End Sub
 End Class
 
+Public Class proxyConfigurationErrorException
+    Inherits Exception
+
+    Public Sub New()
+    End Sub
+
+    Public Sub New(message As String)
+        MyBase.New(message)
+    End Sub
+
+    Public Sub New(message As String, inner As Exception)
+        MyBase.New(message, inner)
+    End Sub
+End Class
+
 Public Class noHTTPServerResponseHeadersFoundException
     Inherits Exception
 
@@ -205,10 +220,12 @@ End Class
 
 ''' <summary>Allows you to easily POST and upload files to a remote HTTP server without you, the programmer, knowing anything about how it all works. This class does it all for you. It handles adding a User Agent String, additional HTTP Request Headers, string data to your HTTP POST data, and files to be uploaded in the HTTP POST data.</summary>
 Public Class httpHelper
-    Private Const classVersion As String = "1.235"
+    Private Const classVersion As String = "1.240"
 
     Private strUserAgentString As String = Nothing
     Private boolUseProxy As Boolean = False
+    Private boolUseSystemProxy As Boolean = True
+    Private customProxy As Net.IWebProxy = Nothing
     Private httpResponseHeaders As Net.WebHeaderCollection = Nothing
     Private httpDownloadProgressPercentage As Short = 0
     Private remoteFileSize, currentFileSize, bytesPerSecond As ULong
@@ -262,6 +279,60 @@ Public Class httpHelper
         Else
             If throwExceptionIfAlreadySet Then Throw New credentialsAlreadySet("HTTP Authentication Credentials have already been set for this HTTPHelper Class Instance.")
         End If
+    End Sub
+
+    ''' <summary>Sets up a custom proxy configuration for this class instance.</summary>
+    ''' <param name="strUsername">The username you want to pass to the server.</param>
+    ''' <param name="strPassword">The password you want to pass to the server.</param>
+    ''' <param name="strServer">The proxy server's address, usually an IP address.</param>
+    ''' <param name="intPort">The proxy port.</param>
+    ''' <param name="boolByPassOnLocal">This tells the class instance if it should bypass the proxy for local servers. This is an optional value, by default it is True.</param>
+    ''' <exception cref="proxyConfigurationErrorException">If this function throws a proxyConfigurationError, it means that something went wrong while setting up the proxy configuration for this class instance.</exception>
+    Public Sub setProxy(strServer As String, intPort As Integer, strUsername As String, strPassword As String, Optional boolByPassOnLocal As Boolean = True)
+        Try
+            customProxy = New Net.WebProxy(String.Format("{0}:{1}", strServer, intPort.ToString), boolByPassOnLocal) With {.Credentials = New Net.NetworkCredential(strUsername, strPassword)}
+        Catch ex As UriFormatException
+            Throw New proxyConfigurationErrorException("There was an error setting up the proxy for this class instance.", ex)
+        End Try
+    End Sub
+
+    ''' <summary>Sets up a custom proxy configuration for this class instance.</summary>
+    ''' <param name="boolByPassOnLocal">This tells the class instance if it should bypass the proxy for local servers. This is an optional value, by default it is True.</param>
+    ''' <param name="strServer">The proxy server's address, usually an IP address.</param>
+    ''' <param name="intPort">The proxy port.</param>
+    ''' <exception cref="proxyConfigurationErrorException">If this function throws a proxyConfigurationError, it means that something went wrong while setting up the proxy configuration for this class instance.</exception>
+    Public Sub setProxy(strServer As String, intPort As Integer, Optional boolByPassOnLocal As Boolean = True)
+        Try
+            customProxy = New Net.WebProxy(String.Format("{0}:{1}", strServer, intPort.ToString), boolByPassOnLocal)
+        Catch ex As UriFormatException
+            Throw New proxyConfigurationErrorException("There was an error setting up the proxy for this class instance.", ex)
+        End Try
+    End Sub
+
+    ''' <summary>Sets up a custom proxy configuration for this class instance.</summary>
+    ''' <param name="boolByPassOnLocal">This tells the class instance if it should bypass the proxy for local servers. This is an optional value, by default it is True.</param>
+    ''' <param name="strServer">The proxy server's address, usually an IP address followed up by a ":" followed up by a port number.</param>
+    ''' <exception cref="proxyConfigurationErrorException">If this function throws a proxyConfigurationError, it means that something went wrong while setting up the proxy configuration for this class instance.</exception>
+    Public Sub setProxy(strServer As String, Optional boolByPassOnLocal As Boolean = True)
+        Try
+            customProxy = New Net.WebProxy(strServer, boolByPassOnLocal)
+        Catch ex As UriFormatException
+            Throw New proxyConfigurationErrorException("There was an error setting up the proxy for this class instance.", ex)
+        End Try
+    End Sub
+
+    ''' <summary>Sets up a custom proxy configuration for this class instance.</summary>
+    ''' <param name="boolByPassOnLocal">This tells the class instance if it should bypass the proxy for local servers. This is an optional value, by default it is True.</param>
+    ''' <param name="strServer">The proxy server's address, usually an IP address followed up by a ":" followed up by a port number.</param>
+    ''' <param name="strUsername">The username you want to pass to the server.</param>
+    ''' <param name="strPassword">The password you want to pass to the server.</param>
+    ''' <exception cref="proxyConfigurationErrorException">If this function throws a proxyConfigurationError, it means that something went wrong while setting up the proxy configuration for this class instance.</exception>
+    Public Sub setProxy(strServer As String, strUsername As String, strPassword As String, Optional boolByPassOnLocal As Boolean = True)
+        Try
+            customProxy = New Net.WebProxy(strServer, boolByPassOnLocal) With {.Credentials = New Net.NetworkCredential(strUsername, strPassword)}
+        Catch ex As UriFormatException
+            Throw New proxyConfigurationErrorException("There was an error setting up the proxy for this class instance.", ex)
+        End Try
     End Sub
 
     ''' <summary>Returns the last Exception that occurred within this Class instance.</summary>
@@ -329,6 +400,13 @@ Public Class httpHelper
         End Get
     End Property
 
+    ''' <summary>Tells the Class instance if it should use the system proxy.</summary>
+    Public WriteOnly Property useSystemProxy As Boolean
+        Set
+            boolUseSystemProxy = Value
+        End Set
+    End Property
+
     ''' <summary>This function allows you to get a peek inside the Class object instance. It returns many of the things that make up the Class instance like POST and GET data, cookies, additional HTTP headers, if proxy mode and HTTP compression mode is enabled, the user agent string, etc.</summary>
     ''' <returns>A String.</returns>
     Public Overrides Function toString() As String
@@ -394,7 +472,7 @@ Public Class httpHelper
     ''' <param name="boolHumanReadable">Optional setting, normally set to True. Tells the function if it should transform the Integer representing the file size into a human readable format.</param>
     ''' <returns>Either a String or a Long containing the remote file size.</returns>
     Public Function getHTTPDownloadRemoteFileSize(Optional boolHumanReadable As Boolean = True) As Object
-        If boolHumanReadable = True Then
+        If boolHumanReadable Then
             Return fileSizeToHumanReadableFormat(remoteFileSize)
         Else
             Return remoteFileSize
@@ -403,11 +481,11 @@ Public Class httpHelper
 
     ''' <summary>This returns the SSL certificate details for the last HTTP request made by this Class instance.</summary>
     ''' <returns>System.Security.Cryptography.X509Certificates.X509Certificate2</returns>
-    ''' <exception cref="noSSLCertificateFoundException">If this function throw a noSSLCertificateFoundException, it means that the Class doesn't have an SSL certificate in the memory space of the Class instance. Perhaps the last HTTP request wasn't an HTTPS request.</exception>
+    ''' <exception cref="noSSLCertificateFoundException">If this function throws a noSSLCertificateFoundException it means that the Class doesn't have an SSL certificate in the memory space of the Class instance. Perhaps the last HTTP request wasn't an HTTPS request.</exception>
     ''' <param name="boolThrowException">An optional parameter that tells the function if it should throw an exception if an SSL certificate isn't found in the memory space of this Class instance.</param>
     Public Function getCertificateDetails(Optional boolThrowException As Boolean = True) As X509Certificates.X509Certificate2
         If sslCertificate Is Nothing Then
-            If boolThrowException = True Then
+            If boolThrowException Then
                 lastException = New noSSLCertificateFoundException("No valid SSL certificate found for the last HTTP request. Perhaps the last HTTP request wasn't an HTTPS request.")
                 Throw lastException
             End If
@@ -421,7 +499,7 @@ Public Class httpHelper
     ''' <param name="boolHumanReadable">Optional setting, normally set to True. Tells the function if it should transform the Integer representing the file size into a human readable format.</param>
     ''' <returns>Either a String or a Long containing the current local file's size.</returns>
     Public Function getHTTPDownloadLocalFileSize(Optional boolHumanReadable As Boolean = True) As Object
-        If boolHumanReadable = True Then
+        If boolHumanReadable Then
             Return fileSizeToHumanReadableFormat(currentFileSize)
         Else
             Return currentFileSize
@@ -491,7 +569,7 @@ Public Class httpHelper
             Throw lastException
         End If
 
-        If postData.ContainsKey(strName) = True And throwExceptionIfDataAlreadyExists = True Then
+        If postData.ContainsKey(strName) And throwExceptionIfDataAlreadyExists Then
             lastException = New dataAlreadyExistsException(String.Format("The POST data key named {0}{1}{0} already exists in the POST data.", Chr(34), strName))
             Throw lastException
         Else
@@ -510,7 +588,7 @@ Public Class httpHelper
             Throw lastException
         End If
 
-        If getData.ContainsKey(strName) = True And throwExceptionIfDataAlreadyExists = True Then
+        If getData.ContainsKey(strName) And throwExceptionIfDataAlreadyExists Then
             lastException = New dataAlreadyExistsException(String.Format("The GET data key named {0}{1}{0} already exists in the GET data.", Chr(34), strName))
             Throw lastException
         Else
@@ -526,8 +604,8 @@ Public Class httpHelper
     ''' <example>httpPostObject.addHTTPHeader("myheader", "my header value")</example>
     ''' <exception cref="dataAlreadyExistsException">If this function throws an dataAlreadyExistsException, it means that this Class instance already has an Additional HTTP Header of that name in the Class instance.</exception>
     Public Sub addHTTPHeader(strHeaderName As String, strHeaderContents As String, Optional urlEncodeHeaderContent As Boolean = False)
-        If doesAdditionalHeaderExist(strHeaderName) = False Then
-            If urlEncodeHeaderContent = True Then
+        If Not doesAdditionalHeaderExist(strHeaderName) Then
+            If urlEncodeHeaderContent Then
                 additionalHTTPHeaders.Add(strHeaderName.ToLower, Web.HttpUtility.UrlEncode(strHeaderContents))
             Else
                 additionalHTTPHeaders.Add(strHeaderName.ToLower, strHeaderContents)
@@ -546,10 +624,10 @@ Public Class httpHelper
     ''' <param name="urlEncodeHeaderContent">Optional setting, normally set to False. Tells the function if it should URLEncode the cookie contents before setting it.</param>
     ''' <exception cref="dataAlreadyExistsException">If this function throws a dataAlreadyExistsException, it means that the cookie already exists in this Class instance.</exception>
     Public Sub addHTTPCookie(strCookieName As String, strCookieValue As String, strDomainDomain As String, strCookiePath As String, Optional urlEncodeHeaderContent As Boolean = False)
-        If doesCookieExist(strCookieName) = False Then
+        If Not doesCookieExist(strCookieName) Then
             Dim cookieDetails As New cookieDetails() With {.cookieDomain = strDomainDomain, .cookiePath = strCookiePath}
 
-            If urlEncodeHeaderContent = True Then
+            If urlEncodeHeaderContent Then
                 cookieDetails.cookieData = Web.HttpUtility.UrlEncode(strCookieValue)
             Else
                 cookieDetails.cookieData = strCookieValue
@@ -569,10 +647,10 @@ Public Class httpHelper
     ''' <param name="urlEncodeHeaderContent">Optional setting, normally set to False. Tells the function if it should URLEncode the cookie contents before setting it.</param>
     ''' <exception cref="dataAlreadyExistsException">If this function throws a dataAlreadyExistsException, it means that the cookie already exists in this Class instance.</exception>
     Public Sub addHTTPCookie(strCookieName As String, strCookieValue As String, strCookieDomain As String, Optional urlEncodeHeaderContent As Boolean = False)
-        If doesCookieExist(strCookieName) = False Then
+        If Not doesCookieExist(strCookieName) Then
             Dim cookieDetails As New cookieDetails() With {.cookieDomain = strCookieDomain, .cookiePath = "/"}
 
-            If urlEncodeHeaderContent = True Then
+            If urlEncodeHeaderContent Then
                 cookieDetails.cookieData = Web.HttpUtility.UrlEncode(strCookieValue)
             Else
                 cookieDetails.cookieData = strCookieValue
@@ -627,11 +705,11 @@ Public Class httpHelper
     Public Sub addFileUpload(strFormName As String, strLocalFilePath As String, strRemoteFileName As String, strContentType As String, Optional throwExceptionIfItemAlreadyExists As Boolean = False)
         Dim fileInfo As New FileInfo(strLocalFilePath)
 
-        If fileInfo.Exists = False Then
+        If Not fileInfo.Exists Then
             lastException = New FileNotFoundException("Local file not found.", strLocalFilePath)
             Throw lastException
         ElseIf postData.ContainsKey(strFormName) Then
-            If throwExceptionIfItemAlreadyExists = True Then
+            If throwExceptionIfItemAlreadyExists Then
                 lastException = New dataAlreadyExistsException(String.Format("The POST data key named {0}{1}{0} already exists in the POST data.", Chr(34), strFormName))
                 Throw lastException
             Else
@@ -674,7 +752,7 @@ Public Class httpHelper
     ''' <exception cref="noHTTPServerResponseHeadersFoundException">If this function throws a noHTTPServerResponseHeadersFoundException, there are no HTTP Response Headers in this Class instance.</exception>
     Public Function getHTTPResponseHeaders(Optional throwExceptionIfNoHeaders As Boolean = False) As Net.WebHeaderCollection
         If httpResponseHeaders Is Nothing Then
-            If throwExceptionIfNoHeaders = True Then
+            If throwExceptionIfNoHeaders Then
                 lastException = New noHTTPServerResponseHeadersFoundException("No HTTP Server Response Headers found.")
                 Throw lastException
             Else
@@ -724,13 +802,13 @@ Public Class httpHelper
                 addHTTPHeader("Authorization", "Basic " & Convert.ToBase64String(Text.Encoding.Default.GetBytes(credentials.strUser & ":" & credentials.strPassword)))
             End If
 
-            If boolUseHTTPCompression = True Then
+            If boolUseHTTPCompression Then
                 ' We tell the web server that we can accept a GZIP and Deflate compressed data stream.
                 httpWebRequest.Accept = "gzip, deflate"
                 httpWebRequest.Headers.Add(Net.HttpRequestHeader.AcceptEncoding, "gzip, deflate")
             End If
 
-            If boolUseProxy = True Then httpWebRequest.Proxy = Net.WebRequest.DefaultWebProxy
+            configureProxy(httpWebRequest)
 
             If strUserAgentString <> Nothing Then httpWebRequest.UserAgent = strUserAgentString
             If httpCookies.Count <> 0 Then getCookies(httpWebRequest)
@@ -738,7 +816,7 @@ Public Class httpHelper
 
             Dim webResponse As Net.WebResponse = httpWebRequest.GetResponse() ' We now get the web response.
 
-            If fileDownloadURL.StartsWith("https://", StringComparison.OrdinalIgnoreCase) = True Then
+            If fileDownloadURL.StartsWith("https://", StringComparison.OrdinalIgnoreCase) Then
                 sslCertificate = New X509Certificates.X509Certificate2(httpWebRequest.ServicePoint.Certificate)
             Else
                 sslCertificate = Nothing
@@ -792,7 +870,7 @@ Public Class httpHelper
                 memStream.Dispose() ' Disposes the file stream.
             End If
 
-            If throwExceptionIfError = False Then Return False
+            If Not throwExceptionIfError Then Return False
 
             If customErrorHandler IsNot Nothing Then
                 customErrorHandler.DynamicInvoke(ex, Me)
@@ -842,8 +920,8 @@ Public Class httpHelper
             End If
             lastAccessedURL = fileDownloadURL
 
-            If File.Exists(localFileName) = True Then
-                If throwExceptionIfLocalFileExists = True Then
+            If File.Exists(localFileName) Then
+                If throwExceptionIfLocalFileExists Then
                     lastException = New localFileAlreadyExistsException(String.Format("The local file found at {0}{1}{0} already exists.", Chr(34), localFileName))
                     Throw lastException
                 Else
@@ -863,13 +941,13 @@ Public Class httpHelper
                 addHTTPHeader("Authorization", "Basic " & Convert.ToBase64String(Text.Encoding.Default.GetBytes(credentials.strUser & ":" & credentials.strPassword)))
             End If
 
-            If boolUseHTTPCompression = True Then
+            If boolUseHTTPCompression Then
                 ' We tell the web server that we can accept a GZIP and Deflate compressed data stream.
                 httpWebRequest.Accept = "gzip, deflate"
                 httpWebRequest.Headers.Add(Net.HttpRequestHeader.AcceptEncoding, "gzip, deflate")
             End If
 
-            If boolUseProxy = True Then httpWebRequest.Proxy = Net.WebRequest.DefaultWebProxy
+            configureProxy(httpWebRequest)
 
             If strUserAgentString <> Nothing Then httpWebRequest.UserAgent = strUserAgentString
             If httpCookies.Count <> 0 Then getCookies(httpWebRequest)
@@ -877,7 +955,7 @@ Public Class httpHelper
 
             Dim webResponse As Net.WebResponse = httpWebRequest.GetResponse() ' We now get the web response.
 
-            If fileDownloadURL.StartsWith("https://", StringComparison.OrdinalIgnoreCase) = True Then
+            If fileDownloadURL.StartsWith("https://", StringComparison.OrdinalIgnoreCase) Then
                 sslCertificate = New X509Certificates.X509Certificate2(httpWebRequest.ServicePoint.Certificate)
             Else
                 sslCertificate = Nothing
@@ -929,7 +1007,7 @@ Public Class httpHelper
                 fileWriteStream.Dispose() ' Disposes the file stream.
             End If
 
-            If throwExceptionIfError = False Then Return False
+            If Not throwExceptionIfError Then Return False
 
             If customErrorHandler IsNot Nothing Then
                 customErrorHandler.DynamicInvoke(ex, Me)
@@ -988,8 +1066,9 @@ Public Class httpHelper
                 addHTTPHeader("Authorization", "Basic " & Convert.ToBase64String(Text.Encoding.Default.GetBytes(credentials.strUser & ":" & credentials.strPassword)))
             End If
 
-            If boolUseHTTPCompression = True Then httpWebRequest.Accept = "gzip, deflate"
-            If boolUseProxy = True Then httpWebRequest.Proxy = Net.WebRequest.DefaultWebProxy
+            If boolUseHTTPCompression Then httpWebRequest.Accept = "gzip, deflate"
+
+            configureProxy(httpWebRequest)
 
             If strUserAgentString <> Nothing Then httpWebRequest.UserAgent = strUserAgentString
             If httpCookies.Count <> 0 Then getCookies(httpWebRequest)
@@ -1012,7 +1091,7 @@ Public Class httpHelper
 
             Dim httpWebResponse As Net.WebResponse = httpWebRequest.GetResponse()
 
-            If url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) = True Then
+            If url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) Then
                 sslCertificate = New X509Certificates.X509Certificate2(httpWebRequest.ServicePoint.Certificate)
             Else
                 sslCertificate = Nothing
@@ -1038,7 +1117,7 @@ Public Class httpHelper
             End If
 
             lastException = ex
-            If throwExceptionIfError = False Then Return False
+            If Not throwExceptionIfError Then Return False
 
             If customErrorHandler IsNot Nothing Then
                 customErrorHandler.DynamicInvoke(ex, Me)
@@ -1107,8 +1186,9 @@ Public Class httpHelper
                 addHTTPHeader("Authorization", "Basic " & Convert.ToBase64String(Text.Encoding.Default.GetBytes(credentials.strUser & ":" & credentials.strPassword)))
             End If
 
-            If boolUseHTTPCompression = True Then httpWebRequest.Accept = "gzip, deflate"
-            If boolUseProxy = True Then httpWebRequest.Proxy = Net.WebRequest.DefaultWebProxy
+            If boolUseHTTPCompression Then httpWebRequest.Accept = "gzip, deflate"
+
+            configureProxy(httpWebRequest)
 
             httpWebRequest.KeepAlive = True
             httpWebRequest.ContentType = "multipart/form-data; boundary=" & boundary
@@ -1166,7 +1246,7 @@ Public Class httpHelper
 
             Dim httpWebResponse As Net.WebResponse = httpWebRequest.GetResponse()
 
-            If url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) = True Then
+            If url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) Then
                 sslCertificate = New X509Certificates.X509Certificate2(httpWebRequest.ServicePoint.Certificate)
             Else
                 sslCertificate = Nothing
@@ -1192,7 +1272,7 @@ Public Class httpHelper
             End If
 
             lastException = ex
-            If throwExceptionIfError = False Then Return False
+            If Not throwExceptionIfError Then Return False
 
             If customErrorHandler IsNot Nothing Then
                 customErrorHandler.DynamicInvoke(ex, Me)
@@ -1237,6 +1317,20 @@ Public Class httpHelper
         Next
     End Sub
 
+    Private Sub configureProxy(ByRef httpWebRequest As Net.HttpWebRequest)
+        If boolUseProxy Then
+            If boolUseSystemProxy Then
+                httpWebRequest.Proxy = Net.WebRequest.DefaultWebProxy
+            Else
+                If customProxy Is Nothing Then
+                    httpWebRequest.Proxy = Net.WebRequest.DefaultWebProxy
+                Else
+                    httpWebRequest.Proxy = customProxy
+                End If
+            End If
+        End If
+    End Sub
+
     Private Function convertLineFeeds(input As String) As String
         ' Checks to see if the file is in Windows linefeed format or UNIX linefeed format.
         If input.Contains(vbCrLf) Then
@@ -1249,7 +1343,7 @@ Public Class httpHelper
     Private Function getPOSTDataString() As String
         Dim postDataString As String = ""
         For Each entry As KeyValuePair(Of String, Object) In postData
-            If (TypeOf entry.Value Is FormFile) = False Then
+            If Not entry.Value.GetType.Equals(GetType(FormFile)) Then
                 postDataString &= entry.Key.Trim & "=" & Web.HttpUtility.UrlEncode(entry.Value.Trim) & "&"
             End If
         Next
@@ -1304,31 +1398,31 @@ Public Class httpHelper
         If size <= (2 ^ 10) Then
             result = size & " Bytes"
         ElseIf size > (2 ^ 10) And size <= (2 ^ 20) Then
-            If roundToNearestWholeNumber = True Then
+            If roundToNearestWholeNumber Then
                 result = Math.Round(size / (2 ^ 10), 0) & " KBs"
             Else
                 result = Math.Round(size / (2 ^ 10), 2) & " KBs"
             End If
         ElseIf size > (2 ^ 20) And size <= (2 ^ 30) Then
-            If roundToNearestWholeNumber = True Then
+            If roundToNearestWholeNumber Then
                 result = Math.Round(size / (2 ^ 20), 0) & " MBs"
             Else
                 result = Math.Round(size / (2 ^ 20), 2) & " MBs"
             End If
         ElseIf size > (2 ^ 30) And size <= (2 ^ 40) Then
-            If roundToNearestWholeNumber = True Then
+            If roundToNearestWholeNumber Then
                 result = Math.Round(size / (2 ^ 30), 0) & " GBs"
             Else
                 result = Math.Round(size / (2 ^ 30), 2) & " GBs"
             End If
         ElseIf size > (2 ^ 40) And size <= (2 ^ 50) Then
-            If roundToNearestWholeNumber = True Then
+            If roundToNearestWholeNumber Then
                 result = Math.Round(size / (2 ^ 40), 0) & " TBs"
             Else
                 result = Math.Round(size / (2 ^ 40), 2) & " TBs"
             End If
         ElseIf size > (2 ^ 50) And size <= (2 ^ 60) Then
-            If roundToNearestWholeNumber = True Then
+            If roundToNearestWholeNumber Then
                 result = Math.Round(size / (2 ^ 50), 0) & " PBs"
             Else
                 result = Math.Round(size / (2 ^ 50), 2) & " PBs"
