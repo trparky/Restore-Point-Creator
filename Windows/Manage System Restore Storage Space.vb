@@ -33,6 +33,7 @@ Public Class frmManageSystemRestoreStorageSpace
     End Function
 
     Private Sub frmManageSystemRestoreStorageSpace_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        chkConfirmNewSmallerSize.Checked = My.Settings.confirmSmallerRestorePointSpaceSetting
         Me.Location = My.Settings.ManageSystemRestoreStorageSpaceWindowLocation
         Control.CheckForIllegalCrossThreadCalls = False
         percentageIndicator.ProgressBarColor = My.Settings.barColor
@@ -145,8 +146,13 @@ Public Class frmManageSystemRestoreStorageSpace
 
         Dim size As ULong = Functions.vss.getMaxSize(globalVariables.systemDriveLetter)
 
-        If newSize < size And MsgBox("Your new size (" & Functions.support.bytesToHumanSize(newSize) & ") is smaller than your old specified (" & Functions.support.bytesToHumanSize(size) & ") size. This may cause your system to lose restore points." & vbCrLf & vbCrLf & "Are you sure you want to do this?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Set New Size") = MsgBoxResult.No Then
+        If size = newSize Then
+            MsgBox("You didn't change the size.", MsgBoxStyle.Information, Me.Text)
             Exit Sub
+        End If
+
+        If newSize < size And My.Settings.confirmSmallerRestorePointSpaceSetting Then
+            If MsgBox("Your new size (" & Functions.support.bytesToHumanSize(newSize) & ") is smaller than your old specified (" & Functions.support.bytesToHumanSize(size) & ") size. This may cause your system to lose restore points." & vbCrLf & vbCrLf & "Are you sure you want to do this?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Set New Size") = MsgBoxResult.No Then Exit Sub
         End If
 
         If size = 0 Then
@@ -175,5 +181,10 @@ Public Class frmManageSystemRestoreStorageSpace
         Else
             MsgBox("Invalid numerical input.", MsgBoxStyle.Critical, Me.Text)
         End If
+    End Sub
+
+    Private Sub chkConfirmNewSmallerSize_Click(sender As Object, e As EventArgs) Handles chkConfirmNewSmallerSize.Click
+        My.Settings.confirmSmallerRestorePointSpaceSetting = chkConfirmNewSmallerSize.Checked
+        My.Settings.Save()
     End Sub
 End Class

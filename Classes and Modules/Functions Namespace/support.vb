@@ -3,69 +3,78 @@ Imports ICSharpCode.SharpZipLib.Zip
 
 Namespace Functions.support
     Module support
-        Public Sub addExtendedCrashData(ByRef stringBuilder As System.Text.StringBuilder, rawExceptionObject As Exception)
-            Dim jsonTemp As String
-
+        Public Function convertErrorCodeToHex(input As Long) As String
             Try
-                If rawExceptionObject.GetType.Equals(GetType(IO.FileNotFoundException)) Then
+                Return input.ToString("x").caseInsensitiveReplace("ffffffff", "0x").ToString.ToUpper
+            Catch ex As Exception
+                Return Nothing
+            End Try
+        End Function
+
+        Private Sub addJSONedExtendedExceptionDataPackage(ByVal exceptionObject As Exception, ByRef stringBuilder As System.Text.StringBuilder)
+            Try
+                Dim jsonTemp As String = jsonObject(exceptionObject.Data)
+
+                If Not jsonTemp.Equals("{}") Then
+                    stringBuilder.AppendLine(String.Format("Additional {0} Data: {1}", exceptionObject.GetType.ToString, jsonTemp))
+                End If
+            Catch ex As Exception
+            End Try
+        End Sub
+
+        Public Sub addExtendedCrashData(ByRef stringBuilder As System.Text.StringBuilder, rawExceptionObject As Exception)
+            Try
+                Dim exceptionType As Type = rawExceptionObject.GetType
+
+                If exceptionType.Equals(GetType(IO.FileNotFoundException)) Or
+                    exceptionType.Equals(GetType(IO.FileLoadException)) Or
+                    exceptionType.Equals(GetType(Runtime.InteropServices.COMException)) Or
+                    exceptionType.Equals(GetType(IO.IOException)) Or
+                    exceptionType.Equals(GetType(ArgumentOutOfRangeException)) Or
+                    exceptionType.Equals(GetType(FormatException)) Or
+                    exceptionType.Equals(GetType(ComponentModel.Win32Exception)) Or
+                    exceptionType.Equals(GetType(ObjectDisposedException)) Then
+
                     stringBuilder.AppendLine()
-                    stringBuilder.AppendLine("Additional IO.FileNotFoundException Data")
+                    stringBuilder.AppendLine("Additional " & rawExceptionObject.GetType.ToString & " Data")
 
-                    Dim FileNotFoundExceptionObject As IO.FileNotFoundException = DirectCast(rawExceptionObject, IO.FileNotFoundException)
-                    stringBuilder.AppendLine("Name of File: " & FileNotFoundExceptionObject.FileName)
+                    If exceptionType.Equals(GetType(IO.FileNotFoundException)) Then
+                        Dim FileNotFoundExceptionObject As IO.FileNotFoundException = DirectCast(rawExceptionObject, IO.FileNotFoundException)
+                        stringBuilder.AppendLine("Name of File: " & FileNotFoundExceptionObject.FileName)
 
-                    If Not String.IsNullOrEmpty(FileNotFoundExceptionObject.FusionLog) Then
-                        stringBuilder.AppendLine("Reason: " & FileNotFoundExceptionObject.FusionLog)
+                        If Not String.IsNullOrEmpty(FileNotFoundExceptionObject.FusionLog) Then
+                            stringBuilder.AppendLine("Reason: " & FileNotFoundExceptionObject.FusionLog)
+                        End If
+                    ElseIf exceptionType.Equals(GetType(IO.FileLoadException)) Then
+                        Dim FileLoadExceptionObject As IO.FileLoadException = DirectCast(rawExceptionObject, IO.FileLoadException)
+                        stringBuilder.AppendLine("Unable to Load Assembly File: " & FileLoadExceptionObject.FileName)
+
+                        If Not String.IsNullOrEmpty(FileLoadExceptionObject.FusionLog) Then
+                            stringBuilder.AppendLine("Reason why assembly couldn't be loaded: " & FileLoadExceptionObject.FusionLog)
+                        End If
+                    ElseIf exceptionType.Equals(GetType(Runtime.InteropServices.COMException)) Then
+                        Dim COMExceptionObject As Runtime.InteropServices.COMException = DirectCast(rawExceptionObject, Runtime.InteropServices.COMException)
+                        stringBuilder.AppendLine("Source: " & COMExceptionObject.Source)
+                        stringBuilder.AppendLine("Error Code: " & COMExceptionObject.ErrorCode)
+                    ElseIf exceptionType.Equals(GetType(ObjectDisposedException)) Then
+                        Dim ObjectDisposedExceptionObject As ObjectDisposedException = DirectCast(rawExceptionObject, ObjectDisposedException)
+                        stringBuilder.AppendLine("Source: " & ObjectDisposedExceptionObject.Source)
+                        stringBuilder.AppendLine("Object Name: " & ObjectDisposedExceptionObject.ObjectName)
+                    ElseIf exceptionType.Equals(GetType(IO.IOException)) Then
+                        stringBuilder.AppendLine("Source: " & DirectCast(rawExceptionObject, IO.IOException).Source)
+                    ElseIf exceptionType.Equals(GetType(ArgumentOutOfRangeException)) Then
+                        Dim ArgumentOutOfRangeExceptionObject As ArgumentOutOfRangeException = DirectCast(rawExceptionObject, ArgumentOutOfRangeException)
+                        stringBuilder.AppendLine("Parameter Name: " & ArgumentOutOfRangeExceptionObject.ParamName)
+                        stringBuilder.AppendLine("Parameter Value: " & ArgumentOutOfRangeExceptionObject.ActualValue)
+                    ElseIf exceptionType.Equals(GetType(ArgumentException)) Then
+                        stringBuilder.AppendLine("Parameter Name: " & DirectCast(rawExceptionObject, ArgumentException).ParamName)
+                    ElseIf exceptionType.Equals(GetType(ComponentModel.Win32Exception)) Then
+                        Dim Win32ExceptionObject As ComponentModel.Win32Exception = DirectCast(rawExceptionObject, ComponentModel.Win32Exception)
+                        stringBuilder.AppendLine(String.Format("Error Code: {0} ({1})", Win32ExceptionObject.ErrorCode, convertErrorCodeToHex(Win32ExceptionObject.ErrorCode)))
+                        stringBuilder.AppendLine(String.Format("Native Error Code: {0} ({1})", Win32ExceptionObject.NativeErrorCode, convertErrorCodeToHex(Win32ExceptionObject.NativeErrorCode)))
                     End If
 
-                    Try
-                        jsonTemp = jsonObject(FileNotFoundExceptionObject.Data)
-
-                        If Not jsonTemp.Equals("{}") Then
-                            stringBuilder.AppendLine("Additional FileLoadException Data: " & jsonTemp)
-                        End If
-                    Catch ex As Exception
-                    End Try
-
-                    stringBuilder.AppendLine()
-                ElseIf rawExceptionObject.GetType.Equals(GetType(IO.FileLoadException)) Then
-                    stringBuilder.AppendLine()
-                    stringBuilder.AppendLine("Additional IO.FileLoadException Data")
-
-                    Dim FileLoadExceptionObject As IO.FileLoadException = DirectCast(rawExceptionObject, IO.FileLoadException)
-                    stringBuilder.AppendLine("Unable to Load Assembly File: " & FileLoadExceptionObject.FileName)
-
-                    If Not String.IsNullOrEmpty(FileLoadExceptionObject.FusionLog) Then
-                        stringBuilder.AppendLine("Reason why assembly couldn't be loaded: " & FileLoadExceptionObject.FusionLog)
-                    End If
-
-                    Try
-                        jsonTemp = jsonObject(FileLoadExceptionObject.Data)
-
-                        If Not jsonTemp.Equals("{}") Then
-                            stringBuilder.AppendLine("Additional FileLoadException Data: " & jsonTemp)
-                        End If
-                    Catch ex As Exception
-                    End Try
-
-                    stringBuilder.AppendLine()
-                ElseIf rawExceptionObject.GetType.Equals(GetType(Runtime.InteropServices.COMException)) Then
-                    stringBuilder.AppendLine()
-                    stringBuilder.AppendLine("Additional Runtime.InteropServices.COMException Data")
-
-                    Dim COMExceptionObject As Runtime.InteropServices.COMException = DirectCast(rawExceptionObject, Runtime.InteropServices.COMException)
-                    stringBuilder.AppendLine("Source: " & COMExceptionObject.Source)
-                    stringBuilder.AppendLine("Error Code: " & COMExceptionObject.ErrorCode)
-
-                    Try
-                        jsonTemp = jsonObject(COMExceptionObject.Data)
-
-                        If Not jsonTemp.Equals("{}") Then
-                            stringBuilder.AppendLine("Additional FileLoadException Data: " & jsonTemp)
-                        End If
-                    Catch ex As Exception
-                    End Try
-
+                    addJSONedExtendedExceptionDataPackage(rawExceptionObject, stringBuilder)
                     stringBuilder.AppendLine()
                 End If
             Catch ex As Exception

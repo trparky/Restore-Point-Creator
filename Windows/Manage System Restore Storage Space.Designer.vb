@@ -30,6 +30,7 @@ Partial Class frmManageSystemRestoreStorageSpace
         Me.lblUsedShadowStorageSpace = New System.Windows.Forms.Label()
         Me.lblDriveLabel = New System.Windows.Forms.Label()
         Me.percentageIndicator = New Tom.SmoothProgressBar()
+        Me.chkConfirmNewSmallerSize = New System.Windows.Forms.CheckBox()
         Me.SuspendLayout()
         '
         'Label2
@@ -106,11 +107,22 @@ Partial Class frmManageSystemRestoreStorageSpace
         Me.percentageIndicator.TabIndex = 14
         Me.percentageIndicator.Value = 0
         '
+        'chkConfirmNewSmallerSize
+        '
+        Me.chkConfirmNewSmallerSize.AutoSize = True
+        Me.chkConfirmNewSmallerSize.Location = New System.Drawing.Point(12, 141)
+        Me.chkConfirmNewSmallerSize.Name = "chkConfirmNewSmallerSize"
+        Me.chkConfirmNewSmallerSize.Size = New System.Drawing.Size(220, 17)
+        Me.chkConfirmNewSmallerSize.TabIndex = 15
+        Me.chkConfirmNewSmallerSize.Text = "Confirm if new size is smaller than old size"
+        Me.chkConfirmNewSmallerSize.UseVisualStyleBackColor = True
+        '
         'frmManageSystemRestoreStorageSpace
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
-        Me.ClientSize = New System.Drawing.Size(385, 145)
+        Me.ClientSize = New System.Drawing.Size(385, 166)
+        Me.Controls.Add(Me.chkConfirmNewSmallerSize)
         Me.Controls.Add(Me.percentageIndicator)
         Me.Controls.Add(Me.lblDriveLabel)
         Me.Controls.Add(Me.lblUsedShadowStorageSpace)
@@ -136,4 +148,5 @@ Partial Class frmManageSystemRestoreStorageSpace
     Friend WithEvents lblUsedShadowStorageSpace As System.Windows.Forms.Label
     Friend WithEvents lblDriveLabel As System.Windows.Forms.Label
     Friend WithEvents percentageIndicator As Tom.SmoothProgressBar
+    Friend WithEvents chkConfirmNewSmallerSize As CheckBox
 End Class

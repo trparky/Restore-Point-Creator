@@ -14,24 +14,18 @@ Public Class Mount_Volume_Shadow_Copy
 
         listShadowCopyIDs.Items.Clear()
 
-        Dim timeCreated As Date, index As Integer
+        Dim timeCreated As Date
 
         For Each queryObj As ManagementObject In searcher.Get()
             timeCreated = Functions.support.parseSystemRestorePointCreationDate(queryObj("InstallDate").ToString).ToUniversalTime
 
             listShadowCopyIDs.Items.Add(New myListViewItemTypes.volumeShadowCopyListItem() With {.Text = (timeCreated.ToLongDateString & " at " & timeCreated.ToLongTimeString).Trim, .deviceID = queryObj("DeviceObject").ToString})
 
-            Debug.WriteLine("shadow copy info | " & index & " | " & queryObj("DeviceObject").ToString)
-
             timeCreated = Nothing
         Next
 
         searcher.Dispose()
         searcher = Nothing
-
-        For Each item As ListViewItem In listShadowCopyIDs.Items
-            Debug.WriteLine(item.Text)
-        Next
     End Sub
 
     Private Sub Mount_Volume_Shadow_Copy_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -42,10 +36,13 @@ Public Class Mount_Volume_Shadow_Copy
     Private Sub listShadowCopyIDs_SelectedIndexChanged(sender As Object, e As EventArgs) Handles listShadowCopyIDs.SelectedIndexChanged
         If IO.Directory.Exists(globalVariables.shadowCopyMountFolder) Then IO.Directory.Delete(globalVariables.shadowCopyMountFolder)
 
-        btnUnmount.Enabled = False
-        btnMount.Enabled = True
+        If listShadowCopyIDs.SelectedItems.Count = 0 Then
+            btnMount.Enabled = False
+        Else
+            btnMount.Enabled = True
+        End If
 
-        If listShadowCopyIDs.SelectedItems.Count <> 0 Then Debug.WriteLine("shadow copy info | " & DirectCast(listShadowCopyIDs.SelectedItems(0), myListViewItemTypes.volumeShadowCopyListItem).deviceID)
+        btnUnmount.Enabled = False
     End Sub
 
     Private Sub btnMount_Click(sender As Object, e As EventArgs) Handles btnMount.Click

@@ -512,6 +512,11 @@ Public Class Form1
 #End Region
 
 #Region "--== Functions and Sub-Routines ==--"
+    Sub startCheckForUpdatesThread()
+        Threading.ThreadPool.QueueUserWorkItem(AddressOf userInitiatedCheckForUpdates)
+        toolStripCheckForUpdates.Enabled = False
+    End Sub
+
     Public Enum userFeedbackType As Short
         typeError = 0
         typeInfo = 1
@@ -1175,10 +1180,15 @@ Public Class Form1
 
                         Functions.eventLogFunctions.writeToSystemEventLog("The system returned error code 1058 (ERROR_SERVICE_DISABLED). Attempting to correct it by setting up reserved system restore point space and enabling system restore on the system drive.")
 
-                        Functions.vss.executeVSSAdminCommand(globalVariables.systemDriveLetter)
-                        Functions.vss.setShadowStorageSize(globalVariables.systemDriveLetter, newSize)
-                        Functions.vss.enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
-                        boolHaveWeTriedToCreateTheRestorePointAgain = True
+                        If MsgBox("The system has returned error code 1058 (ERROR_SERVICE_DISABLED). System Restore Point Creator can go about fixing this issue but it could have unintended consequences." & vbCrLf & vbCrLf & "Do you want System Restore Point Creator to attempt repairs to your system?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "System Error 1058 (ERROR_SERVICE_DISABLED) -- System Restore Point Creator") = MsgBoxResult.Yes Then
+                            Functions.vss.executeVSSAdminCommand(globalVariables.systemDriveLetter)
+                            Functions.vss.setShadowStorageSize(globalVariables.systemDriveLetter, newSize)
+                            Functions.vss.enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
+                            boolHaveWeTriedToCreateTheRestorePointAgain = True
+                        Else
+                            MsgBox("You have chosen not to repair your system. System Restore Point creation has failed.", MsgBoxStyle.Exclamation, "System Restore Point Creator")
+                            Exit Sub
+                        End If
 
                         Functions.eventLogFunctions.writeToSystemEventLog("Attempting to create the restore point after system configuration corrections.")
                         unifiedCreateSystemRestorePoint(stringRestorePointName)
@@ -1200,7 +1210,7 @@ Public Class Form1
 
                 Functions.wait.closePleaseWaitWindow()
 
-                MsgBox(String.Format("There was an error while attempting to creating the restore point. The error code returned from the system was {0}{1}{0}.", Chr(34), result), MsgBoxStyle.Critical, strMessageBoxTitle)
+                MsgBox(String.Format("There was an error while attempting to creating the restore point. The error code returned from the system was ""{0}"" ({1}).", result, Functions.support.convertErrorCodeToHex(result)), MsgBoxStyle.Critical, strMessageBoxTitle)
                 Exit Sub
             End If
 
@@ -3191,8 +3201,7 @@ Public Class Form1
     End Sub
 
     Private Sub toolStripCheckForUpdates_Click(sender As Object, e As EventArgs) Handles toolStripCheckForUpdates.Click
-        Threading.ThreadPool.QueueUserWorkItem(AddressOf userInitiatedCheckForUpdates)
-        toolStripCheckForUpdates.Enabled = False
+        startCheckForUpdatesThread()
     End Sub
 
     Private Sub ProductWebSiteToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ProductWebSiteToolStripMenuItem.Click
@@ -3315,6 +3324,8 @@ Public Class Form1
                 Functions.APIs.MoveFileEx(globalVariables.pdbFileNameInZIP, vbNullString, 4)
             End Try
         End If
+
+        startCheckForUpdatesThread()
     End Sub
 
     Private Sub toolStripBetaChannel_Click(sender As Object, e As EventArgs) Handles toolStripBetaChannel.Click
@@ -3328,6 +3339,8 @@ Public Class Form1
 
             My.Settings.updateChannel = globalVariables.updateChannels.beta
             My.Settings.Save()
+
+            startCheckForUpdatesThread()
         Else
             toolStripBetaChannel.Checked = False
             toolStripStableChannel.Checked = True

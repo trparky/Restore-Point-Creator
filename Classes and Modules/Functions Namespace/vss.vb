@@ -23,7 +23,7 @@
                         If queryObj("AllocatedSpace") Is Nothing Then
                             shadowStorageDataClassInstance.AllocatedSpace = 0
                         Else
-                            If ULong.TryParse(queryObj("AllocatedSpace"), shadowStorageDataClassInstance.AllocatedSpace) = False Then
+                            If ULong.TryParse(queryObj("AllocatedSpace").ToString, shadowStorageDataClassInstance.AllocatedSpace) = False Then
                                 shadowStorageDataClassInstance.AllocatedSpace = 0
                             End If
                         End If
@@ -32,7 +32,7 @@
                         If queryObj("MaxSpace") Is Nothing Then
                             shadowStorageDataClassInstance.MaxSpace = 0
                         Else
-                            If ULong.TryParse(queryObj("MaxSpace"), shadowStorageDataClassInstance.MaxSpace) = False Then
+                            If ULong.TryParse(queryObj("MaxSpace").ToString, shadowStorageDataClassInstance.MaxSpace) = False Then
                                 shadowStorageDataClassInstance.MaxSpace = 0
                             End If
                         End If
@@ -41,7 +41,7 @@
                         If queryObj("UsedSpace") Is Nothing Then
                             shadowStorageDataClassInstance.UsedSpace = 0
                         Else
-                            If ULong.TryParse(queryObj("UsedSpace"), shadowStorageDataClassInstance.UsedSpace) = False Then
+                            If ULong.TryParse(queryObj("UsedSpace").ToString, shadowStorageDataClassInstance.UsedSpace) = False Then
                                 shadowStorageDataClassInstance.UsedSpace = 0
                             End If
                         End If
@@ -50,14 +50,14 @@
                         If queryObj("DiffVolume") Is Nothing Then
                             shadowStorageDataClassInstance.DiffVolume = Nothing
                         Else
-                            shadowStorageDataClassInstance.DiffVolume = queryObj("DiffVolume")
+                            shadowStorageDataClassInstance.DiffVolume = queryObj("DiffVolume").ToString
                         End If
 
                         ' This is all in an effort to try and prevent Null Reference Exceptions.
                         If queryObj("Volume") Is Nothing Then
                             shadowStorageDataClassInstance.Volume = Nothing
                         Else
-                            shadowStorageDataClassInstance.Volume = queryObj("Volume")
+                            shadowStorageDataClassInstance.Volume = queryObj("Volume").ToString
                         End If
 
                         searcher.Dispose()
@@ -166,10 +166,17 @@
                     Dim shadowStorageDetails As supportClasses.ShadowStorageData = getData(globalVariables.systemDriveLetter, boolGetVSSDataResult)
 
                     If boolGetVSSDataResult = True Then
-                    	eventLogFunctions.writeToSystemEventLog(String.Format("The old max space assigned for System Restore Points was {0}.", support.bytesToHumanSize(shadowStorageDetails.MaxSpace)), EventLogEntryType.Information)
+                        eventLogFunctions.writeToSystemEventLog(String.Format("The old max space assigned for System Restore Points was {0}.", support.bytesToHumanSize(shadowStorageDetails.MaxSpace)), EventLogEntryType.Information)
 
-                        executeVSSAdminCommand(globalVariables.systemDriveLetter)
-                        enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
+                        If Not privilegeChecks.areWeRunningAsSystemUser() Then
+                            If MsgBox("System Restore Point Creator has detected that System Restore is not enabled on your system. System Restore Point Creator can go about fixing this issue but it could have unintended consequences." & vbCrLf & vbCrLf & "Do you want System Restore Point Creator to attempt repairs to your system?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "System Restore Point Creator") = MsgBoxResult.Yes Then
+                                executeVSSAdminCommand(globalVariables.systemDriveLetter)
+                                enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
+                            Else
+                                MsgBox("You have chosen not to repair your system. System Restore Point creation has failed.", MsgBoxStyle.Exclamation, "System Restore Point Creator")
+                                Exit Sub
+                            End If
+                        End If
                     End If
                 End If
             Catch ex As Threading.ThreadAbortException
@@ -178,8 +185,15 @@
                 eventLogFunctions.writeCrashToEventLog(ex)
                 eventLogFunctions.writeToSystemEventLog("System Restore appears to not be enabled on this system.", EventLogEntryType.Information)
 
-                executeVSSAdminCommand(globalVariables.systemDriveLetter)
-                enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
+                If Not privilegeChecks.areWeRunningAsSystemUser() Then
+                    If MsgBox("System Restore Point Creator has detected that System Restore is not enabled on your system. System Restore Point Creator can go about fixing this issue but it could have unintended consequences." & vbCrLf & vbCrLf & "Do you want System Restore Point Creator to attempt repairs to your system?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "System Restore Point Creator") = MsgBoxResult.Yes Then
+                        executeVSSAdminCommand(globalVariables.systemDriveLetter)
+                        enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
+                    Else
+                        MsgBox("You have chosen not to repair your system. System Restore Point creation has failed.", MsgBoxStyle.Exclamation, "System Restore Point Creator")
+                        Exit Sub
+                    End If
+                End If
             End Try
         End Sub
 
