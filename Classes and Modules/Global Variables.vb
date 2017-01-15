@@ -80,8 +80,8 @@ Namespace globalVariables
             Public Const boolBeta As Boolean = False
             Public Const shortBetaVersion As Short = 0
 
-            Public Const boolReleaseCandidate As Boolean = True
-            Public Const shortReleaseCandidateVersion As Short = 1
+            Public Const boolReleaseCandidate As Boolean = False
+            Public Const shortReleaseCandidateVersion As Short = 0
 #Else
             Public Const boolDebugBuild As Boolean = False
 
