@@ -809,7 +809,7 @@ Public Class Form1
 
     Private Sub checkRestorePointSpaceThreadSub()
         Try
-            Functions.vss.checkSystemDrivesForFullShadowStorage(Me)
+            Functions.vss.checkSystemDrivesForFullShadowStorage()
         Catch ex As Exception
         End Try
     End Sub
