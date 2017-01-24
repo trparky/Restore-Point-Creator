@@ -161,8 +161,9 @@ Namespace Functions.wmi
 
                 Return oOutParams("ReturnValue")
             Catch ex4 As UnauthorizedAccessException
+                eventLogFunctions.writeToSystemEventLog("Falling back to core Windows APIs to create restore point.", EventLogEntryType.Warning)
+
                 Try
-                    eventLogFunctions.writeToSystemEventLog("Falling back to core Windows APIs to create restore point.", EventLogEntryType.Warning)
                     Return APIs.systemRestore.StartRestore(restorePointName, restorePointType, restorePointID)
                 Catch ex6 As Exception
                     eventLogFunctions.writeCrashToEventLog(ex6)
@@ -172,8 +173,9 @@ Namespace Functions.wmi
                     Return APIs.errorCodes.ERROR_ACCESS_DENIED
                 End Try
             Catch ex3 As Runtime.InteropServices.COMException
+                eventLogFunctions.writeToSystemEventLog("Falling back to core Windows APIs to create restore point.", EventLogEntryType.Warning)
+
                 Try
-                    eventLogFunctions.writeToSystemEventLog("Falling back to core Windows APIs to create restore point.", EventLogEntryType.Warning)
                     Return APIs.systemRestore.StartRestore(restorePointName, restorePointType, restorePointID)
                 Catch ex5 As Exception
                     eventLogFunctions.writeCrashToEventLog(ex5)
@@ -334,9 +336,7 @@ Namespace Functions.wmi
                 Dim searcher As New Management.ManagementObjectSearcher("root\CIMV2", "Select * FROM Win32_Processor")
                 Dim queryObj As Management.ManagementObjectCollection = searcher.Get()
 
-                Dim rawProcessorName As String = queryObj(0)("Name").ToString.Trim
-                rawProcessorName = Regex.Replace(rawProcessorName, "\(R\)", "", RegexOptions.IgnoreCase)
-                rawProcessorName = Regex.Replace(rawProcessorName, "\(TM\)", "", RegexOptions.IgnoreCase)
+                Dim rawProcessorName As String = queryObj(0)("Name").ToString.Trim.caseInsensitiveReplace("\((?:R|TM)\)", "", False)
 
                 Dim processorInfo As New supportClasses.processorInfoClass
                 processorInfo.strProcessor = rawProcessorName
