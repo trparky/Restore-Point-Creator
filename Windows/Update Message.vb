@@ -86,6 +86,9 @@
         If My.Settings.useSSL = True Then
             ToolTip1.SetToolTip(btnYes, "Download Secured by SSL.")
             imgSSL.Visible = True
+            lblTheUpdateWillDownload.Location = New Point(33, 238)
+        Else
+            lblTheUpdateWillDownload.Location = New Point(9, 238)
         End If
 
         If versionUpdate = versionUpdateType.betaVersionUpdate Or versionUpdate = versionUpdateType.releaseCandidateVersionUpdate Then
@@ -100,10 +103,10 @@
         Media.SystemSounds.Asterisk.Play()
 
         If My.Settings.askToUpgrade = True Then
-            Label2.Text = "Do you want to upgrade to this new version?"
+            lblTheUpdateWillDownload.Text = "Do you want to upgrade to this new version?"
             TableLayoutPanel1.Visible = True
         Else
-            Label2.Text = "The update will now be downloaded and installed on your system."
+            lblTheUpdateWillDownload.Text = "The update will now be downloaded and installed on your system."
             TableLayoutPanel1.Visible = False
         End If
 

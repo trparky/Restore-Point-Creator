@@ -24,7 +24,7 @@ Partial Class Update_Message
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Me.txtChanges = New System.Windows.Forms.TextBox()
-        Me.Label2 = New System.Windows.Forms.Label()
+        Me.lblTheUpdateWillDownload = New System.Windows.Forms.Label()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.btnOK = New System.Windows.Forms.Button()
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
@@ -59,17 +59,17 @@ Partial Class Update_Message
         Me.txtChanges.TabIndex = 1
         Me.txtChanges.Text = "Loading Change Log Data... Please Wait."
         '
-        'Label2
+        'lblTheUpdateWillDownload
         '
-        Me.Label2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.lblTheUpdateWillDownload.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Label2.AutoSize = True
-        Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label2.Location = New System.Drawing.Point(9, 238)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(316, 13)
-        Me.Label2.TabIndex = 2
-        Me.Label2.Text = "The update will now be downloaded and installed on your system."
+        Me.lblTheUpdateWillDownload.AutoSize = True
+        Me.lblTheUpdateWillDownload.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblTheUpdateWillDownload.Location = New System.Drawing.Point(33, 238)
+        Me.lblTheUpdateWillDownload.Name = "lblTheUpdateWillDownload"
+        Me.lblTheUpdateWillDownload.Size = New System.Drawing.Size(316, 13)
+        Me.lblTheUpdateWillDownload.TabIndex = 2
+        Me.lblTheUpdateWillDownload.Text = "The update will now be downloaded and installed on your system."
         '
         'PictureBox1
         '
@@ -192,9 +192,9 @@ Partial Class Update_Message
         '
         Me.imgSSL.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.imgSSL.Image = Global.Restore_Point_Creator.My.Resources.Resources.lock
-        Me.imgSSL.Location = New System.Drawing.Point(562, 238)
+        Me.imgSSL.Location = New System.Drawing.Point(12, 238)
         Me.imgSSL.Name = "imgSSL"
-        Me.imgSSL.Size = New System.Drawing.Size(18, 18)
+        Me.imgSSL.Size = New System.Drawing.Size(15, 18)
         Me.imgSSL.TabIndex = 15
         Me.imgSSL.TabStop = False
         Me.ToolTip1.SetToolTip(Me.imgSSL, "Download Secured by SSL.")
@@ -227,7 +227,7 @@ Partial Class Update_Message
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.Controls.Add(Me.btnOK)
         Me.Controls.Add(Me.PictureBox1)
-        Me.Controls.Add(Me.Label2)
+        Me.Controls.Add(Me.lblTheUpdateWillDownload)
         Me.Controls.Add(Me.txtChanges)
         Me.KeyPreview = True
         Me.MaximizeBox = False
@@ -244,7 +244,7 @@ Partial Class Update_Message
 
     End Sub
     Friend WithEvents txtChanges As TextBox
-    Friend WithEvents Label2 As Label
+    Friend WithEvents lblTheUpdateWillDownload As Label
     Friend WithEvents PictureBox1 As PictureBox
     Friend WithEvents btnOK As Button
     Friend WithEvents TableLayoutPanel1 As TableLayoutPanel
