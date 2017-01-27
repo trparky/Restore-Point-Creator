@@ -5,7 +5,6 @@
         betaVersionUpdate = 2
         releaseCandidateVersionUpdate = 3
         totallyNewVersionUpdate = 4
-        minorUpdate = 5
     End Enum
 
     Public Enum userResponse
@@ -18,12 +17,13 @@
     ' dialogResponse is the Public Variable that exposes the user's response outside of this form.
     Public dialogResponse As userResponse = userResponse.dontDoTheUpdate
 
+    Public newVersionString, strRemoteBetaRCVersion As String
+
     ' versionUpdate is the Public Variable that is used by code outside of this form to write to it when a totally new version is released.
     ' It's only used when versionUpdate is equal to versionUpdateType.totallyNewVersionUpdate.
     Public versionUpdate As versionUpdateType
 #End Region
 
-    Public newVersionString As String
     Private shortCountDown As Short = 30
 
     Sub loadChangeLogData()
@@ -32,7 +32,7 @@
 
             Dim httpHelper As httpHelper = Functions.http.createNewHTTPHelperObject()
 
-            If versionUpdate = versionUpdateType.standardVersionUpdate Or versionUpdate = versionUpdateType.totallyNewVersionUpdate Or versionUpdate = versionUpdateType.minorUpdate Then
+            If versionUpdate = versionUpdateType.standardVersionUpdate Or versionUpdate = versionUpdateType.totallyNewVersionUpdate Then
                 urlToLoadDataFrom = globalVariables.webURLs.core.strRecentChangesLog
             ElseIf versionUpdate = versionUpdateType.betaVersionUpdate Or versionUpdate = versionUpdateType.releaseCandidateVersionUpdate Then
                 urlToLoadDataFrom = globalVariables.webURLs.core.strBetaDetails
@@ -111,15 +111,14 @@
         End If
 
         If versionUpdate = versionUpdateType.standardVersionUpdate Then
-            lblTopUpdateMessage.Text = "There is an updated version of System Restore Point Creator."
+            lblTopUpdateMessage.Text = String.Format("There is an updated Public Beta version of System Restore Point Creator. Version {0} Build {1}.", globalVariables.version.versionStringWithoutBuild, newVersionString)
         ElseIf versionUpdate = versionUpdateType.totallyNewVersionUpdate Then
             lblTopUpdateMessage.Text = String.Format("Restore Point Creator version {0} is no longer supported and has been replaced by version {1}. Completely new versions are more important than{2}simple new builds of an existing version.", globalVariables.version.versionStringWithoutBuild, newVersionString, vbCrLf)
         ElseIf versionUpdate = versionUpdateType.betaVersionUpdate Then
-            lblTopUpdateMessage.Text = "There is an updated Public Beta version of System Restore Point Creator."
+            lblTopUpdateMessage.Text = String.Format("There is an updated Public Beta version of System Restore Point Creator. Version {0} Build {1} {2}.", globalVariables.version.versionStringWithoutBuild, newVersionString, strRemoteBetaRCVersion)
+
         ElseIf versionUpdate = versionUpdateType.releaseCandidateVersionUpdate Then
-            lblTopUpdateMessage.Text = "There is an updated Release Candidate version of System Restore Point Creator."
-        ElseIf versionUpdate = versionUpdateType.minorUpdate Then
-            lblTopUpdateMessage.Text = String.Format("There is an update available but it's classified as a minor update. It's not a required update so if you do not want to update the program at this time,{0}it is OK to keep using the version you have.", vbCrLf)
+            lblTopUpdateMessage.Text = String.Format("There is an updated Release Candidate version of System Restore Point Creator. Version {0} Build {1} {2}.", globalVariables.version.versionStringWithoutBuild, newVersionString, strRemoteBetaRCVersion)
         End If
 
         If globalVariables.version.boolBeta = True Then
