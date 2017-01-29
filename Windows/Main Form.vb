@@ -38,6 +38,15 @@ Public Class Form1
 #End Region
 
 #Region "--== Form Load Event Sub-Routines ==--"
+    Private Sub verifyUpdateChannel()
+        If Not My.Settings.updateChannel.Equals(globalVariables.updateChannels.stable) And
+           Not My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta) And
+           Not My.Settings.updateChannel.Equals(globalVariables.updateChannels.tom) Then
+            Functions.eventLogFunctions.writeToSystemEventLog(String.Format("An invalid update channel was detected. The update channel was previously set to ""{0}"". This has been auto-corrected by setting it back to the ""stable"" update channel.", My.Settings.updateChannel), EventLogEntryType.Warning)
+            My.Settings.updateChannel = globalVariables.updateChannels.stable
+        End If
+    End Sub
+
     Private Sub checkForMyComputerRightClickOption()
         Try
             If Functions.osVersionInfo.isThisWindows10() = True Then
@@ -2051,6 +2060,8 @@ Public Class Form1
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Control.CheckForIllegalCrossThreadCalls = False
+
+        verifyUpdateChannel()
 
         If IO.File.Exists("tom") Then
             ToolStripMenuItemPrivateForTom.Visible = True
