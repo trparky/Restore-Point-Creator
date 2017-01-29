@@ -38,7 +38,7 @@ Public Class Form1
 #End Region
 
 #Region "--== Form Load Event Sub-Routines ==--"
-    Sub checkForMyComputerRightClickOption()
+    Private Sub checkForMyComputerRightClickOption()
         Try
             If Functions.osVersionInfo.isThisWindows10() = True Then
                 ' Apparently Microsoft doesn't want anyone adding anything to the My Computer context menu since they have completely made it impossible
@@ -225,7 +225,7 @@ Public Class Form1
         End Try
     End Sub
 
-    Sub checkScheduledTaskEXEPathsSubRoutine(ByRef taskService As TaskScheduler.TaskService, ByRef task As TaskScheduler.Task, commandLineArgument As String)
+    Private Sub checkScheduledTaskEXEPathsSubRoutine(ByRef taskService As TaskScheduler.TaskService, ByRef task As TaskScheduler.Task, commandLineArgument As String)
         If Functions.support.areWeInSafeMode() = True Then Exit Sub
 
         Try
@@ -257,7 +257,7 @@ Public Class Form1
         End Try
     End Sub
 
-    Sub checkScheduledTaskEXEPaths()
+    Private Sub checkScheduledTaskEXEPaths()
         If Functions.support.areWeInSafeMode() = True Then Exit Sub
         If Debugger.IsAttached = True Then Exit Sub
 
@@ -284,7 +284,7 @@ Public Class Form1
         End Try
     End Sub
 
-    Sub loadPreferences()
+    Private Sub loadPreferences()
         Try
             ConfigureHTTPTimeoutToolStripMenuItem.Text = String.Format("Configure HTTP Timeout ({0} Seconds)", My.Settings.httpTimeout)
             Dim registryObject As RegistryKey
@@ -467,7 +467,7 @@ Public Class Form1
         End Try
     End Sub
 
-    Sub addSpecialRegistryKeysToWindows8ToFixWindows8SystemRestorePoint()
+    Private Sub addSpecialRegistryKeysToWindows8ToFixWindows8SystemRestorePoint()
         'Debug.WriteLine("We are running on Windows 8.x or Windows 10")
         ' Yep, we are.  Let the changes commence.
 
@@ -512,7 +512,7 @@ Public Class Form1
 #End Region
 
 #Region "--== Functions and Sub-Routines ==--"
-    Sub startCheckForUpdatesThread()
+    Private Sub startCheckForUpdatesThread()
         Threading.ThreadPool.QueueUserWorkItem(AddressOf userInitiatedCheckForUpdates)
         toolStripCheckForUpdates.Enabled = False
     End Sub
@@ -523,7 +523,7 @@ Public Class Form1
         typeWarning = 2
     End Enum
 
-    Sub giveFeedbackToUser(feedBackMessage As String, Optional feedbackType As userFeedbackType = userFeedbackType.typeInfo)
+    Private Sub giveFeedbackToUser(feedBackMessage As String, Optional feedbackType As userFeedbackType = userFeedbackType.typeInfo)
         If My.Settings.notificationType2 = enums.userFeedbackType.msgbox Then
             If feedbackType = userFeedbackType.typeInfo Then
                 MsgBox(feedBackMessage, MsgBoxStyle.Information, strMessageBoxTitle)
@@ -543,7 +543,7 @@ Public Class Form1
         End If
     End Sub
 
-    Sub savePreferenceToRegistry(variableName As String, variableValue As String)
+    Private Sub savePreferenceToRegistry(variableName As String, variableValue As String)
         Dim registryKeyObject As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
 
         If registryKeyObject IsNot Nothing Then
@@ -554,7 +554,7 @@ Public Class Form1
         End If
     End Sub
 
-    Sub applySavedSorting()
+    Private Sub applySavedSorting()
         ' Some data validation.
         If My.Settings.sortingColumn < 0 Or My.Settings.sortingColumn > 4 Then
             My.Settings.sortingColumn = 0
@@ -606,14 +606,14 @@ Public Class Form1
         systemRestorePointsList.Sort()
     End Sub
 
-    Sub startSystemRestorePointListLoadThreadSub()
+    Private Sub startSystemRestorePointListLoadThreadSub()
         Try
             loadRestorePointsFromSystemIntoList()
         Catch ex As Threading.ThreadAbortException
         End Try
     End Sub
 
-    Sub interfaceTooSmallSettingCheckFormLoadSubRoutine()
+    Private Sub interfaceTooSmallSettingCheckFormLoadSubRoutine()
         Try
             Dim registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers", False)
 
@@ -640,7 +640,7 @@ Public Class Form1
         'End If
     End Sub
 
-    Function openUpdateDialog(versionUpdateType As Update_Message.versionUpdateType, newVersionString As String, strRemoteBetaRCVersion As String) As Update_Message.userResponse
+    Private Function openUpdateDialog(versionUpdateType As Update_Message.versionUpdateType, newVersionString As String, strRemoteBetaRCVersion As String) As Update_Message.userResponse
         Dim updateMessageDialog As New Update_Message
 
         updateMessageDialog.StartPosition = FormStartPosition.CenterScreen
@@ -658,7 +658,7 @@ Public Class Form1
         Return response
     End Function
 
-    Sub addRPSessionInterval()
+    Private Sub addRPSessionInterval()
         Try
             If Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore") IsNot Nothing Then
                 Dim regKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore", True)
@@ -681,7 +681,7 @@ Public Class Form1
         End Try
     End Sub
 
-    Sub addRPGlobalInterval()
+    Private Sub addRPGlobalInterval()
         Try
             If Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore") IsNot Nothing Then
                 Dim regKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore", True)
@@ -822,7 +822,7 @@ Public Class Form1
         End Try
     End Sub
 
-    Sub showDonationNotice()
+    Private Sub showDonationNotice()
         Try
             If boolShowDonationMessage = True Then
                 Dim randomNumberGenerator As New Random()
@@ -842,7 +842,7 @@ Public Class Form1
         End Try
     End Sub
 
-    Sub launchDonationURL()
+    Private Sub launchDonationURL()
         Functions.support.launchURLInWebBrowser(globalVariables.webURLs.webPages.strPayPal, "An error occurred when trying to launch the donation URL in your default browser. The donation URL has been copied to your Windows Clipboard for you to paste into the address bar in the browser of your choice.")
     End Sub
 
@@ -929,7 +929,7 @@ Public Class Form1
         End Try
     End Sub
 
-    Sub doTheGrayingOfTheRestorePointNameTextBox()
+    Private Sub doTheGrayingOfTheRestorePointNameTextBox()
         If txtRestorePointDescription.Text.caseInsensitiveContains(strTypeYourRestorePointName) = True Then
             txtRestorePointDescription.ForeColor = Color.DimGray
             btnCreate.Enabled = False
@@ -977,7 +977,7 @@ Public Class Form1
         End Try
     End Sub
 
-    Sub deleteAllRestorePointsThread()
+    Private Sub deleteAllRestorePointsThread()
         ' Declares some variables.
         Dim systemRestorePoints As ManagementObjectSearcher
         Dim numberOfOldRestorePointsDeleted As Short = 0
@@ -1074,7 +1074,7 @@ Public Class Form1
         End Try
     End Sub
 
-    Public Sub doDeleteOldSystemRestorePoint(maxAgeInput As Short)
+    Private Sub doDeleteOldSystemRestorePoint(maxAgeInput As Short)
         toolStripDeleteOldRestorePoints.Enabled = False
         btnDeleteRestorePoint.Enabled = False
         stripDelete.Enabled = False
@@ -1123,7 +1123,7 @@ Public Class Form1
         restorePointListContextMenu.Enabled = True
     End Sub
 
-    Sub giveFeedbackAfterCreatingRestorePoint(result As Integer)
+    Private Sub giveFeedbackAfterCreatingRestorePoint(result As Integer)
         If result = Functions.APIs.errorCodes.ERROR_SUCCESS Then
             If Me.ShowMessageBoxAfterSuccessfulCreationOfRestorePointToolStripMenuItem.Checked = True Then
                 giveFeedbackToUser("System Restore Point Created Successfully.", userFeedbackType.typeInfo)
@@ -1242,7 +1242,7 @@ Public Class Form1
         End Try
     End Sub
 
-    Sub giveDownloadErrorMessage()
+    Private Sub giveDownloadErrorMessage()
         Functions.wait.closePleaseWaitWindow()
         MsgBox("There was an error while downloading required files, please check the Event Log for more details.", MsgBoxStyle.Critical, strMessageBoxTitle)
     End Sub
@@ -1419,7 +1419,7 @@ Public Class Form1
         End If
     End Sub
 
-    Sub disableAutomaticUpdatesAndNotifyUser()
+    Private Sub disableAutomaticUpdatesAndNotifyUser()
         Dim msgBoxResult As MsgBoxResult = MsgBox("Since you have told the program that you didn't want to update to the newest supported version, do you want to also disable Automatic Update Checking?" & vbCrLf & vbCrLf & "By disabling Automatic Update Checking you will no longer be notified about new versions of this program, that is, unless you manually check for updates." & vbCrLf & vbCrLf & "Do you want to disable Automatic Checking for Updates?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, strMessageBoxTitle)
 
         If msgBoxResult = MsgBoxResult.Yes Then
@@ -1429,7 +1429,7 @@ Public Class Form1
         End If
     End Sub
 
-    Sub openThePleaseWaitWindowAndStartTheDownloadThread(Optional boolOverrideUserUpdateChannelPreferences As Boolean = False)
+    Private Sub openThePleaseWaitWindowAndStartTheDownloadThread(Optional boolOverrideUserUpdateChannelPreferences As Boolean = False)
         Functions.wait.createPleaseWaitWindow("Downloading update... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
         Threading.ThreadPool.QueueUserWorkItem(Sub()
@@ -1442,7 +1442,7 @@ Public Class Form1
         Functions.wait.openPleaseWaitWindow(Me)
     End Sub
 
-    Sub userInitiatedCheckForUpdates()
+    Private Sub userInitiatedCheckForUpdates()
         My.Settings.ProgramExecutionsSinceLastUpdateCheck = 0 ' We reset the number of program executions since last update to 0.
         My.Settings.Save() ' And save the settings to disk.
 
@@ -1712,7 +1712,7 @@ Public Class Form1
         End Try
     End Sub
 
-    Sub restoreSystemRestorePoint(systemRestorePointIndex As Integer)
+    Private Sub restoreSystemRestorePoint(systemRestorePointIndex As Integer)
         Try
             disableFormElements()
             Functions.wmi.restoreToSystemRestorePoint(systemRestorePointIndex)
@@ -1726,7 +1726,7 @@ Public Class Form1
         End Try
     End Sub
 
-    Sub afterDeleteSelectedRestorePoints(restorePointsToBeDeleted As Dictionary(Of String, restorePointInfo))
+    Private Sub afterDeleteSelectedRestorePoints(restorePointsToBeDeleted As Dictionary(Of String, restorePointInfo))
         Functions.wait.closePleaseWaitWindow()
 
         Dim boolMultiMode As Boolean = False
@@ -1748,7 +1748,7 @@ Public Class Form1
         End If
     End Sub
 
-    Sub deleteSelectedRestorePoints(restorePointsToBeDeleted As Dictionary(Of String, restorePointInfo), boolEnableLogging As Boolean)
+    Private Sub deleteSelectedRestorePoints(restorePointsToBeDeleted As Dictionary(Of String, restorePointInfo), boolEnableLogging As Boolean)
         Try
             Dim intRestorePointID As Integer
             Dim restorePointCreationDate As Date
