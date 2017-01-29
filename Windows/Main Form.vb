@@ -1517,8 +1517,14 @@ Public Class Form1
 
             Exit Sub ' Exit the routine.
         Else
-            Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and it's been determined that you already have the latest version.") ' Log it.
-            giveFeedbackToUser("You already have the latest version.") ' Gives feedback.
+            If updateType = Functions.support.updateType.buildLessThanError Then
+                Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and something weird happened. Your current version is newer than what is listed on the web site.") ' Log it.
+                giveFeedbackToUser("Something weird happened. Your current version is newer than what is listed on the web site.") ' Gives feedback.
+            Else
+                Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and it's been determined that you already have the latest version.") ' Log it.
+                giveFeedbackToUser("You already have the latest version.") ' Gives feedback.
+            End If
+
             Exit Sub ' Exits the routine.
         End If
     End Sub

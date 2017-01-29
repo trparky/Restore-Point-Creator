@@ -8,12 +8,14 @@ Namespace Functions.support
         release = 1
         candidate = 2
         beta = 3
+        buildLessThanError = 4
     End Enum
 
     Module support
         Public Function processUpdateXMLData(ByVal xmlData As String, ByRef updateType As updateType, ByRef remoteVersion As String, ByRef remoteBuild As String, ByRef strRemoteBetaRCVersion As String) As Boolean
             Try
                 Dim strRemoteType As String
+                Dim shortRemoteBuild As Short
 
                 updateType = updateType.null ' Give it a default value of null.
                 strRemoteBetaRCVersion = Nothing ' Give it a default value of Nothing.
@@ -33,6 +35,15 @@ Namespace Functions.support
                     Return False
                 Else
                     ' Nope, they don't match so let's do some additional checks before we just assume that there's an update.
+
+                    If Short.TryParse(remoteBuild, shortRemoteBuild) Then
+                        If shortRemoteBuild < globalVariables.version.shortBuild Then
+                            updateType = updateType.buildLessThanError
+
+                            ' This is weird, the remote build is less than the current build. Something went wrong. So to be safe we're going to return a False value indicating that there is no update to download. Better to be safe.
+                            Return False
+                        End If
+                    End If
 
                     ' Let's check to see if the user's update channel preference is set to "beta" or "tom".
                     If My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta) Or My.Settings.updateChannel.Equals(globalVariables.updateChannels.tom) Then
