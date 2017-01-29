@@ -938,7 +938,7 @@ Public Class Form1
         End Try
     End Sub
 
-    Private Sub doTheGrayingOfTheRestorePointNameTextBox()
+    Public Sub doTheGrayingOfTheRestorePointNameTextBox()
         If txtRestorePointDescription.Text.caseInsensitiveContains(strTypeYourRestorePointName) = True Then
             txtRestorePointDescription.ForeColor = Color.DimGray
             btnCreate.Enabled = False
@@ -1083,7 +1083,7 @@ Public Class Form1
         End Try
     End Sub
 
-    Private Sub doDeleteOldSystemRestorePoint(maxAgeInput As Short)
+    Public Sub doDeleteOldSystemRestorePoint(maxAgeInput As Short)
         toolStripDeleteOldRestorePoints.Enabled = False
         btnDeleteRestorePoint.Enabled = False
         stripDelete.Enabled = False
