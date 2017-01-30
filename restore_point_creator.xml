@@ -10,18 +10,18 @@ for testing purposes.
 <xmlroot>
 	<stable>
 		<version>5.8</version>
-		<build>1</build>
+		<build>2</build>
 		<type>release</type>
 	</stable>
 	<beta>
 		<version>5.8</version>
-		<build>1</build>
+		<build>2</build>
 		<type>release</type>
 		<betaRCVersion></betaRCVersion>
 	</beta>
 	<tom>
 		<version>5.8</version>
-		<build>1</build>
+		<build>2</build>
 		<type>release</type>
 		<betaRCVersion></betaRCVersion>
 	</tom>
