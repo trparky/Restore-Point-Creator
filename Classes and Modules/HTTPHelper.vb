@@ -220,7 +220,7 @@ End Class
 
 ''' <summary>Allows you to easily POST and upload files to a remote HTTP server without you, the programmer, knowing anything about how it all works. This class does it all for you. It handles adding a User Agent String, additional HTTP Request Headers, string data to your HTTP POST data, and files to be uploaded in the HTTP POST data.</summary>
 Public Class httpHelper
-    Private Const classVersion As String = "1.240"
+    Private Const classVersion As String = "1.245"
 
     Private strUserAgentString As String = Nothing
     Private boolUseProxy As Boolean = False
@@ -1320,10 +1320,10 @@ Public Class httpHelper
     Private Sub configureProxy(ByRef httpWebRequest As Net.HttpWebRequest)
         If boolUseProxy Then
             If boolUseSystemProxy Then
-                httpWebRequest.Proxy = Net.WebRequest.DefaultWebProxy
+                httpWebRequest.Proxy = Net.WebRequest.GetSystemWebProxy()
             Else
                 If customProxy Is Nothing Then
-                    httpWebRequest.Proxy = Net.WebRequest.DefaultWebProxy
+                    httpWebRequest.Proxy = Net.WebRequest.GetSystemWebProxy()
                 Else
                     httpWebRequest.Proxy = customProxy
                 End If

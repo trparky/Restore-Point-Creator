@@ -1,8 +1,103 @@
 ﻿Imports System.Text.RegularExpressions
 Imports ICSharpCode.SharpZipLib.Zip
+Imports System.Xml
 
 Namespace Functions.support
+    Public Enum updateType
+        null = 0
+        release = 1
+        candidate = 2
+        beta = 3
+        buildLessThanError = 4
+    End Enum
+
     Module support
+        Public Function processUpdateXMLData(ByVal xmlData As String, ByRef updateType As updateType, ByRef remoteVersion As String, ByRef remoteBuild As String, ByRef strRemoteBetaRCVersion As String) As Boolean
+            Try
+                Dim strRemoteType As String
+                Dim shortRemoteBuild As Short
+
+                updateType = updateType.null ' Give it a default value of null.
+                strRemoteBetaRCVersion = Nothing ' Give it a default value of Nothing.
+
+                Dim xmlDocument As New XmlDocument() ' First we create an XML Document Object.
+                xmlDocument.Load(New IO.StringReader(xmlData)) ' Now we try and parse the XML data.
+
+                Dim xmlNode As XmlNode = xmlDocument.SelectSingleNode(String.Format("/xmlroot/{0}", My.Settings.updateChannel))
+
+                remoteVersion = xmlNode.SelectSingleNode("version").InnerText.Trim
+                remoteBuild = xmlNode.SelectSingleNode("build").InnerText.Trim
+                strRemoteType = xmlNode.SelectSingleNode("type").InnerText.Trim
+
+                ' This checks to see if current version and the current build matches that of the remote values in the XML document.
+                If remoteVersion.Equals(globalVariables.version.versionStringWithoutBuild) And remoteBuild.Equals(globalVariables.version.shortBuild.ToString) Then
+                    ' OK, they match so there's no update to download and update to therefore we return a False value.
+                    Return False
+                Else
+                    ' Nope, they don't match so let's do some additional checks before we just assume that there's an update.
+
+                    If Short.TryParse(remoteBuild, shortRemoteBuild) Then
+                        If shortRemoteBuild < globalVariables.version.shortBuild Then
+                            updateType = updateType.buildLessThanError
+
+                            ' This is weird, the remote build is less than the current build. Something went wrong. So to be safe we're going to return a False value indicating that there is no update to download. Better to be safe.
+                            Return False
+                        End If
+                    End If
+
+                    ' Let's check to see if the user's update channel preference is set to "beta" or "tom".
+                    If My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta) Or My.Settings.updateChannel.Equals(globalVariables.updateChannels.tom) Then
+                        ' Yes, it is set to the "beta" or "tom" channel.
+
+                        ' Now let's check to see if the user wants any betas if the current new version is a beta.
+                        If strRemoteType.Equals("beta", StringComparison.OrdinalIgnoreCase) And My.Settings.onlyGiveMeRCs Then
+                            ' Nope, the user doesn't want betas versions, they only want release candidates, so we return
+                            ' a False value indicating that there is no new version to download and update to.
+                            Return False
+                        End If
+
+                        ' Let's try and get the "betaRCVersion" from the XML document. We don't want to crash so we check to see if the object is null first.
+                        If xmlNode.SelectSingleNode("betaRCVersion") IsNot Nothing Then
+                            ' Get the "strRemoteBetaRCVersion" version string from the XML data.
+                            strRemoteBetaRCVersion = xmlNode.SelectSingleNode("betaRCVersion").InnerText.Trim
+                        End If
+
+                        ' Now we need to check the remote update type.
+                        If strRemoteType.Equals("release", StringComparison.OrdinalIgnoreCase) Then
+                            ' It's a release type so we set the update type to "release".
+                            updateType = updateType.release
+                        ElseIf strRemoteType.Equals("candidate", StringComparison.OrdinalIgnoreCase) Then
+                            ' It's a "rc" or candidate so we set the update type to "candidate".
+                            updateType = updateType.candidate
+                        ElseIf strRemoteType.Equals("beta", StringComparison.OrdinalIgnoreCase) Then
+                            ' It's a beta so we set the update type to "beta".
+                            updateType = updateType.beta
+                        End If
+                    Else
+                        ' The user's update channel is set to stable so we set the update type to "release".
+                        updateType = updateType.release
+                    End If
+
+                    Return True ' And now we return a True value indicating that there is a new version to download and install.
+                End If
+            Catch ex As XPath.XPathException
+                eventLogFunctions.writeToSystemEventLog("There was an error while parsing the XML document. The contents of the XML document are below..." & vbCrLf & vbCrLf & xmlData, EventLogEntryType.Error)
+                eventLogFunctions.writeCrashToEventLog(ex)
+
+                ' Something went wrong so we return a False value.
+                Return False
+            Catch ex As XmlException
+                eventLogFunctions.writeToSystemEventLog("There was an error while parsing the XML document. The contents of the XML document are below..." & vbCrLf & vbCrLf & xmlData, EventLogEntryType.Error)
+                eventLogFunctions.writeCrashToEventLog(ex)
+
+                ' Something went wrong so we return a False value.
+                Return False
+            Catch ex As Exception
+                ' Something went wrong so we return a False value.
+                Return False
+            End Try
+        End Function
+
         Public Function convertErrorCodeToHex(input As Long) As String
             Try
                 Return input.ToString("x").caseInsensitiveReplace("ffffffff", "0x").ToString.ToUpper
@@ -33,6 +128,8 @@ Namespace Functions.support
                     exceptionType.Equals(GetType(ArgumentOutOfRangeException)) Or
                     exceptionType.Equals(GetType(FormatException)) Or
                     exceptionType.Equals(GetType(ComponentModel.Win32Exception)) Or
+                    exceptionType.Equals(GetType(XPath.XPathException)) Or
+                    exceptionType.Equals(GetType(XmlException)) Or
                     exceptionType.Equals(GetType(ObjectDisposedException)) Then
 
                     stringBuilder.AppendLine()
@@ -45,6 +142,15 @@ Namespace Functions.support
                         If Not String.IsNullOrEmpty(FileNotFoundExceptionObject.FusionLog) Then
                             stringBuilder.AppendLine("Reason: " & FileNotFoundExceptionObject.FusionLog)
                         End If
+                    ElseIf exceptionType.Equals(GetType(XmlException)) Then
+                        Dim XmlExceptionObject As XmlException = DirectCast(rawExceptionObject, XmlException)
+                        stringBuilder.AppendLine("Line Number: " & XmlExceptionObject.LineNumber)
+                        stringBuilder.AppendLine("Line Position: " & XmlExceptionObject.LinePosition)
+
+                        addJSONedExtendedExceptionDataPackage(XmlExceptionObject, stringBuilder)
+                    ElseIf exceptionType.Equals(GetType(XPath.XPathException)) Then
+                        Dim XPathExceptionExceptionObject As XPath.XPathException = DirectCast(rawExceptionObject, XPath.XPathException)
+                        addJSONedExtendedExceptionDataPackage(XPathExceptionExceptionObject, stringBuilder)
                     ElseIf exceptionType.Equals(GetType(IO.FileLoadException)) Then
                         Dim FileLoadExceptionObject As IO.FileLoadException = DirectCast(rawExceptionObject, IO.FileLoadException)
                         stringBuilder.AppendLine("Unable to Load Assembly File: " & FileLoadExceptionObject.FileName)

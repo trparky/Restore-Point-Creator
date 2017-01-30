@@ -21,10 +21,15 @@ Module StringExtensions
     ''' <param name="source">The source String, aka the String where the data will be replaced in.</param>
     ''' <param name="replace">What you want to replace in the String.</param>
     ''' <param name="replaceWith">What you want to replace with in the String.</param>
+    ''' <param name="boolEscape">This is an optional parameter, the default is True. This parameter gives you far more control over how the function works. With this parameter set to True the function automatically properly escapes the "replace" parameter for use in the RegEx replace function that operates inside this function. If this parameter is set to False it is up to you, the programmer, to properly escape the value of the "replace" parameter or this function will throw an exception.</param>
     ''' <return>Returns a String value.</return>
     <Extension()>
-    Public Function caseInsensitiveReplace(source As String, replace As String, replaceWith As String) As String
-        Return Regex.Replace(source, Regex.Escape(replace), replaceWith, RegexOptions.IgnoreCase)
+    Public Function caseInsensitiveReplace(source As String, replace As String, replaceWith As String, Optional boolEscape As Boolean = True) As String
+        If boolEscape Then
+            Return Regex.Replace(source, Regex.Escape(replace), replaceWith, RegexOptions.IgnoreCase)
+        Else
+            Return Regex.Replace(source, replace, replaceWith, RegexOptions.IgnoreCase)
+        End If
     End Function
 
     ' PHP like addSlashes and stripSlashes. Call using String.addSlashes() and String.stripSlashes().
