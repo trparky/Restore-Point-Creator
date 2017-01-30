@@ -2061,7 +2061,7 @@ Public Class Form1
 
         Threading.ThreadPool.QueueUserWorkItem(AddressOf startSystemRestorePointListLoadThreadSub)
 
-        Functions.wait.openPleaseWaitWindow(Me)
+        Functions.wait.openPleaseWaitWindow()
     End Sub
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
