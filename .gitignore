@@ -6,6 +6,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+*restore_point_creator.xml
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
