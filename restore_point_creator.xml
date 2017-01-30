@@ -15,14 +15,14 @@ for testing purposes.
 	</stable>
 	<beta>
 		<version>5.8</version>
-		<build>2</build>
-		<type>release</type>
-		<betaRCVersion></betaRCVersion>
+		<build>9</build>
+		<type>beta</type>
+		<betaRCVersion>Public Beta 1</betaRCVersion>
 	</beta>
 	<tom>
 		<version>5.8</version>
-		<build>2</build>
-		<type>release</type>
-		<betaRCVersion></betaRCVersion>
+		<build>9</build>
+		<type>beta</type>
+		<betaRCVersion>Public Beta 1</betaRCVersion>
 	</tom>
 </xmlroot>
