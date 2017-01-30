@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+The types are "release", "candidate", and "beta". The "betaRCVersion" node
+is only used in the "beta" channel and is used to tell the user if it's a
+public beta or release candidate. The standard string used in it is
+"Public Beta X" and "Release Candidate X" with X being the number.
+The "tom" channel is a private channel for use by the developer only
+for testing purposes.
+-->
+<xmlroot>
+	<stable>
+		<version>5.8</version>
+		<build>1</build>
+		<type>release</type>
+	</stable>
+	<beta>
+		<version>5.8</version>
+		<build>1</build>
+		<type>release</type>
+		<betaRCVersion></betaRCVersion>
+	</beta>
+	<tom>
+		<version>5.8</version>
+		<build>1</build>
+		<type>release</type>
+		<betaRCVersion></betaRCVersion>
+	</tom>
+</xmlroot>
