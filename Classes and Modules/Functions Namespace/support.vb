@@ -37,7 +37,7 @@ Namespace Functions.support
                     ' Nope, they don't match so let's do some additional checks before we just assume that there's an update.
 
                     If Short.TryParse(remoteBuild, shortRemoteBuild) Then
-                        If shortRemoteBuild < globalVariables.version.shortBuild Then
+                        If shortRemoteBuild < globalVariables.version.shortBuild And remoteVersion.Equals(globalVariables.version.versionStringWithoutBuild) Then
                             updateType = updateType.buildLessThanError
 
                             ' This is weird, the remote build is less than the current build. Something went wrong. So to be safe we're going to return a False value indicating that there is no update to download. Better to be safe.
