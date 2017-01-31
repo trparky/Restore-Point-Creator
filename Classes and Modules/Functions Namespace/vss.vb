@@ -177,9 +177,9 @@
                     Dim shadowStorageDetails As supportClasses.ShadowStorageData = getData(globalVariables.systemDriveLetter, boolGetVSSDataResult)
 
                     If boolGetVSSDataResult Then
-                        If shadowStorageDetails.MaxSpace > 0 Then
-                            eventLogFunctions.writeToSystemEventLog(String.Format("The old max space assigned for System Restore Points was {0}.", support.bytesToHumanSize(shadowStorageDetails.MaxSpace)), EventLogEntryType.Information)
+                        eventLogFunctions.writeToSystemEventLog(String.Format("The old max space assigned for System Restore Points was {0} ({1} Bytes).", support.bytesToHumanSize(shadowStorageDetails.MaxSpace), shadowStorageDetails.MaxSpace.ToString), EventLogEntryType.Information)
 
+                        If shadowStorageDetails.MaxSpace = 0 Then
                             askUserToFixSystemRestore()
                         End If
                     Else
@@ -192,15 +192,7 @@
                 eventLogFunctions.writeCrashToEventLog(ex)
                 eventLogFunctions.writeToSystemEventLog("System Restore appears to not be enabled on this system.", EventLogEntryType.Information)
 
-                If Not privilegeChecks.areWeRunningAsSystemUser() Then
-                    If MsgBox("System Restore Point Creator has detected that System Restore is not enabled on your system. System Restore Point Creator can go about fixing this issue but it could have unintended consequences." & vbCrLf & vbCrLf & "Do you want System Restore Point Creator to attempt repairs to your system?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "System Restore Point Creator") = MsgBoxResult.Yes Then
-                        executeVSSAdminCommand(globalVariables.systemDriveLetter)
-                        enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
-                    Else
-                        MsgBox("You have chosen not to repair your system. System Restore Point creation has failed.", MsgBoxStyle.Exclamation, "System Restore Point Creator")
-                        Exit Sub
-                    End If
-                End If
+                askUserToFixSystemRestore()
             End Try
         End Sub
 
