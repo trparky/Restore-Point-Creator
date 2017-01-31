@@ -555,7 +555,6 @@
     <Content Include="FodyWeavers.xml">
       <SubType>Designer</SubType>
     </Content>
-    <None Include="restore_point_creator.xml" />
     <None Include="Resources\yes.png" />
     <None Include="Resources\checkbox_yes.png" />
     <None Include="Resources\checkbox_no.png" />
