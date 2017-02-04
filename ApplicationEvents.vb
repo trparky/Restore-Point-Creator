@@ -40,13 +40,16 @@ Namespace My
                 boolNoTask = True
             End If
 
-            ' This is to test the crash submission code. Make sure this block is commented out before compiling for public release.
-            'Try
-            '    Throw New IO.FileLoadException()
-            'Catch ex As Exception
-            '    exceptionHandler.manuallyLoadCrashWindow(ex)
-            'End Try
-            ' This is to test the crash submission code. Make sure this block is commented out before compiling for public release.
+            If Debugger.IsAttached Then
+                Debug.WriteLine("debugger is attached")
+                ' This is to test the crash submission code. Make sure this block is commented out before compiling for public release.
+                'Try
+                '    Throw New IO.FileLoadException()
+                'Catch ex As Exception
+                '    exceptionHandler.manuallyLoadCrashWindow(ex)
+                'End Try
+                ' This is to test the crash submission code. Make sure this block is commented out before compiling for public release.
+            End If
 
             ' We're going to store the result of the Functions.areWeAnAdministrator() call in this Boolean variable for later use in this code block.
             Dim boolAreWeAnAdministrator As Boolean = Functions.privilegeChecks.areWeAnAdministrator()
