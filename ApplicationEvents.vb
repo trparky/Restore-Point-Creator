@@ -567,7 +567,7 @@ Namespace My
                     Functions.support.removeSafeModeBoot()
                 End If
 
-                If (Functions.osVersionInfo.isThisWindows10() = True Or Functions.osVersionInfo.isThisWindows8x() = True) And boolAreWeAnAdministrator = True And Functions.support.areWeInSafeMode() = False Then
+                If (Functions.osVersionInfo.isThisWindows10() = True Or Functions.osVersionInfo.isThisWindows8x() = True) And boolAreWeAnAdministrator = True And boolAreWeInSafeMode = False Then
                     Functions.taskStuff.disableBuiltInRestorePointTask()
                 End If
             Catch ex As Exception
