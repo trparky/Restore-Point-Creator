@@ -438,7 +438,7 @@
         Try
             SaveFileDialog1.Title = "Export Application Event Logs to File"
             SaveFileDialog1.FileName = Nothing
-            SaveFileDialog1.Filter = "Restore Point Creator Exported Log File|*.reslog"
+            SaveFileDialog1.Filter = "Restore Point Creator Exported XML Log File|*.reslogx"
             SaveFileDialog1.OverwritePrompt = True
 
             If SaveFileDialog1.ShowDialog = DialogResult.OK Then

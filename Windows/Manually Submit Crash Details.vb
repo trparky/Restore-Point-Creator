@@ -3,7 +3,7 @@
     Private boolDoWeHaveAttachments As Boolean = False
     Public crashData As String
 
-    Private strLogFile As String = IO.Path.Combine(IO.Path.GetTempPath(), "event log entries.reslog")
+    Private strLogFile As String = IO.Path.Combine(IO.Path.GetTempPath(), "event log entries.reslogx")
     Private strZIPFile As String = IO.Path.Combine(IO.Path.GetTempPath(), "attachments.zip")
 
     Private Sub Manually_Submit_Crash_Details_Load(sender As Object, e As EventArgs) Handles MyBase.Load

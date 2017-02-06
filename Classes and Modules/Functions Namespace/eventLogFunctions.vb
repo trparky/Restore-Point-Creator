@@ -10,21 +10,29 @@
             Try
                 Dim jsonEngine As New Web.Script.Serialization.JavaScriptSerializer
 
+                Dim logObject As New exportedLogFile
+                logObject.operatingSystem = osVersionInfo.getFullOSVersionString
+                logObject.programVersion = globalVariables.version.strFullVersionString
+                logObject.version = 4
+
+                Dim logsEntries As New List(Of restorePointCreatorExportedLog)()
+
                 If IO.File.Exists(strLogFile) Then IO.File.Delete(strLogFile)
-                Dim fileHandle As New IO.StreamWriter(strLogFile, False, Text.Encoding.UTF8)
 
-                fileHandle.WriteLine("// Export Data Version: 3")
-                fileHandle.WriteLine("// Program Version: " & globalVariables.version.strFullVersionString)
-                fileHandle.WriteLine("// Operating System: " & osVersionInfo.getFullOSVersionString)
-                fileHandle.WriteLine("// --== End Header Information ==--")
-                fileHandle.WriteLine("//")
+                exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strApplication, logsEntries, logCount)
+                exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strSystemRestorePointCreator, logsEntries, logCount)
 
-                exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strApplication, fileHandle, jsonEngine, logCount)
-                exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strSystemRestorePointCreator, fileHandle, jsonEngine, logCount)
+                logObject.logsEntries = logsEntries
 
-                jsonEngine = Nothing
-                fileHandle.Close()
-                fileHandle.Dispose()
+                Try
+                    Dim streamWriter As New IO.StreamWriter(strLogFile)
+                    Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(logObject.GetType)
+                    xmlSerializerObject.Serialize(streamWriter, logObject)
+                    streamWriter.Close()
+                    streamWriter.Dispose()
+                Catch ex As Exception
+                    writeCrashToEventLog(ex)
+                End Try
 
                 Return True
             Catch ex As Exception
@@ -118,10 +126,8 @@
 
         ''' <summary>This sub-routine is called by the exportLogsToFile() sub-routine, this is not intended to be called outside of this module.</summary>
         ''' <param name="logCount">This is a ByRef argument which passes back the number of logs that this function exported.</param>
-        ''' <param name="fileHandle">The file handle that we're writing to data to.</param>
         ''' <param name="strEventLog">The log that we're exporting.</param>
-        ''' <param name="jsonEngine">The JSON engine we're using to encode the data with.</param>
-        Private Sub exportApplicationEventLogEntriesToFile(ByVal strEventLog As String, ByRef fileHandle As IO.StreamWriter, ByRef jsonEngine As Web.Script.Serialization.JavaScriptSerializer, ByRef logCount As ULong)
+        Private Sub exportApplicationEventLogEntriesToFile(ByVal strEventLog As String, ByRef logEntries As List(Of restorePointCreatorExportedLog), ByRef logCount As ULong)
             Dim eventLogQuery As Eventing.Reader.EventLogQuery
             Dim logReader As Eventing.Reader.EventLogReader
             Dim eventInstance As Eventing.Reader.EventRecord
@@ -143,7 +149,7 @@
                             logClass.logID = eventInstance.RecordId
 
                             logCount += 1
-                            fileHandle.WriteLine(jsonEngine.Serialize(logClass))
+                            logEntries.Add(logClass)
                             logClass = Nothing
                         End If
 
