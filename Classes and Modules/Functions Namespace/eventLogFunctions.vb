@@ -1,6 +1,10 @@
-﻿Namespace Functions.eventLogFunctions
+﻿Imports System.Runtime.InteropServices
+Imports Microsoft.Win32
+
+Namespace Functions.eventLogFunctions
     Module eventLogFunctions
         Private Const strSystemRestorePointCreator As String = "System Restore Point Creator"
+        Private Const strRegistryApplicationPath As String = "SYSTEM\CurrentControlSet\services\eventlog\Application"
 
         ''' <summary>Exports the application logs to a file.</summary>
         ''' <param name="strLogFile">The path to the file we will be exporting the data to.</param>
@@ -54,14 +58,16 @@
                     Dim logName As String = "Application"
                     Dim host As String = "."
 
-                    If Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application\" & logSource) Is Nothing Then
-                        Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application", True).CreateSubKey(logSource)
-                        Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application\" & logSource, True).SetValue("EventMessageFile", IO.Path.Combine(Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "EventLogMessages.dll"), Microsoft.Win32.RegistryValueKind.String)
-                    Else
-                        If Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application\" & logSource, False).GetValue("EventMessageFile", Nothing) Is Nothing Then
-                            Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application\" & logSource, True).SetValue("EventMessageFile", IO.Path.Combine(Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "EventLogMessages.dll"), Microsoft.Win32.RegistryValueKind.String)
+                    With Registry.LocalMachine
+                        If .OpenSubKey(strRegistryApplicationPath & "\" & logSource) Is Nothing Then
+                            .OpenSubKey(strRegistryApplicationPath, True).CreateSubKey(logSource)
+                            .OpenSubKey(strRegistryApplicationPath & "\" & logSource, True).SetValue("EventMessageFile", IO.Path.Combine(RuntimeEnvironment.GetRuntimeDirectory(), "EventLogMessages.dll"), RegistryValueKind.String)
+                        Else
+                            If .OpenSubKey(strRegistryApplicationPath & "\" & logSource, False).GetValue("EventMessageFile", Nothing) Is Nothing Then
+                                .OpenSubKey(strRegistryApplicationPath & "\" & logSource, True).SetValue("EventMessageFile", IO.Path.Combine(RuntimeEnvironment.GetRuntimeDirectory(), "EventLogMessages.dll"), RegistryValueKind.String)
+                            End If
                         End If
-                    End If
+                    End With
 
                     If Not EventLog.SourceExists(logSource, host) Then
                         EventLog.CreateEventSource(New EventSourceCreationData(logSource, logName))
@@ -131,6 +137,7 @@
             Dim eventLogQuery As Eventing.Reader.EventLogQuery
             Dim logReader As Eventing.Reader.EventLogReader
             Dim eventInstance As Eventing.Reader.EventRecord
+            Dim logClass As restorePointCreatorExportedLog
 
             Try
                 If EventLog.Exists(strEventLog) Then
@@ -140,8 +147,9 @@
                     eventInstance = logReader.ReadEvent()
 
                     While eventInstance IsNot Nothing
-                        If eventInstance.ProviderName = strSystemRestorePointCreator Or eventInstance.ProviderName.caseInsensitiveContains(strSystemRestorePointCreator) = True Then
-                            Dim logClass As New restorePointCreatorExportedLog
+                        If eventInstance.ProviderName.Equals(strSystemRestorePointCreator, StringComparison.OrdinalIgnoreCase) Or eventInstance.ProviderName.caseInsensitiveContains(strSystemRestorePointCreator) = True Then
+                            logClass = New restorePointCreatorExportedLog
+
                             logClass.logData = eventInstance.FormatDescription
                             logClass.unixTime = eventInstance.TimeCreated.Value.ToUniversalTime.toUNIXTimestamp()
                             logClass.logType = eventInstance.Level
