@@ -5,6 +5,7 @@ Imports System.Text
 Imports System.Runtime.InteropServices
 Imports System.Management
 Imports ICSharpCode.SharpZipLib.Zip
+Imports System.StringComparison
 #End Region
 
 Public Class Form1
@@ -313,6 +314,14 @@ Public Class Form1
                 toolStripStableChannel.Checked = True
                 lineUnderRC.Visible = False
                 OnlyGiveMeReleaseCandidates.Visible = False
+
+                If IO.File.Exists(globalVariables.pdbFileNameInZIP) Then
+                    Try
+                        IO.File.Delete(globalVariables.pdbFileNameInZIP)
+                    Catch ex As Exception
+                        Functions.APIs.MoveFileEx(globalVariables.pdbFileNameInZIP, vbNullString, 4)
+                    End Try
+                End If
             ElseIf My.Settings.updateChannel = globalVariables.updateChannels.beta Then
                 toolStripBetaChannel.Checked = True
                 lineUnderRC.Visible = True
@@ -1478,6 +1487,8 @@ Public Class Form1
         Dim changeLog As String = Nothing
         Dim strRemoteBetaRCVersion As String = Nothing
         Dim updateType As Functions.support.updateType = Functions.support.updateType.null
+        Dim boolOverrideUserUpdateChannelPreferences As Boolean = False
+        Dim boolSetTriggerUpdateAtNextRuntimeSetting As Boolean = False
 
         ' Now let's set up an httpHelper Class Instance to check for updates with, we will use this Class instance for all HTTP operations in this routine
         Dim httpHelper As httpHelper = Functions.http.createNewHTTPHelperObject()
@@ -1497,6 +1508,13 @@ Public Class Form1
             ' Creates a variable to store the user's response to the update notification window.
             Dim updateDialogResponse As Update_Message.userResponse
 
+            If (My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta, OrdinalIgnoreCase) Or My.Settings.updateChannel.Equals(globalVariables.updateChannels.tom, OrdinalIgnoreCase)) And remoteVersion <> globalVariables.version.versionStringWithoutBuild Then
+                boolSetTriggerUpdateAtNextRuntimeSetting = True
+                boolOverrideUserUpdateChannelPreferences = True
+
+                updateType = Functions.support.updateType.release
+            End If
+
             If updateType = Functions.support.updateType.beta Then
                 updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.betaVersionUpdate, remoteBuild, strRemoteBetaRCVersion)
             ElseIf updateType = Functions.support.updateType.candidate Then
@@ -1511,8 +1529,15 @@ Public Class Form1
 
             ' Checks to see if the user said yes to update.
             If updateDialogResponse = Update_Message.userResponse.doTheUpdate Then
+                If boolSetTriggerUpdateAtNextRuntimeSetting Then
+                    Functions.support.setBooleanValueInRegistry("UpdateAtNextRunTime", True)
+                End If
+
                 ' The user said yes.
-                openThePleaseWaitWindowAndStartTheDownloadThread() ' Starts the download and update thread.
+                openThePleaseWaitWindowAndStartTheDownloadThread(boolOverrideUserUpdateChannelPreferences) ' Starts the download and update thread.
+            ElseIf updateDialogResponse = Update_Message.userResponse.dontDoTheUpdate Then
+                Functions.eventLogFunctions.writeToSystemEventLog("There was an update but you have chosen not download it.", EventLogEntryType.Information)
+                giveFeedbackToUser("The update will not be downloaded.")
             End If
 
             Exit Sub ' Exit the routine.
@@ -2414,11 +2439,11 @@ Public Class Form1
                     While streamReader.EndOfStream = False
                         strTemp = streamReader.ReadLine
 
-                        If strTemp.StartsWith("Payload: ", StringComparison.OrdinalIgnoreCase) = True Then
+                        If strTemp.StartsWith("Payload: ", OrdinalIgnoreCase) = True Then
                             strDataPayload = strTemp.caseInsensitiveReplace("Payload: ", "").Trim
-                        ElseIf strTemp.StartsWith("Random String: ", StringComparison.OrdinalIgnoreCase) = True Then
+                        ElseIf strTemp.StartsWith("Random String: ", OrdinalIgnoreCase) = True Then
                             strRandomString = strTemp.caseInsensitiveReplace("Random String: ", "").Trim
-                        ElseIf strTemp.StartsWith("Checksum: ", StringComparison.OrdinalIgnoreCase) = True Then
+                        ElseIf strTemp.StartsWith("Checksum: ", OrdinalIgnoreCase) = True Then
                             strChecksum = strTemp.caseInsensitiveReplace("Checksum: ", "").Trim
                         End If
                     End While
