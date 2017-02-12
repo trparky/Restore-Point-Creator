@@ -1,6 +1,7 @@
 ﻿Imports System.Text.RegularExpressions
 Imports ICSharpCode.SharpZipLib.Zip
 Imports System.Xml
+Imports Microsoft.Win32
 
 Namespace Functions.support
     Public Enum updateType
@@ -206,12 +207,54 @@ Namespace Functions.support
             End Try
         End Function
 
+        ''' <summary>Creates a Registry value in the application's Registry key.</summary>
+        ''' <param name="strValueNameToSetInRegistry">The name of the Registry value you want to create.</param>
+        ''' <param name="strValueToSet">The data for the Registry value you want to create.</param>
+        Public Sub setValueInRegistry(ByVal strValueNameToSetInRegistry As String, ByVal strValueToSet As String)
+            Dim registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
+            setValueInRegistry(registryKey, strValueNameToSetInRegistry, strValueToSet, True)
+        End Sub
+
+        ''' <summary>Creates a Registry value in the application's Registry key.</summary>
+        ''' <param name="strValueNameToSetInRegistry">The name of the Registry value you want to create.</param>
+        ''' <param name="strValueToSet">The data for the Registry value you want to create.</param>
+        ''' <param name="registryKey">The Registry Object you want to act on.</param>
+        ''' <param name="boolCloseAfterSettingValue">This is an optional Boolean value, this is normally set to False.</param>
+        Public Sub setValueInRegistry(ByRef registryKey As RegistryKey, ByVal strValueNameToSetInRegistry As String, ByVal strValueToSet As String, Optional boolCloseAfterSettingValue As Boolean = False)
+            If registryKey Is Nothing Then
+                registryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
+            End If
+
+            registryKey.SetValue(strValueNameToSetInRegistry, strValueToSet, RegistryValueKind.String)
+
+            If boolCloseAfterSettingValue Then
+                registryKey.Close()
+                registryKey.Dispose()
+            End If
+        End Sub
+
+        ''' <summary>Creates a Boolean value Registry value in the application's Registry key.</summary>
+        ''' <param name="strValueNameToSetInRegistry">The name of the Registry value you want to create.</param>
+        ''' <param name="boolValueToSet">The Boolean value for the Registry value you want to create.</param>
+        Public Sub setBooleanValueInRegistry(ByVal strValueNameToSetInRegistry As String, ByVal boolValueToSet As Boolean)
+            setValueInRegistry(strValueNameToSetInRegistry, boolValueToSet.ToString)
+        End Sub
+
+        ''' <summary>Creates a Boolean value Registry value in the application's Registry key.</summary>
+        ''' <param name="strValueNameToSetInRegistry">The name of the Registry value you want to create.</param>
+        ''' <param name="boolValueToSet">The Boolean value for the Registry value you want to create.</param>
+        ''' <param name="registryKey">The Registry Object you want to act on.</param>
+        ''' <param name="boolCloseAfterSettingValue">This is an optional Boolean value, this is normally set to False.</param>
+        Public Sub setBooleanValueInRegistry(ByRef registryKey As RegistryKey, ByVal strValueNameToSetInRegistry As String, ByVal boolValueToSet As Boolean, Optional boolCloseAfterSettingValue As Boolean = False)
+            setValueInRegistry(registryKey, strValueNameToSetInRegistry, boolValueToSet, boolCloseAfterSettingValue)
+        End Sub
+
         ''' <summary>Gets a setting from the application's Registry key.</summary>
         ''' <param name="registryObject">This is Registry Key Object that will be used in this function to pull the Registry value from.</param>
         ''' <param name="valueToGetFromRegistry">The name of the Registry Value we will be pulling from.</param>
         ''' <param name="boolDefaultValue">If the Registry Value isn't found or the value is malformed, this will be the Boolean value that this function will return.</param>
         ''' <returns>A Boolean value.</returns>
-        Public Function getBooleanValueFromRegistry(ByRef registryObject As Microsoft.Win32.RegistryKey, ByVal valueToGetFromRegistry As String, ByVal boolDefaultValue As Boolean) As Boolean
+        Public Function getBooleanValueFromRegistry(ByRef registryObject As RegistryKey, ByVal valueToGetFromRegistry As String, ByVal boolDefaultValue As Boolean) As Boolean
             Try
                 Dim boolTemp As Boolean, strDefaultValue As String
 
