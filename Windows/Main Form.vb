@@ -1508,12 +1508,22 @@ Public Class Form1
             ' Creates a variable to store the user's response to the update notification window.
             Dim updateDialogResponse As Update_Message.userResponse
 
+            ' This checks to see two of the following conditions are met...
+            ' 1. If the update channel is set to beta or tom.
+            ' 2. If the remote version (5.8, 5.9, etc.) does not equal the current version of the program (5.8, 5.9, etc.).
+            ' If both conditions are met then that means that a new .1 version has been released (5.8, 5.9, etc.) and that
+            ' we need to upgrade the user to the latest release branch version first.
             If (My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta, OrdinalIgnoreCase) Or My.Settings.updateChannel.Equals(globalVariables.updateChannels.tom, OrdinalIgnoreCase)) And remoteVersion <> globalVariables.version.versionStringWithoutBuild Then
-                boolSetTriggerUpdateAtNextRuntimeSetting = True
-                boolOverrideUserUpdateChannelPreferences = True
+                ' OK, both conditions were met so we need to set some stuff up for later use in this function.
+                
+                boolSetTriggerUpdateAtNextRuntimeSetting = True ' We need to tell this sub-routine to set a trigger in the Registry that triggers an update check at the next program launch.
+                boolOverrideUserUpdateChannelPreferences = True ' We need to override the update channel that the user has so we set this value to True.
 
-                updateType = Functions.support.updateType.release
+                updateType = Functions.support.updateType.release ' We override the update type to release.
             End If
+            
+            ' At this point, if the conditional statement above didn't work out and the code inside the
+            ' statement didn't execute then we simply go onto the rest of the update code that is below.
 
             If updateType = Functions.support.updateType.beta Then
                 updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.betaVersionUpdate, remoteBuild, strRemoteBetaRCVersion)
