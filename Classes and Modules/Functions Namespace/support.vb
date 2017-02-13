@@ -25,12 +25,34 @@ Namespace Functions.support
         End Function
 
         Public Sub importSettingsFromXMLFile(strPathToFile As String, strMessageBoxTitle As String)
+            Dim xmlSerializerObject As Serialization.XmlSerializer
+            Dim bytes() As Byte
+
+            'exportedSettingsFile
             Dim streamReader As New IO.StreamReader(strPathToFile)
-            Dim exportedSettingsArray As New List(Of exportedSettings)
-            Dim xmlSerializerObject As New Serialization.XmlSerializer(exportedSettingsArray.GetType)
-            exportedSettingsArray = xmlSerializerObject.Deserialize(streamReader)
+            Dim exportedSettingsFile As New exportedSettingsFile()
+            xmlSerializerObject = New Serialization.XmlSerializer(exportedSettingsFile.GetType)
+            exportedSettingsFile = xmlSerializerObject.Deserialize(streamReader)
             streamReader.Close()
             streamReader.Dispose()
+            xmlSerializerObject = Nothing
+
+            With exportedSettingsFile
+                If Not calculateConfigBackupDataPayloadChecksum(.xmlPayload, .randomString).Equals(.checksum) Then
+                    MsgBox("Checksum validation failed.", MsgBoxStyle.Critical, strMessageBoxTitle)
+                End If
+
+                bytes = Text.Encoding.UTF8.GetBytes(convertFromBase64(exportedSettingsFile.xmlPayload))
+            End With
+
+            Dim memStream As New IO.MemoryStream(bytes)
+            bytes = Nothing
+            Dim exportedSettingsArray As New List(Of exportedSettings)
+            xmlSerializerObject = New Serialization.XmlSerializer(exportedSettingsArray.GetType)
+            exportedSettingsArray = xmlSerializerObject.Deserialize(memStream)
+            memStream.Close()
+            memStream.Dispose()
+            xmlSerializerObject = Nothing
 
             Dim registryKeyWeAreWorkingWith As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
             Dim type As Type
@@ -265,9 +287,32 @@ Namespace Functions.support
             registryKeyWeAreWorkingWith.Dispose()
 
             Try
+                Dim xmlSerializerObject As Serialization.XmlSerializer
+
+                Dim memStream As New IO.MemoryStream
+                xmlSerializerObject = New Serialization.XmlSerializer(exportedSettingsArray.GetType)
+                xmlSerializerObject.Serialize(memStream, exportedSettingsArray)
+                memStream.Position = 0
+
+                Dim streamReader As New IO.StreamReader(memStream)
+                Dim strXMLData As String = streamReader.ReadToEnd
+
+                streamReader.Close()
+                streamReader.Dispose()
+                memStream.Close()
+                memStream.Dispose()
+                xmlSerializerObject = Nothing
+
+                Dim exportedSettingsFile As New exportedSettingsFile()
+                With exportedSettingsFile
+                    .xmlPayload = convertToBase64(strXMLData)
+                    .randomString = randomStringGenerator((New Random).Next(100, 300))
+                    .checksum = calculateConfigBackupDataPayloadChecksum(.xmlPayload, .randomString)
+                End With
+
                 Dim streamWriter As New IO.StreamWriter(strPathToXMLFile)
-                Dim xmlSerializerObject As New Serialization.XmlSerializer(exportedSettingsArray.GetType)
-                xmlSerializerObject.Serialize(streamWriter, exportedSettingsArray)
+                xmlSerializerObject = New Serialization.XmlSerializer(exportedSettingsFile.GetType)
+                xmlSerializerObject.Serialize(streamWriter, exportedSettingsFile)
                 streamWriter.Close()
                 streamWriter.Dispose()
             Catch ex As Exception
