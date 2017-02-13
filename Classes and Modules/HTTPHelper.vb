@@ -9,8 +9,8 @@ Public Class FormFile
         Get
             Return m_Name
         End Get
-        Set
-            m_Name = Value
+        Set(value As String)
+            m_Name = value
         End Set
     End Property
 
@@ -19,8 +19,8 @@ Public Class FormFile
         Get
             Return m_ContentType
         End Get
-        Set
-            m_ContentType = Value
+        Set(value As String)
+            m_ContentType = value
         End Set
     End Property
 
@@ -29,8 +29,8 @@ Public Class FormFile
         Get
             Return m_FilePath
         End Get
-        Set
-            m_FilePath = Value
+        Set(value As String)
+            m_FilePath = value
         End Set
     End Property
 
@@ -39,8 +39,8 @@ Public Class FormFile
         Get
             Return m_uploadedFileName
         End Get
-        Set
-            m_uploadedFileName = Value
+        Set(value As String)
+            m_uploadedFileName = value
         End Set
     End Property
 End Class
@@ -220,7 +220,7 @@ End Class
 
 ''' <summary>Allows you to easily POST and upload files to a remote HTTP server without you, the programmer, knowing anything about how it all works. This class does it all for you. It handles adding a User Agent String, additional HTTP Request Headers, string data to your HTTP POST data, and files to be uploaded in the HTTP POST data.</summary>
 Public Class httpHelper
-    Private Const classVersion As String = "1.245"
+    Private Const classVersion As String = "1.266"
 
     Private strUserAgentString As String = Nothing
     Private boolUseProxy As Boolean = False
@@ -228,11 +228,16 @@ Public Class httpHelper
     Private customProxy As Net.IWebProxy = Nothing
     Private httpResponseHeaders As Net.WebHeaderCollection = Nothing
     Private httpDownloadProgressPercentage As Short = 0
-    Private remoteFileSize, currentFileSize, bytesPerSecond As ULong
+    Private remoteFileSize, currentFileSize As ULong
     Private httpTimeOut As Long = 5000
     Private boolUseHTTPCompression As Boolean = True
     Private lastAccessedURL As String = Nothing
     Private lastException As Exception = Nothing
+    Private boolRunDownloadStatusUpdatePluginInSeparateThread As Boolean = True
+    Private downloadStatusUpdaterThread As Threading.Thread = Nothing
+    Private _intDownloadThreadSleepTime As Integer = 1000
+    Private intDownloadBufferSize As Integer = 8191 ' The default is 8192 bytes or 8 KBs.
+    Private strLastHTTPServerResponse As String
 
     Private additionalHTTPHeaders As New Dictionary(Of String, String)
     Private httpCookies As New Dictionary(Of String, cookieDetails)
@@ -254,6 +259,13 @@ Public Class httpHelper
         End Get
     End Property
 
+    ''' <summary>Sets the size of the download buffer to hold data in memory during the downloading of a file. The default is 8192 bytes or 8 KBs.</summary>
+    Public WriteOnly Property setDownloadBufferSize As Integer
+        Set(value As Integer)
+            intDownloadBufferSize = value - 1
+        End Set
+    End Property
+
     ''' <summary>This allows you to inject your own error handler for HTTP exceptions into the Class instance.</summary>
     ''' <value>A Lambda</value>
     ''' <example>
@@ -264,8 +276,8 @@ Public Class httpHelper
     ''' httpHelper.setCustomErrorHandler((Exception ex, httpHelper classInstance) => { }
     ''' </example>
     Public WriteOnly Property setCustomErrorHandler As [Delegate]
-        Set
-            customErrorHandler = Value
+        Set(value As [Delegate])
+            customErrorHandler = value
         End Set
     End Property
 
@@ -353,8 +365,8 @@ Public Class httpHelper
     ''' httpHelper.setDownloadStatusUpdateRoutine((downloadStatusDetails downloadStatusDetails) => { })
     ''' </example>
     Public WriteOnly Property setDownloadStatusUpdateRoutine As [Delegate]
-        Set
-            downloadStatusUpdater = Value
+        Set(value As [Delegate])
+            downloadStatusUpdater = value
         End Set
     End Property
 
@@ -369,8 +381,8 @@ Public Class httpHelper
     ''' End Function)
     ''' </example>
     Public WriteOnly Property setURLPreProcessor As Func(Of String, String)
-        Set
-            urlPreProcessor = Value
+        Set(value As Func(Of String, String))
+            urlPreProcessor = value
         End Set
     End Property
 
@@ -383,13 +395,13 @@ Public Class httpHelper
 
         remoteFileSize = 0
         currentFileSize = 0
-        bytesPerSecond = 0
 
         sslCertificate = Nothing
         urlPreProcessor = Nothing
         customErrorHandler = Nothing
         downloadStatusUpdater = Nothing
         httpResponseHeaders = Nothing
+        strLastHTTPServerResponse = Nothing
     End Sub
 
     ''' <summary>Returns the last accessed URL by this Class instance.</summary>
@@ -402,8 +414,8 @@ Public Class httpHelper
 
     ''' <summary>Tells the Class instance if it should use the system proxy.</summary>
     Public WriteOnly Property useSystemProxy As Boolean
-        Set
-            boolUseSystemProxy = Value
+        Set(value As Boolean)
+            boolUseSystemProxy = value
         End Set
     End Property
 
@@ -529,32 +541,32 @@ Public Class httpHelper
 
     ''' <summary>Tells the HTTPPost Class if you want to use a Proxy or not.</summary>
     Public WriteOnly Property setProxyMode As Boolean
-        Set
-            boolUseProxy = Value
+        Set(value As Boolean)
+            boolUseProxy = value
         End Set
     End Property
 
     ''' <summary>Sets a timeout for any HTTP requests in this Class. Normally it's set for 5 seconds. The input is the amount of time in seconds (NOT milliseconds) that you want your HTTP requests to timeout in. The class will translate the seconds to milliseconds for you.</summary>
     ''' <value>The amount of time in seconds (NOT milliseconds) that you want your HTTP requests to timeout in. This function will translate the seconds to milliseconds for you.</value>
     Public WriteOnly Property setHTTPTimeout As Short
-        Set
-            httpTimeOut = Value * 1000
+        Set(value As Short)
+            httpTimeOut = value * 1000
         End Set
     End Property
 
     ''' <summary>Tells this Class instance if it should use HTTP compression for transport. Using HTTP Compression can save bandwidth. Normally the Class is setup to use HTTP Compression by default.</summary>
     ''' <value>Boolean value.</value>
     Public WriteOnly Property useHTTPCompression As Boolean
-        Set
-            boolUseHTTPCompression = Value
+        Set(value As Boolean)
+            boolUseHTTPCompression = value
         End Set
     End Property
 
     ''' <summary>Sets the User Agent String to be used by the HTTPPost Class.</summary>
     ''' <value>Your User Agent String.</value>
     Public WriteOnly Property setUserAgent As String
-        Set
-            strUserAgentString = Value
+        Set(value As String)
+            strUserAgentString = value
         End Set
     End Property
 
@@ -771,6 +783,69 @@ Public Class httpHelper
         End Get
     End Property
 
+    ''' <summary>This tells the current HTTPHelper Class Instance if it should run the download update status routine in a separate thread. By default this is enabled.</summary>
+    Public Property enableMultiThreadedDownloadStatusUpdates As Boolean
+        Get
+            Return boolRunDownloadStatusUpdatePluginInSeparateThread
+        End Get
+        Set(value As Boolean)
+            boolRunDownloadStatusUpdatePluginInSeparateThread = value
+        End Set
+    End Property
+
+    ''' <summary>Sets the amount of time in miliseconds that the download status updating thread sleeps. The default is 1000 ms or 1 second, perfect for calculating the amount of data downloaded per second.</summary>
+    Public WriteOnly Property intDownloadThreadSleepTime As Integer
+        Set(value As Integer)
+            _intDownloadThreadSleepTime = value
+        End Set
+    End Property
+
+    Private Sub downloadStatusUpdaterThreadSubroutine()
+        Try
+beginAgain:
+            downloadStatusUpdater.DynamicInvoke(downloadStatusDetails)
+            Threading.Thread.Sleep(_intDownloadThreadSleepTime)
+            GoTo beginAgain
+        Catch ex As Threading.ThreadAbortException
+            ' Does nothing
+        Catch ex2 As Reflection.TargetInvocationException
+            ' Does nothing
+        End Try
+    End Sub
+
+    ''' <summary>This subroutine is used by the downloadFile function to update the download status of the file that's being downloaded by the class instance.</summary>
+    Private Sub downloadStatusUpdateInvoker()
+        downloadStatusDetails = New downloadStatusDetails With {.remoteFileSize = remoteFileSize, .percentageDownloaded = httpDownloadProgressPercentage, .localFileSize = currentFileSize} ' Update the downloadStatusDetails.
+
+        ' Checks to see if we have a status update routine to invoke.
+        If downloadStatusUpdater IsNot Nothing Then
+            ' We invoke the status update routine if we have one to invoke. This is usually injected
+            ' into the class instance by the programmer who's using this class in his/her program.
+            If boolRunDownloadStatusUpdatePluginInSeparateThread Then
+                If downloadStatusUpdaterThread Is Nothing Then
+                    downloadStatusUpdaterThread = New Threading.Thread(AddressOf downloadStatusUpdaterThreadSubroutine)
+                    downloadStatusUpdaterThread.IsBackground = True
+                    downloadStatusUpdaterThread.Priority = Threading.ThreadPriority.Lowest
+                    downloadStatusUpdaterThread.Name = "HTTPHelper Class Download Status Updating Thread"
+                    downloadStatusUpdaterThread.Start()
+                End If
+            Else
+                downloadStatusUpdater.DynamicInvoke(downloadStatusDetails)
+            End If
+        End If
+    End Sub
+
+    Private Sub abortDownloadStatusUpdaterThread()
+        Try
+            If downloadStatusUpdaterThread IsNot Nothing And boolRunDownloadStatusUpdatePluginInSeparateThread Then
+                downloadStatusUpdaterThread.Abort()
+                downloadStatusUpdaterThread = Nothing
+            End If
+        Catch ex As Exception
+            ' Does nothing
+        End Try
+    End Sub
+
     ''' <summary>Downloads a file from a web server while feeding back the status of the download. You can find the percentage of the download in the httpDownloadProgressPercentage variable. This function gives you the programmer more control over how HTTP downloads are done. For instance, if you don't want to write the data directly out to disk until the download is complete, this function gives you that ability whereas the downloadFile() function writes the downloaded data directly to disk bypassing system RAM. This is good for those cases you may be writing the data to an SSD in which you only want to write the data to the SSD until the download is known to be successful.</summary>
     ''' <param name="fileDownloadURL">The HTTP Path to a file on a remote server to download.</param>
     ''' <param name="memStream">This is a IO.MemoryStream, it is passed as a ByRef so that the function will be able to act on the IO.MemoryStream() Object you pass to it. At the end of the download, if it is successful, the function will reset the position back to 0 for writing to whatever stream you choose.</param>
@@ -790,61 +865,37 @@ Public Class httpHelper
             End If
             lastAccessedURL = fileDownloadURL
 
-            ' A data buffer that holds 4096 bytes or 4 KBs. We use this data buffer to hold the stream of data from the web server.
-            Dim dataBuffer As Byte() = New Byte(4095) {}
+            ' We create a new data buffer to hold the stream of data from the web server.
+            Dim dataBuffer As Byte() = New Byte(intDownloadBufferSize) {}
 
             httpWebRequest = DirectCast(Net.WebRequest.Create(fileDownloadURL), Net.HttpWebRequest)
-            httpWebRequest.Timeout = httpTimeOut
-            httpWebRequest.KeepAlive = True
-
-            If credentials IsNot Nothing Then
-                httpWebRequest.PreAuthenticate = True
-                addHTTPHeader("Authorization", "Basic " & Convert.ToBase64String(Text.Encoding.Default.GetBytes(credentials.strUser & ":" & credentials.strPassword)))
-            End If
-
-            If boolUseHTTPCompression Then
-                ' We tell the web server that we can accept a GZIP and Deflate compressed data stream.
-                httpWebRequest.Accept = "gzip, deflate"
-                httpWebRequest.Headers.Add(Net.HttpRequestHeader.AcceptEncoding, "gzip, deflate")
-            End If
 
             configureProxy(httpWebRequest)
-
-            If strUserAgentString <> Nothing Then httpWebRequest.UserAgent = strUserAgentString
-            If httpCookies.Count <> 0 Then getCookies(httpWebRequest)
-            If additionalHTTPHeaders.Count <> 0 Then getHeaders(httpWebRequest)
+            addParametersToWebRequest(httpWebRequest)
 
             Dim webResponse As Net.WebResponse = httpWebRequest.GetResponse() ' We now get the web response.
-
-            If fileDownloadURL.StartsWith("https://", StringComparison.OrdinalIgnoreCase) Then
-                sslCertificate = New X509Certificates.X509Certificate2(httpWebRequest.ServicePoint.Certificate)
-            Else
-                sslCertificate = Nothing
-            End If
+            captureSSLInfo(fileDownloadURL, httpWebRequest)
 
             ' Gets the size of the remote file on the web server.
-            remoteFileSize = Long.Parse(webResponse.Headers("Content-Length").ToString)
+            remoteFileSize = webResponse.ContentLength
 
             Dim responseStream As Stream = webResponse.GetResponseStream() ' Gets the response stream.
 
-            Dim count As Long = responseStream.Read(dataBuffer, 0, dataBuffer.Length) ' Reads some data from the HTTP stream into our data buffer.
+            Dim lngBytesReadFromInternet As Long = responseStream.Read(dataBuffer, 0, dataBuffer.Length) ' Reads some data from the HTTP stream into our data buffer.
             Dim oldCurrentFileSize As Long = 0
 
             ' We keep looping until all of the data has been downloaded.
-            While count <> 0
+            While lngBytesReadFromInternet <> 0
                 ' We calculate the current file size by adding the amount of data that we've so far
                 ' downloaded from the server repeatedly to a variable called "currentFileSize".
-                currentFileSize += count
-                memStream.Write(dataBuffer, 0, count) ' Writes the data directly to disk.
-                httpDownloadProgressPercentage = Math.Round((memStream.Length / remoteFileSize) * 100, 0)
+                currentFileSize += lngBytesReadFromInternet
 
-                downloadStatusDetails = New downloadStatusDetails With {.remoteFileSize = remoteFileSize, .percentageDownloaded = httpDownloadProgressPercentage, .localFileSize = currentFileSize}
+                memStream.Write(dataBuffer, 0, lngBytesReadFromInternet) ' Writes the data directly to disk.
 
-                If downloadStatusUpdater IsNot Nothing Then
-                    downloadStatusUpdater.DynamicInvoke(downloadStatusDetails)
-                End If
+                httpDownloadProgressPercentage = Math.Round((currentFileSize / remoteFileSize) * 100, 0) ' Update the download percentage value.
+                downloadStatusUpdateInvoker()
 
-                count = responseStream.Read(dataBuffer, 0, dataBuffer.Length) ' Reads more data into our data buffer.
+                lngBytesReadFromInternet = responseStream.Read(dataBuffer, 0, dataBuffer.Length) ' Reads more data into our data buffer.
             End While
 
             ' Before we return the MemoryStream to the user we have to reset the position back to the beginning of the Stream. This is so that when the
@@ -853,8 +904,12 @@ Public Class httpHelper
             ' on the IO.MemoryStream Object the user will have nothing written out because the IO.MemoryStream will be at the end of the stream.
             memStream.Position = 0
 
+            abortDownloadStatusUpdaterThread()
+
             Return True
         Catch ex As Threading.ThreadAbortException
+            abortDownloadStatusUpdaterThread()
+
             If httpWebRequest IsNot Nothing Then httpWebRequest.Abort()
 
             If memStream IsNot Nothing Then
@@ -864,6 +919,8 @@ Public Class httpHelper
 
             Return False
         Catch ex As Exception
+            abortDownloadStatusUpdaterThread()
+
             lastException = ex
             If memStream IsNot Nothing Then
                 memStream.Close() ' Closes the file stream.
@@ -929,69 +986,54 @@ Public Class httpHelper
                 End If
             End If
 
-            ' A data buffer that holds 4096 bytes or 4 KBs. We use this data buffer to hold the stream of data from the web server.
-            Dim dataBuffer As Byte() = New Byte(4095) {}
+            ' We create a new data buffer to hold the stream of data from the web server.
+            Dim dataBuffer As Byte() = New Byte(intDownloadBufferSize) {}
 
             httpWebRequest = DirectCast(Net.WebRequest.Create(fileDownloadURL), Net.HttpWebRequest)
-            httpWebRequest.Timeout = httpTimeOut
-            httpWebRequest.KeepAlive = True
-
-            If credentials IsNot Nothing Then
-                httpWebRequest.PreAuthenticate = True
-                addHTTPHeader("Authorization", "Basic " & Convert.ToBase64String(Text.Encoding.Default.GetBytes(credentials.strUser & ":" & credentials.strPassword)))
-            End If
-
-            If boolUseHTTPCompression Then
-                ' We tell the web server that we can accept a GZIP and Deflate compressed data stream.
-                httpWebRequest.Accept = "gzip, deflate"
-                httpWebRequest.Headers.Add(Net.HttpRequestHeader.AcceptEncoding, "gzip, deflate")
-            End If
 
             configureProxy(httpWebRequest)
-
-            If strUserAgentString <> Nothing Then httpWebRequest.UserAgent = strUserAgentString
-            If httpCookies.Count <> 0 Then getCookies(httpWebRequest)
-            If additionalHTTPHeaders.Count <> 0 Then getHeaders(httpWebRequest)
+            addParametersToWebRequest(httpWebRequest)
 
             Dim webResponse As Net.WebResponse = httpWebRequest.GetResponse() ' We now get the web response.
-
-            If fileDownloadURL.StartsWith("https://", StringComparison.OrdinalIgnoreCase) Then
-                sslCertificate = New X509Certificates.X509Certificate2(httpWebRequest.ServicePoint.Certificate)
-            Else
-                sslCertificate = Nothing
-            End If
+            captureSSLInfo(fileDownloadURL, httpWebRequest)
 
             ' Gets the size of the remote file on the web server.
-            remoteFileSize = Long.Parse(webResponse.Headers("Content-Length").ToString)
+            remoteFileSize = webResponse.ContentLength
 
             Dim responseStream As Stream = webResponse.GetResponseStream() ' Gets the response stream.
             fileWriteStream = New FileStream(localFileName, FileMode.Create) ' Creates a file write stream.
 
-            Dim count As Long = responseStream.Read(dataBuffer, 0, dataBuffer.Length) ' Reads some data from the HTTP stream into our data buffer.
+            Dim lngBytesReadFromInternet As Long = responseStream.Read(dataBuffer, 0, dataBuffer.Length) ' Reads some data from the HTTP stream into our data buffer.
             Dim oldCurrentFileSize As Long = 0
 
             ' We keep looping until all of the data has been downloaded.
-            While count <> 0
+            While lngBytesReadFromInternet <> 0
                 ' We calculate the current file size by adding the amount of data that we've so far
                 ' downloaded from the server repeatedly to a variable called "currentFileSize".
-                currentFileSize += count
-                fileWriteStream.Write(dataBuffer, 0, count) ' Writes the data directly to disk.
-                httpDownloadProgressPercentage = Math.Round((fileWriteStream.Length / remoteFileSize) * 100, 0)
+                currentFileSize += lngBytesReadFromInternet
 
-                downloadStatusDetails = New downloadStatusDetails With {.remoteFileSize = remoteFileSize, .percentageDownloaded = httpDownloadProgressPercentage, .localFileSize = currentFileSize}
+                fileWriteStream.Write(dataBuffer, 0, lngBytesReadFromInternet) ' Writes the data directly to disk.
 
-                If downloadStatusUpdater IsNot Nothing Then
-                    downloadStatusUpdater.DynamicInvoke(downloadStatusDetails)
-                End If
+                httpDownloadProgressPercentage = Math.Round((currentFileSize / remoteFileSize) * 100, 0) ' Update the download percentage value.
+                downloadStatusUpdateInvoker()
 
-                count = responseStream.Read(dataBuffer, 0, dataBuffer.Length) ' Reads more data into our data buffer.
+                lngBytesReadFromInternet = responseStream.Read(dataBuffer, 0, dataBuffer.Length) ' Reads more data into our data buffer.
             End While
 
             fileWriteStream.Close() ' Closes the file stream.
             fileWriteStream.Dispose() ' Disposes the file stream.
 
+            If downloadStatusUpdaterThread IsNot Nothing And boolRunDownloadStatusUpdatePluginInSeparateThread Then
+                downloadStatusUpdaterThread.Abort()
+                downloadStatusUpdaterThread = Nothing
+            End If
+
+            abortDownloadStatusUpdaterThread()
+
             Return True
         Catch ex As Threading.ThreadAbortException
+            abortDownloadStatusUpdaterThread()
+
             If httpWebRequest IsNot Nothing Then httpWebRequest.Abort()
 
             If fileWriteStream IsNot Nothing Then
@@ -1001,6 +1043,8 @@ Public Class httpHelper
 
             Return False
         Catch ex As Exception
+            abortDownloadStatusUpdaterThread()
+
             lastException = ex
             If fileWriteStream IsNot Nothing Then
                 fileWriteStream.Close() ' Closes the file stream.
@@ -1046,7 +1090,9 @@ Public Class httpHelper
     ''' <exception cref="sslErrorException">If this function throws an sslErrorException, an error occurred while negotiating an SSL connection.</exception>
     ''' <example>httpPostObject.getWebData("http://www.myserver.com/mywebpage", httpResponseText)</example>
     ''' <param name="throwExceptionIfError">Normally True. If True this function will throw an exception if an error occurs. If set to False, the function simply returns False if an error occurs; this is a much more simpler way to handle errors.</param>
-    Public Function getWebData(ByVal url As String, ByRef httpResponseText As String, Optional throwExceptionIfError As Boolean = True) As Boolean
+    ''' <param name="shortRangeTo">This controls how much data is downloaded from the server.</param>
+    ''' <param name="shortRangeFrom">This controls how much data is downloaded from the server.</param>
+    Public Function getWebData(ByVal url As String, ByRef httpResponseText As String, shortRangeFrom As Short, shortRangeTo As Short, Optional throwExceptionIfError As Boolean = True) As Boolean
         Dim httpWebRequest As Net.HttpWebRequest = Nothing
 
         Try
@@ -1058,44 +1104,14 @@ Public Class httpHelper
             If getData.Count <> 0 Then url &= "?" & Me.getGETDataString
 
             httpWebRequest = DirectCast(Net.WebRequest.Create(url), Net.HttpWebRequest)
-            httpWebRequest.Timeout = httpTimeOut
-            httpWebRequest.KeepAlive = True
-
-            If credentials IsNot Nothing Then
-                httpWebRequest.PreAuthenticate = True
-                addHTTPHeader("Authorization", "Basic " & Convert.ToBase64String(Text.Encoding.Default.GetBytes(credentials.strUser & ":" & credentials.strPassword)))
-            End If
-
-            If boolUseHTTPCompression Then httpWebRequest.Accept = "gzip, deflate"
+            httpWebRequest.AddRange(shortRangeFrom, shortRangeTo)
 
             configureProxy(httpWebRequest)
-
-            If strUserAgentString <> Nothing Then httpWebRequest.UserAgent = strUserAgentString
-            If httpCookies.Count <> 0 Then getCookies(httpWebRequest)
-            If additionalHTTPHeaders.Count <> 0 Then getHeaders(httpWebRequest)
-
-            If postData.Count = 0 Then
-                httpWebRequest.Method = "GET"
-            Else
-                httpWebRequest.Method = "POST"
-                Dim postDataString As String = Me.getPOSTDataString
-                httpWebRequest.ContentType = "application/x-www-form-urlencoded"
-                httpWebRequest.ContentLength = postDataString.Length
-
-                Dim httpRequestWriter = New StreamWriter(httpWebRequest.GetRequestStream())
-                httpRequestWriter.Write(postDataString)
-                httpRequestWriter.Close()
-                httpRequestWriter.Dispose()
-                httpRequestWriter = Nothing
-            End If
+            addParametersToWebRequest(httpWebRequest)
+            addPostDataToWebRequest(httpWebRequest)
 
             Dim httpWebResponse As Net.WebResponse = httpWebRequest.GetResponse()
-
-            If url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) Then
-                sslCertificate = New X509Certificates.X509Certificate2(httpWebRequest.ServicePoint.Certificate)
-            Else
-                sslCertificate = Nothing
-            End If
+            captureSSLInfo(url, httpWebRequest)
 
             Dim httpInStream As New StreamReader(httpWebResponse.GetResponseStream())
             Dim httpTextOutput As String = httpInStream.ReadToEnd.Trim()
@@ -1109,6 +1125,91 @@ Public Class httpHelper
             httpWebRequest = Nothing
 
             httpResponseText = convertLineFeeds(httpTextOutput).Trim()
+            strLastHTTPServerResponse = httpResponseText
+
+            Return True
+        Catch ex As Exception
+            If TypeOf ex Is Threading.ThreadAbortException Then
+                If httpWebRequest IsNot Nothing Then httpWebRequest.Abort()
+                Return False
+            End If
+
+            lastException = ex
+            If Not throwExceptionIfError Then Return False
+
+            If customErrorHandler IsNot Nothing Then
+                customErrorHandler.DynamicInvoke(ex, Me)
+                ' Since we handled the exception with an injected custom error handler, we can now exit the function with the return of a False value.
+                Return False
+            End If
+
+            If TypeOf ex Is Net.WebException Then
+                Dim ex2 As Net.WebException = DirectCast(ex, Net.WebException)
+
+                If ex2.Status = Net.WebExceptionStatus.ProtocolError Then
+                    Throw handleWebExceptionProtocolError(url, ex2)
+                    Return False
+                ElseIf ex2.Status = Net.WebExceptionStatus.TrustFailure Then
+                    lastException = New sslErrorException("There was an error establishing an SSL connection.", ex2)
+                    Throw lastException
+                    Return False
+                End If
+
+                lastException = New Net.WebException(ex.Message, ex2)
+                Throw lastException
+                Return False
+            End If
+
+            lastException = New Exception(ex.Message, ex)
+            Throw lastException
+            Return False
+        End Try
+    End Function
+
+    ''' <summary>Performs an HTTP Request for data from a web server.</summary>
+    ''' <param name="url">This is the URL that the program will send to the web server in the HTTP request. Do not include any GET variables in the URL, use the addGETData() function before calling this function.</param>
+    ''' <param name="httpResponseText">This is a ByRef variable so declare it before passing it to this function, think of this as a pointer. The HTML/text content that the web server on the other end responds with is put into this variable and passed back in a ByRef function.</param>
+    ''' <returns>A Boolean value. If the HTTP operation was successful it returns a TRUE value, if not FALSE.</returns>
+    ''' <exception cref="Net.WebException">If this function throws a Net.WebException then something failed during the HTTP request.</exception>
+    ''' <exception cref="Exception">If this function throws a general Exception, something really went wrong; something that the function normally doesn't handle.</exception>
+    ''' <exception cref="httpProtocolException">This exception is thrown if the server responds with an HTTP Error.</exception>
+    ''' <exception cref="sslErrorException">If this function throws an sslErrorException, an error occurred while negotiating an SSL connection.</exception>
+    ''' <example>httpPostObject.getWebData("http://www.myserver.com/mywebpage", httpResponseText)</example>
+    ''' <param name="throwExceptionIfError">Normally True. If True this function will throw an exception if an error occurs. If set to False, the function simply returns False if an error occurs; this is a much more simpler way to handle errors.</param>
+    Public Function getWebData(ByVal url As String, ByRef httpResponseText As String, Optional throwExceptionIfError As Boolean = True) As Boolean
+        Dim httpWebRequest As Net.HttpWebRequest = Nothing
+
+        Try
+            If urlPreProcessor IsNot Nothing Then
+                url = urlPreProcessor(url)
+            End If
+            lastAccessedURL = url
+
+            If getData.Count <> 0 Then url &= "?" & getGETDataString()
+
+            httpWebRequest = DirectCast(Net.WebRequest.Create(url), Net.HttpWebRequest)
+
+            configureProxy(httpWebRequest)
+            addParametersToWebRequest(httpWebRequest)
+            addPostDataToWebRequest(httpWebRequest)
+
+            Dim httpWebResponse As Net.WebResponse = httpWebRequest.GetResponse()
+            captureSSLInfo(url, httpWebRequest)
+
+            Dim httpInStream As New StreamReader(httpWebResponse.GetResponseStream())
+            Dim httpTextOutput As String = httpInStream.ReadToEnd.Trim()
+            httpResponseHeaders = httpWebResponse.Headers
+
+            httpInStream.Close()
+            httpInStream.Dispose()
+
+            httpWebResponse.Close()
+            httpWebResponse = Nothing
+            httpWebRequest = Nothing
+
+            httpResponseText = convertLineFeeds(httpTextOutput).Trim()
+            strLastHTTPServerResponse = httpResponseText
+
             Return True
         Catch ex As Exception
             If TypeOf ex Is Threading.ThreadAbortException Then
@@ -1178,25 +1279,13 @@ Public Class httpHelper
             Dim boundaryBytes As Byte() = Text.Encoding.ASCII.GetBytes((Convert.ToString(vbCr & vbLf & "--") & boundary) & vbCr & vbLf)
 
             httpWebRequest = DirectCast(Net.WebRequest.Create(url), Net.HttpWebRequest)
-            httpWebRequest.Timeout = httpTimeOut
-            httpWebRequest.KeepAlive = True
-
-            If credentials IsNot Nothing Then
-                httpWebRequest.PreAuthenticate = True
-                addHTTPHeader("Authorization", "Basic " & Convert.ToBase64String(Text.Encoding.Default.GetBytes(credentials.strUser & ":" & credentials.strPassword)))
-            End If
-
-            If boolUseHTTPCompression Then httpWebRequest.Accept = "gzip, deflate"
 
             configureProxy(httpWebRequest)
+            addParametersToWebRequest(httpWebRequest)
 
             httpWebRequest.KeepAlive = True
             httpWebRequest.ContentType = "multipart/form-data; boundary=" & boundary
             httpWebRequest.Method = "POST"
-
-            If strUserAgentString <> Nothing Then httpWebRequest.UserAgent = strUserAgentString
-            If httpCookies.Count <> 0 Then getCookies(httpWebRequest)
-            If additionalHTTPHeaders.Count <> 0 Then getHeaders(httpWebRequest)
 
             If postData.Count <> 0 Then
                 Dim httpRequestWriter As Stream = httpWebRequest.GetRequestStream()
@@ -1245,12 +1334,7 @@ Public Class httpHelper
             End If
 
             Dim httpWebResponse As Net.WebResponse = httpWebRequest.GetResponse()
-
-            If url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) Then
-                sslCertificate = New X509Certificates.X509Certificate2(httpWebRequest.ServicePoint.Certificate)
-            Else
-                sslCertificate = Nothing
-            End If
+            captureSSLInfo(url, httpWebRequest)
 
             Dim httpInStream As New StreamReader(httpWebResponse.GetResponseStream())
             Dim httpTextOutput As String = httpInStream.ReadToEnd.Trim()
@@ -1264,6 +1348,7 @@ Public Class httpHelper
             httpWebRequest = Nothing
 
             httpResponseText = convertLineFeeds(httpTextOutput).Trim()
+            strLastHTTPServerResponse = httpResponseText
 
             Return True
         Catch ex As Exception
@@ -1302,6 +1387,52 @@ Public Class httpHelper
             Return False
         End Try
     End Function
+
+    Private Sub captureSSLInfo(ByVal url As String, ByRef httpWebRequest As Net.HttpWebRequest)
+        If url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) Then
+            sslCertificate = New X509Certificates.X509Certificate2(httpWebRequest.ServicePoint.Certificate)
+        Else
+            sslCertificate = Nothing
+        End If
+    End Sub
+
+    Private Sub addPostDataToWebRequest(ByRef httpWebRequest As Net.HttpWebRequest)
+        If postData.Count = 0 Then
+            httpWebRequest.Method = "GET"
+        Else
+            httpWebRequest.Method = "POST"
+            Dim postDataString As String = getPOSTDataString()
+            httpWebRequest.ContentType = "application/x-www-form-urlencoded"
+            httpWebRequest.ContentLength = postDataString.Length
+
+            Dim httpRequestWriter = New StreamWriter(httpWebRequest.GetRequestStream())
+            httpRequestWriter.Write(postDataString)
+            httpRequestWriter.Close()
+            httpRequestWriter.Dispose()
+            httpRequestWriter = Nothing
+        End If
+    End Sub
+
+    Private Sub addParametersToWebRequest(ByRef httpWebRequest As Net.HttpWebRequest)
+        If credentials IsNot Nothing Then
+            httpWebRequest.PreAuthenticate = True
+            addHTTPHeader("Authorization", "Basic " & Convert.ToBase64String(Text.Encoding.Default.GetBytes(credentials.strUser & ":" & credentials.strPassword)))
+        End If
+
+        If strUserAgentString IsNot Nothing Then httpWebRequest.UserAgent = strUserAgentString
+        If httpCookies.Count <> 0 Then getCookies(httpWebRequest)
+        If additionalHTTPHeaders.Count <> 0 Then getHeaders(httpWebRequest)
+
+        If boolUseHTTPCompression Then
+            ' We tell the web server that we can accept a GZIP and Deflate compressed data stream.
+            httpWebRequest.Accept = "gzip, deflate"
+            httpWebRequest.Headers.Add(Net.HttpRequestHeader.AcceptEncoding, "gzip, deflate")
+            httpWebRequest.AutomaticDecompression = Net.DecompressionMethods.GZip Or Net.DecompressionMethods.Deflate
+        End If
+
+        httpWebRequest.Timeout = httpTimeOut
+        httpWebRequest.KeepAlive = True
+    End Sub
 
     Private Sub getCookies(ByRef httpWebRequest As Net.HttpWebRequest)
         Dim cookieContainer As New Net.CookieContainer
