@@ -1195,7 +1195,12 @@ Public Class Form1
                         Exit Sub
                     End If
                 Else
-                    Functions.eventLogFunctions.writeToSystemEventLog("The reserved space for restore points on the system drive appears to be set correctly, something else appears to be wrong. Auto-correction of system configurations may cause unintended side-effects. The auto-correction routine has halted.", EventLogEntryType.Error)
+                    Dim msgBoxAndEventLogText As String = "The reserved space for restore points on the system drive appears to be set correctly, something else appears to be wrong. Auto-correction of system configurations may cause unintended side-effects. The auto-correction routine has halted."
+
+                    Functions.eventLogFunctions.writeToSystemEventLog(msgBoxAndEventLogText, EventLogEntryType.Error)
+                    MsgBox(msgBoxAndEventLogText & vbCrLf & vbCrLf & "If you want to try and correct it, go to the Utilities menu and click on ""Manually Fix System Restore"".", MsgBoxStyle.Exclamation, strMessageBoxTitle)
+
+                    Exit Sub
                 End If
             End If
 
@@ -2238,7 +2243,7 @@ Public Class Form1
 
 #Region "--== ToolStrip Click Events ==--"
     Private Sub ManuallyFixSystemRestoreToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ManuallyFixSystemRestoreToolStripMenuItem.Click
-        If MsgBox("You are about to forcefully fix System Restore on your system by enabling System Restore on the system drive. Use this tool only if you have received errors from the program such as Error 1058." & vbCrLf & vbCrLf & "Are you sure you want to do this?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, strMessageBoxTitle) = MsgBoxResult.Yes Then
+        If MsgBox("You are about to forcefully fix System Restore on your system by enabling System Restore on the system drive. Use this tool only if you have received errors from the program such as Error 1058." & vbCrLf & vbCrLf & "WARNING! This tool may have unintended consequences such as lost restore points. By using this tool you agree that the developer of System Restore Point Creator is not liable for any lost restore points." & vbCrLf & vbCrLf & "Are you sure you want to do this?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, strMessageBoxTitle) = MsgBoxResult.Yes Then
             Functions.eventLogFunctions.writeToSystemEventLog("The Manual System Restore Fix Tool has been engaged.", EventLogEntryType.Information)
 
             Dim gigabytesInBytes As Long = 1073741824
