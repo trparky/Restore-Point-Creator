@@ -2237,6 +2237,27 @@ Public Class Form1
 #End Region
 
 #Region "--== ToolStrip Click Events ==--"
+    Private Sub ManuallyFixSystemRestoreToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ManuallyFixSystemRestoreToolStripMenuItem.Click
+        If MsgBox("You are about to forcefully fix System Restore on your system by enabling System Restore on the system drive. Use this tool only if you have received errors from the program such as Error 1058." & vbCrLf & vbCrLf & "Are you sure you want to do this?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, strMessageBoxTitle) = MsgBoxResult.Yes Then
+            Functions.eventLogFunctions.writeToSystemEventLog("The Manual System Restore Fix Tool has been engaged.", EventLogEntryType.Information)
+
+            Dim gigabytesInBytes As Long = 1073741824
+            Dim newSize As Long = gigabytesInBytes * 20 ' Sets the size to 20 GBs.
+
+            Functions.vss.executeVSSAdminCommand(globalVariables.systemDriveLetter)
+            Functions.vss.setShadowStorageSize(globalVariables.systemDriveLetter, newSize)
+            Functions.vss.enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
+
+            Functions.eventLogFunctions.writeToSystemEventLog("The Manual System Restore Fix Tool completed it's work. The system will now reboot.", EventLogEntryType.Information)
+
+            If MsgBox("The Manual System Restore Fix Tool completed it's work. Your system needs to be rebooted." & vbCrLf & vbCrLf & "Do you want to reboot your computer now?", MsgBoxStyle.Information + MsgBoxStyle.YesNo, strMessageBoxTitle) = MsgBoxResult.Yes Then
+                Functions.support.rebootSystem()
+            End If
+        Else
+            MsgBox("You have chosen to not use this tool therefore nothing has been done to your system.", MsgBoxStyle.Information, strMessageBoxTitle)
+        End If
+    End Sub
+
     Private Sub ConfigureHTTPTimeoutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConfigureHTTPTimeoutToolStripMenuItem.Click
         Dim frmConfigureHTTPTimeout As New Configure_HTTP_Timeout
         frmConfigureHTTPTimeout.StartPosition = FormStartPosition.CenterParent

@@ -50,6 +50,7 @@ Partial Class Form1
         Me.btnRestoreToRestorePointSafeMode = New System.Windows.Forms.Button()
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
         Me.toolUtilities = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ManuallyFixSystemRestoreToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MountVolumeShadowCopyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CheckWindowsPowerPlanSettingsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.toolStripDeleteRestorePoints = New System.Windows.Forms.ToolStripMenuItem()
@@ -387,10 +388,17 @@ Partial Class Form1
         '
         'toolUtilities
         '
-        Me.toolUtilities.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MountVolumeShadowCopyToolStripMenuItem, Me.CheckWindowsPowerPlanSettingsToolStripMenuItem, Me.toolStripDeleteRestorePoints, Me.toolStripViewDiskSpaceUsage, Me.toolStripManageSystemRestoreStorageSize, Me.toolStripScheduleRestorePoints, Me.FixRuntimeTasksToolStripMenuItem, Me.ProgramEventLogToolStripMenuItem, Me.RebootSystemToolStripMenuItem, Me.toolStripCheckForUpdates})
+        Me.toolUtilities.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ManuallyFixSystemRestoreToolStripMenuItem, Me.MountVolumeShadowCopyToolStripMenuItem, Me.CheckWindowsPowerPlanSettingsToolStripMenuItem, Me.toolStripDeleteRestorePoints, Me.toolStripViewDiskSpaceUsage, Me.toolStripManageSystemRestoreStorageSize, Me.toolStripScheduleRestorePoints, Me.FixRuntimeTasksToolStripMenuItem, Me.ProgramEventLogToolStripMenuItem, Me.RebootSystemToolStripMenuItem, Me.toolStripCheckForUpdates})
         Me.toolUtilities.Name = "toolUtilities"
         Me.toolUtilities.Size = New System.Drawing.Size(172, 20)
         Me.toolUtilities.Text = "System Restore Point &Utilities"
+        '
+        'ManuallyFixSystemRestoreToolStripMenuItem
+        '
+        Me.ManuallyFixSystemRestoreToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.hammer
+        Me.ManuallyFixSystemRestoreToolStripMenuItem.Name = "ManuallyFixSystemRestoreToolStripMenuItem"
+        Me.ManuallyFixSystemRestoreToolStripMenuItem.Size = New System.Drawing.Size(308, 22)
+        Me.ManuallyFixSystemRestoreToolStripMenuItem.Text = "Manually Fix System Restore"
         '
         'MountVolumeShadowCopyToolStripMenuItem
         '
@@ -1113,4 +1121,5 @@ Partial Class Form1
     Friend WithEvents chkShowVersionInTitleBarToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ConfigureHTTPTimeoutToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ConfirmRestorePointDeletionsInBatchesToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ManuallyFixSystemRestoreToolStripMenuItem As ToolStripMenuItem
 End Class
