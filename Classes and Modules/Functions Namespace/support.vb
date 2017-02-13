@@ -42,7 +42,7 @@ Namespace Functions.support
                     MsgBox("Checksum validation failed.", MsgBoxStyle.Critical, strMessageBoxTitle)
                 End If
 
-                bytes = Text.Encoding.UTF8.GetBytes(convertFromBase64(exportedSettingsFile.xmlPayload))
+                bytes = Text.Encoding.UTF8.GetBytes(convertFromBase64(.xmlPayload))
             End With
 
             Dim memStream As New IO.MemoryStream(bytes)
