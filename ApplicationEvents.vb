@@ -40,13 +40,16 @@ Namespace My
                 boolNoTask = True
             End If
 
-            ' This is to test the crash submission code. Make sure this block is commented out before compiling for public release.
-            'Try
-            '    Throw New IO.FileLoadException()
-            'Catch ex As Exception
-            '    exceptionHandler.manuallyLoadCrashWindow(ex)
-            'End Try
-            ' This is to test the crash submission code. Make sure this block is commented out before compiling for public release.
+            If Debugger.IsAttached Then
+                Debug.WriteLine("debugger is attached")
+                ' This is to test the crash submission code. Make sure this block is commented out before compiling for public release.
+                'Try
+                '    Throw New IO.FileLoadException()
+                'Catch ex As Exception
+                '    exceptionHandler.manuallyLoadCrashWindow(ex)
+                'End Try
+                ' This is to test the crash submission code. Make sure this block is commented out before compiling for public release.
+            End If
 
             ' We're going to store the result of the Functions.areWeAnAdministrator() call in this Boolean variable for later use in this code block.
             Dim boolAreWeAnAdministrator As Boolean = Functions.privilegeChecks.areWeAnAdministrator()
@@ -210,6 +213,16 @@ Namespace My
                 boolNoTask = False
             End If
 
+            If Not boolAreWeInSafeMode And boolAreWeAnAdministrator And My.Application.CommandLineArgs.Count > 0 Then
+                commandLineArgument = My.Application.CommandLineArgs(0)
+
+                If commandLineArgument.stringCompare("-update") Or commandLineArgument.stringCompare("-updatewithoutuninstallinfoupdate") Then
+                    Functions.startupFunctions.performApplicationUpdate(commandLineArgument)
+                    e.Cancel = True
+                    Exit Sub
+                End If
+            End If
+
             ' Checks to see if we are in Safe Mode and if the No Task setting is set to False.  Both conditions have to be False for this code block to run.
             If boolAreWeInSafeMode = False And boolNoTask = False Then
                 If Functions.privilegeChecks.IsUserInAdminGroup() = True Then
@@ -242,10 +255,6 @@ Namespace My
                         If commandLineArgument.stringCompare("-createtasks") Then
                             Functions.eventLogFunctions.writeToSystemEventLog("The program was called with an obsolete command line argument, specifically ""-createtasks"". The program has ignored the command and exited.", EventLogEntryType.Information)
                             Process.GetCurrentProcess.Kill()
-                        ElseIf commandLineArgument.stringCompare("-update") Or commandLineArgument.stringCompare("-updatewithoutuninstallinfoupdate") Then
-                            Functions.startupFunctions.performApplicationUpdate(commandLineArgument)
-                            e.Cancel = True
-                            Exit Sub
                         ElseIf commandLineArgument.stringCompare("-fixruntimetasks") Then
                             Functions.startupFunctions.repairRuntimeTasks()
 
@@ -558,7 +567,7 @@ Namespace My
                     Functions.support.removeSafeModeBoot()
                 End If
 
-                If (Functions.osVersionInfo.isThisWindows10() = True Or Functions.osVersionInfo.isThisWindows8x() = True) And boolAreWeAnAdministrator = True And Functions.support.areWeInSafeMode() = False Then
+                If (Functions.osVersionInfo.isThisWindows10() = True Or Functions.osVersionInfo.isThisWindows8x() = True) And boolAreWeAnAdministrator = True And boolAreWeInSafeMode = False Then
                     Functions.taskStuff.disableBuiltInRestorePointTask()
                 End If
             Catch ex As Exception

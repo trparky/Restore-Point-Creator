@@ -6,7 +6,7 @@ Public Class frmCrash
     Property exceptionType As String
     Property rawExceptionObject As Exception
 
-    Private strFileToHaveDataExportedTo As String = IO.Path.Combine(IO.Path.GetTempPath(), "event log entries.reslog")
+    Private strFileToHaveDataExportedTo As String = IO.Path.Combine(IO.Path.GetTempPath(), "event log entries.reslogx")
     Private strTempZIPFile As String = IO.Path.Combine(IO.Path.GetTempPath(), "attachments.zip")
 
     Sub deleteFileWithCrashPrevention(strPathToFile As String)

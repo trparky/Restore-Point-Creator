@@ -4,7 +4,7 @@ Imports System.Text
 
 Public Class Official_Contact_Form
     Protected Const apiAccessCode As String = "YWiIMIyGVVFEunRpDF5PNIF2yzcADdBxneRmWDlLpMTCoVFEunRWiIMIyRmWnRpDF"
-    Private strFileToHaveDataExportedTo As String = IO.Path.Combine(IO.Path.GetTempPath(), "event log entries.reslog")
+    Private strFileToHaveDataExportedTo As String = IO.Path.Combine(IO.Path.GetTempPath(), "event log entries.reslogx")
 
     Private Sub btnClose_Click(sender As Object, e As EventArgs) Handles btnClose.Click
         Me.Close()

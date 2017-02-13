@@ -1,6 +1,10 @@
-﻿Namespace Functions.eventLogFunctions
+﻿Imports System.Runtime.InteropServices
+Imports Microsoft.Win32
+
+Namespace Functions.eventLogFunctions
     Module eventLogFunctions
         Private Const strSystemRestorePointCreator As String = "System Restore Point Creator"
+        Private Const strRegistryApplicationPath As String = "SYSTEM\CurrentControlSet\services\eventlog\Application"
 
         ''' <summary>Exports the application logs to a file.</summary>
         ''' <param name="strLogFile">The path to the file we will be exporting the data to.</param>
@@ -10,21 +14,29 @@
             Try
                 Dim jsonEngine As New Web.Script.Serialization.JavaScriptSerializer
 
+                Dim logObject As New exportedLogFile
+                logObject.operatingSystem = osVersionInfo.getFullOSVersionString
+                logObject.programVersion = globalVariables.version.strFullVersionString
+                logObject.version = 4
+
+                Dim logsEntries As New List(Of restorePointCreatorExportedLog)()
+
                 If IO.File.Exists(strLogFile) Then IO.File.Delete(strLogFile)
-                Dim fileHandle As New IO.StreamWriter(strLogFile, False, Text.Encoding.UTF8)
 
-                fileHandle.WriteLine("// Export Data Version: 3")
-                fileHandle.WriteLine("// Program Version: " & globalVariables.version.strFullVersionString)
-                fileHandle.WriteLine("// Operating System: " & osVersionInfo.getFullOSVersionString)
-                fileHandle.WriteLine("// --== End Header Information ==--")
-                fileHandle.WriteLine("//")
+                exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strApplication, logsEntries, logCount)
+                exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strSystemRestorePointCreator, logsEntries, logCount)
 
-                exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strApplication, fileHandle, jsonEngine, logCount)
-                exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strSystemRestorePointCreator, fileHandle, jsonEngine, logCount)
+                logObject.logsEntries = logsEntries
 
-                jsonEngine = Nothing
-                fileHandle.Close()
-                fileHandle.Dispose()
+                Try
+                    Dim streamWriter As New IO.StreamWriter(strLogFile)
+                    Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(logObject.GetType)
+                    xmlSerializerObject.Serialize(streamWriter, logObject)
+                    streamWriter.Close()
+                    streamWriter.Dispose()
+                Catch ex As Exception
+                    writeCrashToEventLog(ex)
+                End Try
 
                 Return True
             Catch ex As Exception
@@ -46,14 +58,16 @@
                     Dim logName As String = "Application"
                     Dim host As String = "."
 
-                    If Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application\" & logSource) Is Nothing Then
-                        Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application", True).CreateSubKey(logSource)
-                        Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application\" & logSource, True).SetValue("EventMessageFile", IO.Path.Combine(Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "EventLogMessages.dll"), Microsoft.Win32.RegistryValueKind.String)
-                    Else
-                        If Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application\" & logSource, False).GetValue("EventMessageFile", Nothing) Is Nothing Then
-                            Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\services\eventlog\Application\" & logSource, True).SetValue("EventMessageFile", IO.Path.Combine(Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "EventLogMessages.dll"), Microsoft.Win32.RegistryValueKind.String)
+                    With Registry.LocalMachine
+                        If .OpenSubKey(strRegistryApplicationPath & "\" & logSource) Is Nothing Then
+                            .OpenSubKey(strRegistryApplicationPath, True).CreateSubKey(logSource)
+                            .OpenSubKey(strRegistryApplicationPath & "\" & logSource, True).SetValue("EventMessageFile", IO.Path.Combine(RuntimeEnvironment.GetRuntimeDirectory(), "EventLogMessages.dll"), RegistryValueKind.String)
+                        Else
+                            If .OpenSubKey(strRegistryApplicationPath & "\" & logSource, False).GetValue("EventMessageFile", Nothing) Is Nothing Then
+                                .OpenSubKey(strRegistryApplicationPath & "\" & logSource, True).SetValue("EventMessageFile", IO.Path.Combine(RuntimeEnvironment.GetRuntimeDirectory(), "EventLogMessages.dll"), RegistryValueKind.String)
+                            End If
                         End If
-                    End If
+                    End With
 
                     If Not EventLog.SourceExists(logSource, host) Then
                         EventLog.CreateEventSource(New EventSourceCreationData(logSource, logName))
@@ -118,13 +132,12 @@
 
         ''' <summary>This sub-routine is called by the exportLogsToFile() sub-routine, this is not intended to be called outside of this module.</summary>
         ''' <param name="logCount">This is a ByRef argument which passes back the number of logs that this function exported.</param>
-        ''' <param name="fileHandle">The file handle that we're writing to data to.</param>
         ''' <param name="strEventLog">The log that we're exporting.</param>
-        ''' <param name="jsonEngine">The JSON engine we're using to encode the data with.</param>
-        Private Sub exportApplicationEventLogEntriesToFile(ByVal strEventLog As String, ByRef fileHandle As IO.StreamWriter, ByRef jsonEngine As Web.Script.Serialization.JavaScriptSerializer, ByRef logCount As ULong)
+        Private Sub exportApplicationEventLogEntriesToFile(ByVal strEventLog As String, ByRef logEntries As List(Of restorePointCreatorExportedLog), ByRef logCount As ULong)
             Dim eventLogQuery As Eventing.Reader.EventLogQuery
             Dim logReader As Eventing.Reader.EventLogReader
             Dim eventInstance As Eventing.Reader.EventRecord
+            Dim logClass As restorePointCreatorExportedLog
 
             Try
                 If EventLog.Exists(strEventLog) Then
@@ -134,8 +147,9 @@
                     eventInstance = logReader.ReadEvent()
 
                     While eventInstance IsNot Nothing
-                        If eventInstance.ProviderName = strSystemRestorePointCreator Or eventInstance.ProviderName.caseInsensitiveContains(strSystemRestorePointCreator) = True Then
-                            Dim logClass As New restorePointCreatorExportedLog
+                        If eventInstance.ProviderName.Equals(strSystemRestorePointCreator, StringComparison.OrdinalIgnoreCase) Or eventInstance.ProviderName.caseInsensitiveContains(strSystemRestorePointCreator) = True Then
+                            logClass = New restorePointCreatorExportedLog
+
                             logClass.logData = eventInstance.FormatDescription
                             logClass.unixTime = eventInstance.TimeCreated.Value.ToUniversalTime.toUNIXTimestamp()
                             logClass.logType = eventInstance.Level
@@ -143,7 +157,7 @@
                             logClass.logID = eventInstance.RecordId
 
                             logCount += 1
-                            fileHandle.WriteLine(jsonEngine.Serialize(logClass))
+                            logEntries.Add(logClass)
                             logClass = Nothing
                         End If
 

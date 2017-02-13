@@ -354,147 +354,153 @@ Namespace Functions.startupFunctions
         End Sub
 
         Public Sub performApplicationUpdate(commandLineArgument As String)
-            Dim boolExtendedLoggingForUpdating As Boolean = True
+            Try
+                Dim boolExtendedLoggingForUpdating As Boolean = True
 
-            Dim registryObject As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
-            If registryObject IsNot Nothing Then
-                If Boolean.TryParse(registryObject.GetValue("Enable Extended Logging During Updating", "True"), boolExtendedLoggingForUpdating) = False Then
-                    ' This is in case we can't parse the value from the Registry.
-                    boolExtendedLoggingForUpdating = True
-                End If
-
-                registryObject.Close()
-                registryObject.Dispose()
-            End If
-
-            wait.createPleaseWaitWindow("Updating Restore Point Creator... Please Wait.", True, enums.howToCenterWindow.screen, True)
-
-            If boolExtendedLoggingForUpdating = True Then
-                eventLogFunctions.writeToSystemEventLog("Update thread sleeping for 5 seconds for processes to close out before continuing with update procedure.", EventLogEntryType.Information)
-            End If
-
-            Threading.Thread.Sleep(5000)
-
-            Dim boolNeedsReboot As Boolean = False
-            Dim currentProcessFileName As String = New FileInfo(Application.ExecutablePath).Name
-
-            If boolExtendedLoggingForUpdating = True Then
-                eventLogFunctions.writeToSystemEventLog("Beginning second phase of application update process. Verifying environment for updating.", EventLogEntryType.Information)
-            End If
-
-            If currentProcessFileName.caseInsensitiveContains(".new.exe") Then
-                If boolExtendedLoggingForUpdating = True Then
-                    eventLogFunctions.writeToSystemEventLog("The environment is ready for updating.", EventLogEntryType.Information)
-                End If
-
-                Dim restorePointCreatorMainEXEName As String = Regex.Replace(currentProcessFileName, Regex.Escape(".new.exe"), "", RegexOptions.IgnoreCase)
-
-                If commandLineArgument.stringCompare("-update") Then
-                    registryStuff.updateRestorePointCreatorUninstallationInfo()
-
-                    If globalVariables.version.boolBeta = True Then
-                        eventLogFunctions.writeToSystemEventLog(String.Format("Updated program to version {0} Public Beta {1}.", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion), EventLogEntryType.Information)
-                    ElseIf globalVariables.version.boolReleaseCandidate = True Then
-                        eventLogFunctions.writeToSystemEventLog(String.Format("Updated program to version {0} Release Candidate {1}.", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion), EventLogEntryType.Information)
-                    Else
-                        eventLogFunctions.writeToSystemEventLog(String.Format("Updated program to version {0}.", globalVariables.version.strFullVersionString), EventLogEntryType.Information)
+                Dim registryObject As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+                If registryObject IsNot Nothing Then
+                    If Boolean.TryParse(registryObject.GetValue("Enable Extended Logging During Updating", "True"), boolExtendedLoggingForUpdating) = False Then
+                        ' This is in case we can't parse the value from the Registry.
+                        boolExtendedLoggingForUpdating = True
                     End If
+
+                    registryObject.Close()
+                    registryObject.Dispose()
                 End If
 
-                If File.Exists(globalVariables.pdbFileNameInZIP & ".new") = True Then
+                wait.createPleaseWaitWindow("Updating Restore Point Creator... Please Wait.", True, enums.howToCenterWindow.screen, True)
+
+                If boolExtendedLoggingForUpdating = True Then
+                    eventLogFunctions.writeToSystemEventLog("Update thread sleeping for 5 seconds for processes to close out before continuing with update procedure.", EventLogEntryType.Information)
+                End If
+
+                Threading.Thread.Sleep(5000)
+
+                Dim boolNeedsReboot As Boolean = False
+                Dim currentProcessFileName As String = New FileInfo(Application.ExecutablePath).Name
+
+                If boolExtendedLoggingForUpdating = True Then
+                    eventLogFunctions.writeToSystemEventLog("Beginning second phase of application update process. Verifying environment for updating.", EventLogEntryType.Information)
+                End If
+
+                If currentProcessFileName.caseInsensitiveContains(".new.exe") Then
                     If boolExtendedLoggingForUpdating = True Then
-                        eventLogFunctions.writeToSystemEventLog("PDB file found. Starting the updating of the PDF file.", EventLogEntryType.Information)
+                        eventLogFunctions.writeToSystemEventLog("The environment is ready for updating.", EventLogEntryType.Information)
+                    End If
+
+                    Dim restorePointCreatorMainEXEName As String = Regex.Replace(currentProcessFileName, Regex.Escape(".new.exe"), "", RegexOptions.IgnoreCase)
+
+                    If commandLineArgument.stringCompare("-update") Then
+                        registryStuff.updateRestorePointCreatorUninstallationInfo()
+
+                        If globalVariables.version.boolBeta = True Then
+                            eventLogFunctions.writeToSystemEventLog(String.Format("Updated program to version {0} Public Beta {1}.", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion), EventLogEntryType.Information)
+                        ElseIf globalVariables.version.boolReleaseCandidate = True Then
+                            eventLogFunctions.writeToSystemEventLog(String.Format("Updated program to version {0} Release Candidate {1}.", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion), EventLogEntryType.Information)
+                        Else
+                            eventLogFunctions.writeToSystemEventLog(String.Format("Updated program to version {0}.", globalVariables.version.strFullVersionString), EventLogEntryType.Information)
+                        End If
+                    End If
+
+                    If File.Exists(globalVariables.pdbFileNameInZIP & ".new") = True Then
+                        If boolExtendedLoggingForUpdating = True Then
+                            eventLogFunctions.writeToSystemEventLog("PDB file found. Starting the updating of the PDF file.", EventLogEntryType.Information)
+                        End If
+
+                        Try
+                            File.Delete(globalVariables.pdbFileNameInZIP)
+                            File.Move(globalVariables.pdbFileNameInZIP & ".new", globalVariables.pdbFileNameInZIP)
+
+                            If boolExtendedLoggingForUpdating = True Then
+                                eventLogFunctions.writeToSystemEventLog("Update of the PDB file complete.", EventLogEntryType.Information)
+                            End If
+                        Catch ex As Exception
+                            Dim pdbFullPath As String = New FileInfo(globalVariables.pdbFileNameInZIP).FullName
+                            APIs.MoveFileEx(pdbFullPath, vbNullString, 4)
+                            APIs.MoveFileEx(pdbFullPath & ".new", pdbFullPath, 4)
+                            boolNeedsReboot = True
+
+                            eventLogFunctions.writeToSystemEventLog("Something went wrong with the updating of the PDB file, scheduling it for update at system reboot.", EventLogEntryType.Error)
+                        End Try
+                    Else
+                        If boolExtendedLoggingForUpdating = True Then
+                            eventLogFunctions.writeToSystemEventLog("No PDB file found, skipping PDB file update.", EventLogEntryType.Information)
+                        End If
+                    End If
+
+                    If boolExtendedLoggingForUpdating = True Then
+                        eventLogFunctions.writeToSystemEventLog(String.Format("Killing process with parent executable of {0}{1}{0}.", Chr(34), restorePointCreatorMainEXEName), EventLogEntryType.Information)
+                    End If
+
+                    support.searchForProcessAndKillIt(restorePointCreatorMainEXEName, False)
+
+                    If boolExtendedLoggingForUpdating = True Then
+                        eventLogFunctions.writeToSystemEventLog("Starting the updating of the core executable file.", EventLogEntryType.Information)
                     End If
 
                     Try
-                        File.Delete(globalVariables.pdbFileNameInZIP)
-                        File.Move(globalVariables.pdbFileNameInZIP & ".new", globalVariables.pdbFileNameInZIP)
+                        File.Delete(restorePointCreatorMainEXEName)
+                        File.Copy(currentProcessFileName, restorePointCreatorMainEXEName)
 
                         If boolExtendedLoggingForUpdating = True Then
-                            eventLogFunctions.writeToSystemEventLog("Update of the PDB file complete.", EventLogEntryType.Information)
+                            eventLogFunctions.writeToSystemEventLog("Update of the core executable file complete.", EventLogEntryType.Information)
                         End If
                     Catch ex As Exception
-                        Dim pdbFullPath As String = New FileInfo(globalVariables.pdbFileNameInZIP).FullName
-                        APIs.MoveFileEx(pdbFullPath, vbNullString, 4)
-                        APIs.MoveFileEx(pdbFullPath & ".new", pdbFullPath, 4)
+                        APIs.MoveFileEx(New FileInfo(restorePointCreatorMainEXEName).FullName, vbNullString, 4)
+                        APIs.MoveFileEx(New FileInfo(currentProcessFileName).FullName, New FileInfo(restorePointCreatorMainEXEName).FullName, 4)
                         boolNeedsReboot = True
 
-                        eventLogFunctions.writeToSystemEventLog("Something went wrong with the updating of the PDB file, scheduling it for update at system reboot.", EventLogEntryType.Error)
+                        eventLogFunctions.writeToSystemEventLog("Something went wrong with the updating of the core executable file, scheduling it for update at system reboot.", EventLogEntryType.Error)
                     End Try
-                Else
-                    If boolExtendedLoggingForUpdating = True Then
-                        eventLogFunctions.writeToSystemEventLog("No PDB file found, skipping PDB file update.", EventLogEntryType.Information)
-                    End If
-                End If
 
-                If boolExtendedLoggingForUpdating = True Then
-                    eventLogFunctions.writeToSystemEventLog(String.Format("Killing process with parent executable of {0}{1}{0}.", Chr(34), restorePointCreatorMainEXEName), EventLogEntryType.Information)
-                End If
+                    If boolNeedsReboot = True Then
+                        writeKeyToRegistryToForceUpdateAtNextRun()
 
-                support.searchForProcessAndKillIt(restorePointCreatorMainEXEName, False)
+                        Dim msgBoxResult As MsgBoxResult = MsgBox("A system restart will need to be done in order to finish the update. System Restore Point Creator will not function properly until you restart your system." & vbCrLf & vbCrLf & "Would you like to restart your system now?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Restart?")
 
-                If boolExtendedLoggingForUpdating = True Then
-                    eventLogFunctions.writeToSystemEventLog("Starting the updating of the core executable file.", EventLogEntryType.Information)
-                End If
+                        If msgBoxResult = MsgBoxResult.Yes Then
+                            If boolExtendedLoggingForUpdating = True Then
+                                eventLogFunctions.writeToSystemEventLog("Rebooting system.", EventLogEntryType.Information)
+                            End If
 
-                Try
-                    File.Delete(restorePointCreatorMainEXEName)
-                    File.Copy(currentProcessFileName, restorePointCreatorMainEXEName)
+                            support.rebootSystem()
+                            Process.GetCurrentProcess.Kill()
+                        Else
+                            If boolExtendedLoggingForUpdating = True Then
+                                eventLogFunctions.writeToSystemEventLog("User chose not to reboot the system. Application updating is scheduled for the next system reboot.", EventLogEntryType.Information)
+                            End If
 
-                    If boolExtendedLoggingForUpdating = True Then
-                        eventLogFunctions.writeToSystemEventLog("Update of the core executable file complete.", EventLogEntryType.Information)
-                    End If
-                Catch ex As Exception
-                    APIs.MoveFileEx(New FileInfo(restorePointCreatorMainEXEName).FullName, vbNullString, 4)
-                    APIs.MoveFileEx(New FileInfo(currentProcessFileName).FullName, New FileInfo(restorePointCreatorMainEXEName).FullName, 4)
-                    boolNeedsReboot = True
-
-                    eventLogFunctions.writeToSystemEventLog("Something went wrong with the updating of the core executable file, scheduling it for update at system reboot.", EventLogEntryType.Error)
-                End Try
-
-                If boolNeedsReboot = True Then
-                    writeKeyToRegistryToForceUpdateAtNextRun()
-
-                    Dim msgBoxResult As MsgBoxResult = MsgBox("A system restart will need to be done in order to finish the update. System Restore Point Creator will not function properly until you restart your system." & vbCrLf & vbCrLf & "Would you like to restart your system now?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Restart?")
-
-                    If msgBoxResult = MsgBoxResult.Yes Then
+                            MsgBox("System Restore Point Creator will not function properly until your system is rebooted.", MsgBoxStyle.Information, "System Restore Point Creator -- Application Update")
+                        End If
+                    Else
                         If boolExtendedLoggingForUpdating = True Then
-                            eventLogFunctions.writeToSystemEventLog("Rebooting system.", EventLogEntryType.Information)
+                            eventLogFunctions.writeToSystemEventLog("Starting the third and final phase of application update procedure; verification of update.", EventLogEntryType.Information)
                         End If
 
-                        support.rebootSystem()
+                        If File.Exists(restorePointCreatorMainEXEName) = True Then
+                            If boolExtendedLoggingForUpdating = True Then
+                                eventLogFunctions.writeToSystemEventLog("Final verification of update complete, things all look good. Starting newly updated program.", EventLogEntryType.Information)
+                            End If
+
+                            eventLogFunctions.writeToSystemEventLog("Application Update Procedure Complete.", EventLogEntryType.Information)
+
+                            Process.Start(New ProcessStartInfo With {.FileName = restorePointCreatorMainEXEName, .Verb = "runas"})
+                        Else
+                            MsgBox("Something went wrong during the update process.", MsgBoxStyle.Critical, "Restore Point Creator Update Procedure")
+                            Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe"), New FileInfo(Application.ExecutablePath).DirectoryName)
+                        End If
+
                         Process.GetCurrentProcess.Kill()
-                    Else
-                        If boolExtendedLoggingForUpdating = True Then
-                            eventLogFunctions.writeToSystemEventLog("User chose not to reboot the system. Application updating is scheduled for the next system reboot.", EventLogEntryType.Information)
-                        End If
-
-                        MsgBox("System Restore Point Creator will not function properly until your system is rebooted.", MsgBoxStyle.Information, "System Restore Point Creator -- Application Update")
                     End If
                 Else
-                    If boolExtendedLoggingForUpdating = True Then
-                        eventLogFunctions.writeToSystemEventLog("Starting the third and final phase of application update procedure; verification of update.", EventLogEntryType.Information)
-                    End If
-
-                    If File.Exists(restorePointCreatorMainEXEName) = True Then
-                        If boolExtendedLoggingForUpdating = True Then
-                            eventLogFunctions.writeToSystemEventLog("Final verification of update complete, things all look good. Starting newly updated program.", EventLogEntryType.Information)
-                        End If
-
-                        eventLogFunctions.writeToSystemEventLog("Application Update Procedure Complete.", EventLogEntryType.Information)
-
-                        Process.Start(New ProcessStartInfo With {.FileName = restorePointCreatorMainEXEName, .Verb = "runas"})
-                    Else
-                        MsgBox("Something went wrong during the update process.", MsgBoxStyle.Critical, "Restore Point Creator Update Procedure")
-                        Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe"), New FileInfo(Application.ExecutablePath).DirectoryName)
-                    End If
-
+                    MsgBox("The environment is not ready for an update. This process will now terminate.", MsgBoxStyle.Critical, "Restore Point Creator")
                     Process.GetCurrentProcess.Kill()
                 End If
-            Else
-                MsgBox("The environment is not ready for an update. This process will now terminate.", MsgBoxStyle.Critical, "Restore Point Creator")
+            Catch ex As Exception
+                eventLogFunctions.writeCrashToEventLog(ex)
+                MsgBox("Something went wrong during the application update procedure, please see the Application Event Log for more details.", MsgBoxStyle.Critical, "Restore Point Creator -- Error")
                 Process.GetCurrentProcess.Kill()
-            End If
+            End Try
         End Sub
     End Module
 End Namespace
