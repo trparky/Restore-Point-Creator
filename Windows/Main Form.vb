@@ -864,25 +864,6 @@ Public Class Form1
         Functions.support.launchURLInWebBrowser(globalVariables.webURLs.webPages.strPayPal, "An error occurred when trying to launch the donation URL in your default browser. The donation URL has been copied to your Windows Clipboard for you to paste into the address bar in the browser of your choice.")
     End Sub
 
-    Private Function calculateConfigBackupDataPayloadChecksum(strInput As String, strSaltedString As String) As String
-        Dim string1, string2, string3, string4 As String
-        string1 = strInput.Substring(0, 30)
-        string2 = strInput.Substring(29, 30)
-        string3 = strInput.Substring(59, 30)
-        string4 = strInput.Substring(89, 30)
-
-        Dim compoundString As String = strInput & string4 & strSaltedString & string1 & strInput & strSaltedString & string4 & string3 & strInput & strSaltedString & string2 & string1 & strInput & strSaltedString
-
-        Return SHA512ChecksumString(compoundString)
-    End Function
-
-    Private Function SHA512ChecksumString(input As String) As String
-        Dim SHA1Engine As New Security.Cryptography.SHA512CryptoServiceProvider
-        Dim inputAsByteArray As Byte() = Encoding.ASCII.GetBytes(input)
-        Dim hashedByteArray As Byte() = SHA1Engine.ComputeHash(inputAsByteArray)
-        Return BitConverter.ToString(hashedByteArray).ToLower().Replace("-", "").Trim
-    End Function
-
     Private Sub switchToDebugBuildDownloadThreadSub()
         Try
             Dim memoryStream As New IO.MemoryStream()
@@ -2336,7 +2317,7 @@ Public Class Form1
 
     Private Sub BackupToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BackupToolStripMenuItem.Click
         exportBackupDialog.Title = "Backup your settings where?"
-        exportBackupDialog.Filter = "Config Backup File|*.resbak|INI File|*.ini"
+        exportBackupDialog.Filter = "Config Backup File|*.resbakx"
         exportBackupDialog.FileName = Nothing
 
         If exportBackupDialog.ShowDialog() = DialogResult.OK Then
@@ -2349,82 +2330,7 @@ Public Class Form1
                 IO.File.Delete(exportBackupDialog.FileName)
             End If
 
-            Dim iniFile As New IniFile
-            Dim settingName As String, settingType As Type, settingValue As Object
-            Dim stringCollection As Specialized.StringCollection
-            Dim point As Point
-
-            For Each settingProperty As Object In My.Settings.PropertyValues
-                If settingProperty.propertyvalue IsNot Nothing Then
-                    settingName = settingProperty.name
-                    settingType = settingProperty.propertyvalue.GetType
-
-                    If settingType = GetType(Color) Then
-                        settingValue = DirectCast(settingProperty.propertyvalue, Color).ToArgb
-                    Else
-                        settingValue = settingProperty.propertyvalue.ToString
-                    End If
-
-                    If settingType = GetType(Short) Or settingType = GetType(Integer) Or settingType = GetType(Boolean) Or settingType = GetType(String) Or settingType = GetType(Size) Or settingType = GetType(Color) Then
-                        If settingType = GetType(String) Then
-                            If Not String.IsNullOrEmpty(DirectCast(settingValue, String).Trim) Then
-                                iniFile.SetKeyValue("Settings", settingName, settingType.ToString & "," & settingValue)
-                            End If
-                        Else
-                            iniFile.SetKeyValue("Settings", settingName, settingType.ToString & "," & settingValue)
-                        End If
-                    ElseIf settingType = GetType(Specialized.StringCollection) Then
-                        stringCollection = DirectCast(settingProperty.propertyvalue, Specialized.StringCollection)
-
-                        Dim tempArray(stringCollection.Count - 1) As String
-                        stringCollection.CopyTo(tempArray, 0)
-                        iniFile.SetKeyValue("Settings", settingName, settingType.ToString & "," & (New Web.Script.Serialization.JavaScriptSerializer).Serialize(tempArray))
-                    ElseIf settingType = GetType(Point) Then
-                        point = DirectCast(settingProperty.propertyvalue, Point)
-                        iniFile.SetKeyValue("Settings", settingName, settingType.ToString & "," & point.X & "|" & point.Y)
-                    End If
-                End If
-
-                settingName = Nothing
-                settingType = Nothing
-                settingValue = Nothing
-            Next
-
-            Dim registryKeyWeAreWorkingWith As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
-            Dim registryValue As String
-
-            For Each registryValueName As String In registryKeyWeAreWorkingWith.GetValueNames
-                registryValue = registryKeyWeAreWorkingWith.GetValue(registryValueName, Nothing)
-
-                If registryValue IsNot Nothing Then
-                    iniFile.SetKeyValue("Registry", registryValueName.Replace(" ", "_"), registryValue)
-                    registryValue = Nothing
-                End If
-            Next
-
-            registryKeyWeAreWorkingWith.Close()
-            registryKeyWeAreWorkingWith.Dispose()
-
-            Dim fileInfo As New IO.FileInfo(exportBackupDialog.FileName)
-            Debug.WriteLine(fileInfo.Extension)
-
-            If fileInfo.Extension.stringCompare(".ini") Then
-                iniFile.Save(exportBackupDialog.FileName)
-            Else
-                Dim iniFileTextBase64ed As String = Functions.support.convertToBase64(iniFile.getINIText())
-                Dim randomString As String = Functions.support.randomStringGenerator((New Random).Next(100, 300))
-                Dim checksum As String = calculateConfigBackupDataPayloadChecksum(iniFileTextBase64ed, randomString)
-
-                Dim streamWriter As New IO.StreamWriter(exportBackupDialog.FileName)
-                streamWriter.WriteLine("Payload: " & iniFileTextBase64ed)
-                streamWriter.WriteLine("Random String: " & randomString)
-                streamWriter.Write("Checksum: " & checksum)
-
-                streamWriter.Close()
-                streamWriter.Dispose()
-            End If
-
-            iniFile = Nothing
+            Functions.support.exportSettingsToXMLFile(exportBackupDialog.FileName)
 
             MsgBox("Backup complete.", MsgBoxStyle.Information, strMessageBoxTitle)
         End If
@@ -2432,129 +2338,16 @@ Public Class Form1
 
     Private Sub RestoreToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RestoreToolStripMenuItem.Click
         importBackupDialog.Title = "Locate your backup file..."
-        importBackupDialog.Filter = "Config Backup File|*.resbak|INI File|*.ini"
+        importBackupDialog.Filter = "XML Config Backup File|*.resbakx|Config Backup File|*.resbak|INI File|*.ini"
         importBackupDialog.FileName = Nothing
 
         If importBackupDialog.ShowDialog() = DialogResult.OK Then
             If IO.File.Exists(importBackupDialog.FileName) = True Then
-                Dim fileInfo As New IO.FileInfo(importBackupDialog.FileName)
-                Dim iniFile As New IniFile
-
-                If fileInfo.Extension.stringCompare(".ini") Then
-                    iniFile.loadINIFileFromFile(importBackupDialog.FileName)
+                If New IO.FileInfo(importBackupDialog.FileName).Extension.Equals(".resbakx", OrdinalIgnoreCase) Then
+                    Functions.support.importSettingsFromXMLFile(importBackupDialog.FileName, strMessageBoxTitle)
                 Else
-                    Dim streamReader As New IO.StreamReader(importBackupDialog.FileName)
-                    Dim strDataPayload = Nothing, strRandomString = Nothing, strChecksum = Nothing, strTemp As String
-
-                    While streamReader.EndOfStream = False
-                        strTemp = streamReader.ReadLine
-
-                        If strTemp.StartsWith("Payload: ", OrdinalIgnoreCase) = True Then
-                            strDataPayload = strTemp.caseInsensitiveReplace("Payload: ", "").Trim
-                        ElseIf strTemp.StartsWith("Random String: ", OrdinalIgnoreCase) = True Then
-                            strRandomString = strTemp.caseInsensitiveReplace("Random String: ", "").Trim
-                        ElseIf strTemp.StartsWith("Checksum: ", OrdinalIgnoreCase) = True Then
-                            strChecksum = strTemp.caseInsensitiveReplace("Checksum: ", "").Trim
-                        End If
-                    End While
-
-                    streamReader.Close()
-                    streamReader.Dispose()
-
-                    If calculateConfigBackupDataPayloadChecksum(strDataPayload, strRandomString) = strChecksum Then
-                        iniFile.loadINIFileFromText(Functions.support.convertFromBase64(strDataPayload))
-                    Else
-                        MsgBox("Invalid backup file.", MsgBoxStyle.Critical, strMessageBoxTitle)
-                        Exit Sub
-                    End If
+                    Functions.support.importSettingsFromLegacyBackupFile(importBackupDialog.FileName, strMessageBoxTitle)
                 End If
-
-                Dim iniFileValue, iniFileKeyName As String
-                Dim tempShort As Short, tempInteger As Integer, tempBoolean As Boolean
-                Dim tempWidth, tempHeight As Integer
-                Dim regExMatches As Match
-
-                Dim systemDrawingSizeRegexObject As New Regex("\{Width=(?<width>[0-9]{1,4}), Height=(?<height>[0-9]{1,4})\}", RegexOptions.Compiled)
-
-                For Each valueObject As Object In iniFile.GetSection("Settings").Keys
-                    Try
-                        iniFileKeyName = valueObject.name
-                        iniFileValue = valueObject.value
-
-                        If iniFileValue.StartsWith("System.Int16") Then
-                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Int16,", "")
-
-                            If Short.TryParse(iniFileValue, tempShort) Then
-                                My.Settings(iniFileKeyName) = tempShort
-                            End If
-                        ElseIf iniFileValue.StartsWith("System.Int32") Then
-                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Int32,", "")
-
-                            If Integer.TryParse(iniFileValue, tempInteger) Then
-                                My.Settings(iniFileKeyName) = tempInteger
-                            End If
-                        ElseIf iniFileValue.StartsWith("System.Boolean") Then
-                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Boolean,", "")
-
-                            If Boolean.TryParse(iniFileValue, tempBoolean) Then
-                                My.Settings(iniFileKeyName) = tempBoolean
-                            End If
-                        ElseIf iniFileValue.StartsWith("System.String") Then
-                            My.Settings(iniFileKeyName) = iniFileValue.caseInsensitiveReplace("System.String,", "")
-                        ElseIf iniFileValue.StartsWith("System.Drawing.Size") Then
-                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Drawing.Size,", "")
-
-                            If systemDrawingSizeRegexObject.IsMatch(iniFileValue) = True Then
-                                regExMatches = systemDrawingSizeRegexObject.Match(iniFileValue)
-
-                                tempWidth = Integer.Parse(regExMatches.Groups("width").Value)
-                                tempHeight = Integer.Parse(regExMatches.Groups("height").Value)
-
-                                regExMatches = Nothing
-                                My.Settings(iniFileKeyName) = New Size(tempWidth, tempHeight)
-                            End If
-                        ElseIf iniFileValue.StartsWith("System.Drawing.Color") Then
-                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Drawing.Color,", "")
-
-                            If Integer.TryParse(iniFileValue, tempInteger) Then
-                                My.Settings(iniFileKeyName) = Color.FromArgb(tempInteger)
-                            End If
-                        ElseIf iniFileValue.StartsWith("System.Collections.Specialized.StringCollection") Then
-                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Collections.Specialized.StringCollection,", "")
-                            Dim deJSONedObject As String() = (New Web.Script.Serialization.JavaScriptSerializer).Deserialize(iniFileValue, GetType(String()))
-
-                            Dim tempStringCollection As New Specialized.StringCollection
-                            For i = 0 To deJSONedObject.Count - 1
-                                tempStringCollection.Add(deJSONedObject(i))
-                            Next
-                            My.Settings(iniFileKeyName) = tempStringCollection
-                        ElseIf iniFileValue.StartsWith("System.Drawing.Point") Then
-                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Drawing.Point,", "").Trim
-                            Dim pointParts() As String = iniFileValue.Split("|")
-                            My.Settings(iniFileKeyName) = New Point(pointParts(0), pointParts(1))
-                        End If
-                    Catch ex As Configuration.SettingsPropertyNotFoundException
-                        ' Does nothing
-                    End Try
-                Next
-
-                My.Settings.Save()
-
-                systemDrawingSizeRegexObject = Nothing
-
-                Dim registryKeyWeAreWorkingWith As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
-
-                For Each valueObject As Object In iniFile.GetSection("Registry").Keys
-                    iniFileKeyName = valueObject.name.ToString.Replace("_", " ")
-                    iniFileValue = valueObject.value.ToString
-
-                    registryKeyWeAreWorkingWith.SetValue(iniFileKeyName, iniFileValue, RegistryValueKind.String)
-                Next
-
-                registryKeyWeAreWorkingWith.Close()
-                registryKeyWeAreWorkingWith.Dispose()
-
-                iniFile = Nothing
 
                 Functions.eventLogFunctions.writeToSystemEventLog(String.Format("A configuration backup has been restored from {0}{1}{0} by user {0}{2}{0}.", Chr(34), importBackupDialog.FileName, Environment.UserName), EventLogEntryType.Information)
 

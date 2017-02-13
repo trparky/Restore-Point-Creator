@@ -122,6 +122,7 @@
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
     <Compile Include="Classes and Modules\Exported Log Class.vb" />
+    <Compile Include="Classes and Modules\exportedSettings.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\apis.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\checksum.vb" />
     <Compile Include="Classes and Modules\enums.vb" />
