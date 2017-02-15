@@ -1262,9 +1262,26 @@ Public Class Form1
         Dim extractPDB As Boolean = False
         Dim boolRebootNeeded As Boolean = False
         Dim memoryStream As New IO.MemoryStream()
+        Dim overrideURLPaths As Boolean = False
 
-        If boolOverrideUserUpdateChannelPreferences = True Then
+        If boolOverrideUserUpdateChannelPreferences And Not updateChannel.Equals(globalVariables.updateChannels.stable) Then
+            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                Functions.eventLogFunctions.writeToSystemEventLog("Forcing the update channel to the stable channel for this update session.", EventLogEntryType.Information)
+            End If
+
             updateChannel = globalVariables.updateChannels.stable
+
+            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                Functions.eventLogFunctions.writeToSystemEventLog("Setting extractPDB flag to True.", EventLogEntryType.Information)
+            End If
+
+            extractPDB = True
+
+            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                Functions.eventLogFunctions.writeToSystemEventLog("Setting overrideURLPaths flag to True.", EventLogEntryType.Information)
+            End If
+
+            overrideURLPaths = True
         End If
 
         If updateChannel = globalVariables.updateChannels.stable Then
@@ -1272,7 +1289,19 @@ Public Class Form1
                 Functions.eventLogFunctions.writeToSystemEventLog("Downloading compressed application ZIP package into system RAM.", EventLogEntryType.Information)
             End If
 
-            If Functions.http.downloadFile(globalVariables.webURLs.updateBranch.main.strProgramZIP, memoryStream) = False Then
+            Dim urlToZipFile As String = globalVariables.webURLs.updateBranch.main.strProgramZIP
+            Dim urlToZipFileSHA2 As String = globalVariables.webURLs.updateBranch.main.strProgramZIPSHA2
+
+            If boolOverrideUserUpdateChannelPreferences And overrideURLPaths Then
+                If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                    Functions.eventLogFunctions.writeToSystemEventLog("Overriding URL paths for download in this update session.", EventLogEntryType.Information)
+                End If
+
+                urlToZipFile = globalVariables.webURLs.updateBranch.debug.strProgramZIP
+                urlToZipFileSHA2 = globalVariables.webURLs.updateBranch.debug.strProgramZIPSHA2
+            End If
+
+            If Functions.http.downloadFile(urlToZipFile, memoryStream) = False Then
                 memoryStream.Close()
                 memoryStream.Dispose()
                 memoryStream = Nothing
@@ -1285,7 +1314,7 @@ Public Class Form1
                 Functions.eventLogFunctions.writeToSystemEventLog("Compressed application ZIP package download complete. Now verifying compressed application ZIP package integrity.", EventLogEntryType.Information)
             End If
 
-            If Functions.checksum.verifyChecksum(globalVariables.webURLs.updateBranch.main.strProgramZIPSHA2, memoryStream, True) = False Then
+            If Functions.checksum.verifyChecksum(urlToZipFileSHA2, memoryStream, True) = False Then
                 Functions.eventLogFunctions.writeToSystemEventLog("There was an error in the download of the program's ZIP file, checksums don't match. Update process aborted.", EventLogEntryType.Error)
 
                 memoryStream.Close()
@@ -1315,9 +1344,6 @@ Public Class Form1
 
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                 Functions.eventLogFunctions.writeToSystemEventLog("Compressed application ZIP package download complete. Now verifying compressed application ZIP package integrity.", EventLogEntryType.Information)
-            End If
-
-            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
             End If
 
             If Functions.checksum.verifyChecksum(globalVariables.webURLs.updateBranch.beta.strProgramZIPSHA2, memoryStream, True) = False Then
@@ -1501,13 +1527,13 @@ Public Class Form1
             ' we need to upgrade the user to the latest release branch version first.
             If (My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta, OrdinalIgnoreCase) Or My.Settings.updateChannel.Equals(globalVariables.updateChannels.tom, OrdinalIgnoreCase)) And remoteVersion <> globalVariables.version.versionStringWithoutBuild Then
                 ' OK, both conditions were met so we need to set some stuff up for later use in this function.
-                
+
                 boolSetTriggerUpdateAtNextRuntimeSetting = True ' We need to tell this sub-routine to set a trigger in the Registry that triggers an update check at the next program launch.
                 boolOverrideUserUpdateChannelPreferences = True ' We need to override the update channel that the user has so we set this value to True.
 
                 updateType = Functions.support.updateType.release ' We override the update type to release.
             End If
-            
+
             ' At this point, if the conditional statement above didn't work out and the code inside the
             ' statement didn't execute then we simply go onto the rest of the update code that is below.
 
