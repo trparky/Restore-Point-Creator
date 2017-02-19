@@ -43,9 +43,6 @@ Partial Class frmManageSystemRestoreStorageSpace
         '
         'SplitContainer1
         '
-        Me.SplitContainer1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.SplitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel2
         Me.SplitContainer1.Location = New System.Drawing.Point(0, 0)
         Me.SplitContainer1.Name = "SplitContainer1"
@@ -59,7 +56,6 @@ Partial Class frmManageSystemRestoreStorageSpace
         'SplitContainer1.Panel2
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.lblDriveSize)
-        Me.SplitContainer1.Panel2.Controls.Add(Me.chkConfirmNewSmallerSize)
         Me.SplitContainer1.Panel2.Controls.Add(Me.Label2)
         Me.SplitContainer1.Panel2.Controls.Add(Me.percentageIndicator)
         Me.SplitContainer1.Panel2.Controls.Add(Me.txtSize)
@@ -68,7 +64,7 @@ Partial Class frmManageSystemRestoreStorageSpace
         Me.SplitContainer1.Panel2.Controls.Add(Me.lblUsedShadowStorageSpace)
         Me.SplitContainer1.Panel2.Controls.Add(Me.btnSetSize)
         Me.SplitContainer1.Panel2MinSize = 385
-        Me.SplitContainer1.Size = New System.Drawing.Size(463, 159)
+        Me.SplitContainer1.Size = New System.Drawing.Size(463, 139)
         Me.SplitContainer1.SplitterDistance = 74
         Me.SplitContainer1.TabIndex = 16
         '
@@ -76,7 +72,7 @@ Partial Class frmManageSystemRestoreStorageSpace
         '
         Me.listDrives.Location = New System.Drawing.Point(10, 24)
         Me.listDrives.Name = "listDrives"
-        Me.listDrives.Size = New System.Drawing.Size(52, 127)
+        Me.listDrives.Size = New System.Drawing.Size(52, 109)
         Me.listDrives.TabIndex = 2
         Me.listDrives.UseCompatibleStateImageBehavior = False
         Me.listDrives.View = System.Windows.Forms.View.List
@@ -102,7 +98,7 @@ Partial Class frmManageSystemRestoreStorageSpace
         'chkConfirmNewSmallerSize
         '
         Me.chkConfirmNewSmallerSize.AutoSize = True
-        Me.chkConfirmNewSmallerSize.Location = New System.Drawing.Point(6, 139)
+        Me.chkConfirmNewSmallerSize.Location = New System.Drawing.Point(10, 139)
         Me.chkConfirmNewSmallerSize.Name = "chkConfirmNewSmallerSize"
         Me.chkConfirmNewSmallerSize.Size = New System.Drawing.Size(220, 17)
         Me.chkConfirmNewSmallerSize.TabIndex = 15
@@ -177,24 +173,25 @@ Partial Class frmManageSystemRestoreStorageSpace
         'chkAdvancedMode
         '
         Me.chkAdvancedMode.AutoSize = True
-        Me.chkAdvancedMode.Location = New System.Drawing.Point(10, 157)
+        Me.chkAdvancedMode.Location = New System.Drawing.Point(236, 139)
         Me.chkAdvancedMode.Name = "chkAdvancedMode"
-        Me.chkAdvancedMode.Size = New System.Drawing.Size(191, 17)
+        Me.chkAdvancedMode.Size = New System.Drawing.Size(109, 30)
         Me.chkAdvancedMode.TabIndex = 17
-        Me.chkAdvancedMode.Text = "Advanced Mode (For Experts Only)"
+        Me.chkAdvancedMode.Text = "Advanced Mode" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "(For Experts Only)"
         Me.chkAdvancedMode.UseVisualStyleBackColor = True
         '
         'frmManageSystemRestoreStorageSpace
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
-        Me.ClientSize = New System.Drawing.Size(463, 178)
+        Me.ClientSize = New System.Drawing.Size(463, 170)
         Me.Controls.Add(Me.chkAdvancedMode)
+        Me.Controls.Add(Me.chkConfirmNewSmallerSize)
         Me.Controls.Add(Me.SplitContainer1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
         Me.Icon = Global.Restore_Point_Creator.My.Resources.Resources.RestorePoint_noBackground_2
         Me.MaximizeBox = False
-        Me.MinimumSize = New System.Drawing.Size(405, 217)
+        Me.MinimumSize = New System.Drawing.Size(405, 209)
         Me.Name = "frmManageSystemRestoreStorageSpace"
         Me.Text = "Manage System Restore Storage Space"
         Me.SplitContainer1.Panel1.ResumeLayout(False)

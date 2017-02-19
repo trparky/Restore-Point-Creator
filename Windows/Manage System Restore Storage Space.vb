@@ -6,6 +6,8 @@ Public Class frmManageSystemRestoreStorageSpace
     Private Const gigabytesInBytes As Long = 1073741824
     Private Const terabytesInBytes As Long = 1099511627776
 
+    Private Const windowHeight As Short = 209
+
     Public strDriveLetterWeAreWorkingWith As String
 
     Private Sub frmManageSystemRestoreStorageSpace_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
@@ -45,11 +47,13 @@ Public Class frmManageSystemRestoreStorageSpace
     End Sub
 
     Private Sub frmManageSystemRestoreStorageSpace_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.SplitContainer1.Anchor = CType((AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right), AnchorStyles)
+
         If Not String.IsNullOrEmpty(strDriveLetterWeAreWorkingWith) Then
-            Me.Size = New Size(479, 217)
+            Me.Size = New Size(479, windowHeight)
             chkAdvancedMode.Checked = True
         Else
-            Me.Size = New Size(405, 217)
+            Me.Size = New Size(405, windowHeight)
         End If
 
         listDrives.Items.Clear()
@@ -220,7 +224,7 @@ Public Class frmManageSystemRestoreStorageSpace
 
     Private Sub chkAdvancedMode_Click(sender As Object, e As EventArgs) Handles chkAdvancedMode.Click
         If chkAdvancedMode.Checked Then
-            Me.Size = New Size(479, 217)
+            Me.Size = New Size(479, windowHeight)
 
             lblDriveSize.Text = "Total Size of Drive:"
             lblDriveLabel.Text = "Drive Label:"
@@ -231,7 +235,7 @@ Public Class frmManageSystemRestoreStorageSpace
             btnSetSize.Text = Nothing
             btnSetSize.Enabled = False
         Else
-            Me.Size = New Size(405, 217)
+            Me.Size = New Size(405, windowHeight)
             loadDriveData(globalVariables.systemDriveLetter)
         End If
     End Sub
