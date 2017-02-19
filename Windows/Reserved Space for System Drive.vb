@@ -97,7 +97,7 @@
     Sub manualFixSub(drive As String)
         If (globalVariables.windows.frmManageSystemRestoreStorageSpace Is Nothing) Then
             globalVariables.windows.frmManageSystemRestoreStorageSpace = New frmManageSystemRestoreStorageSpace
-            globalVariables.windows.frmManageSystemRestoreStorageSpace.preSelectedDriveLetter = drive
+            globalVariables.windows.frmManageSystemRestoreStorageSpace.strDriveLetterWeAreWorkingWith = drive
             globalVariables.windows.frmManageSystemRestoreStorageSpace.Show()
         Else
             globalVariables.windows.frmManageSystemRestoreStorageSpace.BringToFront()
