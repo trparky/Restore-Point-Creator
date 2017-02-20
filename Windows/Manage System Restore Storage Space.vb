@@ -6,8 +6,6 @@ Public Class frmManageSystemRestoreStorageSpace
     Private Const gigabytesInBytes As Long = 1073741824
     Private Const terabytesInBytes As Long = 1099511627776
 
-    Private Const windowHeight As Short = 209
-
     Public strDriveLetterWeAreWorkingWith As String
 
     Private Sub frmManageSystemRestoreStorageSpace_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
@@ -47,13 +45,11 @@ Public Class frmManageSystemRestoreStorageSpace
     End Sub
 
     Private Sub frmManageSystemRestoreStorageSpace_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.SplitContainer1.Anchor = CType((AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right), AnchorStyles)
-
         If Not String.IsNullOrEmpty(strDriveLetterWeAreWorkingWith) Then
-            Me.Size = New Size(479, windowHeight)
+            showDrivesPanel()
             chkAdvancedMode.Checked = True
         Else
-            Me.Size = New Size(405, windowHeight)
+            hideDrivesPanel()
         End If
 
         listDrives.Items.Clear()
@@ -224,7 +220,7 @@ Public Class frmManageSystemRestoreStorageSpace
 
     Private Sub chkAdvancedMode_Click(sender As Object, e As EventArgs) Handles chkAdvancedMode.Click
         If chkAdvancedMode.Checked Then
-            Me.Size = New Size(479, windowHeight)
+            showDrivesPanel()
 
             lblDriveSize.Text = "Total Size of Drive:"
             lblDriveLabel.Text = "Drive Label:"
@@ -235,12 +231,26 @@ Public Class frmManageSystemRestoreStorageSpace
             btnSetSize.Text = Nothing
             btnSetSize.Enabled = False
         Else
-            Me.Size = New Size(405, windowHeight)
+            hideDrivesPanel()
             loadDriveData(globalVariables.systemDriveLetter)
         End If
     End Sub
 
     Private Sub listDrives_Click(sender As Object, e As EventArgs) Handles listDrives.Click
         If listDrives.SelectedItems.Count > 0 Then loadDriveData(listDrives.SelectedItems(0).Text)
+    End Sub
+
+    Private Sub showDrivesPanel()
+        Me.Size = New Size(469, 217)
+
+        drivePanel.Visible = True
+        settingsPanel.Location = New Point(75, 5)
+    End Sub
+
+    Private Sub hideDrivesPanel()
+        Me.Size = New Size(400, 217)
+
+        drivePanel.Visible = False
+        settingsPanel.Location = New Point(5, 5)
     End Sub
 End Class
