@@ -454,6 +454,7 @@ Namespace Functions.startupFunctions
                     End Try
 
                     If boolNeedsReboot = True Then
+                        wait.closePleaseWaitWindow()
                         writeKeyToRegistryToForceUpdateAtNextRun()
 
                         Dim msgBoxResult As MsgBoxResult = MsgBox("A system restart will need to be done in order to finish the update. System Restore Point Creator will not function properly until you restart your system." & vbCrLf & vbCrLf & "Would you like to restart your system now?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Restart?")
