@@ -3264,37 +3264,41 @@ Public Class Form1
             strRestorePointType = restorePointEntryItem.strRestorePointType
             dateRestorePointCreated = restorePointEntryItem.dateRestorePointDate
 
-            If boolConfirmDeletions And My.Settings.multiConfirmRestorePointDeletions And systemRestorePointsList.SelectedItems.Count > 1 Then
-                restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
-            ElseIf boolConfirmDeletions And (Not My.Settings.multiConfirmRestorePointDeletions Or systemRestorePointsList.SelectedItems.Count = 1) Then
-                deletionConfirmationWindow = New frmConfirmDelete
+            ' This check is required to make sure that we don't have duplicate key IDs going into the restorePointIDsToBeDeleted Dictionary.
+            ' This fixes a bug that was reported by "George".
+            If Not restorePointIDsToBeDeleted.ContainsKey(strRestorePointID) Then
+                If boolConfirmDeletions And My.Settings.multiConfirmRestorePointDeletions And systemRestorePointsList.SelectedItems.Count > 1 Then
+                    restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
+                ElseIf boolConfirmDeletions And (Not My.Settings.multiConfirmRestorePointDeletions Or systemRestorePointsList.SelectedItems.Count = 1) Then
+                    deletionConfirmationWindow = New frmConfirmDelete
 
-                deletionConfirmationWindow.lblCreatedOn.Text &= " " & strRestorePointDate
-                deletionConfirmationWindow.lblRestorePointName.Text &= " " & strRestorePointName
-                deletionConfirmationWindow.lblType.Text &= " " & strRestorePointType
+                    deletionConfirmationWindow.lblCreatedOn.Text &= " " & strRestorePointDate
+                    deletionConfirmationWindow.lblRestorePointName.Text &= " " & strRestorePointName
+                    deletionConfirmationWindow.lblType.Text &= " " & strRestorePointType
 
-                deletionConfirmationWindow.StartPosition = FormStartPosition.CenterParent
-                deletionConfirmationWindow.ShowDialog(ParentForm)
+                    deletionConfirmationWindow.StartPosition = FormStartPosition.CenterParent
+                    deletionConfirmationWindow.ShowDialog(ParentForm)
 
-                If deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.yes Then
-                    boolUserWantsToDeleteTheRestorePoint = True
-                ElseIf deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.yesAndDontAskAgain Then
-                    boolConfirmDeletions = False
-                    boolUserWantsToDeleteTheRestorePoint = True
-                ElseIf deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.cancel Then
-                    systemRestorePointsList.Enabled = True
-                    giveFeedbackToUser("Deletion of selected restore points canceled.")
-                    Exit Sub
+                    If deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.yes Then
+                        boolUserWantsToDeleteTheRestorePoint = True
+                    ElseIf deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.yesAndDontAskAgain Then
+                        boolConfirmDeletions = False
+                        boolUserWantsToDeleteTheRestorePoint = True
+                    ElseIf deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.cancel Then
+                        systemRestorePointsList.Enabled = True
+                        giveFeedbackToUser("Deletion of selected restore points canceled.")
+                        Exit Sub
+                    Else
+                        boolUserWantsToDeleteTheRestorePoint = False
+                    End If
+
+                    deletionConfirmationWindow.Dispose()
+                    deletionConfirmationWindow = Nothing
+
+                    If boolUserWantsToDeleteTheRestorePoint Then restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
                 Else
-                    boolUserWantsToDeleteTheRestorePoint = False
+                    restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
                 End If
-
-                deletionConfirmationWindow.Dispose()
-                deletionConfirmationWindow = Nothing
-
-                If boolUserWantsToDeleteTheRestorePoint Then restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
-            Else
-                restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
             End If
 
             strRestorePointName = Nothing
