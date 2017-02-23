@@ -1737,6 +1737,8 @@ Public Class Form1
                 End If
             End If
         Catch ex7 As Functions.myExceptions.integerTryParseException
+            Functions.wait.closePleaseWaitWindow()
+            Functions.eventLogFunctions.writeCrashToEventLog(ex7)
             MsgBox("There was a serious error while loading the restore points on your system. The restore point IDs appear to have been mangled and can't be parsed into an Integer like it should be. The loading of restore points has been halted." & vbCrLf & vbCrLf & "The value that was returned by the system was... " & ex7.strThatCouldNotBeParsedIntoAnInteger, MsgBoxStyle.Critical, strMessageBoxTitle)
         Catch ex6 As ObjectDisposedException
             Functions.eventLogFunctions.writeCrashToEventLog(ex6)
