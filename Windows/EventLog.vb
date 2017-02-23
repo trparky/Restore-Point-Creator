@@ -52,10 +52,10 @@
                             .SubItems.Add(strEventLog)
                             .SubItems.Add("")
 
-                            .eventLogText = Functions.support.removeSourceCodePathInfo(eventInstance.FormatDescription)
-                            .eventLogEntryID = Long.Parse(eventInstance.RecordId)
-                            .eventLogSource = strEventLog
-                            .eventLogLevel = Short.Parse(eventInstance.Level)
+                            .strEventLogText = Functions.support.removeSourceCodePathInfo(eventInstance.FormatDescription)
+                            .longEventLogEntryID = Long.Parse(eventInstance.RecordId)
+                            .strEventLogSource = strEventLog
+                            .shortLevelType = Short.Parse(eventInstance.Level)
                         End With
 
                         itemsToPutInToList.Add(itemAdd)
@@ -309,7 +309,7 @@
     Private Sub eventLogList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles eventLogList.SelectedIndexChanged
         Try
             If eventLogList.SelectedItems.Count <> 0 Then
-                eventLogText.Text = DirectCast(eventLogList.SelectedItems(0), myListViewItemTypes.eventLogListEntry).eventLogText
+                eventLogText.Text = DirectCast(eventLogList.SelectedItems(0), myListViewItemTypes.eventLogListEntry).strEventLogText
 
                 If eventLogText.Text.caseInsensitiveContains("exception") And chkAskMeToSubmitIfViewingAnExceptionEntry.Checked And selectedIndex <> eventLogList.SelectedIndices(0) Then
                     If MsgBox("The log entry that you're looking at appears to be a program exception and stack trace. Would you like to submit it?", MsgBoxStyle.Question + MsgBoxStyle.YesNo + MsgBoxStyle.DefaultButton2, Me.Text) = MsgBoxResult.Yes Then
@@ -386,27 +386,27 @@
             For Each item As myListViewItemTypes.eventLogListEntry In eventLogList.Items
                 With item
                     If boolUseRegEx = True Then
-                        If searchType = Search_Event_Log.searceType.typeAny And .eventLogText.regExSearch(searchTerms) Then
+                        If searchType = Search_Event_Log.searceType.typeAny And .strEventLogText.regExSearch(searchTerms) Then
                             highlightItemInList(item, longEntriesFound)
-                        ElseIf searchType = Search_Event_Log.searceType.typeError And .eventLogLevel = EventLogEntryType.Error And .eventLogText.regExSearch(searchTerms) Then
+                        ElseIf searchType = Search_Event_Log.searceType.typeError And .shortLevelType = EventLogEntryType.Error And .strEventLogText.regExSearch(searchTerms) Then
                             highlightItemInList(item, longEntriesFound)
-                        ElseIf searchType = Search_Event_Log.searceType.typeInfo And .eventLogLevel = EventLogEntryType.Information And .eventLogText.regExSearch(searchTerms) Then
+                        ElseIf searchType = Search_Event_Log.searceType.typeInfo And .shortLevelType = EventLogEntryType.Information And .strEventLogText.regExSearch(searchTerms) Then
                             highlightItemInList(item, longEntriesFound)
                         End If
                     ElseIf boolCaseInsensitive = True Then
-                        If searchType = Search_Event_Log.searceType.typeAny And .eventLogText.caseInsensitiveContains(searchTerms) Then
+                        If searchType = Search_Event_Log.searceType.typeAny And .strEventLogText.caseInsensitiveContains(searchTerms) Then
                             highlightItemInList(item, longEntriesFound)
-                        ElseIf searchType = Search_Event_Log.searceType.typeError And .eventLogLevel = EventLogEntryType.Error And .eventLogText.caseInsensitiveContains(searchTerms) Then
+                        ElseIf searchType = Search_Event_Log.searceType.typeError And .shortLevelType = EventLogEntryType.Error And .strEventLogText.caseInsensitiveContains(searchTerms) Then
                             highlightItemInList(item, longEntriesFound)
-                        ElseIf searchType = Search_Event_Log.searceType.typeInfo And .eventLogLevel = EventLogEntryType.Information And .eventLogText.caseInsensitiveContains(searchTerms) Then
+                        ElseIf searchType = Search_Event_Log.searceType.typeInfo And .shortLevelType = EventLogEntryType.Information And .strEventLogText.caseInsensitiveContains(searchTerms) Then
                             highlightItemInList(item, longEntriesFound)
                         End If
                     Else
-                        If searchType = Search_Event_Log.searceType.typeAny And .eventLogText.Contains(searchTerms) Then
+                        If searchType = Search_Event_Log.searceType.typeAny And .strEventLogText.Contains(searchTerms) Then
                             highlightItemInList(item, longEntriesFound)
-                        ElseIf searchType = Search_Event_Log.searceType.typeError And .eventLogLevel = EventLogEntryType.Error And .eventLogText.Contains(searchTerms) Then
+                        ElseIf searchType = Search_Event_Log.searceType.typeError And .shortLevelType = EventLogEntryType.Error And .strEventLogText.Contains(searchTerms) Then
                             highlightItemInList(item, longEntriesFound)
-                        ElseIf searchType = Search_Event_Log.searceType.typeInfo And .eventLogLevel = EventLogEntryType.Information And .eventLogText.Contains(searchTerms) Then
+                        ElseIf searchType = Search_Event_Log.searceType.typeInfo And .shortLevelType = EventLogEntryType.Information And .strEventLogText.Contains(searchTerms) Then
                             highlightItemInList(item, longEntriesFound)
                         End If
                     End If
