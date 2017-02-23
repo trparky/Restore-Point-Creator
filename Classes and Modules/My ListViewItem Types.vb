@@ -17,7 +17,7 @@
     ' This class extends the ListViewItem so that I can add more properties to it for my purposes.
     Public Class eventLogListEntry
         Inherits ListViewItem
-        Private longEventLogEntryID As Long, strEventLogSource, strEventLogText, _strLevel As String, levelType As Short
+        Private _longEventLogEntryID As Long, _strEventLogSource, _strEventLogText, _strLevel As String, _shortLevelType As Short
 
         Public Sub New(strInput As String)
             Me.Text = strInput
@@ -33,39 +33,39 @@
             End Set
         End Property
 
-        Public Property eventLogText() As String
+        Public Property strEventLogText() As String
             Get
-                Return strEventLogText
+                Return _strEventLogText
             End Get
             Set(value As String)
-                strEventLogText = value
+                _strEventLogText = value
             End Set
         End Property
 
-        Public Property eventLogEntryID() As Long
+        Public Property longEventLogEntryID() As Long
             Get
-                Return longEventLogEntryID
+                Return _longEventLogEntryID
             End Get
             Set(value As Long)
-                longEventLogEntryID = value
+                _longEventLogEntryID = value
             End Set
         End Property
 
-        Public Property eventLogSource() As String
+        Public Property strEventLogSource() As String
             Get
-                Return strEventLogSource
+                Return _strEventLogSource
             End Get
             Set(value As String)
-                strEventLogSource = value
+                _strEventLogSource = value
             End Set
         End Property
 
-        Public Property eventLogLevel() As Short
+        Public Property shortLevelType() As Short
             Get
-                Return levelType
+                Return _shortLevelType
             End Get
             Set(value As Short)
-                levelType = value
+                _shortLevelType = value
             End Set
         End Property
     End Class
@@ -73,60 +73,70 @@
     ' This class extends the ListViewItem so that I can add more properties to it for my purposes.
     Public Class restorePointEntryItem
         Inherits ListViewItem
-        Private strRestorePointID, strRestorePointName, strRestorePointDate, strRestorePointType, strRestorePointAge As String
-        Private dateRestorePointDate As Date
+        Private _strRestorePointID, _strRestorePointName, _strRestorePointDate, _strRestorePointType, _strRestorePointAge As String
+        Private _intRestorePointID As Integer
+        Private _dateRestorePointDate As Date
 
-        Public Property restorePointID() As String
+        Public Property intRestorePointID() As Integer
             Get
-                Return strRestorePointID
+                Return _intRestorePointID
             End Get
-            Set(value As String)
-                strRestorePointID = value
+            Set(value As Integer)
+                _intRestorePointID = value
             End Set
         End Property
 
-        Public Property restorePointAge() As String
+        Public Property strRestorePointID() As String
             Get
-                Return strRestorePointAge
+                Return _strRestorePointID
             End Get
             Set(value As String)
-                strRestorePointAge = value
+                _strRestorePointID = value
             End Set
         End Property
 
-        Public Property restorePointName() As String
+        Public Property strRestorePointAge() As String
             Get
-                Return strRestorePointName
+                Return _strRestorePointAge
             End Get
             Set(value As String)
-                strRestorePointName = value
+                _strRestorePointAge = value
             End Set
         End Property
 
-        Public Property restorePointDate() As String
+        Public Property strRestorePointName() As String
             Get
-                Return strRestorePointDate
+                Return _strRestorePointName
             End Get
             Set(value As String)
-                strRestorePointDate = value
+                _strRestorePointName = value
             End Set
         End Property
 
-        Public Property restorePointType() As String
+        Public Property strRestorePointDate() As String
             Get
-                Return strRestorePointType
+                Return _strRestorePointDate
             End Get
             Set(value As String)
-                strRestorePointType = value
+                _strRestorePointDate = value
             End Set
         End Property
 
-        Public Property rawRestorePointDate() As Date
+        Public Property strRestorePointType() As String
             Get
-                Return dateRestorePointDate
+                Return _strRestorePointType
+            End Get
+            Set(value As String)
+                _strRestorePointType = value
+            End Set
+        End Property
+
+        Public Property dateRestorePointDate() As Date
+            Get
+                Return _dateRestorePointDate
             End Get
             Set(value As Date)
-                dateRestorePointDate = value
+                _dateRestorePointDate = value
             End Set
         End Property
     End Class
