@@ -128,6 +128,7 @@
     <Compile Include="Classes and Modules\enums.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\eventLogFunctions.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\http.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\myExceptions.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\osVersionInfo.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\privilegeChecks.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\registryStuff.vb" />
