@@ -2,7 +2,6 @@
 Imports System.IO
 Imports Microsoft.Win32
 Imports System.Management
-Imports System.Text.RegularExpressions
 Imports System.Configuration
 
 Namespace Functions.startupFunctions
@@ -388,7 +387,7 @@ Namespace Functions.startupFunctions
                         eventLogFunctions.writeToSystemEventLog("The environment is ready for updating.", EventLogEntryType.Information)
                     End If
 
-                    Dim restorePointCreatorMainEXEName As String = Regex.Replace(currentProcessFileName, Regex.Escape(".new.exe"), "", RegexOptions.IgnoreCase)
+                    Dim restorePointCreatorMainEXEName As String = currentProcessFileName.caseInsensitiveReplace(".new.exe", "")
 
                     If commandLineArgument.stringCompare("-update") Then
                         registryStuff.updateRestorePointCreatorUninstallationInfo()
