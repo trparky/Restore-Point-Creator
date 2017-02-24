@@ -410,13 +410,24 @@ Namespace Functions.startupFunctions
                             File.Delete(globalVariables.pdbFileNameInZIP)
                             File.Move(globalVariables.pdbFileNameInZIP & ".new", globalVariables.pdbFileNameInZIP)
 
+                            Dim deleteAtReboot As New deleteAtReboot()
+                            deleteAtReboot.removeItem(globalVariables.pdbFileNameInZIP)
+                            deleteAtReboot.removeItem(globalVariables.pdbFileNameInZIP & ".new")
+                            deleteAtReboot.dispose(True)
+                            deleteAtReboot = Nothing
+
                             If boolExtendedLoggingForUpdating = True Then
                                 eventLogFunctions.writeToSystemEventLog("Update of the PDB file complete.", EventLogEntryType.Information)
                             End If
                         Catch ex As Exception
                             Dim pdbFullPath As String = New FileInfo(globalVariables.pdbFileNameInZIP).FullName
-                            APIs.MoveFileEx(pdbFullPath, vbNullString, 4)
-                            APIs.MoveFileEx(pdbFullPath & ".new", pdbFullPath, 4)
+
+                            Dim deleteAtReboot As New deleteAtReboot()
+                            deleteAtReboot.addItem(pdbFullPath)
+                            deleteAtReboot.addItem(pdbFullPath & ".new", pdbFullPath)
+                            deleteAtReboot.dispose(True)
+                            deleteAtReboot = Nothing
+
                             boolNeedsReboot = True
 
                             eventLogFunctions.writeToSystemEventLog("Something went wrong with the updating of the PDB file, scheduling it for update at system reboot.", EventLogEntryType.Error)
@@ -441,12 +452,22 @@ Namespace Functions.startupFunctions
                         File.Delete(restorePointCreatorMainEXEName)
                         File.Copy(currentProcessFileName, restorePointCreatorMainEXEName)
 
+                        Dim deleteAtReboot As New deleteAtReboot()
+                        deleteAtReboot.removeItem(restorePointCreatorMainEXEName)
+                        deleteAtReboot.removeItem(currentProcessFileName)
+                        deleteAtReboot.dispose(True)
+                        deleteAtReboot = Nothing
+
                         If boolExtendedLoggingForUpdating = True Then
                             eventLogFunctions.writeToSystemEventLog("Update of the core executable file complete.", EventLogEntryType.Information)
                         End If
                     Catch ex As Exception
-                        APIs.MoveFileEx(New FileInfo(restorePointCreatorMainEXEName).FullName, vbNullString, 4)
-                        APIs.MoveFileEx(New FileInfo(currentProcessFileName).FullName, New FileInfo(restorePointCreatorMainEXEName).FullName, 4)
+                        Dim deleteAtReboot As New deleteAtReboot()
+                        deleteAtReboot.addItem(New FileInfo(restorePointCreatorMainEXEName).FullName)
+                        deleteAtReboot.addItem(New FileInfo(currentProcessFileName).FullName, New FileInfo(restorePointCreatorMainEXEName).FullName)
+                        deleteAtReboot.dispose(True)
+                        deleteAtReboot = Nothing
+
                         boolNeedsReboot = True
 
                         eventLogFunctions.writeToSystemEventLog("Something went wrong with the updating of the core executable file, scheduling it for update at system reboot.", EventLogEntryType.Error)

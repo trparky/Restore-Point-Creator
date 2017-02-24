@@ -257,9 +257,5 @@ Namespace Functions.APIs
         <DllImport("kernel32.dll", SetLastError:=True)>
         Public Function CloseHandle(hHandle As IntPtr) As Boolean
         End Function
-
-        <DllImport("kernel32.dll")>
-        Public Function MoveFileEx(ByVal lpExistingFileName As String, ByVal lpNewFileName As String, ByVal dwFlags As Int32) As Boolean
-        End Function
     End Module
 End Namespace

@@ -121,6 +121,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\deleteAtRebootClass.vb" />
     <Compile Include="Classes and Modules\Exported Log Class.vb" />
     <Compile Include="Classes and Modules\exportedSettings.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\apis.vb" />
