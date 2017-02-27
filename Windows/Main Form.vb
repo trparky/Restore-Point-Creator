@@ -319,7 +319,9 @@ Public Class Form1
                     Try
                         IO.File.Delete(globalVariables.pdbFileNameInZIP)
                     Catch ex As Exception
-                        Functions.APIs.MoveFileEx(globalVariables.pdbFileNameInZIP, vbNullString, 4)
+                        Dim deleteAtReboot As New Functions.deleteAtReboot()
+                        deleteAtReboot.addItem(globalVariables.pdbFileNameInZIP)
+                        deleteAtReboot.dispose(True)
                     End Try
                 End If
             ElseIf My.Settings.updateChannel = globalVariables.updateChannels.beta Then
@@ -808,7 +810,9 @@ Public Class Form1
                 Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deletion of {0}{1}{0} was successful.", Chr(34), strFoundFile))
             End If
         Catch ex As Exception
-            Functions.APIs.MoveFileEx(Application.ExecutablePath & ".new.exe", vbNullString, 4)
+            Dim deleteAtReboot As New Functions.deleteAtReboot()
+            deleteAtReboot.addItem(Application.ExecutablePath & ".new.exe")
+            deleteAtReboot.dispose(True)
 
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                 Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deletion of {0}{1}{0} was unsuccessful, scheduling it to be deleted at next system reboot.", Chr(34), strFoundFile))
@@ -2951,7 +2955,9 @@ Public Class Form1
             Try
                 IO.File.Delete(globalVariables.pdbFileNameInZIP)
             Catch ex As Exception
-                Functions.APIs.MoveFileEx(globalVariables.pdbFileNameInZIP, vbNullString, 4)
+                Dim deleteAtReboot As New Functions.deleteAtReboot()
+                deleteAtReboot.addItem(globalVariables.pdbFileNameInZIP)
+                deleteAtReboot.dispose(True)
             End Try
         End If
 
