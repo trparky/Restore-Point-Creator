@@ -226,26 +226,26 @@ Namespace Functions.support
             Dim stringCollection As Specialized.StringCollection
             Dim point As Point, size As Size
 
-            For Each settingProperty As Object In My.Settings.PropertyValues
-                If settingProperty.propertyvalue IsNot Nothing Then
-                    settingType = settingProperty.propertyvalue.GetType
+            For Each settingProperty As Configuration.SettingsPropertyValue In My.Settings.PropertyValues
+                If settingProperty.PropertyValue IsNot Nothing Then
+                    settingType = settingProperty.PropertyValue.GetType
                     exportedSettingsObject = New exportedSettings With {.settingType = Restore_Point_Creator.settingType.settings}
 
-                    exportedSettingsObject.strName = settingProperty.name
-                    exportedSettingsObject.type = settingProperty.propertyvalue.GetType.ToString
+                    exportedSettingsObject.strName = settingProperty.Name
+                    exportedSettingsObject.type = settingProperty.PropertyValue.GetType.ToString
 
                     If settingType = GetType(Point) Then
-                        point = DirectCast(settingProperty.propertyvalue, Point)
+                        point = DirectCast(settingProperty.PropertyValue, Point)
                         exportedSettingsObject.value = point.X & "|" & point.Y
                         point = Nothing
                     ElseIf settingType = GetType(Color) Then
-                        exportedSettingsObject.value = DirectCast(settingProperty.propertyvalue, Color).ToArgb
+                        exportedSettingsObject.value = DirectCast(settingProperty.PropertyValue, Color).ToArgb
                     ElseIf settingType = GetType(Size) Then
-                        size = DirectCast(settingProperty.propertyvalue, Size)
+                        size = DirectCast(settingProperty.PropertyValue, Size)
                         exportedSettingsObject.value = size.Height & "|" & size.Width
                         size = Nothing
                     ElseIf settingType = GetType(Specialized.StringCollection) Then
-                        stringCollection = DirectCast(settingProperty.propertyvalue, Specialized.StringCollection)
+                        stringCollection = DirectCast(settingProperty.PropertyValue, Specialized.StringCollection)
 
                         Dim tempArray(stringCollection.Count - 1) As String
                         stringCollection.CopyTo(tempArray, 0)
@@ -255,9 +255,9 @@ Namespace Functions.support
                         stringCollection = Nothing
                         tempArray = Nothing
                     ElseIf settingType = GetType(Date) Or settingType = GetType(DateTime) Then
-                        exportedSettingsObject.value = DirectCast(settingProperty.propertyvalue, Date).ToUniversalTime
+                        exportedSettingsObject.value = DirectCast(settingProperty.PropertyValue, Date).ToUniversalTime
                     Else
-                        exportedSettingsObject.value = settingProperty.propertyvalue
+                        exportedSettingsObject.value = settingProperty.PropertyValue
                     End If
 
                     exportedSettingsArray.Add(exportedSettingsObject)
