@@ -71,7 +71,10 @@
                 txtChanges.Text = "Error Loading Change Log... Please Try Again."
             End Try
 
-            Me.Focus()
+            Try
+                Me.Focus()
+            Catch ex As Exception
+            End Try
         Catch ex As Exception
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
         End Try

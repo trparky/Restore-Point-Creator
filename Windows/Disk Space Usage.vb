@@ -250,7 +250,10 @@ Public Class Disk_Space_Usage
     End Sub
 
     Private Sub Disk_Space_Usage_Activated(sender As Object, e As EventArgs) Handles Me.Activated
-        GroupBox1.Focus()
+        Try
+            GroupBox1.Focus()
+        Catch ex As Exception
+        End Try
     End Sub
 
     Private Sub Disk_Space_Usage_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
