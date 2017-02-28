@@ -340,6 +340,18 @@ Namespace Functions.startupFunctions
             Catch ex2 As IOException
                 handleLockedSettingsFile(ex2)
             End Try
+
+            Try
+                testSettingsAccess(My.Settings.boolFirstRun)
+                My.Settings.boolFirstRun = My.Settings.boolFirstRun
+                My.Settings.Save()
+            Catch ex As Exception
+                handleLockedSettingsFile(ex)
+            End Try
+        End Sub
+
+        Private Sub testSettingsAccess(boolData As Boolean)
+            ' Does nothing. All this sub-routine does is accept an input and does nothing with it.
         End Sub
 
         Sub writeKeyToRegistryToForceUpdateAtNextRun()
