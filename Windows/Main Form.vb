@@ -1740,6 +1740,9 @@ Public Class Form1
                     newestSystemRestoreID = 0
                 End If
             End If
+        Catch ex8 As IO.FileNotFoundException
+            Functions.wait.closePleaseWaitWindow()
+            MsgBox("There has been an error while trying to load the System Restore Points on your system." & vbCrLf & vbCrLf & "Please go to System Restore Point Utilities and click on Manually Fix System Restore and follow the prompts. It will ask you reboot your computer so please save all work before you do so.", MsgBoxStyle.Critical, strMessageBoxTitle)
         Catch ex7 As Functions.myExceptions.integerTryParseException
             Functions.wait.closePleaseWaitWindow()
             Functions.eventLogFunctions.writeCrashToEventLog(ex7)
