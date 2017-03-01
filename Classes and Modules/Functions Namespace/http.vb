@@ -67,6 +67,8 @@
                     End If
                 ElseIf ex2.Status = Net.WebExceptionStatus.TrustFailure Then
                     eventLogFunctions.writeToSystemEventLog(String.Format("There was an error establishing an SSL connection while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
+                ElseIf ex2.Status = Net.WebExceptionStatus.NameResolutionFailure Then
+                    eventLogFunctions.writeToSystemEventLog(String.Format("There was an error while resolving the domain name when attempting to request the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
                 Else
                     eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP Protocol Error while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
                 End If
