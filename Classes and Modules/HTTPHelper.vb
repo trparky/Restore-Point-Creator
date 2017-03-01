@@ -120,6 +120,21 @@ Public Class proxyConfigurationErrorException
     End Sub
 End Class
 
+Public Class dnsLookupError
+    Inherits Exception
+
+    Public Sub New()
+    End Sub
+
+    Public Sub New(message As String)
+        MyBase.New(message)
+    End Sub
+
+    Public Sub New(message As String, inner As Exception)
+        MyBase.New(message, inner)
+    End Sub
+End Class
+
 Public Class noHTTPServerResponseHeadersFoundException
     Inherits Exception
 
@@ -211,7 +226,7 @@ Class cookieDetails
 End Class
 
 Public Class downloadStatusDetails
-    Public remoteFileSize As Long, localFileSize As Long, percentageDownloaded As Short
+    Public remoteFileSize As ULong, localFileSize As ULong, percentageDownloaded As Short
 End Class
 
 Class credentials
@@ -220,7 +235,7 @@ End Class
 
 ''' <summary>Allows you to easily POST and upload files to a remote HTTP server without you, the programmer, knowing anything about how it all works. This class does it all for you. It handles adding a User Agent String, additional HTTP Request Headers, string data to your HTTP POST data, and files to be uploaded in the HTTP POST data.</summary>
 Public Class httpHelper
-    Private Const classVersion As String = "1.266"
+    Private Const classVersion As String = "1.275"
 
     Private strUserAgentString As String = Nothing
     Private boolUseProxy As Boolean = False
@@ -437,7 +452,7 @@ Public Class httpHelper
 
         If postData.Count <> 0 Then
             For Each item In postData
-                stringBuilder.AppendLine("POST Data | " & item.Key & "=" & item.Value)
+                stringBuilder.AppendLine("POST Data | " & item.Key & "=" & item.Value.ToString())
             Next
         End If
 
@@ -741,7 +756,7 @@ Public Class httpHelper
                     lastException = New noMimeTypeFoundException("No MIME Type found for " & fileInfo.Extension.ToLower)
                     Throw lastException
                 Else
-                    contentType = regPath.GetValue("Content Type", Nothing)
+                    contentType = regPath.GetValue("Content Type", Nothing).ToString
                 End If
 
                 If contentType = Nothing Then
@@ -855,9 +870,11 @@ beginAgain:
     ''' <exception cref="Exception">If this function throws a general Exception, something really went wrong; something that the function normally doesn't handle.</exception>
     ''' <exception cref="httpProtocolException">This exception is thrown if the server responds with an HTTP Error.</exception>
     ''' <exception cref="sslErrorException">If this function throws an sslErrorException, an error occurred while negotiating an SSL connection.</exception>
+    ''' <exception cref="dnsLookupError">If this function throws a dnsLookupError exception it means that the domain name wasn't able to be resolved properly.</exception>
     Public Function downloadFile(ByVal fileDownloadURL As String, ByRef memStream As MemoryStream, Optional ByVal throwExceptionIfError As Boolean = True) As Boolean
         Dim httpWebRequest As Net.HttpWebRequest = Nothing
         currentFileSize = 0
+        Dim amountDownloaded As Double
 
         Try
             If urlPreProcessor IsNot Nothing Then
@@ -877,11 +894,11 @@ beginAgain:
             captureSSLInfo(fileDownloadURL, httpWebRequest)
 
             ' Gets the size of the remote file on the web server.
-            remoteFileSize = webResponse.ContentLength
+            remoteFileSize = CType(webResponse.ContentLength, ULong)
 
             Dim responseStream As Stream = webResponse.GetResponseStream() ' Gets the response stream.
 
-            Dim lngBytesReadFromInternet As Long = responseStream.Read(dataBuffer, 0, dataBuffer.Length) ' Reads some data from the HTTP stream into our data buffer.
+            Dim lngBytesReadFromInternet As ULong = CType(responseStream.Read(dataBuffer, 0, dataBuffer.Length), ULong) ' Reads some data from the HTTP stream into our data buffer.
             Dim oldCurrentFileSize As Long = 0
 
             ' We keep looping until all of the data has been downloaded.
@@ -890,12 +907,13 @@ beginAgain:
                 ' downloaded from the server repeatedly to a variable called "currentFileSize".
                 currentFileSize += lngBytesReadFromInternet
 
-                memStream.Write(dataBuffer, 0, lngBytesReadFromInternet) ' Writes the data directly to disk.
+                memStream.Write(dataBuffer, 0, CType(lngBytesReadFromInternet, Integer)) ' Writes the data directly to disk.
 
-                httpDownloadProgressPercentage = Math.Round((currentFileSize / remoteFileSize) * 100, 0) ' Update the download percentage value.
+                amountDownloaded = (currentFileSize / remoteFileSize) * 100
+                httpDownloadProgressPercentage = CType(Math.Round(amountDownloaded, 0), Short) ' Update the download percentage value.
                 downloadStatusUpdateInvoker()
 
-                lngBytesReadFromInternet = responseStream.Read(dataBuffer, 0, dataBuffer.Length) ' Reads more data into our data buffer.
+                lngBytesReadFromInternet = CType(responseStream.Read(dataBuffer, 0, dataBuffer.Length), ULong) ' Reads more data into our data buffer.
             End While
 
             ' Before we return the MemoryStream to the user we have to reset the position back to the beginning of the Stream. This is so that when the
@@ -945,6 +963,11 @@ beginAgain:
                     lastException = New sslErrorException("There was an error establishing an SSL connection.", ex2)
                     Throw lastException
                     Return False
+                ElseIf ex2.Status = Net.WebExceptionStatus.NameResolutionFailure Then
+                    Dim strDomainName As String = Text.RegularExpressions.Regex.Match(lastAccessedURL, "http://(.*)/", Text.RegularExpressions.RegexOptions.Singleline).Groups(1).Value
+                    lastException = New dnsLookupError(String.Format("There was an error while looking up the DNS records for the domain name {0}{1}{0}.", Chr(34), strDomainName), ex2)
+                    Throw lastException
+                    Return False
                 End If
 
                 lastException = New Net.WebException(ex.Message, ex2)
@@ -966,10 +989,12 @@ beginAgain:
     ''' <exception cref="Exception">If this function throws a general Exception, something really went wrong; something that the function normally doesn't handle.</exception>
     ''' <exception cref="httpProtocolException">This exception is thrown if the server responds with an HTTP Error.</exception>
     ''' <exception cref="sslErrorException">If this function throws an sslErrorException, an error occurred while negotiating an SSL connection.</exception>
+    ''' <exception cref="dnsLookupError">If this function throws a dnsLookupError exception it means that the domain name wasn't able to be resolved properly.</exception>
     Public Function downloadFile(fileDownloadURL As String, localFileName As String, throwExceptionIfLocalFileExists As Boolean, Optional throwExceptionIfError As Boolean = True) As Boolean
         Dim fileWriteStream As FileStream = Nothing
         Dim httpWebRequest As Net.HttpWebRequest = Nothing
         currentFileSize = 0
+        Dim amountDownloaded As Double
 
         Try
             If urlPreProcessor IsNot Nothing Then
@@ -998,12 +1023,12 @@ beginAgain:
             captureSSLInfo(fileDownloadURL, httpWebRequest)
 
             ' Gets the size of the remote file on the web server.
-            remoteFileSize = webResponse.ContentLength
+            remoteFileSize = CType(webResponse.ContentLength, ULong)
 
             Dim responseStream As Stream = webResponse.GetResponseStream() ' Gets the response stream.
             fileWriteStream = New FileStream(localFileName, FileMode.Create) ' Creates a file write stream.
 
-            Dim lngBytesReadFromInternet As Long = responseStream.Read(dataBuffer, 0, dataBuffer.Length) ' Reads some data from the HTTP stream into our data buffer.
+            Dim lngBytesReadFromInternet As ULong = CType(responseStream.Read(dataBuffer, 0, dataBuffer.Length), ULong) ' Reads some data from the HTTP stream into our data buffer.
             Dim oldCurrentFileSize As Long = 0
 
             ' We keep looping until all of the data has been downloaded.
@@ -1012,12 +1037,13 @@ beginAgain:
                 ' downloaded from the server repeatedly to a variable called "currentFileSize".
                 currentFileSize += lngBytesReadFromInternet
 
-                fileWriteStream.Write(dataBuffer, 0, lngBytesReadFromInternet) ' Writes the data directly to disk.
+                fileWriteStream.Write(dataBuffer, 0, CType(lngBytesReadFromInternet, Integer)) ' Writes the data directly to disk.
 
-                httpDownloadProgressPercentage = Math.Round((currentFileSize / remoteFileSize) * 100, 0) ' Update the download percentage value.
+                amountDownloaded = (currentFileSize / remoteFileSize) * 100
+                httpDownloadProgressPercentage = CType(Math.Round(amountDownloaded, 0), Short) ' Update the download percentage value.
                 downloadStatusUpdateInvoker()
 
-                lngBytesReadFromInternet = responseStream.Read(dataBuffer, 0, dataBuffer.Length) ' Reads more data into our data buffer.
+                lngBytesReadFromInternet = CType(responseStream.Read(dataBuffer, 0, dataBuffer.Length), ULong) ' Reads more data into our data buffer.
             End While
 
             fileWriteStream.Close() ' Closes the file stream.
@@ -1069,6 +1095,11 @@ beginAgain:
                     lastException = New sslErrorException("There was an error establishing an SSL connection.", ex2)
                     Throw lastException
                     Return False
+                ElseIf ex2.Status = Net.WebExceptionStatus.NameResolutionFailure Then
+                    Dim strDomainName As String = Text.RegularExpressions.Regex.Match(lastAccessedURL, "http://(.*)/", Text.RegularExpressions.RegexOptions.Singleline).Groups(1).Value
+                    lastException = New dnsLookupError(String.Format("There was an error while looking up the DNS records for the domain name {0}{1}{0}.", Chr(34), strDomainName), ex2)
+                    Throw lastException
+                    Return False
                 End If
 
                 lastException = New Net.WebException(ex.Message, ex2)
@@ -1088,6 +1119,7 @@ beginAgain:
     ''' <exception cref="Exception">If this function throws a general Exception, something really went wrong; something that the function normally doesn't handle.</exception>
     ''' <exception cref="httpProtocolException">This exception is thrown if the server responds with an HTTP Error.</exception>
     ''' <exception cref="sslErrorException">If this function throws an sslErrorException, an error occurred while negotiating an SSL connection.</exception>
+    ''' <exception cref="dnsLookupError">If this function throws a dnsLookupError exception it means that the domain name wasn't able to be resolved properly.</exception>
     ''' <example>httpPostObject.getWebData("http://www.myserver.com/mywebpage", httpResponseText)</example>
     ''' <param name="throwExceptionIfError">Normally True. If True this function will throw an exception if an error occurs. If set to False, the function simply returns False if an error occurs; this is a much more simpler way to handle errors.</param>
     ''' <param name="shortRangeTo">This controls how much data is downloaded from the server.</param>
@@ -1153,6 +1185,11 @@ beginAgain:
                     lastException = New sslErrorException("There was an error establishing an SSL connection.", ex2)
                     Throw lastException
                     Return False
+                ElseIf ex2.Status = Net.WebExceptionStatus.NameResolutionFailure Then
+                    Dim strDomainName As String = Text.RegularExpressions.Regex.Match(lastAccessedURL, "http://(.*)/", Text.RegularExpressions.RegexOptions.Singleline).Groups(1).Value
+                    lastException = New dnsLookupError(String.Format("There was an error while looking up the DNS records for the domain name {0}{1}{0}.", Chr(34), strDomainName), ex2)
+                    Throw lastException
+                    Return False
                 End If
 
                 lastException = New Net.WebException(ex.Message, ex2)
@@ -1174,6 +1211,7 @@ beginAgain:
     ''' <exception cref="Exception">If this function throws a general Exception, something really went wrong; something that the function normally doesn't handle.</exception>
     ''' <exception cref="httpProtocolException">This exception is thrown if the server responds with an HTTP Error.</exception>
     ''' <exception cref="sslErrorException">If this function throws an sslErrorException, an error occurred while negotiating an SSL connection.</exception>
+    ''' <exception cref="dnsLookupError">If this function throws a dnsLookupError exception it means that the domain name wasn't able to be resolved properly.</exception>
     ''' <example>httpPostObject.getWebData("http://www.myserver.com/mywebpage", httpResponseText)</example>
     ''' <param name="throwExceptionIfError">Normally True. If True this function will throw an exception if an error occurs. If set to False, the function simply returns False if an error occurs; this is a much more simpler way to handle errors.</param>
     Public Function getWebData(ByVal url As String, ByRef httpResponseText As String, Optional throwExceptionIfError As Boolean = True) As Boolean
@@ -1236,6 +1274,11 @@ beginAgain:
                     lastException = New sslErrorException("There was an error establishing an SSL connection.", ex2)
                     Throw lastException
                     Return False
+                ElseIf ex2.Status = Net.WebExceptionStatus.NameResolutionFailure Then
+                    Dim strDomainName As String = Text.RegularExpressions.Regex.Match(lastAccessedURL, "http://(.*)/", Text.RegularExpressions.RegexOptions.Singleline).Groups(1).Value
+                    lastException = New dnsLookupError(String.Format("There was an error while looking up the DNS records for the domain name {0}{1}{0}.", Chr(34), strDomainName), ex2)
+                    Throw lastException
+                    Return False
                 End If
 
                 lastException = New Net.WebException(ex.Message, ex2)
@@ -1258,6 +1301,7 @@ beginAgain:
     ''' <exception cref="Exception">If this function throws a general Exception, something really went wrong; something that the function normally doesn't handle.</exception>
     ''' <exception cref="httpProtocolException">This exception is thrown if the server responds with an HTTP Error.</exception>
     ''' <exception cref="sslErrorException">If this function throws an sslErrorException, an error occurred while negotiating an SSL connection.</exception>
+    ''' <exception cref="dnsLookupError">If this function throws a dnsLookupError exception it means that the domain name wasn't able to be resolved properly.</exception>
     ''' <example>httpPostObject.uploadData("http://www.myserver.com/myscript", httpResponseText)</example>
     ''' <param name="throwExceptionIfError">Normally True. If True this function will throw an exception if an error occurs. If set to False, the function simply returns False if an error occurs; this is a much more simpler way to handle errors.</param>
     Public Function uploadData(ByVal url As String, ByRef httpResponseText As String, Optional throwExceptionIfError As Boolean = False) As Boolean
@@ -1375,6 +1419,11 @@ beginAgain:
                     lastException = New sslErrorException("There was an error establishing an SSL connection.", ex2)
                     Throw lastException
                     Return False
+                ElseIf ex2.Status = Net.WebExceptionStatus.NameResolutionFailure Then
+                    Dim strDomainName As String = Text.RegularExpressions.Regex.Match(lastAccessedURL, "http://(.*)/", Text.RegularExpressions.RegexOptions.Singleline).Groups(1).Value
+                    lastException = New dnsLookupError(String.Format("There was an error while looking up the DNS records for the domain name {0}{1}{0}.", Chr(34), strDomainName), ex2)
+                    Throw lastException
+                    Return False
                 End If
 
                 lastException = New Net.WebException(ex.Message, ex2)
@@ -1430,7 +1479,7 @@ beginAgain:
             httpWebRequest.AutomaticDecompression = Net.DecompressionMethods.GZip Or Net.DecompressionMethods.Deflate
         End If
 
-        httpWebRequest.Timeout = httpTimeOut
+        httpWebRequest.Timeout = CType(httpTimeOut, Integer)
         httpWebRequest.KeepAlive = True
     End Sub
 
@@ -1475,7 +1524,7 @@ beginAgain:
         Dim postDataString As String = ""
         For Each entry As KeyValuePair(Of String, Object) In postData
             If Not entry.Value.GetType.Equals(GetType(FormFile)) Then
-                postDataString &= entry.Key.Trim & "=" & Web.HttpUtility.UrlEncode(entry.Value.Trim) & "&"
+                postDataString &= entry.Key.Trim & "=" & Web.HttpUtility.UrlEncode(entry.Value.ToString.Trim) & "&"
             End If
         Next
 
@@ -1520,10 +1569,10 @@ beginAgain:
             lastException = New httpProtocolException("HTTP Protocol Error while accessing " & url, ex)
         End If
 
-        Return lastException
+        Return CType(lastException, httpProtocolException)
     End Function
 
-    Public Function fileSizeToHumanReadableFormat(ByVal size As Long, Optional roundToNearestWholeNumber As Boolean = False) As String
+    Public Function fileSizeToHumanReadableFormat(ByVal size As ULong, Optional roundToNearestWholeNumber As Boolean = False) As String
         Dim result As String
 
         If size <= (2 ^ 10) Then
