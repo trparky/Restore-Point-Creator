@@ -235,7 +235,7 @@ End Class
 
 ''' <summary>Allows you to easily POST and upload files to a remote HTTP server without you, the programmer, knowing anything about how it all works. This class does it all for you. It handles adding a User Agent String, additional HTTP Request Headers, string data to your HTTP POST data, and files to be uploaded in the HTTP POST data.</summary>
 Public Class httpHelper
-    Private Const classVersion As String = "1.275"
+    Private Const classVersion As String = "1.280"
 
     Private strUserAgentString As String = Nothing
     Private boolUseProxy As Boolean = False
@@ -964,7 +964,7 @@ beginAgain:
                     Throw lastException
                     Return False
                 ElseIf ex2.Status = Net.WebExceptionStatus.NameResolutionFailure Then
-                    Dim strDomainName As String = Text.RegularExpressions.Regex.Match(lastAccessedURL, "http://(.*)/", Text.RegularExpressions.RegexOptions.Singleline).Groups(1).Value
+                    Dim strDomainName As String = Text.RegularExpressions.Regex.Match(lastAccessedURL, "(?:http(?:s){0,1}://){0,1}(.*)/", Text.RegularExpressions.RegexOptions.Singleline).Groups(1).Value
                     lastException = New dnsLookupError(String.Format("There was an error while looking up the DNS records for the domain name {0}{1}{0}.", Chr(34), strDomainName), ex2)
                     Throw lastException
                     Return False
@@ -1096,7 +1096,7 @@ beginAgain:
                     Throw lastException
                     Return False
                 ElseIf ex2.Status = Net.WebExceptionStatus.NameResolutionFailure Then
-                    Dim strDomainName As String = Text.RegularExpressions.Regex.Match(lastAccessedURL, "http://(.*)/", Text.RegularExpressions.RegexOptions.Singleline).Groups(1).Value
+                    Dim strDomainName As String = Text.RegularExpressions.Regex.Match(lastAccessedURL, "(?:http(?:s){0,1}://){0,1}(.*)/", Text.RegularExpressions.RegexOptions.Singleline).Groups(1).Value
                     lastException = New dnsLookupError(String.Format("There was an error while looking up the DNS records for the domain name {0}{1}{0}.", Chr(34), strDomainName), ex2)
                     Throw lastException
                     Return False
@@ -1186,7 +1186,7 @@ beginAgain:
                     Throw lastException
                     Return False
                 ElseIf ex2.Status = Net.WebExceptionStatus.NameResolutionFailure Then
-                    Dim strDomainName As String = Text.RegularExpressions.Regex.Match(lastAccessedURL, "http://(.*)/", Text.RegularExpressions.RegexOptions.Singleline).Groups(1).Value
+                    Dim strDomainName As String = Text.RegularExpressions.Regex.Match(lastAccessedURL, "(?:http(?:s){0,1}://){0,1}(.*)/", Text.RegularExpressions.RegexOptions.Singleline).Groups(1).Value
                     lastException = New dnsLookupError(String.Format("There was an error while looking up the DNS records for the domain name {0}{1}{0}.", Chr(34), strDomainName), ex2)
                     Throw lastException
                     Return False
@@ -1275,7 +1275,7 @@ beginAgain:
                     Throw lastException
                     Return False
                 ElseIf ex2.Status = Net.WebExceptionStatus.NameResolutionFailure Then
-                    Dim strDomainName As String = Text.RegularExpressions.Regex.Match(lastAccessedURL, "http://(.*)/", Text.RegularExpressions.RegexOptions.Singleline).Groups(1).Value
+                    Dim strDomainName As String = Text.RegularExpressions.Regex.Match(lastAccessedURL, "(?:http(?:s){0,1}://){0,1}(.*)/", Text.RegularExpressions.RegexOptions.Singleline).Groups(1).Value
                     lastException = New dnsLookupError(String.Format("There was an error while looking up the DNS records for the domain name {0}{1}{0}.", Chr(34), strDomainName), ex2)
                     Throw lastException
                     Return False
@@ -1420,7 +1420,7 @@ beginAgain:
                     Throw lastException
                     Return False
                 ElseIf ex2.Status = Net.WebExceptionStatus.NameResolutionFailure Then
-                    Dim strDomainName As String = Text.RegularExpressions.Regex.Match(lastAccessedURL, "http://(.*)/", Text.RegularExpressions.RegexOptions.Singleline).Groups(1).Value
+                    Dim strDomainName As String = Text.RegularExpressions.Regex.Match(lastAccessedURL, "(?:http(?:s){0,1}://){0,1}(.*)/", Text.RegularExpressions.RegexOptions.Singleline).Groups(1).Value
                     lastException = New dnsLookupError(String.Format("There was an error while looking up the DNS records for the domain name {0}{1}{0}.", Chr(34), strDomainName), ex2)
                     Throw lastException
                     Return False
