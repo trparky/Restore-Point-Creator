@@ -29,6 +29,7 @@ Public Class Mount_Volume_Shadow_Copy
     End Sub
 
     Private Sub Mount_Volume_Shadow_Copy_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.Location = Functions.support.verifyWindowLocation(My.Settings.mountVolumeShadowCopyWindowPosition)
         lblMainLabel.Text = String.Format(lblMainLabel.Text, Environment.GetFolderPath(Environment.SpecialFolder.Windows).Substring(0, 3).ToUpper)
         loadSnapshots()
     End Sub

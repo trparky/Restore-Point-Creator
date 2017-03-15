@@ -380,7 +380,7 @@ Public Class Form1
             LogProgramLoadsAndExitsToEventLogToolStripMenuItem.Checked = globalVariables.boolLogLoadsAndExits
             UseSSLToolStripMenuItem.Checked = My.Settings.useSSL
             AskBeforeUpgradingUpdatingToolStripMenuItem.Checked = My.Settings.askToUpgrade
-            Me.Location = My.Settings.mainWindowPosition
+            Me.Location = Functions.support.verifyWindowLocation(My.Settings.mainWindowPosition)
             AskBeforeCreatingRestorePointToolStripMenuItem.Checked = My.Settings.askBeforeCreatingRestorePoint
 
             If My.Settings.CheckForUpdates = True Then

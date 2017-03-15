@@ -70,7 +70,7 @@ Public Class frmManageSystemRestoreStorageSpace
         End If
 
         chkConfirmNewSmallerSize.Checked = My.Settings.confirmSmallerRestorePointSpaceSetting
-        Me.Location = My.Settings.ManageSystemRestoreStorageSpaceWindowLocation
+        Me.Location = Functions.support.verifyWindowLocation(My.Settings.ManageSystemRestoreStorageSpaceWindowLocation)
         Control.CheckForIllegalCrossThreadCalls = False
         percentageIndicator.ProgressBarColor = My.Settings.barColor
 

@@ -423,4 +423,8 @@ Public Class Disk_Space_Usage
             End If
         Next
     End Sub
+
+    Private Sub Disk_Space_Usage_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.Location = Functions.support.verifyWindowLocation(My.Settings.DiskSpaceUsageWindowLocation)
+    End Sub
 End Class

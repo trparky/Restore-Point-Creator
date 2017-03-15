@@ -177,6 +177,7 @@
     End Sub
 
     Private Sub eventLog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.Location = Functions.support.verifyWindowLocation(My.Settings.eventLogFormWindowLocation)
         chkAskMeToSubmitIfViewingAnExceptionEntry.Checked = My.Settings.boolAskMeToSubmitIfViewingAnExceptionEntry
         Control.CheckForIllegalCrossThreadCalls = False
         applySavedSorting()

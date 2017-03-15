@@ -114,6 +114,7 @@ Public Class frmTaskScheduler
     End Sub
 
     Private Sub frmTaskScheduler_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.Location = Functions.support.verifyWindowLocation(My.Settings.TaskSchedulerWindowLocation)
         checkWindowsTaskScheduler()
 
         Dim boolValueDeleteOldRestorePointsAsString As String = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Delete Old Restore Points", "False").Trim

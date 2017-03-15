@@ -59,6 +59,7 @@ Public Class frmDeleteOldSystemRestorePoints
     End Sub
 
     Private Sub frmDeleteOldSystemRestorePoints_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
+        Me.Location = Functions.support.verifyWindowLocation(My.Settings.DeleteOldSystemRestorePointsWindowLocation)
         txtMaxAge.Select()
     End Sub
 
