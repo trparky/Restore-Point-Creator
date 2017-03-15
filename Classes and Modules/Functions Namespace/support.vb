@@ -24,6 +24,14 @@ Namespace Functions.support
             End Try
         End Function
 
+        Public Function verifyWindowLocation(point As Point) As Point
+            If point.X < 0 Or point.Y < 0 Then
+                Return New Point(0, 0)
+            Else
+                Return point
+            End If
+        End Function
+
         Public Sub importSettingsFromXMLFile(strPathToFile As String, strMessageBoxTitle As String)
             Dim xmlSerializerObject As Serialization.XmlSerializer
             Dim bytes() As Byte
