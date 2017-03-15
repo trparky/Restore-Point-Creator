@@ -1130,7 +1130,7 @@ Namespace Functions.support
                 Process.GetCurrentProcess.Kill()
             Catch ex As ComponentModel.Win32Exception
                 eventLogFunctions.writeCrashToEventLog(ex)
-                MsgBox("There was an error while attempting to elevate the process, please make sure that when the Windows UAC prompt appears asking you to run the program with elevated privileges that you say ""Yes"" to the UAC prompt." & vbCrLf & vbCrLf & "The program will now terminate.", MsgBoxStyle.Critical, globalVariables.programName)
+                MsgBox("There was an error while attempting to elevate the process, please make sure that when the Windows UAC prompt appears asking you to run the program with elevated privileges that you say ""Yes"" to the UAC prompt." & vbCrLf & vbCrLf & "The program will now terminate.", MsgBoxStyle.Critical + MsgBoxStyle.SystemModal, globalVariables.programName)
                 Process.GetCurrentProcess.Kill()
             End Try
         End Sub
