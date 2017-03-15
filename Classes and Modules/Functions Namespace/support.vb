@@ -460,6 +460,7 @@ Namespace Functions.support
                     exceptionType.Equals(GetType(XmlException)) Or
                     exceptionType.Equals(GetType(InvalidOperationException)) Or
                     exceptionType.Equals(GetType(myExceptions.integerTryParseException)) Or
+                    exceptionType.Equals(GetType(IO.DirectoryNotFoundException)) Or
                     exceptionType.Equals(GetType(ObjectDisposedException)) Then
 
                     stringBuilder.AppendLine()
@@ -472,6 +473,10 @@ Namespace Functions.support
                         If Not String.IsNullOrEmpty(FileNotFoundExceptionObject.FusionLog) Then
                             stringBuilder.AppendLine("Reason: " & FileNotFoundExceptionObject.FusionLog)
                         End If
+                    ElseIf exceptionType.Equals(GetType(IO.DirectoryNotFoundException)) Then
+                        Dim DirectoryNotFoundExceptionObject As IO.DirectoryNotFoundException = DirectCast(rawExceptionObject, IO.DirectoryNotFoundException)
+                        stringBuilder.AppendLine("Source: " & DirectoryNotFoundExceptionObject.Source)
+                        addJSONedExtendedExceptionDataPackage(DirectoryNotFoundExceptionObject, stringBuilder)
                     ElseIf exceptionType.Equals(GetType(myExceptions.integerTryParseException)) Then
                         stringBuilder.AppendLine("String that could not be parsed into an Integer: " & DirectCast(rawExceptionObject, myExceptions.integerTryParseException).strThatCouldNotBeParsedIntoAnInteger)
                     ElseIf exceptionType.Equals(GetType(XmlException)) Then
