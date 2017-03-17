@@ -339,8 +339,8 @@ Namespace Functions.NativeMethod
         ''' Specifies additional message-specific information.
         ''' </param>
         ''' <returns></returns>
-        <DllImport("user32", CharSet:=CharSet.Auto, SetLastError:=True)>
-        Public Shared Function SendMessage(ByVal hWnd As IntPtr, ByVal Msg As UInt32, ByVal wParam As Integer, ByVal lParam As IntPtr) As Integer
+        <DllImport("user32.dll", CharSet:=CharSet.Unicode, SetLastError:=True)>
+        Public Shared Function SendMessage(ByVal hWnd As IntPtr, ByVal Msg As UInt32, ByVal wParam As IntPtr, ByVal lParam As IntPtr) As IntPtr
         End Function
 
         ''' <summary>
