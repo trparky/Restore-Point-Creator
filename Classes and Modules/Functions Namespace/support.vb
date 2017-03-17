@@ -960,11 +960,12 @@ Namespace Functions.support
 
         Public Sub executeCommand(pathToExecutable As String, arguments As String, Optional runAsAdmin As Boolean = False)
             If IO.File.Exists(pathToExecutable) = True Then
-                Dim processStartInfo As New ProcessStartInfo()
-                processStartInfo.FileName = pathToExecutable
-                processStartInfo.WindowStyle = ProcessWindowStyle.Hidden
-                processStartInfo.Arguments = arguments
-                processStartInfo.CreateNoWindow = True
+                Dim processStartInfo As New ProcessStartInfo() With {
+                    .FileName = pathToExecutable,
+                    .WindowStyle = ProcessWindowStyle.Hidden,
+                    .Arguments = arguments,
+                    .CreateNoWindow = True
+                }
 
                 If runAsAdmin = True Then processStartInfo.Verb = "runas"
 
@@ -974,10 +975,11 @@ Namespace Functions.support
 
         Public Sub executeCommand(pathToExecutable As String, Optional runAsAdmin As Boolean = False)
             If IO.File.Exists(pathToExecutable) = True Then
-                Dim processStartInfo As New ProcessStartInfo()
-                processStartInfo.FileName = pathToExecutable
-                processStartInfo.WindowStyle = ProcessWindowStyle.Hidden
-                processStartInfo.CreateNoWindow = True
+                Dim processStartInfo As New ProcessStartInfo() With {
+                    .FileName = pathToExecutable,
+                    .WindowStyle = ProcessWindowStyle.Hidden,
+                    .CreateNoWindow = True
+                }
 
                 If runAsAdmin = True Then processStartInfo.Verb = "runas"
 
@@ -987,11 +989,12 @@ Namespace Functions.support
 
         Public Sub executeCommandWithWait(pathToExecutable As String, arguments As String, Optional runAsAdmin As Boolean = False)
             If IO.File.Exists(pathToExecutable) = True Then
-                Dim processStartInfo As New ProcessStartInfo()
-                processStartInfo.FileName = pathToExecutable
-                processStartInfo.WindowStyle = ProcessWindowStyle.Hidden
-                processStartInfo.Arguments = arguments
-                processStartInfo.CreateNoWindow = True
+                Dim processStartInfo As New ProcessStartInfo() With {
+                    .FileName = pathToExecutable,
+                    .WindowStyle = ProcessWindowStyle.Hidden,
+                    .Arguments = arguments,
+                    .CreateNoWindow = True
+                }
 
                 If runAsAdmin = True Then processStartInfo.Verb = "runas"
 
@@ -1001,10 +1004,11 @@ Namespace Functions.support
 
         Public Sub executeCommandWithWait(pathToExecutable As String, Optional runAsAdmin As Boolean = False)
             If IO.File.Exists(pathToExecutable) = True Then
-                Dim processStartInfo As New ProcessStartInfo()
-                processStartInfo.FileName = pathToExecutable
-                processStartInfo.WindowStyle = ProcessWindowStyle.Hidden
-                processStartInfo.CreateNoWindow = True
+                Dim processStartInfo As New ProcessStartInfo() With {
+                    .FileName = pathToExecutable,
+                    .WindowStyle = ProcessWindowStyle.Hidden,
+                    .CreateNoWindow = True
+                }
 
                 If runAsAdmin = True Then processStartInfo.Verb = "runas"
 
@@ -1113,9 +1117,10 @@ Namespace Functions.support
 
         Public Sub launchRuntimeTaskFixRoutine()
             Try
-                Dim startInfo As New ProcessStartInfo
-                startInfo.FileName = New IO.FileInfo(Application.ExecutablePath).FullName
-                startInfo.Arguments = "-fixruntimetasks"
+                Dim startInfo As New ProcessStartInfo With {
+                    .FileName = New IO.FileInfo(Application.ExecutablePath).FullName,
+                    .Arguments = "-fixruntimetasks"
+                }
 
                 If privilegeChecks.areWeAnAdministrator() = False Then startInfo.Verb = "runas"
 
@@ -1130,8 +1135,9 @@ Namespace Functions.support
 
         Public Sub reRunWithAdminUserRights()
             Try
-                Dim startInfo As New ProcessStartInfo
-                startInfo.FileName = New IO.FileInfo(Application.ExecutablePath).FullName
+                Dim startInfo As New ProcessStartInfo With {
+                    .FileName = New IO.FileInfo(Application.ExecutablePath).FullName
+                }
 
                 If Environment.GetCommandLineArgs.Count <> 1 Then
                     startInfo.Arguments = Environment.GetCommandLineArgs(1)
