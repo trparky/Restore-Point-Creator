@@ -36,3 +36,7 @@
 <Assembly: CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass", Scope:="member", Target:="Restore_Point_Creator.Functions.miniDump.MiniDump.#MiniDumpWriteDump(System.IntPtr,System.Int32,System.IntPtr,Restore_Point_Creator.Functions.miniDump.MiniDump+MINIDUMP_TYPE,System.IntPtr,System.IntPtr,System.IntPtr)")>
 <Assembly: CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", Scope:="type", Target:="Restore_Point_Creator.Functions.BCD.bcdEditor")>
 <Assembly: CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass", Scope:="member", Target:="Restore_Point_Creator.Functions.support.support.#SRRemoveRestorePoint(System.Int32)")>
+<Assembly: CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Scope:="member", Target:="Restore_Point_Creator.frmTaskScheduler.#checkWindowsTaskScheduler()")>
+<Assembly: CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Scope:="member", Target:="Restore_Point_Creator.IniFile.#Save(System.String)")>
+<Assembly: CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Scope:="member", Target:="Restore_Point_Creator.IniFile.#getINIText()")>
+<Assembly: CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Scope:="member", Target:="Restore_Point_Creator.Functions.support.support.#exportSettingsToXMLFile(System.String)")>
