@@ -37,11 +37,11 @@ Namespace Functions.APIs
         Friend Shared Function SRSetRestorePointW(ByRef pRestorePtSpec As restorePointInfo, ByRef pSMgrStatus As STATEMGRSTATUS) As <MarshalAs(UnmanagedType.Bool)> Boolean
         End Function
 
-        <DllImport("kernel32.dll", SetLastError:=True, CharSet:=CharSet.Unicode)>
+        <DllImport("kernel32.dll", SetLastError:=True, CharSet:=CharSet.Unicode, ThrowOnUnmappableChar:=True, BestFitMapping:=False)>
         Friend Shared Function SearchPath(lpPath As String, lpFileName As String, lpExtension As String, nBufferLength As Integer, <MarshalAs(UnmanagedType.LPTStr)> lpBuffer As StringBuilder, lpFilePart As String) As UInteger
         End Function
 
-        <DllImport("kernel32.dll")>
+        <DllImport("kernel32.dll", CharSet:=CharSet.Unicode)>
         Friend Shared Function QueryFullProcessImageName(hprocess As IntPtr, dwFlags As Integer, lpExeName As Text.StringBuilder, ByRef size As Integer) As Boolean
         End Function
 
