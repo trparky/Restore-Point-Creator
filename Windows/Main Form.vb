@@ -100,7 +100,6 @@ Public Class Form1
                                         registryKey.SetValue(vbNullString, String.Format("{0}{1}{0} -createrestorepoint", Chr(34), Application.ExecutablePath))
                                         registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
                                         registryKey.Close()
-                                        registryKey.Dispose()
                                         registryKey = Nothing
                                     End If
                                 End If
@@ -135,7 +134,6 @@ Public Class Form1
                                         registryKey.SetValue(vbNullString, String.Format("{0}{1}{0} -createrestorepointcustomname", Chr(34), Application.ExecutablePath))
                                         registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
                                         registryKey.Close()
-                                        registryKey.Dispose()
                                         registryKey = Nothing
                                     End If
                                 End If
@@ -172,7 +170,6 @@ Public Class Form1
                                         registryKey.SetValue(vbNullString, String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
                                         registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
                                         registryKey.Close()
-                                        registryKey.Dispose()
                                         registryKey = Nothing
                                     End If
                                 End If
@@ -197,12 +194,10 @@ Public Class Form1
                         registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
                         registryKey.SetValue("SuppressionPolicy", 1073741884, RegistryValueKind.DWord)
                         registryKey.Close()
-                        registryKey.Dispose()
 
                         registryKey = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator\Command", True)
                         registryKey.SetValue(vbNullString, String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
                         registryKey.Close()
-                        registryKey.Dispose()
                     End If
                 End If
 
@@ -570,7 +565,6 @@ Public Class Form1
             registryKeyObject.SetValue(variableName, variableValue, RegistryValueKind.String)
 
             registryKeyObject.Close()
-            registryKeyObject.Dispose()
         End If
     End Sub
 
@@ -651,7 +645,6 @@ Public Class Form1
 
                 ' Now we dispose of the Registry Access Objects.
                 registryKey.Close()
-                registryKey.Dispose()
             End If
         Catch ex As Exception
             ' Does nothing
@@ -694,7 +687,6 @@ Public Class Form1
                 End If
 
                 regKey.Close()
-                regKey.Dispose()
             End If
         Catch ex As Exception
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
@@ -717,7 +709,6 @@ Public Class Form1
                 End If
 
                 regKey.Close()
-                regKey.Dispose()
             End If
         Catch ex As Exception
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
@@ -753,7 +744,6 @@ Public Class Form1
                 End Try
 
                 registryKey.Close()
-                registryKey.Dispose()
                 registryKey = Nothing
             End If
         Else
@@ -766,7 +756,6 @@ Public Class Form1
                 End Try
 
                 registryKey.Close()
-                registryKey.Dispose()
                 registryKey = Nothing
             End If
 
@@ -779,7 +768,6 @@ Public Class Form1
                 End Try
 
                 registryKey.Close()
-                registryKey.Dispose()
                 registryKey = Nothing
             End If
         End If
@@ -2596,7 +2584,6 @@ Public Class Form1
         If InterfaceTooBigToolStripMenuItem.Checked = True Then
             registryKey.SetValue(Process.GetCurrentProcess.MainModule.FileName.ToLower, "~ HIGHDPIAWARE", RegistryValueKind.String)
             registryKey.Close()
-            registryKey.Dispose()
             registryKey = Nothing
 
             MsgBox("The compatibility flag has been set for the program. The program will relaunch for the changes to take effect.", MsgBoxStyle.Information, strMessageBoxTitle)
@@ -2604,7 +2591,6 @@ Public Class Form1
         Else
             registryKey.DeleteValue(Process.GetCurrentProcess.MainModule.FileName.ToLower, False)
             registryKey.Close()
-            registryKey.Dispose()
             registryKey = Nothing
         End If
     End Sub
@@ -2755,12 +2741,10 @@ Public Class Form1
                 registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
                 registryKey.SetValue("SuppressionPolicy", 1073741884, RegistryValueKind.DWord)
                 registryKey.Close()
-                registryKey.Dispose()
 
                 registryKey = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint\Command", True)
                 registryKey.SetValue(vbNullString, String.Format("{0}{1}{0} -createrestorepoint", Chr(34), Application.ExecutablePath))
                 registryKey.Close()
-                registryKey.Dispose()
 
                 ' ===============================================================
                 ' == Makes the "Create Custom Named System Restore Point" Item ==
@@ -2781,12 +2765,10 @@ Public Class Form1
                 registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
                 registryKey.SetValue("SuppressionPolicy", 1073741884, RegistryValueKind.DWord)
                 registryKey.Close()
-                registryKey.Dispose()
 
                 registryKey = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point\Command", True)
                 registryKey.SetValue(vbNullString, String.Format("{0}{1}{0} -createrestorepointcustomname", Chr(34), Application.ExecutablePath))
                 registryKey.Close()
-                registryKey.Dispose()
 
                 ' ===================================================
                 ' == Makes the "Launch Restore Point Creator" Item ==
@@ -2807,12 +2789,10 @@ Public Class Form1
                 registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
                 registryKey.SetValue("SuppressionPolicy", 1073741884, RegistryValueKind.DWord)
                 registryKey.Close()
-                registryKey.Dispose()
 
                 registryKey = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator\Command", True)
                 registryKey.SetValue(vbNullString, String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
                 registryKey.Close()
-                registryKey.Dispose()
             Catch ex As Security.SecurityException
                 toolStripMyComputer.Checked = False
                 Functions.eventLogFunctions.writeCrashToEventLog(ex)
@@ -3023,7 +3003,6 @@ Public Class Form1
             registryKey.DeleteValue("Keep X Amount of Restore Points Value", False)
 
             registryKey.Close()
-            registryKey.Dispose()
 
             KeepXAmountOfRestorePointsToolStripMenuItem.Text = "Keep X Amount of Restore Points"
         End If

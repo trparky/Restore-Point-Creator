@@ -83,7 +83,6 @@ Namespace Functions
                 Dim registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\Control\Session Manager", False)
                 Dim pendingOperations As String() = registryKey.GetValue("PendingFileRenameOperations")
                 registryKey.Close()
-                registryKey.Dispose()
 
                 Dim strFileToBeWorkedOn, strFileToBeRenamedTo As String
 
@@ -135,7 +134,6 @@ Namespace Functions
             End If
 
             registryKey.Close()
-            registryKey.Dispose()
         End Sub
     End Class
 

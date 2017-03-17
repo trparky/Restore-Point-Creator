@@ -68,7 +68,6 @@ Public Class frmTaskScheduler
                             End If
 
                             serviceController.Close()
-                            serviceController.Dispose()
                             serviceController = Nothing
 
                             outParams.Dispose()
@@ -106,7 +105,6 @@ Public Class frmTaskScheduler
             End If
 
             serviceController.Close()
-            serviceController.Dispose()
             serviceController = Nothing
         Catch ex As Exception
             ' If the above stuff crashes, we don't care.  Windows is broken at this point and we can't fix it.
@@ -401,7 +399,6 @@ Public Class frmTaskScheduler
                 regKey.SetValue("MaxDays", Short.Parse(txtDays.Text.Trim), Microsoft.Win32.RegistryValueKind.String)
                 regKey.SetValue(strDeleteTaskName, "True", Microsoft.Win32.RegistryValueKind.String)
                 regKey.Close()
-                regKey.Dispose()
             Else
                 Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue(strDeleteTaskName, "False", Microsoft.Win32.RegistryValueKind.String)
             End If

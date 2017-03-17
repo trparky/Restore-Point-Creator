@@ -296,7 +296,6 @@ Namespace Functions.startupFunctions
                 Dim fileStream As New StreamWriter("lastrun.txt")
                 fileStream.Write(Now.ToString)
                 fileStream.Close()
-                fileStream.Dispose()
             Catch ex As Exception
                 eventLogFunctions.writeCrashToEventLog(ex)
                 ' Does nothing.
@@ -359,7 +358,6 @@ Namespace Functions.startupFunctions
                 Dim registryObject As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
                 registryObject.SetValue("UpdateAtNextRunTime", "True", RegistryValueKind.String)
                 registryObject.Close()
-                registryObject.Dispose()
             Catch ex As Exception
             End Try
         End Sub
@@ -376,7 +374,6 @@ Namespace Functions.startupFunctions
                     End If
 
                     registryObject.Close()
-                    registryObject.Dispose()
                 End If
 
                 wait.createPleaseWaitWindow("Updating Restore Point Creator... Please Wait.", True, enums.howToCenterWindow.screen, True)

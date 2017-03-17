@@ -72,7 +72,6 @@ Namespace Functions.registryStuff
                     End If
 
                     installerRegistryPath.Close()
-                    installerRegistryPath.Dispose()
                 End If
             Catch ex As Exception
                 eventLogFunctions.writeToSystemEventLog("Unable to update uninstall information in system Registry.", EventLogEntryType.Error)
@@ -88,7 +87,6 @@ Namespace Functions.registryStuff
             copyRegistryKey(parentKey, oldSubKeyName, newSubKeyName)
             parentKey.DeleteSubKeyTree(oldSubKeyName)
             parentKey.Close()
-            parentKey.Dispose()
         End Sub
 
         Private Sub copyRegistryKey(parentKey As RegistryKey, oldSubKeyName As String, newSubKeyName As String)

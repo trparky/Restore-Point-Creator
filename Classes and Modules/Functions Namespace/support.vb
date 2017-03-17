@@ -42,7 +42,6 @@ Namespace Functions.support
             xmlSerializerObject = New Serialization.XmlSerializer(exportedSettingsFile.GetType)
             exportedSettingsFile = xmlSerializerObject.Deserialize(streamReader)
             streamReader.Close()
-            streamReader.Dispose()
             xmlSerializerObject = Nothing
 
             With exportedSettingsFile
@@ -59,7 +58,6 @@ Namespace Functions.support
             xmlSerializerObject = New Serialization.XmlSerializer(exportedSettingsArray.GetType)
             exportedSettingsArray = xmlSerializerObject.Deserialize(memStream)
             memStream.Close()
-            memStream.Dispose()
             xmlSerializerObject = Nothing
 
             Dim registryKeyWeAreWorkingWith As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
@@ -103,7 +101,6 @@ Namespace Functions.support
             Next
 
             registryKeyWeAreWorkingWith.Close()
-            registryKeyWeAreWorkingWith.Dispose()
         End Sub
 
         Public Sub importSettingsFromLegacyBackupFile(strPathToFile As String, strMessageBoxTitle As String)
@@ -129,7 +126,6 @@ Namespace Functions.support
                 End While
 
                 streamReader.Close()
-                streamReader.Dispose()
 
                 If calculateConfigBackupDataPayloadChecksum(strDataPayload, strRandomString) = strChecksum Then
                     iniFile.loadINIFileFromText(convertFromBase64(strDataPayload))
@@ -222,7 +218,6 @@ Namespace Functions.support
             Next
 
             registryKeyWeAreWorkingWith.Close()
-            registryKeyWeAreWorkingWith.Dispose()
 
             iniFile = Nothing
         End Sub
@@ -292,7 +287,6 @@ Namespace Functions.support
             Next
 
             registryKeyWeAreWorkingWith.Close()
-            registryKeyWeAreWorkingWith.Dispose()
 
             Try
                 Dim xmlSerializerObject As Serialization.XmlSerializer
@@ -306,9 +300,7 @@ Namespace Functions.support
                 Dim strXMLData As String = streamReader.ReadToEnd
 
                 streamReader.Close()
-                streamReader.Dispose()
                 memStream.Close()
-                memStream.Dispose()
                 xmlSerializerObject = Nothing
 
                 Dim exportedSettingsFile As New exportedSettingsFile()
@@ -322,7 +314,6 @@ Namespace Functions.support
                 xmlSerializerObject = New Serialization.XmlSerializer(exportedSettingsFile.GetType)
                 xmlSerializerObject.Serialize(streamWriter, exportedSettingsFile)
                 streamWriter.Close()
-                streamWriter.Dispose()
             Catch ex As Exception
                 eventLogFunctions.writeCrashToEventLog(ex)
                 exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
@@ -573,7 +564,6 @@ Namespace Functions.support
 
             If boolCloseAfterSettingValue Then
                 registryKey.Close()
-                registryKey.Dispose()
             End If
         End Sub
 
@@ -771,7 +761,6 @@ Namespace Functions.support
                     End If
 
                     fileStream.Close() ' This closes our FileStream Object.
-                    fileStream.Dispose() ' And this Disposes of our FileStream Object.
 
                     If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                         eventLogFunctions.writeToSystemEventLog(String.Format("Extraction of {0}{1}{0} was successful.", Chr(34), fileToExtract), EventLogEntryType.Information)

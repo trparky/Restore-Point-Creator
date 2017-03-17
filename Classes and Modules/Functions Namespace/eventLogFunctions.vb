@@ -34,7 +34,6 @@ Namespace Functions.eventLogFunctions
                     Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(logObject.GetType)
                     xmlSerializerObject.Serialize(streamWriter, logObject)
                     streamWriter.Close()
-                    streamWriter.Dispose()
                 Catch ex As Exception
                     writeCrashToEventLog(ex)
                 End Try
