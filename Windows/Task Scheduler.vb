@@ -678,8 +678,9 @@ Public Class frmTaskScheduler
     End Sub
 
     Private Sub btnSetCustomName_Click(sender As Object, e As EventArgs) Handles btnSetCustomName.Click
-        Dim setCustomRestorePointNameForScheduledRestorePointsInstance As New Set_Custom_Restore_Point_Name_for_Scheduled_Restore_Points
-        setCustomRestorePointNameForScheduledRestorePointsInstance.StartPosition = FormStartPosition.CenterParent
+        Dim setCustomRestorePointNameForScheduledRestorePointsInstance As New Set_Custom_Restore_Point_Name_for_Scheduled_Restore_Points With {
+            .StartPosition = FormStartPosition.CenterParent
+        }
         setCustomRestorePointNameForScheduledRestorePointsInstance.ShowDialog()
     End Sub
 

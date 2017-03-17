@@ -14,10 +14,11 @@ Namespace Functions.eventLogFunctions
             Try
                 Dim jsonEngine As New Web.Script.Serialization.JavaScriptSerializer
 
-                Dim logObject As New exportedLogFile
-                logObject.operatingSystem = osVersionInfo.getFullOSVersionString
-                logObject.programVersion = globalVariables.version.strFullVersionString
-                logObject.version = 4
+                Dim logObject As New exportedLogFile With {
+                    .operatingSystem = osVersionInfo.getFullOSVersionString,
+                    .programVersion = globalVariables.version.strFullVersionString,
+                    .version = 4
+                }
 
                 Dim logsEntries As New List(Of restorePointCreatorExportedLog)()
 
@@ -148,13 +149,13 @@ Namespace Functions.eventLogFunctions
 
                     While eventInstance IsNot Nothing
                         If eventInstance.ProviderName.Equals(strSystemRestorePointCreator, StringComparison.OrdinalIgnoreCase) Or eventInstance.ProviderName.caseInsensitiveContains(strSystemRestorePointCreator) = True Then
-                            logClass = New restorePointCreatorExportedLog
-
-                            logClass.logData = eventInstance.FormatDescription
-                            logClass.unixTime = eventInstance.TimeCreated.Value.ToUniversalTime.toUNIXTimestamp()
-                            logClass.logType = eventInstance.Level
-                            logClass.logSource = strEventLog
-                            logClass.logID = eventInstance.RecordId
+                            logClass = New restorePointCreatorExportedLog With {
+                                .logData = eventInstance.FormatDescription,
+                                .unixTime = eventInstance.TimeCreated.Value.ToUniversalTime.toUNIXTimestamp(),
+                                .logType = eventInstance.Level,
+                                .logSource = strEventLog,
+                                .logID = eventInstance.RecordId
+                            }
 
                             logCount += 1
                             logEntries.Add(logClass)

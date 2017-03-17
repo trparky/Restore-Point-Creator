@@ -661,12 +661,12 @@ Public Class Form1
     End Sub
 
     Private Function openUpdateDialog(versionUpdateType As Update_Message.versionUpdateType, newVersionString As String, strRemoteBetaRCVersion As String) As Update_Message.userResponse
-        Dim updateMessageDialog As New Update_Message
-
-        updateMessageDialog.StartPosition = FormStartPosition.CenterScreen
-        updateMessageDialog.versionUpdate = versionUpdateType
-        updateMessageDialog.newVersionString = newVersionString
-        updateMessageDialog.strRemoteBetaRCVersion = strRemoteBetaRCVersion
+        Dim updateMessageDialog As New Update_Message With {
+            .StartPosition = FormStartPosition.CenterScreen,
+            .versionUpdate = versionUpdateType,
+            .newVersionString = newVersionString,
+            .strRemoteBetaRCVersion = strRemoteBetaRCVersion
+        }
 
         updateMessageDialog.ShowDialog(Me)
 
@@ -1654,9 +1654,10 @@ Public Class Form1
                                 'index += 1
 
                                 ' Adds a System Restore Point to a list of System Restore Points with the Restore Point ID as a Key
-                                listViewItem = New myListViewItemTypes.restorePointEntryItem()
-                                listViewItem.Text = restorePointDetails("SequenceNumber").ToString
-                                listViewItem.strRestorePointID = restorePointDetails("SequenceNumber").ToString.Trim
+                                listViewItem = New myListViewItemTypes.restorePointEntryItem() With {
+                                    .Text = restorePointDetails("SequenceNumber").ToString,
+                                    .strRestorePointID = restorePointDetails("SequenceNumber").ToString.Trim
+                                }
 
                                 If Not Integer.TryParse(listViewItem.strRestorePointID, listViewItem.intRestorePointID) Then
                                     Throw New Functions.myExceptions.integerTryParseException() With {.strThatCouldNotBeParsedIntoAnInteger = listViewItem.strRestorePointID}
@@ -2305,8 +2306,9 @@ Public Class Form1
     End Sub
 
     Private Sub ConfigureHTTPTimeoutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConfigureHTTPTimeoutToolStripMenuItem.Click
-        Dim frmConfigureHTTPTimeout As New Configure_HTTP_Timeout
-        frmConfigureHTTPTimeout.StartPosition = FormStartPosition.CenterParent
+        Dim frmConfigureHTTPTimeout As New Configure_HTTP_Timeout With {
+            .StartPosition = FormStartPosition.CenterParent
+        }
         frmConfigureHTTPTimeout.ShowDialog(Me)
         ConfigureHTTPTimeoutToolStripMenuItem.Text = String.Format("Configure HTTP Timeout ({0} Seconds)", My.Settings.httpTimeout)
     End Sub
@@ -2428,8 +2430,9 @@ Public Class Form1
 
     Private Sub MountVolumeShadowCopyToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles MountVolumeShadowCopyToolStripMenuItem.Click
         If (globalVariables.windows.mountVolumeShadowCopy Is Nothing) Then
-            globalVariables.windows.mountVolumeShadowCopy = New Mount_Volume_Shadow_Copy
-            globalVariables.windows.mountVolumeShadowCopy.StartPosition = FormStartPosition.CenterScreen
+            globalVariables.windows.mountVolumeShadowCopy = New Mount_Volume_Shadow_Copy With {
+                .StartPosition = FormStartPosition.CenterScreen
+            }
             globalVariables.windows.mountVolumeShadowCopy.Show()
             globalVariables.windows.mountVolumeShadowCopy.Location = My.Settings.mountVolumeShadowCopyWindowPosition
         Else
@@ -2461,8 +2464,9 @@ Public Class Form1
 
     Private Sub ConfigureProxyToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConfigureProxyToolStripMenuItem.Click
         If (globalVariables.windows.configureProxy Is Nothing) Then
-            globalVariables.windows.configureProxy = New Configure_Proxy
-            globalVariables.windows.configureProxy.StartPosition = FormStartPosition.CenterParent
+            globalVariables.windows.configureProxy = New Configure_Proxy With {
+                .StartPosition = FormStartPosition.CenterParent
+            }
             globalVariables.windows.configureProxy.Show()
         Else
             globalVariables.windows.configureProxy.BringToFront()
@@ -2495,8 +2499,9 @@ Public Class Form1
 
     Private Sub ContactTheDeveloperToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ContactTheDeveloperToolStripMenuItem.Click
         If (globalVariables.windows.officialContactForm Is Nothing) Then
-            globalVariables.windows.officialContactForm = New Official_Contact_Form
-            globalVariables.windows.officialContactForm.StartPosition = FormStartPosition.CenterParent
+            globalVariables.windows.officialContactForm = New Official_Contact_Form With {
+                .StartPosition = FormStartPosition.CenterParent
+            }
             globalVariables.windows.officialContactForm.Show()
         Else
             globalVariables.windows.officialContactForm.BringToFront()
@@ -2504,8 +2509,9 @@ Public Class Form1
     End Sub
 
     Private Sub RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem.Click
-        Dim roundWindow As New Round_Restore_Point_Age_in_Days
-        roundWindow.StartPosition = FormStartPosition.CenterParent
+        Dim roundWindow As New Round_Restore_Point_Age_in_Days With {
+            .StartPosition = FormStartPosition.CenterParent
+        }
         roundWindow.ShowDialog()
 
         Dim response As Round_Restore_Point_Age_in_Days.userResponse = roundWindow.dialogResponse
@@ -2513,8 +2519,9 @@ Public Class Form1
     End Sub
 
     Private Sub CommandLineArgumentsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CommandLineArgumentsToolStripMenuItem.Click
-        Dim argumentsWindows As New Restore_Point_Creator_Command_Line_Arguments
-        argumentsWindows.StartPosition = FormStartPosition.CenterParent
+        Dim argumentsWindows As New Restore_Point_Creator_Command_Line_Arguments With {
+            .StartPosition = FormStartPosition.CenterParent
+        }
         argumentsWindows.ShowDialog()
     End Sub
 
@@ -2524,8 +2531,9 @@ Public Class Form1
 
     Private Sub CreateRestorePointAtUserLogonToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CreateRestorePointAtUserLogonToolStripMenuItem.Click
         If (globalVariables.windows.frmCreateRestorePointAtUserLogon Is Nothing) Then
-            globalVariables.windows.frmCreateRestorePointAtUserLogon = New Create_Restore_Point_at_User_Logon
-            globalVariables.windows.frmCreateRestorePointAtUserLogon.StartPosition = FormStartPosition.CenterParent
+            globalVariables.windows.frmCreateRestorePointAtUserLogon = New Create_Restore_Point_at_User_Logon With {
+                .StartPosition = FormStartPosition.CenterParent
+            }
             globalVariables.windows.frmCreateRestorePointAtUserLogon.Show()
         Else
             globalVariables.windows.frmCreateRestorePointAtUserLogon.BringToFront()
@@ -2544,8 +2552,9 @@ Public Class Form1
 
     Private Sub ProgramEventLogToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ProgramEventLogToolStripMenuItem.Click
         If (globalVariables.windows.eventLogForm Is Nothing) Then
-            globalVariables.windows.eventLogForm = New eventLogForm
-            globalVariables.windows.eventLogForm.StartPosition = FormStartPosition.CenterScreen
+            globalVariables.windows.eventLogForm = New eventLogForm With {
+                .StartPosition = FormStartPosition.CenterScreen
+            }
             globalVariables.windows.eventLogForm.Show()
             globalVariables.windows.eventLogForm.Location = My.Settings.eventLogFormWindowLocation
         Else
@@ -2647,8 +2656,9 @@ Public Class Form1
 
     Private Sub ViewOfficialChangeLogToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles ViewOfficialChangeLogToolStripMenuItem1.Click
         If (globalVariables.windows.frmChangeLog Is Nothing) Then
-            globalVariables.windows.frmChangeLog = New Change_Log
-            globalVariables.windows.frmChangeLog.StartPosition = FormStartPosition.CenterParent
+            globalVariables.windows.frmChangeLog = New Change_Log With {
+                .StartPosition = FormStartPosition.CenterParent
+            }
             globalVariables.windows.frmChangeLog.Show()
         Else
             globalVariables.windows.frmChangeLog.BringToFront()
@@ -2657,8 +2667,9 @@ Public Class Form1
 
     Private Sub toolStripViewDiskSpaceUsage_Click(sender As Object, e As EventArgs) Handles toolStripViewDiskSpaceUsage.Click
         If (globalVariables.windows.frmDiskSpaceUsageWindow Is Nothing) Then
-            globalVariables.windows.frmDiskSpaceUsageWindow = New Disk_Space_Usage
-            globalVariables.windows.frmDiskSpaceUsageWindow.StartPosition = FormStartPosition.CenterScreen
+            globalVariables.windows.frmDiskSpaceUsageWindow = New Disk_Space_Usage With {
+                .StartPosition = FormStartPosition.CenterScreen
+            }
             globalVariables.windows.frmDiskSpaceUsageWindow.Show()
             globalVariables.windows.frmDiskSpaceUsageWindow.Location = My.Settings.DiskSpaceUsageWindowLocation
         Else
@@ -2668,8 +2679,9 @@ Public Class Form1
 
     Private Sub toolStripManageSystemRestoreStorageSize_Click(sender As Object, e As EventArgs) Handles toolStripManageSystemRestoreStorageSize.Click
         If (globalVariables.windows.frmManageSystemRestoreStorageSpace Is Nothing) Then
-            globalVariables.windows.frmManageSystemRestoreStorageSpace = New frmManageSystemRestoreStorageSpace
-            globalVariables.windows.frmManageSystemRestoreStorageSpace.StartPosition = FormStartPosition.CenterScreen
+            globalVariables.windows.frmManageSystemRestoreStorageSpace = New frmManageSystemRestoreStorageSpace With {
+                .StartPosition = FormStartPosition.CenterScreen
+            }
             globalVariables.windows.frmManageSystemRestoreStorageSpace.Show()
             globalVariables.windows.frmManageSystemRestoreStorageSpace.Location = My.Settings.ManageSystemRestoreStorageSpaceWindowLocation
         Else
@@ -2679,8 +2691,9 @@ Public Class Form1
 
     Private Sub toolStripScheduleRestorePoints_Click(sender As Object, e As EventArgs) Handles toolStripScheduleRestorePoints.Click
         If (globalVariables.windows.frmTaskScheduler Is Nothing) Then
-            globalVariables.windows.frmTaskScheduler = New frmTaskScheduler
-            globalVariables.windows.frmTaskScheduler.StartPosition = FormStartPosition.CenterScreen
+            globalVariables.windows.frmTaskScheduler = New frmTaskScheduler With {
+                .StartPosition = FormStartPosition.CenterScreen
+            }
             globalVariables.windows.frmTaskScheduler.Show()
             globalVariables.windows.frmTaskScheduler.Location = My.Settings.TaskSchedulerWindowLocation
         Else
@@ -2909,8 +2922,9 @@ Public Class Form1
 
     Private Sub OldToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles toolStripDeleteOldRestorePoints.Click
         If My.Settings.maxDaysManualDelete = -1 Then
-            Dim frmDeleteOldSystemRestorePointsInstance = New frmDeleteOldSystemRestorePoints
-            frmDeleteOldSystemRestorePointsInstance.StartPosition = FormStartPosition.CenterScreen
+            Dim frmDeleteOldSystemRestorePointsInstance = New frmDeleteOldSystemRestorePoints With {
+                .StartPosition = FormStartPosition.CenterScreen
+            }
             frmDeleteOldSystemRestorePointsInstance.ShowDialog()
             frmDeleteOldSystemRestorePointsInstance.Location = My.Settings.DeleteOldSystemRestorePointsWindowLocation
 
@@ -2994,9 +3008,10 @@ Public Class Form1
 
     Private Sub KeepXAmountOfRestorePointsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles KeepXAmountOfRestorePointsToolStripMenuItem.Click
         If KeepXAmountOfRestorePointsToolStripMenuItem.Checked = True Then
-            Dim Keep_X_Amount_of_Restore_PointsInstance = New createRestorePointAtUserLogon
-            Keep_X_Amount_of_Restore_PointsInstance.parentFormG = Me
-            Keep_X_Amount_of_Restore_PointsInstance.StartPosition = FormStartPosition.CenterParent
+            Dim Keep_X_Amount_of_Restore_PointsInstance = New createRestorePointAtUserLogon With {
+                .parentFormG = Me,
+                .StartPosition = FormStartPosition.CenterParent
+            }
             Keep_X_Amount_of_Restore_PointsInstance.ShowDialog()
 
             Keep_X_Amount_of_Restore_PointsInstance.Dispose()
@@ -3032,9 +3047,10 @@ Public Class Form1
         toolStripCheckEveryWeek.Checked = False
         toolStripCheckEveryTwoWeeks.Checked = False
 
-        Dim checkForUpdatesEveryInstance As New checkForUpdatesEvery
-        checkForUpdatesEveryInstance.parentFormG = Me
-        checkForUpdatesEveryInstance.StartPosition = FormStartPosition.CenterParent
+        Dim checkForUpdatesEveryInstance As New checkForUpdatesEvery With {
+            .parentFormG = Me,
+            .StartPosition = FormStartPosition.CenterParent
+        }
         checkForUpdatesEveryInstance.ShowDialog()
     End Sub
 
@@ -3072,9 +3088,10 @@ Public Class Form1
     End Sub
 
     Private Sub DefaultCustomRestorePointNameToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DefaultCustomRestorePointNameToolStripMenuItem.Click
-        Dim setDefaultCustomRestorePointNameWindowInstance As New Set_Default_Custom_Restore_Point_Name
-        setDefaultCustomRestorePointNameWindowInstance.StartPosition = FormStartPosition.CenterParent
-        setDefaultCustomRestorePointNameWindowInstance.parentFormG = Me
+        Dim setDefaultCustomRestorePointNameWindowInstance As New Set_Default_Custom_Restore_Point_Name With {
+            .StartPosition = FormStartPosition.CenterParent,
+            .parentFormG = Me
+        }
         setDefaultCustomRestorePointNameWindowInstance.ShowDialog()
     End Sub
 
@@ -3318,9 +3335,10 @@ Public Class Form1
         Next
 
         If boolConfirmDeletions And My.Settings.multiConfirmRestorePointDeletions And systemRestorePointsList.SelectedItems.Count > 1 Then
-            Dim batchConfirmWindow As New Confirm_Restore_Point_Deletions_Form
-            batchConfirmWindow.restorePointIDsToBeDeleted = restorePointIDsToBeDeleted
-            batchConfirmWindow.StartPosition = FormStartPosition.CenterParent
+            Dim batchConfirmWindow As New Confirm_Restore_Point_Deletions_Form With {
+                .restorePointIDsToBeDeleted = restorePointIDsToBeDeleted,
+                .StartPosition = FormStartPosition.CenterParent
+            }
             batchConfirmWindow.ShowDialog(Me)
 
             If batchConfirmWindow.userResponse = Confirm_Restore_Point_Deletions_Form.userResponseENum.cancel Then

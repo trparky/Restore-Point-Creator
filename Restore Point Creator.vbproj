@@ -147,6 +147,7 @@
     <Compile Include="Classes and Modules\Functions Namespace\miniDump.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\startupFunctions.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\power.vb" />
+    <Compile Include="GlobalSuppressions.vb" />
     <Compile Include="Windows\Command Line Arguments.Designer.vb">
       <DependentUpon>Command Line Arguments.vb</DependentUpon>
     </Compile>
