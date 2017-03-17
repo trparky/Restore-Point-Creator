@@ -2,30 +2,9 @@
 Imports System.Text
 
 Namespace Functions.APIs
-    Public Class systemRestore
-        <DllImport("srclient.dll")>
-        Friend Shared Function SRSetRestorePointW(ByRef pRestorePtSpec As RestorePointInfo, ByRef pSMgrStatus As STATEMGRSTATUS) As <MarshalAs(UnmanagedType.Bool)> Boolean
-        End Function
-
-        <DllImport("kernel32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
-        Friend Shared Function SearchPath(lpPath As String, lpFileName As String, lpExtension As String, nBufferLength As Integer, <MarshalAs(UnmanagedType.LPTStr)> lpBuffer As StringBuilder, lpFilePart As String) As UInteger
-        End Function
-
-        ''' <summary>
-        ''' Contains information used by the SRSetRestorePoint function
-        ''' </summary>
-        <StructLayout(LayoutKind.Sequential, CharSet:=CharSet.Unicode)>
-        Friend Structure RestorePointInfo
-            Public dwEventType As Integer
-            ' The type of event
-            Public dwRestorePtType As Integer
-            ' The type of restore point
-            Public llSequenceNumber As Int64
-            ' The sequence number of the restore point
-            <MarshalAs(UnmanagedType.ByValTStr, SizeConst:=MaxDescW + 1)>
-            Public szDescription As String
-            ' The description to be displayed so the user can easily identify a restore point
-        End Structure
+    Friend NotInheritable Class NativeMethods
+        Private Sub New()
+        End Sub
 
         ''' <summary>
         ''' Contains status information used by the SRSetRestorePoint function
@@ -38,6 +17,44 @@ Namespace Functions.APIs
             ' The sequence number of the restore point
         End Structure
 
+        ''' <summary>
+        ''' Contains information used by the SRSetRestorePoint function
+        ''' </summary>
+        <StructLayout(LayoutKind.Sequential, CharSet:=CharSet.Unicode)>
+        Friend Structure RestorePointInfo
+            Public dwEventType As Integer
+            ' The type of event
+            Public dwRestorePtType As Integer
+            ' The type of restore point
+            Public llSequenceNumber As Int64
+            ' The sequence number of the restore point
+            <MarshalAs(UnmanagedType.ByValTStr, SizeConst:=systemRestore.MaxDescW + 1)>
+            Public szDescription As String
+            ' The description to be displayed so the user can easily identify a restore point
+        End Structure
+
+        <DllImport("srclient.dll", CharSet:=CharSet.Unicode)>
+        Friend Shared Function SRSetRestorePointW(ByRef pRestorePtSpec As restorePointInfo, ByRef pSMgrStatus As STATEMGRSTATUS) As <MarshalAs(UnmanagedType.Bool)> Boolean
+        End Function
+
+        <DllImport("kernel32.dll", SetLastError:=True, CharSet:=CharSet.Unicode)>
+        Friend Shared Function SearchPath(lpPath As String, lpFileName As String, lpExtension As String, nBufferLength As Integer, <MarshalAs(UnmanagedType.LPTStr)> lpBuffer As StringBuilder, lpFilePart As String) As UInteger
+        End Function
+
+        <DllImport("kernel32.dll")>
+        Friend Shared Function QueryFullProcessImageName(hprocess As IntPtr, dwFlags As Integer, lpExeName As Text.StringBuilder, ByRef size As Integer) As Boolean
+        End Function
+
+        <DllImport("kernel32.dll")>
+        Friend Shared Function OpenProcess(dwDesiredAccess As ProcessAccessFlags, bInheritHandle As Boolean, dwProcessId As Integer) As IntPtr
+        End Function
+
+        <DllImport("kernel32.dll", SetLastError:=True)>
+        Friend Shared Function CloseHandle(hHandle As IntPtr) As Boolean
+        End Function
+    End Class
+
+    Public Class systemRestore
         ' Type of restorations
         Public Enum RestoreType
             ApplicationInstall = 0
@@ -95,7 +112,7 @@ Namespace Functions.APIs
             Dim sbPath As New StringBuilder(260)
 
             ' See if DLL exists
-            If SearchPath(Nothing, "srclient.dll", Nothing, 260, sbPath, Nothing) <> 0 Then
+            If NativeMethods.SearchPath(Nothing, "srclient.dll", Nothing, 260, sbPath, Nothing) <> 0 Then
                 Return True
             End If
 
@@ -137,8 +154,8 @@ Namespace Functions.APIs
         ''' <returns>The status of call</returns>
         ''' <remarks>Use EndRestore() or CancelRestore() to end the system restore</remarks>
         Public Shared Function StartRestore(strDescription As String, rt As RestoreType, ByRef lSeqNum As Long) As Integer
-            Dim rpInfo As New RestorePointInfo()
-            Dim rpStatus As New STATEMGRSTATUS()
+            Dim rpInfo As New NativeMethods.RestorePointInfo()
+            Dim rpStatus As New NativeMethods.STATEMGRSTATUS()
 
             If Not SysRestoreAvailable() Then
                 lSeqNum = 0
@@ -153,7 +170,7 @@ Namespace Functions.APIs
                 rpInfo.llSequenceNumber = 0
                 rpInfo.szDescription = strDescription
 
-                SRSetRestorePointW(rpInfo, rpStatus)
+                NativeMethods.SRSetRestorePointW(rpInfo, rpStatus)
             Catch generatedExceptionName As DllNotFoundException
                 lSeqNum = 0
                 Return -1
@@ -170,8 +187,8 @@ Namespace Functions.APIs
         ''' <param name="lSeqNum">The restore sequence number</param>
         ''' <returns>The status of call</returns>
         Public Shared Function EndRestore(lSeqNum As Long) As Integer
-            Dim rpInfo As New RestorePointInfo()
-            Dim rpStatus As New STATEMGRSTATUS()
+            Dim rpInfo As New NativeMethods.RestorePointInfo()
+            Dim rpStatus As New NativeMethods.STATEMGRSTATUS()
 
             If Not SysRestoreAvailable() Then
                 Return -1
@@ -181,7 +198,7 @@ Namespace Functions.APIs
                 rpInfo.dwEventType = EndSystemChange
                 rpInfo.llSequenceNumber = lSeqNum
 
-                SRSetRestorePointW(rpInfo, rpStatus)
+                NativeMethods.SRSetRestorePointW(rpInfo, rpStatus)
             Catch generatedExceptionName As DllNotFoundException
                 Return -1
             End Try
@@ -195,8 +212,8 @@ Namespace Functions.APIs
         ''' <param name="lSeqNum">The restore sequence number</param>
         ''' <returns>The status of call</returns>
         Public Shared Function CancelRestore(lSeqNum As Long) As Integer
-            Dim rpInfo As New RestorePointInfo()
-            Dim rpStatus As New STATEMGRSTATUS()
+            Dim rpInfo As New NativeMethods.RestorePointInfo()
+            Dim rpStatus As New NativeMethods.STATEMGRSTATUS()
 
             If Not SysRestoreAvailable() Then
                 Return -1
@@ -207,7 +224,7 @@ Namespace Functions.APIs
                 rpInfo.dwRestorePtType = CInt(RestoreType.CancelledOperation)
                 rpInfo.llSequenceNumber = lSeqNum
 
-                SRSetRestorePointW(rpInfo, rpStatus)
+                NativeMethods.SRSetRestorePointW(rpInfo, rpStatus)
             Catch generatedExceptionName As DllNotFoundException
                 Return -1
             End Try
@@ -245,17 +262,5 @@ Namespace Functions.APIs
             ERROR_INTERNAL_ERROR = 1359
             ERROR_TIMEOUT = 1460
         End Enum
-
-        <DllImport("kernel32.dll")>
-        Public Function QueryFullProcessImageName(hprocess As IntPtr, dwFlags As Integer, lpExeName As Text.StringBuilder, ByRef size As Integer) As Boolean
-        End Function
-
-        <DllImport("kernel32.dll")>
-        Public Function OpenProcess(dwDesiredAccess As ProcessAccessFlags, bInheritHandle As Boolean, dwProcessId As Integer) As IntPtr
-        End Function
-
-        <DllImport("kernel32.dll", SetLastError:=True)>
-        Public Function CloseHandle(hHandle As IntPtr) As Boolean
-        End Function
     End Module
 End Namespace

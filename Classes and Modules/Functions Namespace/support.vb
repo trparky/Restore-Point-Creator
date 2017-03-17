@@ -645,17 +645,17 @@ Namespace Functions.support
 
         Function getProcessExecutablePath(processID As Integer) As String
             Dim memoryBuffer = New Text.StringBuilder(1024)
-            Dim processHandle As IntPtr = APIs.OpenProcess(APIs.ProcessAccessFlags.PROCESS_QUERY_LIMITED_INFORMATION, False, processID)
+            Dim processHandle As IntPtr = APIs.NativeMethods.OpenProcess(APIs.ProcessAccessFlags.PROCESS_QUERY_LIMITED_INFORMATION, False, processID)
 
             If processHandle <> IntPtr.Zero Then
                 Try
                     Dim memoryBufferSize As Integer = memoryBuffer.Capacity
 
-                    If APIs.QueryFullProcessImageName(processHandle, 0, memoryBuffer, memoryBufferSize) Then
+                    If APIs.NativeMethods.QueryFullProcessImageName(processHandle, 0, memoryBuffer, memoryBufferSize) Then
                         Return memoryBuffer.ToString()
                     End If
                 Finally
-                    APIs.CloseHandle(processHandle)
+                    APIs.NativeMethods.CloseHandle(processHandle)
                 End Try
             End If
 
