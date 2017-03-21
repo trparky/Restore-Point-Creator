@@ -2389,7 +2389,7 @@ Public Class Form1
                 IO.File.Delete(exportBackupDialog.FileName)
             End If
 
-            Functions.support.exportSettingsToXMLFile(exportBackupDialog.FileName)
+            Functions.importExportSettings.exportSettingsToXMLFile(exportBackupDialog.FileName)
 
             MsgBox("Backup complete.", MsgBoxStyle.Information, strMessageBoxTitle)
         End If
@@ -2403,9 +2403,9 @@ Public Class Form1
         If importBackupDialog.ShowDialog() = DialogResult.OK Then
             If IO.File.Exists(importBackupDialog.FileName) = True Then
                 If New IO.FileInfo(importBackupDialog.FileName).Extension.Equals(".resbakx", OrdinalIgnoreCase) Then
-                    Functions.support.importSettingsFromXMLFile(importBackupDialog.FileName, strMessageBoxTitle)
+                    Functions.importExportSettings.importSettingsFromXMLFile(importBackupDialog.FileName, strMessageBoxTitle)
                 Else
-                    Functions.support.importSettingsFromLegacyBackupFile(importBackupDialog.FileName, strMessageBoxTitle)
+                    Functions.importExportSettings.importSettingsFromLegacyBackupFile(importBackupDialog.FileName, strMessageBoxTitle)
                 End If
 
                 Functions.eventLogFunctions.writeToSystemEventLog(String.Format("A configuration backup has been restored from {0}{1}{0} by user {0}{2}{0}.", Chr(34), importBackupDialog.FileName, Environment.UserName), EventLogEntryType.Information)
