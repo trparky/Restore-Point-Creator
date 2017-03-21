@@ -406,10 +406,10 @@ Public Class Form1
             registryObject = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
 
             If registryObject IsNot Nothing Then
-                boolUpdateAtNextRunTime = Functions.support.getBooleanValueFromRegistry(registryObject, "UpdateAtNextRunTime", False)
+                boolUpdateAtNextRunTime = Functions.registryStuff.getBooleanValueFromRegistry(registryObject, "UpdateAtNextRunTime", False)
                 registryObject.DeleteValue("UpdateAtNextRunTime", False)
 
-                boolShowDonationMessage = Functions.support.getBooleanValueFromRegistry(registryObject, "Show Donation Message", True)
+                boolShowDonationMessage = Functions.registryStuff.getBooleanValueFromRegistry(registryObject, "Show Donation Message", True)
 
                 ' Converts some settings over to Registry-based Settings.
                 If registryObject.GetValue("Log Restore Point Deletions", Nothing) Is Nothing Then
@@ -439,16 +439,16 @@ Public Class Form1
             Dim boolNoTask, boolLogRestorePointDeletions, boolExtendedLoggingForScheduledTasks As Boolean
 
             If registryObject IsNot Nothing Then
-                boolNoTask = Functions.support.getBooleanValueFromRegistry(registryObject, "No Task", False)
+                boolNoTask = Functions.registryStuff.getBooleanValueFromRegistry(registryObject, "No Task", False)
                 BypassNoUACLauncherToolStripMenuItem.Checked = boolNoTask
 
-                boolExtendedLoggingForScheduledTasks = Functions.support.getBooleanValueFromRegistry(registryObject, "Extended Logging For Scheduled Tasks", True)
+                boolExtendedLoggingForScheduledTasks = Functions.registryStuff.getBooleanValueFromRegistry(registryObject, "Extended Logging For Scheduled Tasks", True)
                 ExtendedLoggingForScheduledTasks.Checked = boolExtendedLoggingForScheduledTasks
 
-                boolLogRestorePointDeletions = Functions.support.getBooleanValueFromRegistry(registryObject, "Log Restore Point Deletions", True)
+                boolLogRestorePointDeletions = Functions.registryStuff.getBooleanValueFromRegistry(registryObject, "Log Restore Point Deletions", True)
                 toolStripLogRestorePointDeletions.Checked = boolLogRestorePointDeletions
 
-                globalVariables.boolExtendedLoggingDuringUpdating = Functions.support.getBooleanValueFromRegistry(registryObject, "Enable Extended Logging During Updating", True)
+                globalVariables.boolExtendedLoggingDuringUpdating = Functions.registryStuff.getBooleanValueFromRegistry(registryObject, "Enable Extended Logging During Updating", True)
                 EnableExtendedLoggingToolStripMenuItem.Checked = globalVariables.boolExtendedLoggingDuringUpdating
 
                 registryObject.Close()
@@ -1546,7 +1546,7 @@ Public Class Form1
             ' Checks to see if the user said yes to update.
             If updateDialogResponse = Update_Message.userResponse.doTheUpdate Then
                 If boolSetTriggerUpdateAtNextRuntimeSetting Then
-                    Functions.support.setBooleanValueInRegistry("UpdateAtNextRunTime", True)
+                    Functions.registryStuff.setBooleanValueInRegistry("UpdateAtNextRunTime", True)
                 End If
 
                 ' The user said yes.
