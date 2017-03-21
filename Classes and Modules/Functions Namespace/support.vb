@@ -387,6 +387,16 @@ Namespace Functions.support
                         If xmlNode.SelectSingleNode("betaRCVersion") IsNot Nothing Then
                             ' Get the "strRemoteBetaRCVersion" version string from the XML data.
                             strRemoteBetaRCVersion = xmlNode.SelectSingleNode("betaRCVersion").InnerText.Trim
+
+                            ' This checks to see if the "betaRCVersion" node doesn't contain either "Public Beta" or "Release Candidate".
+                            ' If it doesn't then it prepends the appropriate string based upon the value of the "type" node.
+                            If (Not strRemoteBetaRCVersion.caseInsensitiveContains("Public Beta")) And (Not strRemoteBetaRCVersion.caseInsensitiveContains("Release Candidate")) Then
+                                If strRemoteType.Equals("beta", StringComparison.OrdinalIgnoreCase) Then
+                                    strRemoteBetaRCVersion = "Public Beta " & strRemoteBetaRCVersion
+                                ElseIf strRemoteType.Equals("candidate", StringComparison.OrdinalIgnoreCase) Then
+                                    strRemoteBetaRCVersion = "Release Candidate " & strRemoteBetaRCVersion
+                                End If
+                            End If
                         End If
 
                         ' Now we need to check the remote update type.
