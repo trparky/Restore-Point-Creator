@@ -40,3 +40,4 @@
 <Assembly: CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Scope:="member", Target:="Restore_Point_Creator.IniFile.#Save(System.String)")>
 <Assembly: CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Scope:="member", Target:="Restore_Point_Creator.IniFile.#getINIText()")>
 <Assembly: CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Scope:="member", Target:="Restore_Point_Creator.Functions.support.support.#exportSettingsToXMLFile(System.String)")>
+<Assembly: CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Scope:="member", Target:="Restore_Point_Creator.Functions.importExportSettings.importExportSettings.#exportSettingsToXMLFile(System.String)")>
