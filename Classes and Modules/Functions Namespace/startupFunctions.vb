@@ -110,7 +110,7 @@ Namespace Functions.startupFunctions
                 Dim result As Integer
 
                 Dim oldNewestRestorePointID As Integer = wmi.getNewestSystemRestorePointID()
-                result = wmi.createRestorePoint(strRestorePointDescription, support.RestoreType.WindowsType, newRestorePointID)
+                result = wmi.createRestorePoint(strRestorePointDescription, restorePointStuff.RestoreType.WindowsType, newRestorePointID)
                 wait.closePleaseWaitWindow()
 
                 If displayMessage = True Then
@@ -227,7 +227,7 @@ Namespace Functions.startupFunctions
                 ' Loops through systemRestorePoints.
                 For Each systemRestorePoint As ManagementObject In systemRestorePoints.Get()
                     If String.IsNullOrEmpty(systemRestorePoint("CreationTime").ToString.Trim) = False Then
-                        systemRestorePointCreationDate = support.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime"))
+                        systemRestorePointCreationDate = restorePointStuff.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime"))
 
                         dateDiffResults = Math.Abs(DateDiff(DateInterval.Day, Date.Now, systemRestorePointCreationDate))
 

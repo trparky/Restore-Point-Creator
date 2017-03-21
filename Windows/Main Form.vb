@@ -1009,7 +1009,7 @@ Public Class Form1
                             numberOfOldRestorePointsDeleted += 1
 
                             If String.IsNullOrEmpty(systemRestorePoint("CreationTime").ToString.Trim) = False Then
-                                dateTime = Functions.support.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime").ToString)
+                                dateTime = Functions.restorePointStuff.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime").ToString)
 
                                 If toolStripLogRestorePointDeletions.Checked Then
                                     Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deleted Restore Point named ""{0}"" which was created on {1} at {2}.", systemRestorePoint("Description").ToString, dateTime.ToShortDateString, dateTime.ToLongTimeString), EventLogEntryType.Information)
@@ -1157,7 +1157,7 @@ Public Class Form1
             Dim systemRestorePoints As New ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
             Dim oldNewestRestorePointID As Integer = Functions.wmi.getNewestSystemRestorePointID()
 
-            result = Functions.wmi.createRestorePoint(stringRestorePointName, Functions.support.RestoreType.WindowsType, sequenceNumber)
+            result = Functions.wmi.createRestorePoint(stringRestorePointName, Functions.restorePointStuff.RestoreType.WindowsType, sequenceNumber)
 
             If result = Functions.APIs.errorCodes.ERROR_SERVICE_DISABLED Then
                 Dim reservedSpaceSize As ULong = Functions.vss.getMaxSize(globalVariables.systemDriveLetter)
@@ -1660,7 +1660,7 @@ Public Class Form1
                                 listViewItem.strRestorePointName = restorePointDetails("Description").ToString
 
                                 If String.IsNullOrEmpty(restorePointDetails("CreationTime").ToString.Trim) = False Then
-                                    listViewItem.dateRestorePointDate = Functions.support.parseSystemRestorePointCreationDate(restorePointDetails("CreationTime"))
+                                    listViewItem.dateRestorePointDate = Functions.restorePointStuff.parseSystemRestorePointCreationDate(restorePointDetails("CreationTime"))
                                     listViewItem.strRestorePointDate = String.Format("{0} {1}", listViewItem.dateRestorePointDate.ToShortDateString, listViewItem.dateRestorePointDate.ToLongTimeString)
 
                                     listViewItem.SubItems.Add(listViewItem.strRestorePointDate)
@@ -1685,9 +1685,9 @@ Public Class Form1
                                     End If
                                 Else
                                     If My.Settings.debug = True Then
-                                        listViewItem.strRestorePointType = Functions.support.whatTypeOfRestorePointIsIt(Integer.Parse(restorePointDetails("RestorePointType").ToString)) & " (" & restorePointDetails("RestorePointType").ToString & ")"
+                                        listViewItem.strRestorePointType = Functions.restorePointStuff.whatTypeOfRestorePointIsIt(Integer.Parse(restorePointDetails("RestorePointType").ToString)) & " (" & restorePointDetails("RestorePointType").ToString & ")"
                                     Else
-                                        listViewItem.strRestorePointType = Functions.support.whatTypeOfRestorePointIsIt(Integer.Parse(restorePointDetails("RestorePointType").ToString))
+                                        listViewItem.strRestorePointType = Functions.restorePointStuff.whatTypeOfRestorePointIsIt(Integer.Parse(restorePointDetails("RestorePointType").ToString))
                                     End If
                                 End If
 
@@ -1881,7 +1881,7 @@ Public Class Form1
             ' Loops through systemRestorePoints.
             For Each systemRestorePoint As ManagementObject In systemRestorePoints.Get()
                 If systemRestorePoint("CreationTime") IsNot Nothing Then
-                    systemRestorePointCreationDate = Functions.support.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime"), True)
+                    systemRestorePointCreationDate = Functions.restorePointStuff.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime"), True)
 
                     dateDiffResults = Math.Abs(DateDiff(DateInterval.Day, systemRestorePointCreationDate, Date.Now))
 

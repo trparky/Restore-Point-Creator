@@ -398,7 +398,7 @@ Namespace My
 
                             If boolExtendedLoggingForScheduledTasks = True Then oldNewestRestorePointID = Functions.wmi.getNewestSystemRestorePointID()
 
-                            Functions.support.createScheduledSystemRestorePoint(restorePointNameForScheduledTasks)
+                            Functions.restorePointStuff.createScheduledSystemRestorePoint(restorePointNameForScheduledTasks)
 
                             If boolExtendedLoggingForScheduledTasks = True Then
                                 ' We wait here with this loop until the system's has the restore point created.
@@ -408,7 +408,7 @@ Namespace My
                                 End While
                             End If
 
-                            If boolExtendedLoggingForScheduledTasks = True Then Functions.support.writeSystemRestorePointsToApplicationLogs()
+                            If boolExtendedLoggingForScheduledTasks = True Then Functions.restorePointStuff.writeSystemRestorePointsToApplicationLogs()
 
                             Dim boolValueFromRegistryAsString As String = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Delete Old Restore Points", "False").Trim
                             Dim boolValueFromRegistry As Boolean
@@ -540,7 +540,7 @@ Namespace My
                                 Dim numberOfRestorePoints As Integer = Functions.wmi.getNumberOfRestorePoints()
 
                                 If deleteOldRestorePointCommandLineCount < numberOfRestorePoints Then
-                                    Functions.support.writeSystemRestorePointsToApplicationLogs()
+                                    Functions.restorePointStuff.writeSystemRestorePointsToApplicationLogs()
 
                                     Functions.wmi.doDeletingOfXNumberOfRestorePoints(deleteOldRestorePointCommandLineCount)
 
@@ -548,7 +548,7 @@ Namespace My
                                         Threading.Thread.Sleep(500)
                                     End While
 
-                                    Functions.support.writeSystemRestorePointsToApplicationLogs()
+                                    Functions.restorePointStuff.writeSystemRestorePointsToApplicationLogs()
                                 End If
                             End If
 

@@ -17,7 +17,7 @@ Public Class Mount_Volume_Shadow_Copy
         Dim timeCreated As Date
 
         For Each queryObj As ManagementObject In searcher.Get()
-            timeCreated = Functions.support.parseSystemRestorePointCreationDate(queryObj("InstallDate").ToString).ToUniversalTime
+            timeCreated = Functions.restorePointStuff.parseSystemRestorePointCreationDate(queryObj("InstallDate").ToString).ToUniversalTime
 
             listShadowCopyIDs.Items.Add(New myListViewItemTypes.volumeShadowCopyListItem() With {.Text = (timeCreated.ToLongDateString & " at " & timeCreated.ToLongTimeString).Trim, .deviceID = queryObj("DeviceObject").ToString})
 
