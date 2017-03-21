@@ -6,6 +6,10 @@ Namespace Functions.APIs
         Private Sub New()
         End Sub
 
+        <DllImport("Srclient.dll")>
+        Friend Shared Function SRRemoveRestorePoint(index As Integer) As Integer
+        End Function
+
         ''' <summary>
         ''' Contains status information used by the SRSetRestorePoint function
         ''' </summary>

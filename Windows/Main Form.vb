@@ -1019,7 +1019,7 @@ Public Class Form1
                             End If
                         End If
 
-                        Functions.support.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber").ToString))
+                        Functions.APIs.NativeMethods.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber").ToString))
                     End If
 
                     systemRestorePoint.Dispose()
@@ -1834,7 +1834,7 @@ Public Class Form1
                     End If
 
                     intOldNumberOfRestorePoints -= 1
-                    Functions.support.SRRemoveRestorePoint(intRestorePointID) ' Deletes the Restore Point.
+                    Functions.APIs.NativeMethods.SRRemoveRestorePoint(intRestorePointID) ' Deletes the Restore Point.
                 End If
             Next
 
@@ -1886,7 +1886,7 @@ Public Class Form1
                     dateDiffResults = Math.Abs(DateDiff(DateInterval.Day, systemRestorePointCreationDate, Date.Now))
 
                     If dateDiffResults >= maxAgeInput Then
-                        Functions.support.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber").ToString)) ' Deletes the Restore Point.
+                        Functions.APIs.NativeMethods.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber").ToString)) ' Deletes the Restore Point.
 
                         If toolStripLogRestorePointDeletions.Checked Then
                             numberOfOldRestorePointsDeleted += 1

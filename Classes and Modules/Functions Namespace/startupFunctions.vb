@@ -232,7 +232,7 @@ Namespace Functions.startupFunctions
                         dateDiffResults = Math.Abs(DateDiff(DateInterval.Day, Date.Now, systemRestorePointCreationDate))
 
                         If dateDiffResults >= maxDays Then
-                            support.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber"))) ' Deletes the Restore Point.
+                            APIs.NativeMethods.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber"))) ' Deletes the Restore Point.
 
                             If boolLogDeletedRestorePoints Then
                                 numberOfOldRestorePointsDeleted += 1

@@ -105,7 +105,7 @@ Namespace Functions.wmi
                             Dim restorePointCreationDate As Date = restorePointStuff.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime").ToString)
                             eventLogFunctions.writeToSystemEventLog(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", systemRestorePoint("Description").ToString, restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
 
-                            support.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber").ToString))
+                            APIs.NativeMethods.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber").ToString))
                         End If
                     Next
                 End If
