@@ -1710,23 +1710,27 @@ Public Class Form1
                         systemRestorePointsManagementObjectSearcher.Dispose()
                         systemRestorePointsManagementObjectSearcher = Nothing
 
-                        ' Adds the list of System Restore Points that we created earlier in this routine to the System Restore Points list on the GUI.
-                        systemRestorePointsList.Items.AddRange(listOfRestorePoints.ToArray())
+                        If listOfRestorePoints.Count = 0 Then
+                            newestSystemRestoreID = 0
+                        Else
+                            ' Adds the list of System Restore Points that we created earlier in this routine to the System Restore Points list on the GUI.
+                            systemRestorePointsList.Items.AddRange(listOfRestorePoints.ToArray())
 
-                        ' Does some sorting on the System Restore Points list on the GUI.
-                        systemRestorePointsList.Sort()
+                            ' Does some sorting on the System Restore Points list on the GUI.
+                            systemRestorePointsList.Sort()
 
-                        If systemRestoreIDs.Count <> 0 Then
-                            ' First, we convert the ArrayList into an Integer then calculate the Max value of all of the Integers in the Integer Array.
-                            ' This gets the latest System Restore Point ID for later checking to see if the user is deleting the newest System Restore Point.
-                            newestSystemRestoreID = DirectCast(systemRestoreIDs.ToArray(GetType(Integer)), Integer()).Max
-                        End If
-
-                        For Each itemInList As myListViewItemTypes.restorePointEntryItem In systemRestorePointsList.Items
-                            If itemInList.intRestorePointID = newestSystemRestoreID Then
-                                itemInList.Font = New Font(btnCreate.Font.FontFamily, btnCreate.Font.SizeInPoints, FontStyle.Bold)
+                            If systemRestoreIDs.Count <> 0 Then
+                                ' First, we convert the ArrayList into an Integer then calculate the Max value of all of the Integers in the Integer Array.
+                                ' This gets the latest System Restore Point ID for later checking to see if the user is deleting the newest System Restore Point.
+                                newestSystemRestoreID = DirectCast(systemRestoreIDs.ToArray(GetType(Integer)), Integer()).Max
                             End If
-                        Next
+
+                            For Each itemInList As myListViewItemTypes.restorePointEntryItem In systemRestorePointsList.Items
+                                If itemInList.intRestorePointID = newestSystemRestoreID Then
+                                    itemInList.Font = New Font(btnCreate.Font.FontFamily, btnCreate.Font.SizeInPoints, FontStyle.Bold)
+                                End If
+                            Next
+                        End If
                     Else
                         newestSystemRestoreID = 0
                     End If
