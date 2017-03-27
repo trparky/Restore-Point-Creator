@@ -655,11 +655,12 @@ Public Class Form1
         'End If
     End Sub
 
-    Private Function openUpdateDialog(versionUpdateType As Update_Message.versionUpdateType, newVersionString As String, strRemoteBetaRCVersion As String) As Update_Message.userResponse
+    Private Function openUpdateDialog(versionUpdateType As Update_Message.versionUpdateType, remoteVersion As String, remoteBuild As String, strRemoteBetaRCVersion As String) As Update_Message.userResponse
         Dim updateMessageDialog As New Update_Message With {
             .StartPosition = FormStartPosition.CenterScreen,
             .versionUpdate = versionUpdateType,
-            .newVersionString = newVersionString,
+            .remoteVersion = remoteVersion,
+            .remoteBuild = remoteBuild,
             .strRemoteBetaRCVersion = strRemoteBetaRCVersion
         }
 
@@ -1511,6 +1512,11 @@ Public Class Form1
         End Try
 
         If Functions.support.processUpdateXMLData(xmlData, updateType, remoteVersion, remoteBuild, strRemoteBetaRCVersion) Then
+            If My.Settings.ignoreThisVersion = String.Format("{0} Build {1}", remoteVersion, remoteBuild) Then
+                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("There was an update but you have chosen to ignore it ({0}).", My.Settings.ignoreThisVersion), EventLogEntryType.Information)
+                Exit Sub
+            End If
+
             ' Creates a variable to store the user's response to the update notification window.
             Dim updateDialogResponse As Update_Message.userResponse
 
@@ -1532,14 +1538,14 @@ Public Class Form1
             ' statement didn't execute then we simply go onto the rest of the update code that is below.
 
             If updateType = Functions.support.updateType.beta Then
-                updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.betaVersionUpdate, remoteBuild, strRemoteBetaRCVersion)
+                updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.betaVersionUpdate, remoteVersion, remoteBuild, strRemoteBetaRCVersion)
             ElseIf updateType = Functions.support.updateType.candidate Then
-                updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.releaseCandidateVersionUpdate, remoteBuild, strRemoteBetaRCVersion)
+                updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.releaseCandidateVersionUpdate, remoteVersion, remoteBuild, strRemoteBetaRCVersion)
             ElseIf updateType = Functions.support.updateType.release Then
                 If remoteVersion = globalVariables.version.versionStringWithoutBuild Then
-                    updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.standardVersionUpdate, remoteBuild, strRemoteBetaRCVersion)
+                    updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.standardVersionUpdate, remoteVersion, remoteBuild, strRemoteBetaRCVersion)
                 Else
-                    updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.totallyNewVersionUpdate, remoteVersion, strRemoteBetaRCVersion)
+                    updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.totallyNewVersionUpdate, remoteVersion, remoteVersion, strRemoteBetaRCVersion)
                 End If
             End If
 
