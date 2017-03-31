@@ -6,7 +6,7 @@ Public Class frmManageSystemRestoreStorageSpace
     Private Const gigabytesInBytes As Long = 1073741824
     Private Const terabytesInBytes As Long = 1099511627776
 
-    Public Property preSelectedDriveLetter As String
+    Public strDriveLetterWeAreWorkingWith As String
 
     Private Sub frmManageSystemRestoreStorageSpace_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         My.Settings.ManageSystemRestoreStorageSpaceWindowLocation = Me.Location
@@ -32,19 +32,49 @@ Public Class frmManageSystemRestoreStorageSpace
         Return 0
     End Function
 
+    Sub loadDriveData(strDrive As String)
+        percentageIndicator.Value = 0
+        getSize(strDrive)
+
+        lblDriveSize.Text = String.Format("Total Size of Drive {0} {1}", strDrive, Functions.support.bytesToHumanSize(getSizeOfDrive(strDrive)))
+
+        btnSetSize.Text = String.Format("Set Size for System Drive ({0})", strDrive)
+        btnSetSize.Enabled = True
+
+        strDriveLetterWeAreWorkingWith = strDrive
+    End Sub
+
     Private Sub frmManageSystemRestoreStorageSpace_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        If Not String.IsNullOrEmpty(strDriveLetterWeAreWorkingWith) Then
+            showDrivesPanel()
+            chkAdvancedMode.Checked = True
+        Else
+            hideDrivesPanel()
+        End If
+
+        listDrives.Items.Clear()
+
+        For Each drive As IO.DriveInfo In My.Computer.FileSystem.Drives
+            If drive.IsReady And drive.DriveType = IO.DriveType.Fixed Then
+                listDrives.Items.Add(drive.RootDirectory.FullName.Substring(0, 2))
+            End If
+        Next
+
+        If chkAdvancedMode.Checked Then
+            For Each item As ListViewItem In listDrives.Items
+                If item.Text.Equals(strDriveLetterWeAreWorkingWith, StringComparison.OrdinalIgnoreCase) Then
+                    listDrives.Items(item.Index).Selected = True
+                    Exit For
+                End If
+            Next
+        End If
+
         chkConfirmNewSmallerSize.Checked = My.Settings.confirmSmallerRestorePointSpaceSetting
-        Me.Location = My.Settings.ManageSystemRestoreStorageSpaceWindowLocation
+        Me.Location = Functions.support.verifyWindowLocation(My.Settings.ManageSystemRestoreStorageSpaceWindowLocation)
         Control.CheckForIllegalCrossThreadCalls = False
         percentageIndicator.ProgressBarColor = My.Settings.barColor
 
-        percentageIndicator.Value = 0
-        getSize(globalVariables.systemDriveLetter)
-
-        lblDriveSize.Text = String.Format("Total Size of Drive {0} {1}", globalVariables.systemDriveLetter, Functions.support.bytesToHumanSize(getSizeOfDrive(globalVariables.systemDriveLetter)))
-
-        btnSetSize.Text = String.Format("Set Size for System Drive ({0})", globalVariables.systemDriveLetter)
-        btnSetSize.Enabled = True
+        loadDriveData(globalVariables.systemDriveLetter)
     End Sub
 
     ' driveLetter is just that, "C:"
@@ -141,10 +171,10 @@ Public Class frmManageSystemRestoreStorageSpace
             newSize = dblSize * terabytesInBytes
         ElseIf listSizeType.Text = "% (Percentage)" Then
             dblSize = dblSize / 100
-            newSize = getSizeOfDrive(globalVariables.systemDriveLetter) * dblSize
+            newSize = getSizeOfDrive(strDriveLetterWeAreWorkingWith) * dblSize
         End If
 
-        Dim size As ULong = Functions.vss.getMaxSize(globalVariables.systemDriveLetter)
+        Dim size As ULong = Functions.vss.getMaxSize(strDriveLetterWeAreWorkingWith)
 
         If size = newSize Then
             MsgBox("You didn't change the size.", MsgBoxStyle.Information, Me.Text)
@@ -156,14 +186,14 @@ Public Class frmManageSystemRestoreStorageSpace
         End If
 
         If size = 0 Then
-            Functions.vss.executeVSSAdminCommand(globalVariables.systemDriveLetter)
-            Functions.vss.setShadowStorageSize(globalVariables.systemDriveLetter, newSize)
-            Functions.vss.enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
+            Functions.vss.executeVSSAdminCommand(strDriveLetterWeAreWorkingWith)
+            Functions.vss.setShadowStorageSize(strDriveLetterWeAreWorkingWith, newSize)
+            Functions.vss.enableSystemRestoreOnDriveWMI(strDriveLetterWeAreWorkingWith)
         Else
-            Functions.vss.setShadowStorageSize(globalVariables.systemDriveLetter, newSize)
+            Functions.vss.setShadowStorageSize(strDriveLetterWeAreWorkingWith, newSize)
         End If
 
-        getSize(globalVariables.systemDriveLetter)
+        getSize(strDriveLetterWeAreWorkingWith)
 
         MsgBox("New System Restore Point Storage Space Size has been set.", MsgBoxStyle.Information, Me.Text)
     End Sub
@@ -186,5 +216,41 @@ Public Class frmManageSystemRestoreStorageSpace
     Private Sub chkConfirmNewSmallerSize_Click(sender As Object, e As EventArgs) Handles chkConfirmNewSmallerSize.Click
         My.Settings.confirmSmallerRestorePointSpaceSetting = chkConfirmNewSmallerSize.Checked
         My.Settings.Save()
+    End Sub
+
+    Private Sub chkAdvancedMode_Click(sender As Object, e As EventArgs) Handles chkAdvancedMode.Click
+        If chkAdvancedMode.Checked Then
+            showDrivesPanel()
+
+            lblDriveSize.Text = "Total Size of Drive:"
+            lblDriveLabel.Text = "Drive Label:"
+            lblUsedShadowStorageSpace.Text = "Used Shadow Storage Space:"
+            percentageIndicator.Value = 0
+            txtSize.Text = Nothing
+            listSizeType.SelectedIndex = -1
+            btnSetSize.Text = Nothing
+            btnSetSize.Enabled = False
+        Else
+            hideDrivesPanel()
+            loadDriveData(globalVariables.systemDriveLetter)
+        End If
+    End Sub
+
+    Private Sub listDrives_Click(sender As Object, e As EventArgs) Handles listDrives.Click
+        If listDrives.SelectedItems.Count > 0 Then loadDriveData(listDrives.SelectedItems(0).Text)
+    End Sub
+
+    Private Sub showDrivesPanel()
+        Me.Size = New Size(469, 217)
+
+        drivePanel.Visible = True
+        settingsPanel.Location = New Point(75, 5)
+    End Sub
+
+    Private Sub hideDrivesPanel()
+        Me.Size = New Size(400, 217)
+
+        drivePanel.Visible = False
+        settingsPanel.Location = New Point(5, 5)
     End Sub
 End Class

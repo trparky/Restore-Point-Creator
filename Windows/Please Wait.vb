@@ -18,8 +18,11 @@
             Me.CenterToScreen()
         End If
 
-        Me.BringToFront()
-        Me.Focus()
+        Try
+            Me.BringToFront()
+            Me.Focus()
+        Catch ex As Exception
+        End Try
 
         Control.CheckForIllegalCrossThreadCalls = False
         SmoothProgressBar1.ProgressBarColor = My.Settings.barColor

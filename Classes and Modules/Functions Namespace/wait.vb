@@ -11,10 +11,12 @@
             Try
                 If globalVariables.windows.frmPleaseWait IsNot Nothing Then
                     If parentForm Is Nothing Then
-                        globalVariables.windows.frmPleaseWait.ShowDialog()
+                        If globalVariables.windows.frmPleaseWait IsNot Nothing Then globalVariables.windows.frmPleaseWait.ShowDialog()
                     Else
-                        Dim _parentForm As Form = parentForm
-                        parentForm.Invoke(Sub() globalVariables.windows.frmPleaseWait.ShowDialog(_parentForm))
+                        If globalVariables.windows.frmPleaseWait IsNot Nothing Then
+                            Dim _parentForm As Form = parentForm
+                            parentForm.Invoke(Sub() globalVariables.windows.frmPleaseWait.ShowDialog(_parentForm))
+                        End If
                     End If
                 End If
             Catch ex As Exception

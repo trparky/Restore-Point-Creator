@@ -396,7 +396,6 @@ Namespace Functions.taskStuff
 
                         ' And let's close the Registry key.
                         registryKey.Close()
-                        registryKey.Dispose()
                         registryKey = Nothing
 
                         ' Checks to see if the Registry value was True and if we aren't an Admin. If boolNoTask

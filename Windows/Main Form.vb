@@ -50,18 +50,18 @@ Public Class Form1
 
     Private Sub checkForMyComputerRightClickOption()
         Try
-            If Functions.osVersionInfo.isThisWindows10() = True Then
-                ' Apparently Microsoft doesn't want anyone adding anything to the My Computer context menu since they have completely made it impossible
-                ' to do so via Registry Access Permission settings. So, we disable this part of the program and hide it from users.
-                toolStripMyComputer.Visible = False
-                toolStripMyComputer.Enabled = False
-                Exit Sub
-            End If
-
             Dim valueInRegistry As String
             Dim iconPath As String
             Dim registryKey As RegistryKey
             Dim matches As Match
+            Dim registryRootKeyWeAreWorkingWith As RegistryKey
+
+            If Functions.osVersionInfo.isThisWindows10() Then
+                ' In Windows 10 we can only write to the CLSID Classes Root that is a subkey of the current user's registry hive.
+                registryRootKeyWeAreWorkingWith = Registry.CurrentUser.OpenSubKey("SOFTWARE\Classes", True)
+            Else
+                registryRootKeyWeAreWorkingWith = Registry.ClassesRoot
+            End If
 
             ' This checks to see if we need to rename the Registry key for the "My Computer" right-click context menu.
             ' First we check to see if "Create Custom Named System Restore" exists, if it does then we go onto checking if
@@ -69,18 +69,18 @@ Public Class Form1
             ' AND "Create Custom Named System Restore Point" doesn't exist, then we know that we have to rename the
             ' "Create Custom Named System Restore" to "Create Custom Named System Restore Point".
             Try
-                If (Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore", False) Is Nothing) = False And (Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point", False) Is Nothing) = True Then
+                If (registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore", False) Is Nothing) = False And (registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point", False) Is Nothing) = True Then
                     'debug.writeline("renaming registry key")
-                    Functions.registryStuff.renameRegistrySubKey(Registry.ClassesRoot, "CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore", "CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point")
+                    Functions.registryStuff.renameRegistrySubKey(registryRootKeyWeAreWorkingWith, "CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore", "CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point")
                 End If
             Catch ex As Exception
             End Try
 
-            If Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint", False) IsNot Nothing Then
+            If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint", False) IsNot Nothing Then
                 toolStripMyComputer.Checked = True
 
-                If Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint\command", False) IsNot Nothing Then
-                    valueInRegistry = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint\command", False).GetValue(vbNullString, Nothing)
+                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint\command", False) IsNot Nothing Then
+                    valueInRegistry = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint\command", False).GetValue(vbNullString, Nothing)
 
                     If valueInRegistry <> Nothing Then
                         ' We check if the current Registry path is different than the current process's EXE path.
@@ -94,13 +94,12 @@ Public Class Form1
                                 ' Now we make sure that the file exists.
                                 If IO.File.Exists(matches.Groups(1).Value.Replace(Chr(34), "").Trim) = False Then
                                     '  OK, it doesn't.  The entries in the Registry are invalid, now let's fix them.
-                                    registryKey = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint\Command", True)
+                                    registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint\Command", True)
 
                                     If registryKey IsNot Nothing Then ' This should prevent Null Reference Exceptions.
                                         registryKey.SetValue(vbNullString, String.Format("{0}{1}{0} -createrestorepoint", Chr(34), Application.ExecutablePath))
                                         registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
                                         registryKey.Close()
-                                        registryKey.Dispose()
                                         registryKey = Nothing
                                     End If
                                 End If
@@ -114,8 +113,8 @@ Public Class Form1
                 matches = Nothing
                 valueInRegistry = Nothing
 
-                If Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point\command", False) IsNot Nothing Then
-                    valueInRegistry = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point\command", False).GetValue(vbNullString, Nothing)
+                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point\command", False) IsNot Nothing Then
+                    valueInRegistry = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point\command", False).GetValue(vbNullString, Nothing)
 
                     If valueInRegistry <> Nothing Then
                         ' We check if the current Registry path is different than the current process's EXE path.
@@ -129,13 +128,12 @@ Public Class Form1
                                 ' Now we make sure that the file exists.
                                 If IO.File.Exists(matches.Groups(1).Value.Replace(Chr(34), "").Trim) = False Then
                                     ' OK, it doesn't.  The entries in the Registry are invalid, now let's fix them.
-                                    registryKey = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point\Command", True)
+                                    registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point\Command", True)
 
                                     If registryKey IsNot Nothing Then ' This should prevent Null Reference Exceptions.
                                         registryKey.SetValue(vbNullString, String.Format("{0}{1}{0} -createrestorepointcustomname", Chr(34), Application.ExecutablePath))
                                         registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
                                         registryKey.Close()
-                                        registryKey.Dispose()
                                         registryKey = Nothing
                                     End If
                                 End If
@@ -150,9 +148,9 @@ Public Class Form1
                 valueInRegistry = Nothing
 
                 ' This checks to see if the entry exists...
-                If Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator\command", False) IsNot Nothing Then
+                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator\command", False) IsNot Nothing Then
                     ' OK, it does exist so let's go on with the process of checking for the validity of the entries.
-                    valueInRegistry = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator\command", False).GetValue(vbNullString, Nothing)
+                    valueInRegistry = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator\command", False).GetValue(vbNullString, Nothing)
 
                     If valueInRegistry <> Nothing Then
                         ' We check if the current Registry path is different than the current process's EXE path.
@@ -166,13 +164,12 @@ Public Class Form1
                                 ' Now we make sure that the file exists.
                                 If IO.File.Exists(matches.Groups(1).Value.Replace(Chr(34), "").Trim) = False Then
                                     ' OK, it doesn't.  The entries in the Registry are invalid, now let's fix them.
-                                    registryKey = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator\Command", True)
+                                    registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator\Command", True)
 
                                     If registryKey IsNot Nothing Then ' This should prevent Null Reference Exceptions.
                                         registryKey.SetValue(vbNullString, String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
                                         registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
                                         registryKey.Close()
-                                        registryKey.Dispose()
                                         registryKey = Nothing
                                     End If
                                 End If
@@ -188,47 +185,47 @@ Public Class Form1
                     ' == Makes the "Launch Restore Point Creator" Item ==
                     ' ===================================================
 
-                    If Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell") IsNot Nothing Then
-                        Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).CreateSubKey("Launch Restore Point Creator")
-                        Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator", True).CreateSubKey("Command")
+                    If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell") IsNot Nothing Then
+                        registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).CreateSubKey("Launch Restore Point Creator")
+                        registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator", True).CreateSubKey("Command")
 
-                        registryKey = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator", True)
+                        registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator", True)
                         registryKey.SetValue("HasLUAShield", "", RegistryValueKind.String)
                         registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
                         registryKey.SetValue("SuppressionPolicy", 1073741884, RegistryValueKind.DWord)
                         registryKey.Close()
-                        registryKey.Dispose()
 
-                        registryKey = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator\Command", True)
+                        registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator\Command", True)
                         registryKey.SetValue(vbNullString, String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
                         registryKey.Close()
-                        registryKey.Dispose()
                     End If
                 End If
 
                 matches = Nothing
 
-                If Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint") IsNot Nothing Then
-                    iconPath = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint").GetValue("icon", "nothing")
+                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint") IsNot Nothing Then
+                    iconPath = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint").GetValue("icon", "nothing")
                     If iconPath.caseInsensitiveContains(Application.ExecutablePath) = False Then
-                        Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint", True).SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
+                        registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint", True).SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
                     End If
                 End If
 
-                If Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point") IsNot Nothing Then
-                    iconPath = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point").GetValue("icon", "nothing")
+                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point") IsNot Nothing Then
+                    iconPath = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point").GetValue("icon", "nothing")
                     If iconPath.caseInsensitiveContains(Application.ExecutablePath) = False Then
-                        Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point", True).SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
+                        registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point", True).SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
                     End If
                 End If
 
-                If Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator") IsNot Nothing Then
-                    iconPath = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator").GetValue("icon", "nothing")
+                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator") IsNot Nothing Then
+                    iconPath = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator").GetValue("icon", "nothing")
                     If iconPath.caseInsensitiveContains(Application.ExecutablePath) = False Then
-                        Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator", True).SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
+                        registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator", True).SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
                     End If
                 End If
             End If
+
+            registryRootKeyWeAreWorkingWith.Close()
         Catch ex As Exception
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
@@ -319,7 +316,9 @@ Public Class Form1
                     Try
                         IO.File.Delete(globalVariables.pdbFileNameInZIP)
                     Catch ex As Exception
-                        Functions.APIs.MoveFileEx(globalVariables.pdbFileNameInZIP, vbNullString, 4)
+                        Dim deleteAtReboot As New Functions.deleteAtReboot()
+                        deleteAtReboot.addItem(globalVariables.pdbFileNameInZIP)
+                        deleteAtReboot.dispose(True)
                     End Try
                 End If
             ElseIf My.Settings.updateChannel = globalVariables.updateChannels.beta Then
@@ -378,7 +377,7 @@ Public Class Form1
             LogProgramLoadsAndExitsToEventLogToolStripMenuItem.Checked = globalVariables.boolLogLoadsAndExits
             UseSSLToolStripMenuItem.Checked = My.Settings.useSSL
             AskBeforeUpgradingUpdatingToolStripMenuItem.Checked = My.Settings.askToUpgrade
-            Me.Location = My.Settings.mainWindowPosition
+            Me.Location = Functions.support.verifyWindowLocation(My.Settings.mainWindowPosition)
             AskBeforeCreatingRestorePointToolStripMenuItem.Checked = My.Settings.askBeforeCreatingRestorePoint
 
             If My.Settings.CheckForUpdates = True Then
@@ -407,10 +406,10 @@ Public Class Form1
             registryObject = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
 
             If registryObject IsNot Nothing Then
-                boolUpdateAtNextRunTime = Functions.support.getBooleanValueFromRegistry(registryObject, "UpdateAtNextRunTime", False)
+                boolUpdateAtNextRunTime = Functions.registryStuff.getBooleanValueFromRegistry(registryObject, "UpdateAtNextRunTime", False)
                 registryObject.DeleteValue("UpdateAtNextRunTime", False)
 
-                boolShowDonationMessage = Functions.support.getBooleanValueFromRegistry(registryObject, "Show Donation Message", True)
+                boolShowDonationMessage = Functions.registryStuff.getBooleanValueFromRegistry(registryObject, "Show Donation Message", True)
 
                 ' Converts some settings over to Registry-based Settings.
                 If registryObject.GetValue("Log Restore Point Deletions", Nothing) Is Nothing Then
@@ -440,16 +439,16 @@ Public Class Form1
             Dim boolNoTask, boolLogRestorePointDeletions, boolExtendedLoggingForScheduledTasks As Boolean
 
             If registryObject IsNot Nothing Then
-                boolNoTask = Functions.support.getBooleanValueFromRegistry(registryObject, "No Task", False)
+                boolNoTask = Functions.registryStuff.getBooleanValueFromRegistry(registryObject, "No Task", False)
                 BypassNoUACLauncherToolStripMenuItem.Checked = boolNoTask
 
-                boolExtendedLoggingForScheduledTasks = Functions.support.getBooleanValueFromRegistry(registryObject, "Extended Logging For Scheduled Tasks", True)
+                boolExtendedLoggingForScheduledTasks = Functions.registryStuff.getBooleanValueFromRegistry(registryObject, "Extended Logging For Scheduled Tasks", True)
                 ExtendedLoggingForScheduledTasks.Checked = boolExtendedLoggingForScheduledTasks
 
-                boolLogRestorePointDeletions = Functions.support.getBooleanValueFromRegistry(registryObject, "Log Restore Point Deletions", True)
+                boolLogRestorePointDeletions = Functions.registryStuff.getBooleanValueFromRegistry(registryObject, "Log Restore Point Deletions", True)
                 toolStripLogRestorePointDeletions.Checked = boolLogRestorePointDeletions
 
-                globalVariables.boolExtendedLoggingDuringUpdating = Functions.support.getBooleanValueFromRegistry(registryObject, "Enable Extended Logging During Updating", True)
+                globalVariables.boolExtendedLoggingDuringUpdating = Functions.registryStuff.getBooleanValueFromRegistry(registryObject, "Enable Extended Logging During Updating", True)
                 EnableExtendedLoggingToolStripMenuItem.Checked = globalVariables.boolExtendedLoggingDuringUpdating
 
                 registryObject.Close()
@@ -568,7 +567,6 @@ Public Class Form1
             registryKeyObject.SetValue(variableName, variableValue, RegistryValueKind.String)
 
             registryKeyObject.Close()
-            registryKeyObject.Dispose()
         End If
     End Sub
 
@@ -649,7 +647,6 @@ Public Class Form1
 
                 ' Now we dispose of the Registry Access Objects.
                 registryKey.Close()
-                registryKey.Dispose()
             End If
         Catch ex As Exception
             ' Does nothing
@@ -658,13 +655,14 @@ Public Class Form1
         'End If
     End Sub
 
-    Private Function openUpdateDialog(versionUpdateType As Update_Message.versionUpdateType, newVersionString As String, strRemoteBetaRCVersion As String) As Update_Message.userResponse
-        Dim updateMessageDialog As New Update_Message
-
-        updateMessageDialog.StartPosition = FormStartPosition.CenterScreen
-        updateMessageDialog.versionUpdate = versionUpdateType
-        updateMessageDialog.newVersionString = newVersionString
-        updateMessageDialog.strRemoteBetaRCVersion = strRemoteBetaRCVersion
+    Private Function openUpdateDialog(versionUpdateType As Update_Message.versionUpdateType, remoteVersion As String, remoteBuild As String, strRemoteBetaRCVersion As String) As Update_Message.userResponse
+        Dim updateMessageDialog As New Update_Message With {
+            .StartPosition = FormStartPosition.CenterScreen,
+            .versionUpdate = versionUpdateType,
+            .remoteVersion = remoteVersion,
+            .remoteBuild = remoteBuild,
+            .strRemoteBetaRCVersion = strRemoteBetaRCVersion
+        }
 
         updateMessageDialog.ShowDialog(Me)
 
@@ -692,7 +690,6 @@ Public Class Form1
                 End If
 
                 regKey.Close()
-                regKey.Dispose()
             End If
         Catch ex As Exception
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
@@ -715,7 +712,6 @@ Public Class Form1
                 End If
 
                 regKey.Close()
-                regKey.Dispose()
             End If
         Catch ex As Exception
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
@@ -751,7 +747,6 @@ Public Class Form1
                 End Try
 
                 registryKey.Close()
-                registryKey.Dispose()
                 registryKey = Nothing
             End If
         Else
@@ -764,7 +759,6 @@ Public Class Form1
                 End Try
 
                 registryKey.Close()
-                registryKey.Dispose()
                 registryKey = Nothing
             End If
 
@@ -777,7 +771,6 @@ Public Class Form1
                 End Try
 
                 registryKey.Close()
-                registryKey.Dispose()
                 registryKey = Nothing
             End If
         End If
@@ -808,7 +801,9 @@ Public Class Form1
                 Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deletion of {0}{1}{0} was successful.", Chr(34), strFoundFile))
             End If
         Catch ex As Exception
-            Functions.APIs.MoveFileEx(Application.ExecutablePath & ".new.exe", vbNullString, 4)
+            Dim deleteAtReboot As New Functions.deleteAtReboot()
+            deleteAtReboot.addItem(Application.ExecutablePath & ".new.exe")
+            deleteAtReboot.dispose(True)
 
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                 Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deletion of {0}{1}{0} was unsuccessful, scheduling it to be deleted at next system reboot.", Chr(34), strFoundFile))
@@ -863,25 +858,6 @@ Public Class Form1
     Private Sub launchDonationURL()
         Functions.support.launchURLInWebBrowser(globalVariables.webURLs.webPages.strPayPal, "An error occurred when trying to launch the donation URL in your default browser. The donation URL has been copied to your Windows Clipboard for you to paste into the address bar in the browser of your choice.")
     End Sub
-
-    Private Function calculateConfigBackupDataPayloadChecksum(strInput As String, strSaltedString As String) As String
-        Dim string1, string2, string3, string4 As String
-        string1 = strInput.Substring(0, 30)
-        string2 = strInput.Substring(29, 30)
-        string3 = strInput.Substring(59, 30)
-        string4 = strInput.Substring(89, 30)
-
-        Dim compoundString As String = strInput & string4 & strSaltedString & string1 & strInput & strSaltedString & string4 & string3 & strInput & strSaltedString & string2 & string1 & strInput & strSaltedString
-
-        Return SHA512ChecksumString(compoundString)
-    End Function
-
-    Private Function SHA512ChecksumString(input As String) As String
-        Dim SHA1Engine As New Security.Cryptography.SHA512CryptoServiceProvider
-        Dim inputAsByteArray As Byte() = Encoding.ASCII.GetBytes(input)
-        Dim hashedByteArray As Byte() = SHA1Engine.ComputeHash(inputAsByteArray)
-        Return BitConverter.ToString(hashedByteArray).ToLower().Replace("-", "").Trim
-    End Function
 
     Private Sub switchToDebugBuildDownloadThreadSub()
         Try
@@ -1034,7 +1010,7 @@ Public Class Form1
                             numberOfOldRestorePointsDeleted += 1
 
                             If String.IsNullOrEmpty(systemRestorePoint("CreationTime").ToString.Trim) = False Then
-                                dateTime = Functions.support.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime").ToString)
+                                dateTime = Functions.restorePointStuff.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime").ToString)
 
                                 If toolStripLogRestorePointDeletions.Checked Then
                                     Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deleted Restore Point named ""{0}"" which was created on {1} at {2}.", systemRestorePoint("Description").ToString, dateTime.ToShortDateString, dateTime.ToLongTimeString), EventLogEntryType.Information)
@@ -1044,7 +1020,7 @@ Public Class Form1
                             End If
                         End If
 
-                        Functions.support.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber").ToString))
+                        Functions.APIs.NativeMethods.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber").ToString))
                     End If
 
                     systemRestorePoint.Dispose()
@@ -1182,7 +1158,7 @@ Public Class Form1
             Dim systemRestorePoints As New ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
             Dim oldNewestRestorePointID As Integer = Functions.wmi.getNewestSystemRestorePointID()
 
-            result = Functions.wmi.createRestorePoint(stringRestorePointName, Functions.support.RestoreType.WindowsType, sequenceNumber)
+            result = Functions.wmi.createRestorePoint(stringRestorePointName, Functions.restorePointStuff.RestoreType.WindowsType, sequenceNumber)
 
             If result = Functions.APIs.errorCodes.ERROR_SERVICE_DISABLED Then
                 Dim reservedSpaceSize As ULong = Functions.vss.getMaxSize(globalVariables.systemDriveLetter)
@@ -1214,7 +1190,12 @@ Public Class Form1
                         Exit Sub
                     End If
                 Else
-                    Functions.eventLogFunctions.writeToSystemEventLog("The reserved space for restore points on the system drive appears to be set correctly, something else appears to be wrong. Auto-correction of system configurations may cause unintended side-effects. The auto-correction routine has halted.", EventLogEntryType.Error)
+                    Dim msgBoxAndEventLogText As String = "The reserved space for restore points on the system drive appears to be set correctly, something else appears to be wrong. Auto-correction of system configurations may cause unintended side-effects. The auto-correction routine has halted."
+
+                    Functions.eventLogFunctions.writeToSystemEventLog(msgBoxAndEventLogText, EventLogEntryType.Error)
+                    MsgBox(msgBoxAndEventLogText & vbCrLf & vbCrLf & "If you want to try and correct it, go to the Utilities menu and click on ""Manually Fix System Restore"".", MsgBoxStyle.Exclamation, strMessageBoxTitle)
+
+                    Exit Sub
                 End If
             End If
 
@@ -1276,9 +1257,26 @@ Public Class Form1
         Dim extractPDB As Boolean = False
         Dim boolRebootNeeded As Boolean = False
         Dim memoryStream As New IO.MemoryStream()
+        Dim overrideURLPaths As Boolean = False
 
-        If boolOverrideUserUpdateChannelPreferences = True Then
+        If boolOverrideUserUpdateChannelPreferences And Not updateChannel.Equals(globalVariables.updateChannels.stable) Then
+            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                Functions.eventLogFunctions.writeToSystemEventLog("Forcing the update channel to the stable channel for this update session.", EventLogEntryType.Information)
+            End If
+
             updateChannel = globalVariables.updateChannels.stable
+
+            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                Functions.eventLogFunctions.writeToSystemEventLog("Setting extractPDB flag to True.", EventLogEntryType.Information)
+            End If
+
+            extractPDB = True
+
+            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                Functions.eventLogFunctions.writeToSystemEventLog("Setting overrideURLPaths flag to True.", EventLogEntryType.Information)
+            End If
+
+            overrideURLPaths = True
         End If
 
         If updateChannel = globalVariables.updateChannels.stable Then
@@ -1286,7 +1284,19 @@ Public Class Form1
                 Functions.eventLogFunctions.writeToSystemEventLog("Downloading compressed application ZIP package into system RAM.", EventLogEntryType.Information)
             End If
 
-            If Functions.http.downloadFile(globalVariables.webURLs.updateBranch.main.strProgramZIP, memoryStream) = False Then
+            Dim urlToZipFile As String = globalVariables.webURLs.updateBranch.main.strProgramZIP
+            Dim urlToZipFileSHA2 As String = globalVariables.webURLs.updateBranch.main.strProgramZIPSHA2
+
+            If boolOverrideUserUpdateChannelPreferences And overrideURLPaths Then
+                If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                    Functions.eventLogFunctions.writeToSystemEventLog("Overriding URL paths for download in this update session.", EventLogEntryType.Information)
+                End If
+
+                urlToZipFile = globalVariables.webURLs.updateBranch.debug.strProgramZIP
+                urlToZipFileSHA2 = globalVariables.webURLs.updateBranch.debug.strProgramZIPSHA2
+            End If
+
+            If Functions.http.downloadFile(urlToZipFile, memoryStream) = False Then
                 memoryStream.Close()
                 memoryStream.Dispose()
                 memoryStream = Nothing
@@ -1299,7 +1309,7 @@ Public Class Form1
                 Functions.eventLogFunctions.writeToSystemEventLog("Compressed application ZIP package download complete. Now verifying compressed application ZIP package integrity.", EventLogEntryType.Information)
             End If
 
-            If Functions.checksum.verifyChecksum(globalVariables.webURLs.updateBranch.main.strProgramZIPSHA2, memoryStream, True) = False Then
+            If Functions.checksum.verifyChecksum(urlToZipFileSHA2, memoryStream, True) = False Then
                 Functions.eventLogFunctions.writeToSystemEventLog("There was an error in the download of the program's ZIP file, checksums don't match. Update process aborted.", EventLogEntryType.Error)
 
                 memoryStream.Close()
@@ -1329,9 +1339,6 @@ Public Class Form1
 
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                 Functions.eventLogFunctions.writeToSystemEventLog("Compressed application ZIP package download complete. Now verifying compressed application ZIP package integrity.", EventLogEntryType.Information)
-            End If
-
-            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
             End If
 
             If Functions.checksum.verifyChecksum(globalVariables.webURLs.updateBranch.beta.strProgramZIPSHA2, memoryStream, True) = False Then
@@ -1505,6 +1512,11 @@ Public Class Form1
         End Try
 
         If Functions.support.processUpdateXMLData(xmlData, updateType, remoteVersion, remoteBuild, strRemoteBetaRCVersion) Then
+            If My.Settings.ignoreThisVersion = String.Format("{0} Build {1}", remoteVersion, remoteBuild) Then
+                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("There was an update but you have chosen to ignore it ({0}).", My.Settings.ignoreThisVersion), EventLogEntryType.Information)
+                Exit Sub
+            End If
+
             ' Creates a variable to store the user's response to the update notification window.
             Dim updateDialogResponse As Update_Message.userResponse
 
@@ -1515,32 +1527,32 @@ Public Class Form1
             ' we need to upgrade the user to the latest release branch version first.
             If (My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta, OrdinalIgnoreCase) Or My.Settings.updateChannel.Equals(globalVariables.updateChannels.tom, OrdinalIgnoreCase)) And remoteVersion <> globalVariables.version.versionStringWithoutBuild Then
                 ' OK, both conditions were met so we need to set some stuff up for later use in this function.
-                
+
                 boolSetTriggerUpdateAtNextRuntimeSetting = True ' We need to tell this sub-routine to set a trigger in the Registry that triggers an update check at the next program launch.
                 boolOverrideUserUpdateChannelPreferences = True ' We need to override the update channel that the user has so we set this value to True.
 
                 updateType = Functions.support.updateType.release ' We override the update type to release.
             End If
-            
+
             ' At this point, if the conditional statement above didn't work out and the code inside the
             ' statement didn't execute then we simply go onto the rest of the update code that is below.
 
             If updateType = Functions.support.updateType.beta Then
-                updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.betaVersionUpdate, remoteBuild, strRemoteBetaRCVersion)
+                updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.betaVersionUpdate, remoteVersion, remoteBuild, strRemoteBetaRCVersion)
             ElseIf updateType = Functions.support.updateType.candidate Then
-                updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.releaseCandidateVersionUpdate, remoteBuild, strRemoteBetaRCVersion)
+                updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.releaseCandidateVersionUpdate, remoteVersion, remoteBuild, strRemoteBetaRCVersion)
             ElseIf updateType = Functions.support.updateType.release Then
                 If remoteVersion = globalVariables.version.versionStringWithoutBuild Then
-                    updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.standardVersionUpdate, remoteBuild, strRemoteBetaRCVersion)
+                    updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.standardVersionUpdate, remoteVersion, remoteBuild, strRemoteBetaRCVersion)
                 Else
-                    updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.totallyNewVersionUpdate, remoteVersion, strRemoteBetaRCVersion)
+                    updateDialogResponse = openUpdateDialog(Update_Message.versionUpdateType.totallyNewVersionUpdate, remoteVersion, remoteVersion, strRemoteBetaRCVersion)
                 End If
             End If
 
             ' Checks to see if the user said yes to update.
             If updateDialogResponse = Update_Message.userResponse.doTheUpdate Then
                 If boolSetTriggerUpdateAtNextRuntimeSetting Then
-                    Functions.support.setBooleanValueInRegistry("UpdateAtNextRunTime", True)
+                    Functions.registryStuff.setBooleanValueInRegistry("UpdateAtNextRunTime", True)
                 End If
 
                 ' The user said yes.
@@ -1638,23 +1650,28 @@ Public Class Form1
                                 'index += 1
 
                                 ' Adds a System Restore Point to a list of System Restore Points with the Restore Point ID as a Key
-                                listViewItem = New myListViewItemTypes.restorePointEntryItem()
-                                listViewItem.Text = restorePointDetails("SequenceNumber").ToString
-                                listViewItem.restorePointID = restorePointDetails("SequenceNumber").ToString
+                                listViewItem = New myListViewItemTypes.restorePointEntryItem() With {
+                                    .Text = restorePointDetails("SequenceNumber").ToString,
+                                    .strRestorePointID = restorePointDetails("SequenceNumber").ToString.Trim
+                                }
+
+                                If Not Integer.TryParse(listViewItem.strRestorePointID, listViewItem.intRestorePointID) Then
+                                    Throw New Functions.myExceptions.integerTryParseException() With {.strThatCouldNotBeParsedIntoAnInteger = listViewItem.strRestorePointID}
+                                End If
 
                                 ' Adds the System Restore Point ID to our list of System Restore Point IDs to calculate the newest System Restore Point.
                                 systemRestoreIDs.Add(Integer.Parse(restorePointDetails("SequenceNumber")))
 
                                 listViewItem.SubItems.Add(restorePointDetails("Description").ToString)
-                                listViewItem.restorePointName = restorePointDetails("Description").ToString
+                                listViewItem.strRestorePointName = restorePointDetails("Description").ToString
 
                                 If String.IsNullOrEmpty(restorePointDetails("CreationTime").ToString.Trim) = False Then
-                                    listViewItem.rawRestorePointDate = Functions.support.parseSystemRestorePointCreationDate(restorePointDetails("CreationTime"))
-                                    listViewItem.restorePointDate = String.Format("{0} {1}", listViewItem.rawRestorePointDate.ToShortDateString, listViewItem.rawRestorePointDate.ToLongTimeString)
+                                    listViewItem.dateRestorePointDate = Functions.restorePointStuff.parseSystemRestorePointCreationDate(restorePointDetails("CreationTime"))
+                                    listViewItem.strRestorePointDate = String.Format("{0} {1}", listViewItem.dateRestorePointDate.ToShortDateString, listViewItem.dateRestorePointDate.ToLongTimeString)
 
-                                    listViewItem.SubItems.Add(listViewItem.restorePointDate)
+                                    listViewItem.SubItems.Add(listViewItem.strRestorePointDate)
 
-                                    restorePointAge = calculateRestorePointAge(listViewItem.rawRestorePointDate)
+                                    restorePointAge = calculateRestorePointAge(listViewItem.dateRestorePointDate)
                                 Else
                                     restorePointAge = 0
                                     listViewItem.SubItems.Add("(Error Parsing Date)")
@@ -1662,27 +1679,27 @@ Public Class Form1
 
                                 If restorePointDetails("Description").ToString.caseInsensitiveContains("windows update") Then
                                     If My.Settings.debug = True Then
-                                        listViewItem.restorePointType = "Windows Update" & " (" & restorePointDetails("RestorePointType").ToString & ")"
+                                        listViewItem.strRestorePointType = "Windows Update" & " (" & restorePointDetails("RestorePointType").ToString & ")"
                                     Else
-                                        listViewItem.restorePointType = "Windows Update"
+                                        listViewItem.strRestorePointType = "Windows Update"
                                     End If
                                 ElseIf restorePointDetails("Description").ToString.caseInsensitiveContains("system checkpoint") Then
                                     If My.Settings.debug = True Then
-                                        listViewItem.restorePointType = "System Checkpoint" & " (" & restorePointDetails("RestorePointType").ToString & ")"
+                                        listViewItem.strRestorePointType = "System Checkpoint" & " (" & restorePointDetails("RestorePointType").ToString & ")"
                                     Else
-                                        listViewItem.restorePointType = "System Checkpoint"
+                                        listViewItem.strRestorePointType = "System Checkpoint"
                                     End If
                                 Else
                                     If My.Settings.debug = True Then
-                                        listViewItem.restorePointType = Functions.support.whatTypeOfRestorePointIsIt(Integer.Parse(restorePointDetails("RestorePointType").ToString)) & " (" & restorePointDetails("RestorePointType").ToString & ")"
+                                        listViewItem.strRestorePointType = Functions.restorePointStuff.whatTypeOfRestorePointIsIt(Integer.Parse(restorePointDetails("RestorePointType").ToString)) & " (" & restorePointDetails("RestorePointType").ToString & ")"
                                     Else
-                                        listViewItem.restorePointType = Functions.support.whatTypeOfRestorePointIsIt(Integer.Parse(restorePointDetails("RestorePointType").ToString))
+                                        listViewItem.strRestorePointType = Functions.restorePointStuff.whatTypeOfRestorePointIsIt(Integer.Parse(restorePointDetails("RestorePointType").ToString))
                                     End If
                                 End If
 
-                                listViewItem.SubItems.Add(listViewItem.restorePointType)
+                                listViewItem.SubItems.Add(listViewItem.strRestorePointType)
                                 listViewItem.SubItems.Add(restorePointAge.ToString)
-                                listViewItem.restorePointAge = restorePointAge.ToString
+                                listViewItem.strRestorePointAge = restorePointAge.ToString
 
                                 ' Adds the item to the list.
                                 listOfRestorePoints.Add(listViewItem)
@@ -1693,23 +1710,27 @@ Public Class Form1
                         systemRestorePointsManagementObjectSearcher.Dispose()
                         systemRestorePointsManagementObjectSearcher = Nothing
 
-                        ' Adds the list of System Restore Points that we created earlier in this routine to the System Restore Points list on the GUI.
-                        systemRestorePointsList.Items.AddRange(listOfRestorePoints.ToArray())
+                        If listOfRestorePoints.Count = 0 Then
+                            newestSystemRestoreID = 0
+                        Else
+                            ' Adds the list of System Restore Points that we created earlier in this routine to the System Restore Points list on the GUI.
+                            systemRestorePointsList.Items.AddRange(listOfRestorePoints.ToArray())
 
-                        ' Does some sorting on the System Restore Points list on the GUI.
-                        systemRestorePointsList.Sort()
+                            ' Does some sorting on the System Restore Points list on the GUI.
+                            systemRestorePointsList.Sort()
 
-                        If systemRestoreIDs.Count <> 0 Then
-                            ' First, we convert the ArrayList into an Integer then calculate the Max value of all of the Integers in the Integer Array.
-                            ' This gets the latest System Restore Point ID for later checking to see if the user is deleting the newest System Restore Point.
-                            newestSystemRestoreID = DirectCast(systemRestoreIDs.ToArray(GetType(Integer)), Integer()).Max
-                        End If
-
-                        For Each itemInList As myListViewItemTypes.restorePointEntryItem In systemRestorePointsList.Items
-                            If Integer.Parse(itemInList.restorePointID) = newestSystemRestoreID Then
-                                itemInList.Font = New Font(btnCreate.Font.FontFamily, btnCreate.Font.SizeInPoints, FontStyle.Bold)
+                            If systemRestoreIDs.Count <> 0 Then
+                                ' First, we convert the ArrayList into an Integer then calculate the Max value of all of the Integers in the Integer Array.
+                                ' This gets the latest System Restore Point ID for later checking to see if the user is deleting the newest System Restore Point.
+                                newestSystemRestoreID = DirectCast(systemRestoreIDs.ToArray(GetType(Integer)), Integer()).Max
                             End If
-                        Next
+
+                            For Each itemInList As myListViewItemTypes.restorePointEntryItem In systemRestorePointsList.Items
+                                If itemInList.intRestorePointID = newestSystemRestoreID Then
+                                    itemInList.Font = New Font(btnCreate.Font.FontFamily, btnCreate.Font.SizeInPoints, FontStyle.Bold)
+                                End If
+                            Next
+                        End If
                     Else
                         newestSystemRestoreID = 0
                     End If
@@ -1720,6 +1741,13 @@ Public Class Form1
                     newestSystemRestoreID = 0
                 End If
             End If
+        Catch ex8 As IO.FileNotFoundException
+            Functions.wait.closePleaseWaitWindow()
+            MsgBox("There has been an error while trying to load the System Restore Points on your system." & vbCrLf & vbCrLf & "Please go to System Restore Point Utilities and click on Manually Fix System Restore and follow the prompts. It will ask you reboot your computer so please save all work before you do so.", MsgBoxStyle.Critical, strMessageBoxTitle)
+        Catch ex7 As Functions.myExceptions.integerTryParseException
+            Functions.wait.closePleaseWaitWindow()
+            Functions.eventLogFunctions.writeCrashToEventLog(ex7)
+            MsgBox("There was a serious error while loading the restore points on your system. The restore point IDs appear to have been mangled and can't be parsed into an Integer like it should be. The loading of restore points has been halted." & vbCrLf & vbCrLf & "The value that was returned by the system was... " & ex7.strThatCouldNotBeParsedIntoAnInteger, MsgBoxStyle.Critical, strMessageBoxTitle)
         Catch ex6 As ObjectDisposedException
             Functions.eventLogFunctions.writeCrashToEventLog(ex6)
 
@@ -1784,7 +1812,7 @@ Public Class Form1
         If restorePointsToBeDeleted.Count > 1 Then boolMultiMode = True
 
         For Each itemInList As myListViewItemTypes.restorePointEntryItem In systemRestorePointsList.Items
-            If restorePointsToBeDeleted.ContainsKey(itemInList.restorePointID) Then systemRestorePointsList.Items.Remove(itemInList)
+            If restorePointsToBeDeleted.ContainsKey(itemInList.strRestorePointID) Then systemRestorePointsList.Items.Remove(itemInList)
         Next
 
         systemRestorePointsList.Enabled = True
@@ -1816,7 +1844,7 @@ Public Class Form1
                     End If
 
                     intOldNumberOfRestorePoints -= 1
-                    Functions.support.SRRemoveRestorePoint(intRestorePointID) ' Deletes the Restore Point.
+                    Functions.APIs.NativeMethods.SRRemoveRestorePoint(intRestorePointID) ' Deletes the Restore Point.
                 End If
             Next
 
@@ -1863,12 +1891,12 @@ Public Class Form1
             ' Loops through systemRestorePoints.
             For Each systemRestorePoint As ManagementObject In systemRestorePoints.Get()
                 If systemRestorePoint("CreationTime") IsNot Nothing Then
-                    systemRestorePointCreationDate = Functions.support.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime"), True)
+                    systemRestorePointCreationDate = Functions.restorePointStuff.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime"), True)
 
                     dateDiffResults = Math.Abs(DateDiff(DateInterval.Day, systemRestorePointCreationDate, Date.Now))
 
                     If dateDiffResults >= maxAgeInput Then
-                        Functions.support.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber").ToString)) ' Deletes the Restore Point.
+                        Functions.APIs.NativeMethods.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber").ToString)) ' Deletes the Restore Point.
 
                         If toolStripLogRestorePointDeletions.Checked Then
                             numberOfOldRestorePointsDeleted += 1
@@ -2047,7 +2075,7 @@ Public Class Form1
 
         If AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked = False Then
             For Each iteminlist As myListViewItemTypes.restorePointEntryItem In systemRestorePointsList.SelectedItems
-                If Integer.Parse(iteminlist.restorePointID) = newestSystemRestoreID Then
+                If iteminlist.intRestorePointID = newestSystemRestoreID Then
                     btnDeleteRestorePoint.Enabled = False
                     stripDelete.Enabled = False
                     ToolTip.SetToolTip(btnDeleteRestorePoint, "Disabled because you have the latest System Restore Point selected as part of the group of selected System Restore Points.")
@@ -2256,9 +2284,31 @@ Public Class Form1
 #End Region
 
 #Region "--== ToolStrip Click Events ==--"
+    Private Sub ManuallyFixSystemRestoreToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ManuallyFixSystemRestoreToolStripMenuItem.Click
+        If MsgBox("You are about to forcefully fix System Restore on your system by enabling System Restore on the system drive. Use this tool only if you have received errors from the program such as Error 1058." & vbCrLf & vbCrLf & "WARNING! This tool may have unintended consequences such as lost restore points. By using this tool you agree that the developer of System Restore Point Creator is not liable for any lost restore points." & vbCrLf & vbCrLf & "Are you sure you want to do this?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, strMessageBoxTitle) = MsgBoxResult.Yes Then
+            Functions.eventLogFunctions.writeToSystemEventLog("The Manual System Restore Fix Tool has been engaged.", EventLogEntryType.Information)
+
+            Dim gigabytesInBytes As Long = 1073741824
+            Dim newSize As Long = gigabytesInBytes * 20 ' Sets the size to 20 GBs.
+
+            Functions.vss.executeVSSAdminCommand(globalVariables.systemDriveLetter)
+            Functions.vss.setShadowStorageSize(globalVariables.systemDriveLetter, newSize)
+            Functions.vss.enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
+
+            Functions.eventLogFunctions.writeToSystemEventLog("The Manual System Restore Fix Tool completed it's work. The system will now reboot.", EventLogEntryType.Information)
+
+            If MsgBox("The Manual System Restore Fix Tool completed it's work. Your system needs to be rebooted." & vbCrLf & vbCrLf & "Do you want to reboot your computer now?", MsgBoxStyle.Information + MsgBoxStyle.YesNo, strMessageBoxTitle) = MsgBoxResult.Yes Then
+                Functions.support.rebootSystem()
+            End If
+        Else
+            MsgBox("You have chosen to not use this tool therefore nothing has been done to your system.", MsgBoxStyle.Information, strMessageBoxTitle)
+        End If
+    End Sub
+
     Private Sub ConfigureHTTPTimeoutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConfigureHTTPTimeoutToolStripMenuItem.Click
-        Dim frmConfigureHTTPTimeout As New Configure_HTTP_Timeout
-        frmConfigureHTTPTimeout.StartPosition = FormStartPosition.CenterParent
+        Dim frmConfigureHTTPTimeout As New Configure_HTTP_Timeout With {
+            .StartPosition = FormStartPosition.CenterParent
+        }
         frmConfigureHTTPTimeout.ShowDialog(Me)
         ConfigureHTTPTimeoutToolStripMenuItem.Text = String.Format("Configure HTTP Timeout ({0} Seconds)", My.Settings.httpTimeout)
     End Sub
@@ -2336,7 +2386,7 @@ Public Class Form1
 
     Private Sub BackupToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BackupToolStripMenuItem.Click
         exportBackupDialog.Title = "Backup your settings where?"
-        exportBackupDialog.Filter = "Config Backup File|*.resbak|INI File|*.ini"
+        exportBackupDialog.Filter = "Config Backup File|*.resbakx"
         exportBackupDialog.FileName = Nothing
 
         If exportBackupDialog.ShowDialog() = DialogResult.OK Then
@@ -2349,82 +2399,7 @@ Public Class Form1
                 IO.File.Delete(exportBackupDialog.FileName)
             End If
 
-            Dim iniFile As New IniFile
-            Dim settingName As String, settingType As Type, settingValue As Object
-            Dim stringCollection As Specialized.StringCollection
-            Dim point As Point
-
-            For Each settingProperty As Object In My.Settings.PropertyValues
-                If settingProperty.propertyvalue IsNot Nothing Then
-                    settingName = settingProperty.name
-                    settingType = settingProperty.propertyvalue.GetType
-
-                    If settingType = GetType(Color) Then
-                        settingValue = DirectCast(settingProperty.propertyvalue, Color).ToArgb
-                    Else
-                        settingValue = settingProperty.propertyvalue.ToString
-                    End If
-
-                    If settingType = GetType(Short) Or settingType = GetType(Integer) Or settingType = GetType(Boolean) Or settingType = GetType(String) Or settingType = GetType(Size) Or settingType = GetType(Color) Then
-                        If settingType = GetType(String) Then
-                            If Not String.IsNullOrEmpty(DirectCast(settingValue, String).Trim) Then
-                                iniFile.SetKeyValue("Settings", settingName, settingType.ToString & "," & settingValue)
-                            End If
-                        Else
-                            iniFile.SetKeyValue("Settings", settingName, settingType.ToString & "," & settingValue)
-                        End If
-                    ElseIf settingType = GetType(Specialized.StringCollection) Then
-                        stringCollection = DirectCast(settingProperty.propertyvalue, Specialized.StringCollection)
-
-                        Dim tempArray(stringCollection.Count - 1) As String
-                        stringCollection.CopyTo(tempArray, 0)
-                        iniFile.SetKeyValue("Settings", settingName, settingType.ToString & "," & (New Web.Script.Serialization.JavaScriptSerializer).Serialize(tempArray))
-                    ElseIf settingType = GetType(Point) Then
-                        point = DirectCast(settingProperty.propertyvalue, Point)
-                        iniFile.SetKeyValue("Settings", settingName, settingType.ToString & "," & point.X & "|" & point.Y)
-                    End If
-                End If
-
-                settingName = Nothing
-                settingType = Nothing
-                settingValue = Nothing
-            Next
-
-            Dim registryKeyWeAreWorkingWith As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
-            Dim registryValue As String
-
-            For Each registryValueName As String In registryKeyWeAreWorkingWith.GetValueNames
-                registryValue = registryKeyWeAreWorkingWith.GetValue(registryValueName, Nothing)
-
-                If registryValue IsNot Nothing Then
-                    iniFile.SetKeyValue("Registry", registryValueName.Replace(" ", "_"), registryValue)
-                    registryValue = Nothing
-                End If
-            Next
-
-            registryKeyWeAreWorkingWith.Close()
-            registryKeyWeAreWorkingWith.Dispose()
-
-            Dim fileInfo As New IO.FileInfo(exportBackupDialog.FileName)
-            Debug.WriteLine(fileInfo.Extension)
-
-            If fileInfo.Extension.stringCompare(".ini") Then
-                iniFile.Save(exportBackupDialog.FileName)
-            Else
-                Dim iniFileTextBase64ed As String = Functions.support.convertToBase64(iniFile.getINIText())
-                Dim randomString As String = Functions.support.randomStringGenerator((New Random).Next(100, 300))
-                Dim checksum As String = calculateConfigBackupDataPayloadChecksum(iniFileTextBase64ed, randomString)
-
-                Dim streamWriter As New IO.StreamWriter(exportBackupDialog.FileName)
-                streamWriter.WriteLine("Payload: " & iniFileTextBase64ed)
-                streamWriter.WriteLine("Random String: " & randomString)
-                streamWriter.Write("Checksum: " & checksum)
-
-                streamWriter.Close()
-                streamWriter.Dispose()
-            End If
-
-            iniFile = Nothing
+            Functions.importExportSettings.exportSettingsToXMLFile(exportBackupDialog.FileName)
 
             MsgBox("Backup complete.", MsgBoxStyle.Information, strMessageBoxTitle)
         End If
@@ -2432,129 +2407,16 @@ Public Class Form1
 
     Private Sub RestoreToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RestoreToolStripMenuItem.Click
         importBackupDialog.Title = "Locate your backup file..."
-        importBackupDialog.Filter = "Config Backup File|*.resbak|INI File|*.ini"
+        importBackupDialog.Filter = "XML Config Backup File|*.resbakx|Config Backup File|*.resbak|INI File|*.ini"
         importBackupDialog.FileName = Nothing
 
         If importBackupDialog.ShowDialog() = DialogResult.OK Then
             If IO.File.Exists(importBackupDialog.FileName) = True Then
-                Dim fileInfo As New IO.FileInfo(importBackupDialog.FileName)
-                Dim iniFile As New IniFile
-
-                If fileInfo.Extension.stringCompare(".ini") Then
-                    iniFile.loadINIFileFromFile(importBackupDialog.FileName)
+                If New IO.FileInfo(importBackupDialog.FileName).Extension.Equals(".resbakx", OrdinalIgnoreCase) Then
+                    Functions.importExportSettings.importSettingsFromXMLFile(importBackupDialog.FileName, strMessageBoxTitle)
                 Else
-                    Dim streamReader As New IO.StreamReader(importBackupDialog.FileName)
-                    Dim strDataPayload = Nothing, strRandomString = Nothing, strChecksum = Nothing, strTemp As String
-
-                    While streamReader.EndOfStream = False
-                        strTemp = streamReader.ReadLine
-
-                        If strTemp.StartsWith("Payload: ", OrdinalIgnoreCase) = True Then
-                            strDataPayload = strTemp.caseInsensitiveReplace("Payload: ", "").Trim
-                        ElseIf strTemp.StartsWith("Random String: ", OrdinalIgnoreCase) = True Then
-                            strRandomString = strTemp.caseInsensitiveReplace("Random String: ", "").Trim
-                        ElseIf strTemp.StartsWith("Checksum: ", OrdinalIgnoreCase) = True Then
-                            strChecksum = strTemp.caseInsensitiveReplace("Checksum: ", "").Trim
-                        End If
-                    End While
-
-                    streamReader.Close()
-                    streamReader.Dispose()
-
-                    If calculateConfigBackupDataPayloadChecksum(strDataPayload, strRandomString) = strChecksum Then
-                        iniFile.loadINIFileFromText(Functions.support.convertFromBase64(strDataPayload))
-                    Else
-                        MsgBox("Invalid backup file.", MsgBoxStyle.Critical, strMessageBoxTitle)
-                        Exit Sub
-                    End If
+                    Functions.importExportSettings.importSettingsFromLegacyBackupFile(importBackupDialog.FileName, strMessageBoxTitle)
                 End If
-
-                Dim iniFileValue, iniFileKeyName As String
-                Dim tempShort As Short, tempInteger As Integer, tempBoolean As Boolean
-                Dim tempWidth, tempHeight As Integer
-                Dim regExMatches As Match
-
-                Dim systemDrawingSizeRegexObject As New Regex("\{Width=(?<width>[0-9]{1,4}), Height=(?<height>[0-9]{1,4})\}", RegexOptions.Compiled)
-
-                For Each valueObject As Object In iniFile.GetSection("Settings").Keys
-                    Try
-                        iniFileKeyName = valueObject.name
-                        iniFileValue = valueObject.value
-
-                        If iniFileValue.StartsWith("System.Int16") Then
-                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Int16,", "")
-
-                            If Short.TryParse(iniFileValue, tempShort) Then
-                                My.Settings(iniFileKeyName) = tempShort
-                            End If
-                        ElseIf iniFileValue.StartsWith("System.Int32") Then
-                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Int32,", "")
-
-                            If Integer.TryParse(iniFileValue, tempInteger) Then
-                                My.Settings(iniFileKeyName) = tempInteger
-                            End If
-                        ElseIf iniFileValue.StartsWith("System.Boolean") Then
-                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Boolean,", "")
-
-                            If Boolean.TryParse(iniFileValue, tempBoolean) Then
-                                My.Settings(iniFileKeyName) = tempBoolean
-                            End If
-                        ElseIf iniFileValue.StartsWith("System.String") Then
-                            My.Settings(iniFileKeyName) = iniFileValue.caseInsensitiveReplace("System.String,", "")
-                        ElseIf iniFileValue.StartsWith("System.Drawing.Size") Then
-                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Drawing.Size,", "")
-
-                            If systemDrawingSizeRegexObject.IsMatch(iniFileValue) = True Then
-                                regExMatches = systemDrawingSizeRegexObject.Match(iniFileValue)
-
-                                tempWidth = Integer.Parse(regExMatches.Groups("width").Value)
-                                tempHeight = Integer.Parse(regExMatches.Groups("height").Value)
-
-                                regExMatches = Nothing
-                                My.Settings(iniFileKeyName) = New Size(tempWidth, tempHeight)
-                            End If
-                        ElseIf iniFileValue.StartsWith("System.Drawing.Color") Then
-                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Drawing.Color,", "")
-
-                            If Integer.TryParse(iniFileValue, tempInteger) Then
-                                My.Settings(iniFileKeyName) = Color.FromArgb(tempInteger)
-                            End If
-                        ElseIf iniFileValue.StartsWith("System.Collections.Specialized.StringCollection") Then
-                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Collections.Specialized.StringCollection,", "")
-                            Dim deJSONedObject As String() = (New Web.Script.Serialization.JavaScriptSerializer).Deserialize(iniFileValue, GetType(String()))
-
-                            Dim tempStringCollection As New Specialized.StringCollection
-                            For i = 0 To deJSONedObject.Count - 1
-                                tempStringCollection.Add(deJSONedObject(i))
-                            Next
-                            My.Settings(iniFileKeyName) = tempStringCollection
-                        ElseIf iniFileValue.StartsWith("System.Drawing.Point") Then
-                            iniFileValue = iniFileValue.caseInsensitiveReplace("System.Drawing.Point,", "").Trim
-                            Dim pointParts() As String = iniFileValue.Split("|")
-                            My.Settings(iniFileKeyName) = New Point(pointParts(0), pointParts(1))
-                        End If
-                    Catch ex As Configuration.SettingsPropertyNotFoundException
-                        ' Does nothing
-                    End Try
-                Next
-
-                My.Settings.Save()
-
-                systemDrawingSizeRegexObject = Nothing
-
-                Dim registryKeyWeAreWorkingWith As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
-
-                For Each valueObject As Object In iniFile.GetSection("Registry").Keys
-                    iniFileKeyName = valueObject.name.ToString.Replace("_", " ")
-                    iniFileValue = valueObject.value.ToString
-
-                    registryKeyWeAreWorkingWith.SetValue(iniFileKeyName, iniFileValue, RegistryValueKind.String)
-                Next
-
-                registryKeyWeAreWorkingWith.Close()
-                registryKeyWeAreWorkingWith.Dispose()
-
-                iniFile = Nothing
 
                 Functions.eventLogFunctions.writeToSystemEventLog(String.Format("A configuration backup has been restored from {0}{1}{0} by user {0}{2}{0}.", Chr(34), importBackupDialog.FileName, Environment.UserName), EventLogEntryType.Information)
 
@@ -2568,8 +2430,9 @@ Public Class Form1
 
     Private Sub MountVolumeShadowCopyToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles MountVolumeShadowCopyToolStripMenuItem.Click
         If (globalVariables.windows.mountVolumeShadowCopy Is Nothing) Then
-            globalVariables.windows.mountVolumeShadowCopy = New Mount_Volume_Shadow_Copy
-            globalVariables.windows.mountVolumeShadowCopy.StartPosition = FormStartPosition.CenterScreen
+            globalVariables.windows.mountVolumeShadowCopy = New Mount_Volume_Shadow_Copy With {
+                .StartPosition = FormStartPosition.CenterScreen
+            }
             globalVariables.windows.mountVolumeShadowCopy.Show()
             globalVariables.windows.mountVolumeShadowCopy.Location = My.Settings.mountVolumeShadowCopyWindowPosition
         Else
@@ -2601,8 +2464,9 @@ Public Class Form1
 
     Private Sub ConfigureProxyToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConfigureProxyToolStripMenuItem.Click
         If (globalVariables.windows.configureProxy Is Nothing) Then
-            globalVariables.windows.configureProxy = New Configure_Proxy
-            globalVariables.windows.configureProxy.StartPosition = FormStartPosition.CenterParent
+            globalVariables.windows.configureProxy = New Configure_Proxy With {
+                .StartPosition = FormStartPosition.CenterParent
+            }
             globalVariables.windows.configureProxy.Show()
         Else
             globalVariables.windows.configureProxy.BringToFront()
@@ -2635,8 +2499,9 @@ Public Class Form1
 
     Private Sub ContactTheDeveloperToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ContactTheDeveloperToolStripMenuItem.Click
         If (globalVariables.windows.officialContactForm Is Nothing) Then
-            globalVariables.windows.officialContactForm = New Official_Contact_Form
-            globalVariables.windows.officialContactForm.StartPosition = FormStartPosition.CenterParent
+            globalVariables.windows.officialContactForm = New Official_Contact_Form With {
+                .StartPosition = FormStartPosition.CenterParent
+            }
             globalVariables.windows.officialContactForm.Show()
         Else
             globalVariables.windows.officialContactForm.BringToFront()
@@ -2644,8 +2509,9 @@ Public Class Form1
     End Sub
 
     Private Sub RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem.Click
-        Dim roundWindow As New Round_Restore_Point_Age_in_Days
-        roundWindow.StartPosition = FormStartPosition.CenterParent
+        Dim roundWindow As New Round_Restore_Point_Age_in_Days With {
+            .StartPosition = FormStartPosition.CenterParent
+        }
         roundWindow.ShowDialog()
 
         Dim response As Round_Restore_Point_Age_in_Days.userResponse = roundWindow.dialogResponse
@@ -2653,8 +2519,9 @@ Public Class Form1
     End Sub
 
     Private Sub CommandLineArgumentsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CommandLineArgumentsToolStripMenuItem.Click
-        Dim argumentsWindows As New Restore_Point_Creator_Command_Line_Arguments
-        argumentsWindows.StartPosition = FormStartPosition.CenterParent
+        Dim argumentsWindows As New Restore_Point_Creator_Command_Line_Arguments With {
+            .StartPosition = FormStartPosition.CenterParent
+        }
         argumentsWindows.ShowDialog()
     End Sub
 
@@ -2664,8 +2531,9 @@ Public Class Form1
 
     Private Sub CreateRestorePointAtUserLogonToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CreateRestorePointAtUserLogonToolStripMenuItem.Click
         If (globalVariables.windows.frmCreateRestorePointAtUserLogon Is Nothing) Then
-            globalVariables.windows.frmCreateRestorePointAtUserLogon = New Create_Restore_Point_at_User_Logon
-            globalVariables.windows.frmCreateRestorePointAtUserLogon.StartPosition = FormStartPosition.CenterParent
+            globalVariables.windows.frmCreateRestorePointAtUserLogon = New Create_Restore_Point_at_User_Logon With {
+                .StartPosition = FormStartPosition.CenterParent
+            }
             globalVariables.windows.frmCreateRestorePointAtUserLogon.Show()
         Else
             globalVariables.windows.frmCreateRestorePointAtUserLogon.BringToFront()
@@ -2684,8 +2552,9 @@ Public Class Form1
 
     Private Sub ProgramEventLogToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ProgramEventLogToolStripMenuItem.Click
         If (globalVariables.windows.eventLogForm Is Nothing) Then
-            globalVariables.windows.eventLogForm = New eventLogForm
-            globalVariables.windows.eventLogForm.StartPosition = FormStartPosition.CenterScreen
+            globalVariables.windows.eventLogForm = New eventLogForm With {
+                .StartPosition = FormStartPosition.CenterScreen
+            }
             globalVariables.windows.eventLogForm.Show()
             globalVariables.windows.eventLogForm.Location = My.Settings.eventLogFormWindowLocation
         Else
@@ -2727,7 +2596,6 @@ Public Class Form1
         If InterfaceTooBigToolStripMenuItem.Checked = True Then
             registryKey.SetValue(Process.GetCurrentProcess.MainModule.FileName.ToLower, "~ HIGHDPIAWARE", RegistryValueKind.String)
             registryKey.Close()
-            registryKey.Dispose()
             registryKey = Nothing
 
             MsgBox("The compatibility flag has been set for the program. The program will relaunch for the changes to take effect.", MsgBoxStyle.Information, strMessageBoxTitle)
@@ -2735,7 +2603,6 @@ Public Class Form1
         Else
             registryKey.DeleteValue(Process.GetCurrentProcess.MainModule.FileName.ToLower, False)
             registryKey.Close()
-            registryKey.Dispose()
             registryKey = Nothing
         End If
     End Sub
@@ -2787,8 +2654,9 @@ Public Class Form1
 
     Private Sub ViewOfficialChangeLogToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles ViewOfficialChangeLogToolStripMenuItem1.Click
         If (globalVariables.windows.frmChangeLog Is Nothing) Then
-            globalVariables.windows.frmChangeLog = New Change_Log
-            globalVariables.windows.frmChangeLog.StartPosition = FormStartPosition.CenterParent
+            globalVariables.windows.frmChangeLog = New Change_Log With {
+                .StartPosition = FormStartPosition.CenterParent
+            }
             globalVariables.windows.frmChangeLog.Show()
         Else
             globalVariables.windows.frmChangeLog.BringToFront()
@@ -2797,8 +2665,9 @@ Public Class Form1
 
     Private Sub toolStripViewDiskSpaceUsage_Click(sender As Object, e As EventArgs) Handles toolStripViewDiskSpaceUsage.Click
         If (globalVariables.windows.frmDiskSpaceUsageWindow Is Nothing) Then
-            globalVariables.windows.frmDiskSpaceUsageWindow = New Disk_Space_Usage
-            globalVariables.windows.frmDiskSpaceUsageWindow.StartPosition = FormStartPosition.CenterScreen
+            globalVariables.windows.frmDiskSpaceUsageWindow = New Disk_Space_Usage With {
+                .StartPosition = FormStartPosition.CenterScreen
+            }
             globalVariables.windows.frmDiskSpaceUsageWindow.Show()
             globalVariables.windows.frmDiskSpaceUsageWindow.Location = My.Settings.DiskSpaceUsageWindowLocation
         Else
@@ -2808,8 +2677,9 @@ Public Class Form1
 
     Private Sub toolStripManageSystemRestoreStorageSize_Click(sender As Object, e As EventArgs) Handles toolStripManageSystemRestoreStorageSize.Click
         If (globalVariables.windows.frmManageSystemRestoreStorageSpace Is Nothing) Then
-            globalVariables.windows.frmManageSystemRestoreStorageSpace = New frmManageSystemRestoreStorageSpace
-            globalVariables.windows.frmManageSystemRestoreStorageSpace.StartPosition = FormStartPosition.CenterScreen
+            globalVariables.windows.frmManageSystemRestoreStorageSpace = New frmManageSystemRestoreStorageSpace With {
+                .StartPosition = FormStartPosition.CenterScreen
+            }
             globalVariables.windows.frmManageSystemRestoreStorageSpace.Show()
             globalVariables.windows.frmManageSystemRestoreStorageSpace.Location = My.Settings.ManageSystemRestoreStorageSpaceWindowLocation
         Else
@@ -2819,8 +2689,9 @@ Public Class Form1
 
     Private Sub toolStripScheduleRestorePoints_Click(sender As Object, e As EventArgs) Handles toolStripScheduleRestorePoints.Click
         If (globalVariables.windows.frmTaskScheduler Is Nothing) Then
-            globalVariables.windows.frmTaskScheduler = New frmTaskScheduler
-            globalVariables.windows.frmTaskScheduler.StartPosition = FormStartPosition.CenterScreen
+            globalVariables.windows.frmTaskScheduler = New frmTaskScheduler With {
+                .StartPosition = FormStartPosition.CenterScreen
+            }
             globalVariables.windows.frmTaskScheduler.Show()
             globalVariables.windows.frmTaskScheduler.Location = My.Settings.TaskSchedulerWindowLocation
         Else
@@ -2829,16 +2700,21 @@ Public Class Form1
     End Sub
 
     Private Sub toolStripMyComputer_Click(sender As Object, e As EventArgs) Handles toolStripMyComputer.Click
-        If Functions.osVersionInfo.isThisWindows10() = True Then
-            Exit Sub
+        Dim registryRootKeyWeAreWorkingWith As RegistryKey
+
+        If Functions.osVersionInfo.isThisWindows10() Then
+            ' In Windows 10 we can only write to the CLSID Classes Root that is a subkey of the current user's registry hive.
+            registryRootKeyWeAreWorkingWith = Registry.CurrentUser.OpenSubKey("SOFTWARE\Classes", True)
+        Else
+            registryRootKeyWeAreWorkingWith = Registry.ClassesRoot
         End If
 
         If toolStripMyComputer.Checked Then
             Try
                 ' Attempts to fix something that should never have been broken to begin with.  Why this would be broken, who the fuck knows.
-                If (Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}", False) Is Nothing) Then
-                    Registry.ClassesRoot.OpenSubKey("CLSID", True).CreateSubKey("{20D04FE0-3AEA-1069-A2D8-08002B30309D}")
-                    Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}", True).CreateSubKey("Shell")
+                If (registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}", False) Is Nothing) Then
+                    registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID", True).CreateSubKey("{20D04FE0-3AEA-1069-A2D8-08002B30309D}")
+                    registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}", True).CreateSubKey("Shell")
                 End If
             Catch ex As Exception
                 ' Does nothing
@@ -2868,78 +2744,72 @@ Public Class Form1
                 ' =======================================================
 
                 ' Checks if an existing entry exists and deletes it.
-                If Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint") IsNot Nothing Then
-                    Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Create System Restore Checkpoint")
+                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint") IsNot Nothing Then
+                    registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Create System Restore Checkpoint")
                 End If
 
-                Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).CreateSubKey("Create System Restore Checkpoint")
-                Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint", True).CreateSubKey("Command")
+                registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).CreateSubKey("Create System Restore Checkpoint")
+                registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint", True).CreateSubKey("Command")
 
-                registryKey = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint", True)
+                registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint", True)
                 If boolIsThisVistaOrNewer = True Then
                     registryKey.SetValue("HasLUAShield", "", RegistryValueKind.String)
                 End If
                 registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
                 registryKey.SetValue("SuppressionPolicy", 1073741884, RegistryValueKind.DWord)
                 registryKey.Close()
-                registryKey.Dispose()
 
-                registryKey = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint\Command", True)
+                registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint\Command", True)
                 registryKey.SetValue(vbNullString, String.Format("{0}{1}{0} -createrestorepoint", Chr(34), Application.ExecutablePath))
                 registryKey.Close()
-                registryKey.Dispose()
 
                 ' ===============================================================
                 ' == Makes the "Create Custom Named System Restore Point" Item ==
                 ' ===============================================================
 
                 ' Checks if an existing entry exists and deletes it.
-                If Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point") IsNot Nothing Then
-                    Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Create Custom Named System Restore Point")
+                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point") IsNot Nothing Then
+                    registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Create Custom Named System Restore Point")
                 End If
 
-                Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).CreateSubKey("Create Custom Named System Restore Point")
-                Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point", True).CreateSubKey("Command")
+                registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).CreateSubKey("Create Custom Named System Restore Point")
+                registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point", True).CreateSubKey("Command")
 
-                registryKey = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point", True)
+                registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point", True)
                 If boolIsThisVistaOrNewer = True Then
                     registryKey.SetValue("HasLUAShield", "", RegistryValueKind.String)
                 End If
                 registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
                 registryKey.SetValue("SuppressionPolicy", 1073741884, RegistryValueKind.DWord)
                 registryKey.Close()
-                registryKey.Dispose()
 
-                registryKey = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point\Command", True)
+                registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point\Command", True)
                 registryKey.SetValue(vbNullString, String.Format("{0}{1}{0} -createrestorepointcustomname", Chr(34), Application.ExecutablePath))
                 registryKey.Close()
-                registryKey.Dispose()
 
                 ' ===================================================
                 ' == Makes the "Launch Restore Point Creator" Item ==
                 ' ===================================================
 
                 ' Checks if an existing entry exists and deletes it.
-                If Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator") IsNot Nothing Then
-                    Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Launch Restore Point Creator")
+                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator") IsNot Nothing Then
+                    registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Launch Restore Point Creator")
                 End If
 
-                Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).CreateSubKey("Launch Restore Point Creator")
-                Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator", True).CreateSubKey("Command")
+                registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).CreateSubKey("Launch Restore Point Creator")
+                registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator", True).CreateSubKey("Command")
 
-                registryKey = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator", True)
+                registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator", True)
                 If boolIsThisVistaOrNewer = True Then
                     registryKey.SetValue("HasLUAShield", "", RegistryValueKind.String)
                 End If
                 registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
                 registryKey.SetValue("SuppressionPolicy", 1073741884, RegistryValueKind.DWord)
                 registryKey.Close()
-                registryKey.Dispose()
 
-                registryKey = Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator\Command", True)
+                registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator\Command", True)
                 registryKey.SetValue(vbNullString, String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
                 registryKey.Close()
-                registryKey.Dispose()
             Catch ex As Security.SecurityException
                 toolStripMyComputer.Checked = False
                 Functions.eventLogFunctions.writeCrashToEventLog(ex)
@@ -2950,20 +2820,20 @@ Public Class Form1
                 ' This code removes the options from the "My Computer" right-click context menu.
 
                 ' All of this prevents a rare Null Reference Exception.
-                If Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint", False) IsNot Nothing Then
-                    Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Create System Restore Checkpoint")
+                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint", False) IsNot Nothing Then
+                    registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Create System Restore Checkpoint")
                 End If
 
-                If Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore", False) IsNot Nothing Then
-                    Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Create Custom Named System Restore")
+                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore", False) IsNot Nothing Then
+                    registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Create Custom Named System Restore")
                 End If
 
-                If Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point", False) IsNot Nothing Then
-                    Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Create Custom Named System Restore Point")
+                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point", False) IsNot Nothing Then
+                    registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Create Custom Named System Restore Point")
                 End If
 
-                If Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator", False) IsNot Nothing Then
-                    Registry.ClassesRoot.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Launch Restore Point Creator")
+                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator", False) IsNot Nothing Then
+                    registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Launch Restore Point Creator")
                 End If
                 ' All of this prevents a rare Null Reference Exception.
             Catch ex As Security.SecurityException
@@ -2971,6 +2841,8 @@ Public Class Form1
                 MsgBox("Unable to modify the My Computer right-click context menu. A security violation has occurred. Please contact your system administrator for assistance.", MsgBoxStyle.Critical, strMessageBoxTitle)
             End Try
         End If
+
+        registryRootKeyWeAreWorkingWith.Close()
     End Sub
 
     Private Sub toolStripLogRestorePointDeletions_Click(sender As Object, e As EventArgs) Handles toolStripLogRestorePointDeletions.Click
@@ -3049,8 +2921,9 @@ Public Class Form1
 
     Private Sub OldToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles toolStripDeleteOldRestorePoints.Click
         If My.Settings.maxDaysManualDelete = -1 Then
-            Dim frmDeleteOldSystemRestorePointsInstance = New frmDeleteOldSystemRestorePoints
-            frmDeleteOldSystemRestorePointsInstance.StartPosition = FormStartPosition.CenterScreen
+            Dim frmDeleteOldSystemRestorePointsInstance = New frmDeleteOldSystemRestorePoints With {
+                .StartPosition = FormStartPosition.CenterScreen
+            }
             frmDeleteOldSystemRestorePointsInstance.ShowDialog()
             frmDeleteOldSystemRestorePointsInstance.Location = My.Settings.DeleteOldSystemRestorePointsWindowLocation
 
@@ -3098,7 +2971,9 @@ Public Class Form1
             Try
                 IO.File.Delete(globalVariables.pdbFileNameInZIP)
             Catch ex As Exception
-                Functions.APIs.MoveFileEx(globalVariables.pdbFileNameInZIP, vbNullString, 4)
+                Dim deleteAtReboot As New Functions.deleteAtReboot()
+                deleteAtReboot.addItem(globalVariables.pdbFileNameInZIP)
+                deleteAtReboot.dispose(True)
             End Try
         End If
 
@@ -3132,9 +3007,10 @@ Public Class Form1
 
     Private Sub KeepXAmountOfRestorePointsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles KeepXAmountOfRestorePointsToolStripMenuItem.Click
         If KeepXAmountOfRestorePointsToolStripMenuItem.Checked = True Then
-            Dim Keep_X_Amount_of_Restore_PointsInstance = New createRestorePointAtUserLogon
-            Keep_X_Amount_of_Restore_PointsInstance.parentFormG = Me
-            Keep_X_Amount_of_Restore_PointsInstance.StartPosition = FormStartPosition.CenterParent
+            Dim Keep_X_Amount_of_Restore_PointsInstance = New createRestorePointAtUserLogon With {
+                .parentFormG = Me,
+                .StartPosition = FormStartPosition.CenterParent
+            }
             Keep_X_Amount_of_Restore_PointsInstance.ShowDialog()
 
             Keep_X_Amount_of_Restore_PointsInstance.Dispose()
@@ -3146,7 +3022,6 @@ Public Class Form1
             registryKey.DeleteValue("Keep X Amount of Restore Points Value", False)
 
             registryKey.Close()
-            registryKey.Dispose()
 
             KeepXAmountOfRestorePointsToolStripMenuItem.Text = "Keep X Amount of Restore Points"
         End If
@@ -3170,9 +3045,10 @@ Public Class Form1
         toolStripCheckEveryWeek.Checked = False
         toolStripCheckEveryTwoWeeks.Checked = False
 
-        Dim checkForUpdatesEveryInstance As New checkForUpdatesEvery
-        checkForUpdatesEveryInstance.parentFormG = Me
-        checkForUpdatesEveryInstance.StartPosition = FormStartPosition.CenterParent
+        Dim checkForUpdatesEveryInstance As New checkForUpdatesEvery With {
+            .parentFormG = Me,
+            .StartPosition = FormStartPosition.CenterParent
+        }
         checkForUpdatesEveryInstance.ShowDialog()
     End Sub
 
@@ -3210,9 +3086,10 @@ Public Class Form1
     End Sub
 
     Private Sub DefaultCustomRestorePointNameToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DefaultCustomRestorePointNameToolStripMenuItem.Click
-        Dim setDefaultCustomRestorePointNameWindowInstance As New Set_Default_Custom_Restore_Point_Name
-        setDefaultCustomRestorePointNameWindowInstance.StartPosition = FormStartPosition.CenterParent
-        setDefaultCustomRestorePointNameWindowInstance.parentFormG = Me
+        Dim setDefaultCustomRestorePointNameWindowInstance As New Set_Default_Custom_Restore_Point_Name With {
+            .StartPosition = FormStartPosition.CenterParent,
+            .parentFormG = Me
+        }
         setDefaultCustomRestorePointNameWindowInstance.ShowDialog()
     End Sub
 
@@ -3266,13 +3143,13 @@ Public Class Form1
 
         Dim selectedRestorePoint As myListViewItemTypes.restorePointEntryItem = DirectCast(systemRestorePointsList.SelectedItems(0), myListViewItemTypes.restorePointEntryItem)
 
-        Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot into Safe Mode and perform the restore process there and reboot after the process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, selectedRestorePoint.restorePointName, selectedRestorePoint.restorePointDate, selectedRestorePoint.restorePointType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
+        Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot into Safe Mode and perform the restore process there and reboot after the process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, selectedRestorePoint.strRestorePointName, selectedRestorePoint.strRestorePointDate, selectedRestorePoint.strRestorePointType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
 
         If msgboxResult = MsgBoxResult.Yes Then
             Functions.support.setSafeModeBoot() ' Set the system up for Safe Mode Boot.
 
             ' Set the restore point that we're going to restore back to.
-            savePreferenceToRegistry("Preselected Restore Point for Restore in Safe Mode", selectedRestorePoint.restorePointID.Trim)
+            savePreferenceToRegistry("Preselected Restore Point for Restore in Safe Mode", selectedRestorePoint.strRestorePointID.Trim)
 
             ' Set this program up to launch at user logon.
             Registry.LocalMachine.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\RunOnce", True).SetValue("*Restore To Restore Point", String.Format("{0}{1}{0} -restoretopoint", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
@@ -3352,11 +3229,11 @@ Public Class Form1
 
         Dim selectedRestorePoint As myListViewItemTypes.restorePointEntryItem = DirectCast(systemRestorePointsList.SelectedItems(0), myListViewItemTypes.restorePointEntryItem)
 
-        Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot after the restoration process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, selectedRestorePoint.restorePointName, selectedRestorePoint.restorePointDate, selectedRestorePoint.restorePointType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
+        Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot after the restoration process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, selectedRestorePoint.strRestorePointName, selectedRestorePoint.strRestorePointDate, selectedRestorePoint.strRestorePointType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
 
         If msgboxResult = MsgBoxResult.Yes Then
             Functions.wait.createPleaseWaitWindow("Beginning the Restore Process... Please Wait.", False, enums.howToCenterWindow.parent, False)
-            Threading.ThreadPool.QueueUserWorkItem(Sub() restoreSystemRestorePoint(Integer.Parse(selectedRestorePoint.restorePointID)))
+            Threading.ThreadPool.QueueUserWorkItem(Sub() restoreSystemRestorePoint(selectedRestorePoint.intRestorePointID))
             Functions.wait.openPleaseWaitWindow()
         Else
             MsgBox("Your system has NOT been restored to the selected System Restore Point.", MsgBoxStyle.Information, strMessageBoxTitle)
@@ -3396,7 +3273,7 @@ Public Class Form1
         For Each restorePointEntryItem As myListViewItemTypes.restorePointEntryItem In systemRestorePointsList.SelectedItems
             If AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked = False Then
                 ' Checks to see if the user is trying to delete the newest System Restore Point based upon ID.
-                If Integer.Parse(restorePointEntryItem.restorePointID) = newestSystemRestoreID Then
+                If restorePointEntryItem.intRestorePointID = newestSystemRestoreID Then
                     systemRestorePointsList.Enabled = True
 
                     ' Yep, the user is trying to do that.  Stupid user, now we give that stupid user a message to prevent his/her stupidity.
@@ -3407,43 +3284,47 @@ Public Class Form1
 
             boolUserWantsToDeleteTheRestorePoint = False
 
-            strRestorePointName = restorePointEntryItem.restorePointName
-            strRestorePointDate = restorePointEntryItem.restorePointDate
-            strRestorePointID = restorePointEntryItem.restorePointID
-            strRestorePointType = restorePointEntryItem.restorePointType
-            dateRestorePointCreated = restorePointEntryItem.rawRestorePointDate
+            strRestorePointName = restorePointEntryItem.strRestorePointName
+            strRestorePointDate = restorePointEntryItem.strRestorePointDate
+            strRestorePointID = restorePointEntryItem.strRestorePointID
+            strRestorePointType = restorePointEntryItem.strRestorePointType
+            dateRestorePointCreated = restorePointEntryItem.dateRestorePointDate
 
-            If boolConfirmDeletions And My.Settings.multiConfirmRestorePointDeletions And systemRestorePointsList.SelectedItems.Count > 1 Then
-                restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
-            ElseIf boolConfirmDeletions And (Not My.Settings.multiConfirmRestorePointDeletions Or systemRestorePointsList.SelectedItems.Count = 1) Then
-                deletionConfirmationWindow = New frmConfirmDelete
+            ' This check is required to make sure that we don't have duplicate key IDs going into the restorePointIDsToBeDeleted Dictionary.
+            ' This fixes a bug that was reported by "George".
+            If Not restorePointIDsToBeDeleted.ContainsKey(strRestorePointID) Then
+                If boolConfirmDeletions And My.Settings.multiConfirmRestorePointDeletions And systemRestorePointsList.SelectedItems.Count > 1 Then
+                    restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
+                ElseIf boolConfirmDeletions And (Not My.Settings.multiConfirmRestorePointDeletions Or systemRestorePointsList.SelectedItems.Count = 1) Then
+                    deletionConfirmationWindow = New frmConfirmDelete
 
-                deletionConfirmationWindow.lblCreatedOn.Text &= " " & strRestorePointDate
-                deletionConfirmationWindow.lblRestorePointName.Text &= " " & strRestorePointName
-                deletionConfirmationWindow.lblType.Text &= " " & strRestorePointType
+                    deletionConfirmationWindow.lblCreatedOn.Text &= " " & strRestorePointDate
+                    deletionConfirmationWindow.lblRestorePointName.Text &= " " & strRestorePointName
+                    deletionConfirmationWindow.lblType.Text &= " " & strRestorePointType
 
-                deletionConfirmationWindow.StartPosition = FormStartPosition.CenterParent
-                deletionConfirmationWindow.ShowDialog(ParentForm)
+                    deletionConfirmationWindow.StartPosition = FormStartPosition.CenterParent
+                    deletionConfirmationWindow.ShowDialog(ParentForm)
 
-                If deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.yes Then
-                    boolUserWantsToDeleteTheRestorePoint = True
-                ElseIf deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.yesAndDontAskAgain Then
-                    boolConfirmDeletions = False
-                    boolUserWantsToDeleteTheRestorePoint = True
-                ElseIf deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.cancel Then
-                    systemRestorePointsList.Enabled = True
-                    giveFeedbackToUser("Deletion of selected restore points canceled.")
-                    Exit Sub
+                    If deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.yes Then
+                        boolUserWantsToDeleteTheRestorePoint = True
+                    ElseIf deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.yesAndDontAskAgain Then
+                        boolConfirmDeletions = False
+                        boolUserWantsToDeleteTheRestorePoint = True
+                    ElseIf deletionConfirmationWindow.userResponse = frmConfirmDelete.userResponseENum.cancel Then
+                        systemRestorePointsList.Enabled = True
+                        giveFeedbackToUser("Deletion of selected restore points canceled.")
+                        Exit Sub
+                    Else
+                        boolUserWantsToDeleteTheRestorePoint = False
+                    End If
+
+                    deletionConfirmationWindow.Dispose()
+                    deletionConfirmationWindow = Nothing
+
+                    If boolUserWantsToDeleteTheRestorePoint Then restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
                 Else
-                    boolUserWantsToDeleteTheRestorePoint = False
+                    restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
                 End If
-
-                deletionConfirmationWindow.Dispose()
-                deletionConfirmationWindow = Nothing
-
-                If boolUserWantsToDeleteTheRestorePoint Then restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
-            Else
-                restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
             End If
 
             strRestorePointName = Nothing
@@ -3452,9 +3333,10 @@ Public Class Form1
         Next
 
         If boolConfirmDeletions And My.Settings.multiConfirmRestorePointDeletions And systemRestorePointsList.SelectedItems.Count > 1 Then
-            Dim batchConfirmWindow As New Confirm_Restore_Point_Deletions_Form
-            batchConfirmWindow.restorePointIDsToBeDeleted = restorePointIDsToBeDeleted
-            batchConfirmWindow.StartPosition = FormStartPosition.CenterParent
+            Dim batchConfirmWindow As New Confirm_Restore_Point_Deletions_Form With {
+                .restorePointIDsToBeDeleted = restorePointIDsToBeDeleted,
+                .StartPosition = FormStartPosition.CenterParent
+            }
             batchConfirmWindow.ShowDialog(Me)
 
             If batchConfirmWindow.userResponse = Confirm_Restore_Point_Deletions_Form.userResponseENum.cancel Then

@@ -29,9 +29,13 @@
 
     Private Sub frmConfirmDelete_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         PictureBox1.Image = SystemIcons.Question.ToBitmap()
-        Me.Size = New Size(lblRestorePointName.Width + 100, Me.Height)
-        Me.BringToFront()
-        Me.Focus()
+
+        Try
+            Me.Size = New Size(lblRestorePointName.Width + 100, Me.Height)
+            Me.BringToFront()
+            Me.Focus()
+        Catch ex As Exception
+        End Try
 
         Media.SystemSounds.Exclamation.Play()
     End Sub

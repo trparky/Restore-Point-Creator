@@ -68,7 +68,6 @@ Public Class frmTaskScheduler
                             End If
 
                             serviceController.Close()
-                            serviceController.Dispose()
                             serviceController = Nothing
 
                             outParams.Dispose()
@@ -106,7 +105,6 @@ Public Class frmTaskScheduler
             End If
 
             serviceController.Close()
-            serviceController.Dispose()
             serviceController = Nothing
         Catch ex As Exception
             ' If the above stuff crashes, we don't care.  Windows is broken at this point and we can't fix it.
@@ -114,6 +112,7 @@ Public Class frmTaskScheduler
     End Sub
 
     Private Sub frmTaskScheduler_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.Location = Functions.support.verifyWindowLocation(My.Settings.TaskSchedulerWindowLocation)
         checkWindowsTaskScheduler()
 
         Dim boolValueDeleteOldRestorePointsAsString As String = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Delete Old Restore Points", "False").Trim
@@ -400,7 +399,6 @@ Public Class frmTaskScheduler
                 regKey.SetValue("MaxDays", Short.Parse(txtDays.Text.Trim), Microsoft.Win32.RegistryValueKind.String)
                 regKey.SetValue(strDeleteTaskName, "True", Microsoft.Win32.RegistryValueKind.String)
                 regKey.Close()
-                regKey.Dispose()
             Else
                 Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue(strDeleteTaskName, "False", Microsoft.Win32.RegistryValueKind.String)
             End If
@@ -677,8 +675,9 @@ Public Class frmTaskScheduler
     End Sub
 
     Private Sub btnSetCustomName_Click(sender As Object, e As EventArgs) Handles btnSetCustomName.Click
-        Dim setCustomRestorePointNameForScheduledRestorePointsInstance As New Set_Custom_Restore_Point_Name_for_Scheduled_Restore_Points
-        setCustomRestorePointNameForScheduledRestorePointsInstance.StartPosition = FormStartPosition.CenterParent
+        Dim setCustomRestorePointNameForScheduledRestorePointsInstance As New Set_Custom_Restore_Point_Name_for_Scheduled_Restore_Points With {
+            .StartPosition = FormStartPosition.CenterParent
+        }
         setCustomRestorePointNameForScheduledRestorePointsInstance.ShowDialog()
     End Sub
 

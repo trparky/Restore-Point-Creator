@@ -1,7 +1,6 @@
 ﻿Imports System.Text.RegularExpressions
 Imports ICSharpCode.SharpZipLib.Zip
 Imports System.Xml
-Imports Microsoft.Win32
 
 Namespace Functions.support
     Public Enum updateType
@@ -13,6 +12,14 @@ Namespace Functions.support
     End Enum
 
     Module support
+        Public Function verifyWindowLocation(point As Point) As Point
+            If point.X < 0 Or point.Y < 0 Then
+                Return New Point(0, 0)
+            Else
+                Return point
+            End If
+        End Function
+
         Public Function processUpdateXMLData(ByVal xmlData As String, ByRef updateType As updateType, ByRef remoteVersion As String, ByRef remoteBuild As String, ByRef strRemoteBetaRCVersion As String) As Boolean
             Try
                 Dim strRemoteType As String
@@ -61,6 +68,16 @@ Namespace Functions.support
                         If xmlNode.SelectSingleNode("betaRCVersion") IsNot Nothing Then
                             ' Get the "strRemoteBetaRCVersion" version string from the XML data.
                             strRemoteBetaRCVersion = xmlNode.SelectSingleNode("betaRCVersion").InnerText.Trim
+
+                            ' This checks to see if the "betaRCVersion" node doesn't contain either "Public Beta" or "Release Candidate".
+                            ' If it doesn't then it prepends the appropriate string based upon the value of the "type" node.
+                            If (Not strRemoteBetaRCVersion.caseInsensitiveContains("Public Beta")) And (Not strRemoteBetaRCVersion.caseInsensitiveContains("Release Candidate")) Then
+                                If strRemoteType.Equals("beta", StringComparison.OrdinalIgnoreCase) Then
+                                    strRemoteBetaRCVersion = "Public Beta " & strRemoteBetaRCVersion
+                                ElseIf strRemoteType.Equals("candidate", StringComparison.OrdinalIgnoreCase) Then
+                                    strRemoteBetaRCVersion = "Release Candidate " & strRemoteBetaRCVersion
+                                End If
+                            End If
                         End If
 
                         ' Now we need to check the remote update type.
@@ -131,6 +148,9 @@ Namespace Functions.support
                     exceptionType.Equals(GetType(ComponentModel.Win32Exception)) Or
                     exceptionType.Equals(GetType(XPath.XPathException)) Or
                     exceptionType.Equals(GetType(XmlException)) Or
+                    exceptionType.Equals(GetType(InvalidOperationException)) Or
+                    exceptionType.Equals(GetType(myExceptions.integerTryParseException)) Or
+                    exceptionType.Equals(GetType(IO.DirectoryNotFoundException)) Or
                     exceptionType.Equals(GetType(ObjectDisposedException)) Then
 
                     stringBuilder.AppendLine()
@@ -143,6 +163,12 @@ Namespace Functions.support
                         If Not String.IsNullOrEmpty(FileNotFoundExceptionObject.FusionLog) Then
                             stringBuilder.AppendLine("Reason: " & FileNotFoundExceptionObject.FusionLog)
                         End If
+                    ElseIf exceptionType.Equals(GetType(IO.DirectoryNotFoundException)) Then
+                        Dim DirectoryNotFoundExceptionObject As IO.DirectoryNotFoundException = DirectCast(rawExceptionObject, IO.DirectoryNotFoundException)
+                        stringBuilder.AppendLine("Source: " & DirectoryNotFoundExceptionObject.Source)
+                        addJSONedExtendedExceptionDataPackage(DirectoryNotFoundExceptionObject, stringBuilder)
+                    ElseIf exceptionType.Equals(GetType(myExceptions.integerTryParseException)) Then
+                        stringBuilder.AppendLine("String that could not be parsed into an Integer: " & DirectCast(rawExceptionObject, myExceptions.integerTryParseException).strThatCouldNotBeParsedIntoAnInteger)
                     ElseIf exceptionType.Equals(GetType(XmlException)) Then
                         Dim XmlExceptionObject As XmlException = DirectCast(rawExceptionObject, XmlException)
                         stringBuilder.AppendLine("Line Number: " & XmlExceptionObject.LineNumber)
@@ -207,73 +233,6 @@ Namespace Functions.support
             End Try
         End Function
 
-        ''' <summary>Creates a Registry value in the application's Registry key.</summary>
-        ''' <param name="strValueNameToSetInRegistry">The name of the Registry value you want to create.</param>
-        ''' <param name="strValueToSet">The data for the Registry value you want to create.</param>
-        Public Sub setValueInRegistry(ByVal strValueNameToSetInRegistry As String, ByVal strValueToSet As String)
-            Dim registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
-            setValueInRegistry(registryKey, strValueNameToSetInRegistry, strValueToSet, True)
-        End Sub
-
-        ''' <summary>Creates a Registry value in the application's Registry key.</summary>
-        ''' <param name="strValueNameToSetInRegistry">The name of the Registry value you want to create.</param>
-        ''' <param name="strValueToSet">The data for the Registry value you want to create.</param>
-        ''' <param name="registryKey">The Registry Object you want to act on.</param>
-        ''' <param name="boolCloseAfterSettingValue">This is an optional Boolean value, this is normally set to False.</param>
-        Public Sub setValueInRegistry(ByRef registryKey As RegistryKey, ByVal strValueNameToSetInRegistry As String, ByVal strValueToSet As String, Optional boolCloseAfterSettingValue As Boolean = False)
-            If registryKey Is Nothing Then
-                registryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
-            End If
-
-            registryKey.SetValue(strValueNameToSetInRegistry, strValueToSet, RegistryValueKind.String)
-
-            If boolCloseAfterSettingValue Then
-                registryKey.Close()
-                registryKey.Dispose()
-            End If
-        End Sub
-
-        ''' <summary>Creates a Boolean value Registry value in the application's Registry key.</summary>
-        ''' <param name="strValueNameToSetInRegistry">The name of the Registry value you want to create.</param>
-        ''' <param name="boolValueToSet">The Boolean value for the Registry value you want to create.</param>
-        Public Sub setBooleanValueInRegistry(ByVal strValueNameToSetInRegistry As String, ByVal boolValueToSet As Boolean)
-            setValueInRegistry(strValueNameToSetInRegistry, boolValueToSet.ToString)
-        End Sub
-
-        ''' <summary>Creates a Boolean value Registry value in the application's Registry key.</summary>
-        ''' <param name="strValueNameToSetInRegistry">The name of the Registry value you want to create.</param>
-        ''' <param name="boolValueToSet">The Boolean value for the Registry value you want to create.</param>
-        ''' <param name="registryKey">The Registry Object you want to act on.</param>
-        ''' <param name="boolCloseAfterSettingValue">This is an optional Boolean value, this is normally set to False.</param>
-        Public Sub setBooleanValueInRegistry(ByRef registryKey As RegistryKey, ByVal strValueNameToSetInRegistry As String, ByVal boolValueToSet As Boolean, Optional boolCloseAfterSettingValue As Boolean = False)
-            setValueInRegistry(registryKey, strValueNameToSetInRegistry, boolValueToSet, boolCloseAfterSettingValue)
-        End Sub
-
-        ''' <summary>Gets a setting from the application's Registry key.</summary>
-        ''' <param name="registryObject">This is Registry Key Object that will be used in this function to pull the Registry value from.</param>
-        ''' <param name="valueToGetFromRegistry">The name of the Registry Value we will be pulling from.</param>
-        ''' <param name="boolDefaultValue">If the Registry Value isn't found or the value is malformed, this will be the Boolean value that this function will return.</param>
-        ''' <returns>A Boolean value.</returns>
-        Public Function getBooleanValueFromRegistry(ByRef registryObject As RegistryKey, ByVal valueToGetFromRegistry As String, ByVal boolDefaultValue As Boolean) As Boolean
-            Try
-                Dim boolTemp As Boolean, strDefaultValue As String
-
-                If boolDefaultValue = True Then
-                    strDefaultValue = globalVariables.booleans.strTrue
-                Else
-                    strDefaultValue = globalVariables.booleans.strFalse
-                End If
-
-                If Boolean.TryParse(registryObject.GetValue(valueToGetFromRegistry, strDefaultValue), boolTemp) = False Then
-                    boolTemp = boolDefaultValue
-                End If
-
-                Return boolTemp
-            Catch ex As Exception
-                Return boolDefaultValue
-            End Try
-        End Function
-
         ''' <summary>Checks to see if a Process ID or PID exists on the system.</summary>
         ''' <param name="PID">The PID of the process you are checking the existance of.</param>
         ''' <param name="processObject">If the PID does exist, the function writes back to this argument in a ByRef way a Process Object that can be interacted with outside of this function.</param>
@@ -301,17 +260,17 @@ Namespace Functions.support
 
         Function getProcessExecutablePath(processID As Integer) As String
             Dim memoryBuffer = New Text.StringBuilder(1024)
-            Dim processHandle As IntPtr = APIs.OpenProcess(APIs.ProcessAccessFlags.PROCESS_QUERY_LIMITED_INFORMATION, False, processID)
+            Dim processHandle As IntPtr = APIs.NativeMethods.OpenProcess(APIs.ProcessAccessFlags.PROCESS_QUERY_LIMITED_INFORMATION, False, processID)
 
             If processHandle <> IntPtr.Zero Then
                 Try
                     Dim memoryBufferSize As Integer = memoryBuffer.Capacity
 
-                    If APIs.QueryFullProcessImageName(processHandle, 0, memoryBuffer, memoryBufferSize) Then
+                    If APIs.NativeMethods.QueryFullProcessImageName(processHandle, 0, memoryBuffer, memoryBufferSize) Then
                         Return memoryBuffer.ToString()
                     End If
                 Finally
-                    APIs.CloseHandle(processHandle)
+                    APIs.NativeMethods.CloseHandle(processHandle)
                 End Try
             End If
 
@@ -427,7 +386,6 @@ Namespace Functions.support
                     End If
 
                     fileStream.Close() ' This closes our FileStream Object.
-                    fileStream.Dispose() ' And this Disposes of our FileStream Object.
 
                     If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                         eventLogFunctions.writeToSystemEventLog(String.Format("Extraction of {0}{1}{0} was successful.", Chr(34), fileToExtract), EventLogEntryType.Information)
@@ -483,9 +441,6 @@ Namespace Functions.support
             Catch ex As Exception
                 Return False
             End Try
-        End Function
-
-        <Runtime.InteropServices.DllImport("Srclient.dll")> Public Function SRRemoveRestorePoint(index As Integer) As Integer
         End Function
 
         ''' <summary>Converts the number of Bytes to a nice way of saying it, like MBs, GBs, etc.</summary>
@@ -616,11 +571,12 @@ Namespace Functions.support
 
         Public Sub executeCommand(pathToExecutable As String, arguments As String, Optional runAsAdmin As Boolean = False)
             If IO.File.Exists(pathToExecutable) = True Then
-                Dim processStartInfo As New ProcessStartInfo()
-                processStartInfo.FileName = pathToExecutable
-                processStartInfo.WindowStyle = ProcessWindowStyle.Hidden
-                processStartInfo.Arguments = arguments
-                processStartInfo.CreateNoWindow = True
+                Dim processStartInfo As New ProcessStartInfo() With {
+                    .FileName = pathToExecutable,
+                    .WindowStyle = ProcessWindowStyle.Hidden,
+                    .Arguments = arguments,
+                    .CreateNoWindow = True
+                }
 
                 If runAsAdmin = True Then processStartInfo.Verb = "runas"
 
@@ -630,10 +586,11 @@ Namespace Functions.support
 
         Public Sub executeCommand(pathToExecutable As String, Optional runAsAdmin As Boolean = False)
             If IO.File.Exists(pathToExecutable) = True Then
-                Dim processStartInfo As New ProcessStartInfo()
-                processStartInfo.FileName = pathToExecutable
-                processStartInfo.WindowStyle = ProcessWindowStyle.Hidden
-                processStartInfo.CreateNoWindow = True
+                Dim processStartInfo As New ProcessStartInfo() With {
+                    .FileName = pathToExecutable,
+                    .WindowStyle = ProcessWindowStyle.Hidden,
+                    .CreateNoWindow = True
+                }
 
                 If runAsAdmin = True Then processStartInfo.Verb = "runas"
 
@@ -643,11 +600,12 @@ Namespace Functions.support
 
         Public Sub executeCommandWithWait(pathToExecutable As String, arguments As String, Optional runAsAdmin As Boolean = False)
             If IO.File.Exists(pathToExecutable) = True Then
-                Dim processStartInfo As New ProcessStartInfo()
-                processStartInfo.FileName = pathToExecutable
-                processStartInfo.WindowStyle = ProcessWindowStyle.Hidden
-                processStartInfo.Arguments = arguments
-                processStartInfo.CreateNoWindow = True
+                Dim processStartInfo As New ProcessStartInfo() With {
+                    .FileName = pathToExecutable,
+                    .WindowStyle = ProcessWindowStyle.Hidden,
+                    .Arguments = arguments,
+                    .CreateNoWindow = True
+                }
 
                 If runAsAdmin = True Then processStartInfo.Verb = "runas"
 
@@ -657,10 +615,11 @@ Namespace Functions.support
 
         Public Sub executeCommandWithWait(pathToExecutable As String, Optional runAsAdmin As Boolean = False)
             If IO.File.Exists(pathToExecutable) = True Then
-                Dim processStartInfo As New ProcessStartInfo()
-                processStartInfo.FileName = pathToExecutable
-                processStartInfo.WindowStyle = ProcessWindowStyle.Hidden
-                processStartInfo.CreateNoWindow = True
+                Dim processStartInfo As New ProcessStartInfo() With {
+                    .FileName = pathToExecutable,
+                    .WindowStyle = ProcessWindowStyle.Hidden,
+                    .CreateNoWindow = True
+                }
 
                 If runAsAdmin = True Then processStartInfo.Verb = "runas"
 
@@ -676,54 +635,6 @@ Namespace Functions.support
             Else
                 MsgBox("Unable to find the Windows command line reboot tool to trigger a reboot. You will have to manually trigger a reboot yourself.", MsgBoxStyle.Exclamation, "Restore Point Creator")
             End If
-        End Sub
-
-        Public Sub createScheduledSystemRestorePoint(strRestorePointDescription As String)
-            Try
-                Dim integerNewRestorePointID As Integer
-                wmi.createRestorePoint(strRestorePointDescription, RestoreType.WindowsType, integerNewRestorePointID)
-            Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
-                Process.GetCurrentProcess.Kill()
-            End Try
-        End Sub
-
-        Public Sub writeSystemRestorePointsToApplicationLogs()
-            Dim restorePoints As New Text.StringBuilder
-            Dim systemRestorePointsManagementObjectSearcher As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
-            Dim restorePointCreationDate As Date
-
-            If systemRestorePointsManagementObjectSearcher IsNot Nothing Then
-                Dim restorePointsOnSystemManagementObjectCollection As Management.ManagementObjectCollection = systemRestorePointsManagementObjectSearcher.Get()
-
-                If restorePointsOnSystemManagementObjectCollection IsNot Nothing Then
-                    If (restorePointsOnSystemManagementObjectCollection.Count = 0) = False Then
-                        restorePoints.AppendLine("Number of Restore Points: " & restorePointsOnSystemManagementObjectCollection.Count)
-                        restorePoints.AppendLine("=========================")
-                        For Each restorePointDetails As Management.ManagementObject In restorePointsOnSystemManagementObjectCollection
-                            If (restorePointDetails("SequenceNumber") IsNot Nothing) And (restorePointDetails("CreationTime") IsNot Nothing) And (restorePointDetails("Description") IsNot Nothing) And (restorePointDetails("RestorePointType") IsNot Nothing) Then
-                                restorePoints.Append(restorePointDetails("SequenceNumber").ToString & " | " & restorePointDetails("Description").ToString & " | ")
-
-                                If String.IsNullOrEmpty(restorePointDetails("CreationTime").ToString.Trim) Then
-                                    restorePoints.Append("Error Parsing Date")
-                                Else
-                                    restorePointCreationDate = parseSystemRestorePointCreationDate(restorePointDetails("CreationTime").ToString)
-                                    restorePoints.Append(String.Format("{0} {1}", restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToLongTimeString))
-                                End If
-
-                                restorePoints.Append(" | " & whatTypeOfRestorePointIsIt(Integer.Parse(restorePointDetails("RestorePointType").ToString)))
-                                restorePoints.AppendLine()
-                            End If
-                        Next
-                    End If
-                End If
-            End If
-
-            systemRestorePointsManagementObjectSearcher.Dispose()
-            systemRestorePointsManagementObjectSearcher = Nothing
-
-            restorePoints.AppendLine("=========================")
-            eventLogFunctions.writeToSystemEventLog(restorePoints.ToString.Trim, EventLogEntryType.Information)
         End Sub
 
         ''' <summary>Converts an Integer representing days to English. Like "1 day" or "2 days".</summary>
@@ -769,9 +680,10 @@ Namespace Functions.support
 
         Public Sub launchRuntimeTaskFixRoutine()
             Try
-                Dim startInfo As New ProcessStartInfo
-                startInfo.FileName = New IO.FileInfo(Application.ExecutablePath).FullName
-                startInfo.Arguments = "-fixruntimetasks"
+                Dim startInfo As New ProcessStartInfo With {
+                    .FileName = New IO.FileInfo(Application.ExecutablePath).FullName,
+                    .Arguments = "-fixruntimetasks"
+                }
 
                 If privilegeChecks.areWeAnAdministrator() = False Then startInfo.Verb = "runas"
 
@@ -786,8 +698,9 @@ Namespace Functions.support
 
         Public Sub reRunWithAdminUserRights()
             Try
-                Dim startInfo As New ProcessStartInfo
-                startInfo.FileName = New IO.FileInfo(Application.ExecutablePath).FullName
+                Dim startInfo As New ProcessStartInfo With {
+                    .FileName = New IO.FileInfo(Application.ExecutablePath).FullName
+                }
 
                 If Environment.GetCommandLineArgs.Count <> 1 Then
                     startInfo.Arguments = Environment.GetCommandLineArgs(1)
@@ -799,101 +712,16 @@ Namespace Functions.support
                 Process.GetCurrentProcess.Kill()
             Catch ex As ComponentModel.Win32Exception
                 eventLogFunctions.writeCrashToEventLog(ex)
-                MsgBox("There was an error while attempting to elevate the process, please make sure that when the Windows UAC prompt appears asking you to run the program with elevated privileges that you say ""Yes"" to the UAC prompt." & vbCrLf & vbCrLf & "The program will now terminate.", MsgBoxStyle.Critical, globalVariables.programName)
+                MsgBox("There was an error while attempting to elevate the process, please make sure that when the Windows UAC prompt appears asking you to run the program with elevated privileges that you say ""Yes"" to the UAC prompt." & vbCrLf & vbCrLf & "The program will now terminate.", MsgBoxStyle.Critical + MsgBoxStyle.SystemModal, globalVariables.programName)
                 Process.GetCurrentProcess.Kill()
             End Try
         End Sub
-
-        ''' <summary>Returns the creation date of the System Restore Point ID you pass to the function.</summary>
-        ''' <param name="restorePointID">Data type, Short. The ID of the System Restore Point you want to return the creation date of.</param>
-        ''' <returns>A Date Object.</returns>
-        Private Function getSystemRestorePointDate(restorePointID As Short) As Date
-            Try
-                Dim newestSystemRestoreID As Integer = 0 ' Resets the newest System Restore ID to 0.
-
-                ' Get all System Restore Points from the Windows Management System and puts then in the systemRestorePoints variable.
-                Dim systemRestorePoints As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore WHERE SequenceNumber = " & restorePointID)
-
-                If systemRestorePoints.Get().Count <> 0 Then
-                    Return parseSystemRestorePointCreationDate(systemRestorePoints.Get(0)("CreationTime").ToString, True)
-                Else
-                    Return Nothing
-                End If
-            Catch ex As Exception
-                Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
-                exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
-                Return Nothing
-            End Try
-        End Function
-
-        Public Function parseSystemRestorePointCreationDate(strDate As String, Optional boolFullDateParsing As Boolean = True) As Date
-            Dim regexMatches As Match = globalVariables.regexRestorePointCreationTimeParser.Match(strDate)
-            Dim year, month, day, second, minute, hour As Integer
-
-            ' Gets the values out of the Regular Expression Matches object.
-            With regexMatches
-                year = Integer.Parse(.Groups("year").Value)
-                month = Integer.Parse(.Groups("month").Value)
-                day = Integer.Parse(.Groups("day").Value)
-                second = Integer.Parse(.Groups("second").Value)
-                minute = Integer.Parse(.Groups("minute").Value)
-                hour = Integer.Parse(.Groups("hour").Value)
-            End With
-
-            If boolFullDateParsing = True Then
-                Return New DateTime(year, month, day, hour, minute, second, DateTimeKind.Utc).ToLocalTime
-            Else
-                Return New Date(year, month, day)
-            End If
-        End Function
 
         Public Function areWeInSafeMode() As Boolean
             If SystemInformation.BootMode = BootMode.Normal Then
                 Return False
             Else
                 Return True
-            End If
-        End Function
-
-        Public Enum RestoreType
-            ApplicationInstall = 0 ' Installing a new application
-            ApplicationUninstall = 1 ' An application has been uninstalled
-            ModifySettings = 12 ' An application has had features added or removed
-            CancelledOperation = 13 ' An application needs to delete the restore point it created
-            Restore = 6 ' System Restore
-            Checkpoint = 7 ' Checkpoint
-            DeviceDriverInstall = 10 ' Device driver has been installed
-            FirstRun = 11 ' Program used for 1st time
-            BackupRecovery = 14 ' Restoring a backup
-            WindowsType = 16 ' The type of restore point that Windows makes.
-        End Enum
-
-        ''' <summary>A function that returns the type of restore point depending upon the Integer that comes from the WMI.</summary>
-        ''' <param name="type">Integer.</param>
-        ''' <returns>Returns a String value containing the type of Restore Point in English.</returns>
-        Public Function whatTypeOfRestorePointIsIt(type As Integer) As String
-            If type = RestoreType.ApplicationInstall Then
-                Return "Application Install"
-            ElseIf type = RestoreType.ApplicationUninstall Then
-                Return "Application Removal"
-            ElseIf type = RestoreType.BackupRecovery Then
-                Return "Backup Recovery"
-            ElseIf type = RestoreType.CancelledOperation Then
-                Return "Cancelled Operation"
-            ElseIf type = RestoreType.Checkpoint Then
-                Return "System Checkpoint"
-            ElseIf type = RestoreType.DeviceDriverInstall Then
-                Return "Device Driver Install"
-            ElseIf type = RestoreType.FirstRun Then
-                Return "First Run"
-            ElseIf type = RestoreType.ModifySettings Then
-                Return "Settings Modified"
-            ElseIf type = RestoreType.Restore Then
-                Return "Restore"
-            ElseIf type = RestoreType.WindowsType Then
-                Return "System Restore Point"
-            Else
-                Return "Unknown Type"
             End If
         End Function
 
@@ -1007,20 +835,6 @@ Namespace Functions.support
 
         Public Function isNumeric(input As String) As Boolean
             Return Regex.IsMatch(input.Trim, "\A-{0,1}[0-9.]*\Z")
-        End Function
-
-        Public Function randomStringGenerator(length As Integer)
-            Dim random As Random = New Random()
-            Dim builder As New Text.StringBuilder()
-            Dim ch As Char
-            Dim legalCharacters As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"
-
-            For cntr As Integer = 0 To length
-                ch = legalCharacters.Substring(random.Next(0, legalCharacters.Length), 1)
-                builder.Append(ch)
-            Next
-
-            Return builder.ToString()
         End Function
     End Module
 End Namespace

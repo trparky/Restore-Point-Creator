@@ -17,7 +17,7 @@
     ' dialogResponse is the Public Variable that exposes the user's response outside of this form.
     Public dialogResponse As userResponse = userResponse.dontDoTheUpdate
 
-    Public newVersionString, strRemoteBetaRCVersion As String
+    Public remoteVersion, remoteBuild, strRemoteBetaRCVersion As String
 
     ' versionUpdate is the Public Variable that is used by code outside of this form to write to it when a totally new version is released.
     ' It's only used when versionUpdate is equal to versionUpdateType.totallyNewVersionUpdate.
@@ -71,7 +71,10 @@
                 txtChanges.Text = "Error Loading Change Log... Please Try Again."
             End Try
 
-            Me.Focus()
+            Try
+                Me.Focus()
+            Catch ex As Exception
+            End Try
         Catch ex As Exception
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
         End Try
@@ -111,13 +114,13 @@
         End If
 
         If versionUpdate = versionUpdateType.standardVersionUpdate Then
-            lblTopUpdateMessage.Text = String.Format("There is an updated version of System Restore Point Creator. Version {0} Build {1}.", globalVariables.version.versionStringWithoutBuild, newVersionString)
+            lblTopUpdateMessage.Text = String.Format("There is an updated version of System Restore Point Creator. Version {0} Build {1}.", globalVariables.version.versionStringWithoutBuild, remoteBuild)
         ElseIf versionUpdate = versionUpdateType.totallyNewVersionUpdate Then
-            lblTopUpdateMessage.Text = String.Format("Restore Point Creator version {0} is no longer supported and has been replaced by version {1}. Completely new versions are more important than{2}simple new builds of an existing version.", globalVariables.version.versionStringWithoutBuild, newVersionString, vbCrLf)
+            lblTopUpdateMessage.Text = String.Format("Restore Point Creator version {0} is no longer supported and has been replaced by version {1}. Completely new versions are more important than{2}simple new builds of an existing version.", globalVariables.version.versionStringWithoutBuild, remoteBuild, vbCrLf)
         ElseIf versionUpdate = versionUpdateType.betaVersionUpdate Then
-            lblTopUpdateMessage.Text = String.Format("There is an updated Public Beta version of System Restore Point Creator. Version {0} Build {1} {2}.", globalVariables.version.versionStringWithoutBuild, newVersionString, strRemoteBetaRCVersion)
+            lblTopUpdateMessage.Text = String.Format("There is an updated Public Beta version of System Restore Point Creator. Version {0} Build {1} {2}.", globalVariables.version.versionStringWithoutBuild, remoteBuild, strRemoteBetaRCVersion)
         ElseIf versionUpdate = versionUpdateType.releaseCandidateVersionUpdate Then
-            lblTopUpdateMessage.Text = String.Format("There is an updated Release Candidate version of System Restore Point Creator. Version {0} Build {1} {2}.", globalVariables.version.versionStringWithoutBuild, newVersionString, strRemoteBetaRCVersion)
+            lblTopUpdateMessage.Text = String.Format("There is an updated Release Candidate version of System Restore Point Creator. Version {0} Build {1} {2}.", globalVariables.version.versionStringWithoutBuild, remoteBuild, strRemoteBetaRCVersion)
         End If
 
         If globalVariables.version.boolBeta = True Then
@@ -146,6 +149,10 @@
     End Sub
 
     Private Sub btnNo_Click(sender As Object, e As EventArgs) Handles btnNo.Click
+        If MsgBox(String.Format("Do you want to ignore this version ({0} Build {1})?", remoteVersion, remoteBuild), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Ignore this version?") = MsgBoxResult.Yes Then
+            My.Settings.ignoreThisVersion = String.Format("{0} Build {1}", remoteVersion, remoteBuild)
+        End If
+
         dialogResponse = userResponse.dontDoTheUpdate
         Me.Close()
     End Sub

@@ -7,6 +7,7 @@
     Private strZIPFile As String = IO.Path.Combine(IO.Path.GetTempPath(), "attachments.zip")
 
     Private Sub Manually_Submit_Crash_Details_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.Location = Functions.support.verifyWindowLocation(My.Settings.ManuallySubmitCrashDataInstanceLocation)
         If My.Settings.useSSL = True Then
             btnSubmitData.Image = My.Resources.lock
             ToolTip.SetToolTip(btnSubmitData, "Secured by SSL.")

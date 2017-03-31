@@ -78,6 +78,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
     <Reference Include="System.ServiceProcess" />
@@ -85,6 +86,7 @@
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.XML" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -121,15 +123,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\deleteAtRebootClass.vb" />
     <Compile Include="Classes and Modules\Exported Log Class.vb" />
+    <Compile Include="Classes and Modules\exportedSettings.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\apis.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\checksum.vb" />
     <Compile Include="Classes and Modules\enums.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\eventLogFunctions.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\http.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\importExportSettings.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\myExceptions.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\osVersionInfo.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\privilegeChecks.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\registryStuff.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\restorePointStuff.vb" />
     <Compile Include="Classes and Modules\My ListViewItem Types.vb" />
     <Compile Include="Classes and Modules\restorePointInfoClass.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\support.vb" />
@@ -142,6 +149,7 @@
     <Compile Include="Classes and Modules\Functions Namespace\miniDump.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\startupFunctions.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\power.vb" />
+    <Compile Include="GlobalSuppressions.vb" />
     <Compile Include="Windows\Command Line Arguments.Designer.vb">
       <DependentUpon>Command Line Arguments.vb</DependentUpon>
     </Compile>
@@ -555,6 +563,7 @@
     <Content Include="FodyWeavers.xml">
       <SubType>Designer</SubType>
     </Content>
+    <None Include="Resources\hammer.png" />
     <None Include="Resources\yes.png" />
     <None Include="Resources\checkbox_yes.png" />
     <None Include="Resources\checkbox_no.png" />
@@ -565,13 +574,6 @@
     <None Include="Resources\system_question.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
-  <Import Project="packages\Fody.1.28.3\build\Fody.targets" Condition="Exists('packages\Fody.1.28.3\build\Fody.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('packages\Fody.1.28.3\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Fody.1.28.3\build\Fody.targets'))" />
-  </Target>
   <PropertyGroup>
     <PostBuildEvent>del "$(TargetDir)*.xml"</PostBuildEvent>
   </PropertyGroup>
@@ -610,6 +612,13 @@ foreach (var item in filesToCleanup)
   </UsingTask>
   <Target Name="CleanReferenceCopyLocalPaths" AfterTargets="AfterBuild;NonWinFodyTarget">
     <CosturaCleanup Config="FodyWeavers.xml" Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
+  </Target>
+  <Import Project="packages\Fody.1.29.4\build\portable-net+sl+win+wpa+wp\Fody.targets" Condition="Exists('packages\Fody.1.29.4\build\portable-net+sl+win+wpa+wp\Fody.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\Fody.1.29.4\build\portable-net+sl+win+wpa+wp\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Fody.1.29.4\build\portable-net+sl+win+wpa+wp\Fody.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

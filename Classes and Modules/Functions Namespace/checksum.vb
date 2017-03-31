@@ -8,7 +8,6 @@ Namespace Functions.checksum
             Dim FileStream As New IO.FileStream(filename, IO.FileMode.Open, IO.FileAccess.Read, IO.FileShare.Read, 10 * 1048576, IO.FileOptions.SequentialScan)
             Dim Output As Byte() = SHA1Engine.ComputeHash(FileStream)
             FileStream.Close()
-            FileStream.Dispose()
 
             Return BitConverter.ToString(Output).ToLower().Replace("-", "").Trim
         End Function

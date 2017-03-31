@@ -50,6 +50,7 @@ Partial Class Form1
         Me.btnRestoreToRestorePointSafeMode = New System.Windows.Forms.Button()
         Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
         Me.toolUtilities = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ManuallyFixSystemRestoreToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.MountVolumeShadowCopyToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CheckWindowsPowerPlanSettingsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.toolStripDeleteRestorePoints = New System.Windows.Forms.ToolStripMenuItem()
@@ -69,6 +70,7 @@ Partial Class Form1
         Me.CheckSystemDrivesForFullShadowStorageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.EnableSystemEventLoggingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.toolStripConfirmDeletions = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ConfirmRestorePointDeletionsInBatchesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.toolStripLogRestorePointDeletions = New System.Windows.Forms.ToolStripMenuItem()
         Me.toolStripCloseAfterRestorePointIsCreated = New System.Windows.Forms.ToolStripMenuItem()
         Me.AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -134,7 +136,6 @@ Partial Class Form1
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.importBackupDialog = New System.Windows.Forms.OpenFileDialog()
         Me.exportBackupDialog = New System.Windows.Forms.SaveFileDialog()
-        Me.ConfirmRestorePointDeletionsInBatchesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.restorePointListContextMenu.SuspendLayout()
         Me.buttonTableLayout.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
@@ -387,10 +388,17 @@ Partial Class Form1
         '
         'toolUtilities
         '
-        Me.toolUtilities.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MountVolumeShadowCopyToolStripMenuItem, Me.CheckWindowsPowerPlanSettingsToolStripMenuItem, Me.toolStripDeleteRestorePoints, Me.toolStripViewDiskSpaceUsage, Me.toolStripManageSystemRestoreStorageSize, Me.toolStripScheduleRestorePoints, Me.FixRuntimeTasksToolStripMenuItem, Me.ProgramEventLogToolStripMenuItem, Me.RebootSystemToolStripMenuItem, Me.toolStripCheckForUpdates})
+        Me.toolUtilities.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ManuallyFixSystemRestoreToolStripMenuItem, Me.MountVolumeShadowCopyToolStripMenuItem, Me.CheckWindowsPowerPlanSettingsToolStripMenuItem, Me.toolStripDeleteRestorePoints, Me.toolStripViewDiskSpaceUsage, Me.toolStripManageSystemRestoreStorageSize, Me.toolStripScheduleRestorePoints, Me.FixRuntimeTasksToolStripMenuItem, Me.ProgramEventLogToolStripMenuItem, Me.RebootSystemToolStripMenuItem, Me.toolStripCheckForUpdates})
         Me.toolUtilities.Name = "toolUtilities"
         Me.toolUtilities.Size = New System.Drawing.Size(172, 20)
         Me.toolUtilities.Text = "System Restore Point &Utilities"
+        '
+        'ManuallyFixSystemRestoreToolStripMenuItem
+        '
+        Me.ManuallyFixSystemRestoreToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.hammer
+        Me.ManuallyFixSystemRestoreToolStripMenuItem.Name = "ManuallyFixSystemRestoreToolStripMenuItem"
+        Me.ManuallyFixSystemRestoreToolStripMenuItem.Size = New System.Drawing.Size(308, 22)
+        Me.ManuallyFixSystemRestoreToolStripMenuItem.Text = "Manually Fix System Restore"
         '
         'MountVolumeShadowCopyToolStripMenuItem
         '
@@ -468,7 +476,7 @@ Partial Class Form1
         Me.RebootSystemToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.reboot
         Me.RebootSystemToolStripMenuItem.Name = "RebootSystemToolStripMenuItem"
         Me.RebootSystemToolStripMenuItem.Size = New System.Drawing.Size(308, 22)
-        Me.RebootSystemToolStripMenuItem.Text = "Reboot System"
+        Me.RebootSystemToolStripMenuItem.Text = "Reboot Computer"
         '
         'toolStripCheckForUpdates
         '
@@ -529,6 +537,13 @@ Partial Class Form1
         Me.toolStripConfirmDeletions.Name = "toolStripConfirmDeletions"
         Me.toolStripConfirmDeletions.Size = New System.Drawing.Size(435, 22)
         Me.toolStripConfirmDeletions.Text = "Confirm Restore Point &Deletions"
+        '
+        'ConfirmRestorePointDeletionsInBatchesToolStripMenuItem
+        '
+        Me.ConfirmRestorePointDeletionsInBatchesToolStripMenuItem.CheckOnClick = True
+        Me.ConfirmRestorePointDeletionsInBatchesToolStripMenuItem.Name = "ConfirmRestorePointDeletionsInBatchesToolStripMenuItem"
+        Me.ConfirmRestorePointDeletionsInBatchesToolStripMenuItem.Size = New System.Drawing.Size(435, 22)
+        Me.ConfirmRestorePointDeletionsInBatchesToolStripMenuItem.Text = "Confirm Restore Point Deletions in Batches"
         '
         'toolStripLogRestorePointDeletions
         '
@@ -964,13 +979,6 @@ Partial Class Form1
         '
         Me.importBackupDialog.FileName = "OpenFileDialog1"
         '
-        'ConfirmRestorePointDeletionsInBatchesToolStripMenuItem
-        '
-        Me.ConfirmRestorePointDeletionsInBatchesToolStripMenuItem.CheckOnClick = True
-        Me.ConfirmRestorePointDeletionsInBatchesToolStripMenuItem.Name = "ConfirmRestorePointDeletionsInBatchesToolStripMenuItem"
-        Me.ConfirmRestorePointDeletionsInBatchesToolStripMenuItem.Size = New System.Drawing.Size(435, 22)
-        Me.ConfirmRestorePointDeletionsInBatchesToolStripMenuItem.Text = "Confirm Restore Point Deletions in Batches"
-        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
@@ -1113,4 +1121,5 @@ Partial Class Form1
     Friend WithEvents chkShowVersionInTitleBarToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ConfigureHTTPTimeoutToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ConfirmRestorePointDeletionsInBatchesToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ManuallyFixSystemRestoreToolStripMenuItem As ToolStripMenuItem
 End Class

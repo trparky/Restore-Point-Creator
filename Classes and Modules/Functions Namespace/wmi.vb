@@ -102,10 +102,10 @@ Namespace Functions.wmi
                         Else
                             numberOfRestorePointsToBeDeleted -= 1
 
-                            Dim restorePointCreationDate As Date = support.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime").ToString)
+                            Dim restorePointCreationDate As Date = restorePointStuff.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime").ToString)
                             eventLogFunctions.writeToSystemEventLog(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", systemRestorePoint("Description").ToString, restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
 
-                            support.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber").ToString))
+                            APIs.NativeMethods.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber").ToString))
                         End If
                     Next
                 End If
@@ -141,7 +141,7 @@ Namespace Functions.wmi
             End Try
         End Function
 
-        Public Function createRestorePoint(restorePointName As String, restorePointType As support.RestoreType, ByRef restorePointID As Long) As Integer
+        Public Function createRestorePoint(restorePointName As String, restorePointType As restorePointStuff.RestoreType, ByRef restorePointID As Long) As Integer
             Try
                 vss.checkForAndEnableSystemRestoreIfNeeded()
 

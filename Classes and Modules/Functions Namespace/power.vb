@@ -38,7 +38,6 @@ Namespace Functions.power
                 Else
                     Dim powerGUID As String = registryKey.GetValue("ActivePowerScheme", globalVariables.invalidGUID)
                     registryKey.Close()
-                    registryKey.Dispose()
                     registryKey = Nothing
 
                     If powerGUID = globalVariables.invalidGUID Then
@@ -95,7 +94,6 @@ Namespace Functions.power
                         End If
 
                         registryKey.Close()
-                        registryKey.Dispose()
                         registryKey = Nothing
                     End If
 
@@ -132,7 +130,6 @@ Namespace Functions.power
                         End If
 
                         registryKey.Close()
-                        registryKey.Dispose()
                         registryKey = Nothing
                     End If
 

@@ -11,7 +11,7 @@ Public Class Disk_Space_Usage
 
             globalVariables.windows.frmManageSystemRestoreStorageSpace = New frmManageSystemRestoreStorageSpace()
             globalVariables.windows.frmManageSystemRestoreStorageSpace.StartPosition = FormStartPosition.CenterParent
-            globalVariables.windows.frmManageSystemRestoreStorageSpace.preSelectedDriveLetter = drive
+            globalVariables.windows.frmManageSystemRestoreStorageSpace.strDriveLetterWeAreWorkingWith = drive
             globalVariables.windows.frmManageSystemRestoreStorageSpace.Location = My.Settings.ManageSystemRestoreStorageSpaceWindowLocation
             globalVariables.windows.frmManageSystemRestoreStorageSpace.Show()
         Else
@@ -250,7 +250,10 @@ Public Class Disk_Space_Usage
     End Sub
 
     Private Sub Disk_Space_Usage_Activated(sender As Object, e As EventArgs) Handles Me.Activated
-        GroupBox1.Focus()
+        Try
+            GroupBox1.Focus()
+        Catch ex As Exception
+        End Try
     End Sub
 
     Private Sub Disk_Space_Usage_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
@@ -419,5 +422,9 @@ Public Class Disk_Space_Usage
                 End If
             End If
         Next
+    End Sub
+
+    Private Sub Disk_Space_Usage_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.Location = Functions.support.verifyWindowLocation(My.Settings.DiskSpaceUsageWindowLocation)
     End Sub
 End Class

@@ -2,7 +2,6 @@
 Imports System.IO
 Imports Microsoft.Win32
 Imports System.Management
-Imports System.Text.RegularExpressions
 Imports System.Configuration
 
 Namespace Functions.startupFunctions
@@ -111,7 +110,7 @@ Namespace Functions.startupFunctions
                 Dim result As Integer
 
                 Dim oldNewestRestorePointID As Integer = wmi.getNewestSystemRestorePointID()
-                result = wmi.createRestorePoint(strRestorePointDescription, support.RestoreType.WindowsType, newRestorePointID)
+                result = wmi.createRestorePoint(strRestorePointDescription, restorePointStuff.RestoreType.WindowsType, newRestorePointID)
                 wait.closePleaseWaitWindow()
 
                 If displayMessage = True Then
@@ -228,12 +227,12 @@ Namespace Functions.startupFunctions
                 ' Loops through systemRestorePoints.
                 For Each systemRestorePoint As ManagementObject In systemRestorePoints.Get()
                     If String.IsNullOrEmpty(systemRestorePoint("CreationTime").ToString.Trim) = False Then
-                        systemRestorePointCreationDate = support.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime"))
+                        systemRestorePointCreationDate = restorePointStuff.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime"))
 
                         dateDiffResults = Math.Abs(DateDiff(DateInterval.Day, Date.Now, systemRestorePointCreationDate))
 
                         If dateDiffResults >= maxDays Then
-                            support.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber"))) ' Deletes the Restore Point.
+                            APIs.NativeMethods.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber"))) ' Deletes the Restore Point.
 
                             If boolLogDeletedRestorePoints Then
                                 numberOfOldRestorePointsDeleted += 1
@@ -297,7 +296,6 @@ Namespace Functions.startupFunctions
                 Dim fileStream As New StreamWriter("lastrun.txt")
                 fileStream.Write(Now.ToString)
                 fileStream.Close()
-                fileStream.Dispose()
             Catch ex As Exception
                 eventLogFunctions.writeCrashToEventLog(ex)
                 ' Does nothing.
@@ -341,6 +339,18 @@ Namespace Functions.startupFunctions
             Catch ex2 As IOException
                 handleLockedSettingsFile(ex2)
             End Try
+
+            Try
+                testSettingsAccess(My.Settings.boolFirstRun)
+                My.Settings.boolFirstRun = My.Settings.boolFirstRun
+                My.Settings.Save()
+            Catch ex As Exception
+                handleLockedSettingsFile(ex)
+            End Try
+        End Sub
+
+        Private Sub testSettingsAccess(boolData As Boolean)
+            ' Does nothing. All this sub-routine does is accept an input and does nothing with it.
         End Sub
 
         Sub writeKeyToRegistryToForceUpdateAtNextRun()
@@ -348,7 +358,6 @@ Namespace Functions.startupFunctions
                 Dim registryObject As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
                 registryObject.SetValue("UpdateAtNextRunTime", "True", RegistryValueKind.String)
                 registryObject.Close()
-                registryObject.Dispose()
             Catch ex As Exception
             End Try
         End Sub
@@ -365,7 +374,6 @@ Namespace Functions.startupFunctions
                     End If
 
                     registryObject.Close()
-                    registryObject.Dispose()
                 End If
 
                 wait.createPleaseWaitWindow("Updating Restore Point Creator... Please Wait.", True, enums.howToCenterWindow.screen, True)
@@ -388,7 +396,7 @@ Namespace Functions.startupFunctions
                         eventLogFunctions.writeToSystemEventLog("The environment is ready for updating.", EventLogEntryType.Information)
                     End If
 
-                    Dim restorePointCreatorMainEXEName As String = Regex.Replace(currentProcessFileName, Regex.Escape(".new.exe"), "", RegexOptions.IgnoreCase)
+                    Dim restorePointCreatorMainEXEName As String = currentProcessFileName.caseInsensitiveReplace(".new.exe", "")
 
                     If commandLineArgument.stringCompare("-update") Then
                         registryStuff.updateRestorePointCreatorUninstallationInfo()
@@ -411,13 +419,24 @@ Namespace Functions.startupFunctions
                             File.Delete(globalVariables.pdbFileNameInZIP)
                             File.Move(globalVariables.pdbFileNameInZIP & ".new", globalVariables.pdbFileNameInZIP)
 
+                            Dim deleteAtReboot As New deleteAtReboot()
+                            deleteAtReboot.removeItem(globalVariables.pdbFileNameInZIP)
+                            deleteAtReboot.removeItem(globalVariables.pdbFileNameInZIP & ".new")
+                            deleteAtReboot.dispose(True)
+                            deleteAtReboot = Nothing
+
                             If boolExtendedLoggingForUpdating = True Then
                                 eventLogFunctions.writeToSystemEventLog("Update of the PDB file complete.", EventLogEntryType.Information)
                             End If
                         Catch ex As Exception
                             Dim pdbFullPath As String = New FileInfo(globalVariables.pdbFileNameInZIP).FullName
-                            APIs.MoveFileEx(pdbFullPath, vbNullString, 4)
-                            APIs.MoveFileEx(pdbFullPath & ".new", pdbFullPath, 4)
+
+                            Dim deleteAtReboot As New deleteAtReboot()
+                            deleteAtReboot.addItem(pdbFullPath)
+                            deleteAtReboot.addItem(pdbFullPath & ".new", pdbFullPath)
+                            deleteAtReboot.dispose(True)
+                            deleteAtReboot = Nothing
+
                             boolNeedsReboot = True
 
                             eventLogFunctions.writeToSystemEventLog("Something went wrong with the updating of the PDB file, scheduling it for update at system reboot.", EventLogEntryType.Error)
@@ -442,18 +461,29 @@ Namespace Functions.startupFunctions
                         File.Delete(restorePointCreatorMainEXEName)
                         File.Copy(currentProcessFileName, restorePointCreatorMainEXEName)
 
+                        Dim deleteAtReboot As New deleteAtReboot()
+                        deleteAtReboot.removeItem(restorePointCreatorMainEXEName)
+                        deleteAtReboot.removeItem(currentProcessFileName)
+                        deleteAtReboot.dispose(True)
+                        deleteAtReboot = Nothing
+
                         If boolExtendedLoggingForUpdating = True Then
                             eventLogFunctions.writeToSystemEventLog("Update of the core executable file complete.", EventLogEntryType.Information)
                         End If
                     Catch ex As Exception
-                        APIs.MoveFileEx(New FileInfo(restorePointCreatorMainEXEName).FullName, vbNullString, 4)
-                        APIs.MoveFileEx(New FileInfo(currentProcessFileName).FullName, New FileInfo(restorePointCreatorMainEXEName).FullName, 4)
+                        Dim deleteAtReboot As New deleteAtReboot()
+                        deleteAtReboot.addItem(New FileInfo(restorePointCreatorMainEXEName).FullName)
+                        deleteAtReboot.addItem(New FileInfo(currentProcessFileName).FullName, New FileInfo(restorePointCreatorMainEXEName).FullName)
+                        deleteAtReboot.dispose(True)
+                        deleteAtReboot = Nothing
+
                         boolNeedsReboot = True
 
                         eventLogFunctions.writeToSystemEventLog("Something went wrong with the updating of the core executable file, scheduling it for update at system reboot.", EventLogEntryType.Error)
                     End Try
 
                     If boolNeedsReboot = True Then
+                        wait.closePleaseWaitWindow()
                         writeKeyToRegistryToForceUpdateAtNextRun()
 
                         Dim msgBoxResult As MsgBoxResult = MsgBox("A system restart will need to be done in order to finish the update. System Restore Point Creator will not function properly until you restart your system." & vbCrLf & vbCrLf & "Would you like to restart your system now?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Restart?")
