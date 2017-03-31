@@ -1,8 +1,11 @@
-﻿Public Class Please_Wait
+﻿Imports Restore_Point_Creator.Functions.NativeMethod
+
+Public Class Please_Wait
     Public allowClose As Boolean = False
     Public lblLabelText As String
     Public myParentForm As Form
     Public howToCenter As Short = enums.howToCenterWindow.parent
+    Public systemModal As Boolean = False
 
     Private Sub Please_Wait_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         If allowClose = False And e.CloseReason <> CloseReason.UserClosing Then
@@ -16,6 +19,10 @@
             Me.CenterToParent()
         ElseIf howToCenter = enums.howToCenterWindow.screen Then
             Me.CenterToScreen()
+        End If
+
+        If systemModal Then
+            NativeMethod.SetWindowPos(Me.Handle, NativeMethod.HWND_TOPMOST, 0, 0, 0, 0, NativeMethod.TOPMOST_FLAGS)
         End If
 
         Try

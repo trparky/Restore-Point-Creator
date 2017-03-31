@@ -27,7 +27,7 @@
         ''' <param name="message">Sets the message for the Please Wait window.</param>
         ''' <param name="howToCenter">Tells the window how to center itself when it appears.</param>
         ''' <param name="openDialogInNewThread">This is an optional setting, normally it's False. But if set to True, the function will show the newly created Please Wait window in a new thread. Normally, this function doesn't do that.</param>
-        Public Sub createPleaseWaitWindow(message As String, boolShowOnTaskbar As Boolean, howToCenter As enums.howToCenterWindow, openDialogInNewThread As Boolean)
+        Public Sub createPleaseWaitWindow(message As String, boolShowOnTaskbar As Boolean, howToCenter As enums.howToCenterWindow, openDialogInNewThread As Boolean, Optional boolSystemModal As Boolean = False)
             Try
                 globalVariables.windows.frmPleaseWait = New Please_Wait
                 globalVariables.windows.frmPleaseWait.StartPosition = FormStartPosition.CenterParent
@@ -37,6 +37,7 @@
                 globalVariables.windows.frmPleaseWait.TopMost = True
                 globalVariables.windows.frmPleaseWait.howToCenter = howToCenter
                 globalVariables.windows.frmPleaseWait.ShowInTaskbar = boolShowOnTaskbar
+                globalVariables.windows.frmPleaseWait.systemModal = boolSystemModal
 
                 If openDialogInNewThread = True Then Threading.ThreadPool.QueueUserWorkItem(Sub() openPleaseWaitWindow())
             Catch ex As Exception
