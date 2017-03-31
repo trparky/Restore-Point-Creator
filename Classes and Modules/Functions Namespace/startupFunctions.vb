@@ -376,7 +376,7 @@ Namespace Functions.startupFunctions
                     registryObject.Close()
                 End If
 
-                wait.createPleaseWaitWindow("Updating Restore Point Creator... Please Wait.", True, enums.howToCenterWindow.screen, True)
+                wait.createPleaseWaitWindow("Updating Restore Point Creator... Please Wait.", True, enums.howToCenterWindow.screen, True, True)
 
                 If boolExtendedLoggingForUpdating = True Then
                     eventLogFunctions.writeToSystemEventLog("Update thread sleeping for 5 seconds for processes to close out before continuing with update procedure.", EventLogEntryType.Information)
