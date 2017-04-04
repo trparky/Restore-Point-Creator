@@ -143,8 +143,6 @@ Namespace Functions.wmi
 
         Public Function createRestorePoint(restorePointName As String, restorePointType As restorePointStuff.RestoreType, ByRef restorePointID As Long) As Integer
             Try
-                vss.checkForAndEnableSystemRestoreIfNeeded()
-
                 Dim managementScope As New Management.ManagementScope("\\localhost\root\default")
                 Dim managementPath As New Management.ManagementPath("SystemRestore")
                 Dim managementOptions As New Management.ObjectGetOptions()
