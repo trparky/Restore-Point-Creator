@@ -83,7 +83,6 @@
     Private Sub Update_Message_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         PictureBox1.Image = SystemIcons.Information.ToBitmap()
         Control.CheckForIllegalCrossThreadCalls = False
-        Me.Size = My.Settings.updateMessageDialogSize
         chkShowPartialBetaChangeLogs.Checked = My.Settings.showPartialBetaChangeLogs
 
         If My.Settings.useSSL = True Then
@@ -131,6 +130,7 @@
             lblCurrentVersion.Text = String.Format("Current Version: {0}", globalVariables.version.strFullVersionString)
         End If
 
+        Me.Size = My.Settings.updateMessageDialogSize
         timerCountdown.Enabled = True
     End Sub
 
