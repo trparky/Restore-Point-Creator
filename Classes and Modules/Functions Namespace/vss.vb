@@ -158,6 +158,8 @@
         End Sub
 
         Private Sub askUserToFixSystemRestore()
+            eventLogFunctions.writeToSystemEventLog("Asking user if they want to fix System Restore.", EventLogEntryType.Information)
+
             If Not privilegeChecks.areWeRunningAsSystemUser() Then
                 If MsgBox("System Restore Point Creator has detected that System Restore is not enabled on your system. System Restore Point Creator can go about fixing this issue but it could have unintended consequences." & vbCrLf & vbCrLf & "Do you want System Restore Point Creator to attempt repairs to your system?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "System Restore Point Creator") = MsgBoxResult.Yes Then
                     executeVSSAdminCommand(globalVariables.systemDriveLetter)
