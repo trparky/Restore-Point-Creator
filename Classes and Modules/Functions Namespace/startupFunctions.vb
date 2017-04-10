@@ -104,8 +104,6 @@ Namespace Functions.startupFunctions
 
         Public Sub createSystemRestorePoint(Optional displayMessage As Boolean = True, Optional strRestorePointDescription As String = "System Checkpoint made by System Restore Point Creator")
             Try
-                vss.checkForAndEnableSystemRestoreIfNeeded()
-
                 Dim newRestorePointID As Integer
                 Dim result As Integer
 

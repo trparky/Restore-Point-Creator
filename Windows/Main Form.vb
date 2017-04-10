@@ -828,13 +828,6 @@ Public Class Form1
         End Try
     End Sub
 
-    Private Sub checkForAndEnableSystemRestoreIfNeededSub()
-        Try
-            Functions.vss.checkForAndEnableSystemRestoreIfNeeded()
-        Catch ex As Exception
-        End Try
-    End Sub
-
     Private Sub showDonationNotice()
         Try
             If boolShowDonationMessage = True Then
@@ -2205,8 +2198,6 @@ Public Class Form1
                     Me.Text = "Restore Point Creator (" & globalVariables.version.strFullVersionString & ")"
                 End If
             End If
-
-            Threading.ThreadPool.QueueUserWorkItem(AddressOf checkForAndEnableSystemRestoreIfNeededSub)
 
             boolDoneLoading = True
             systemRestorePointsList.Select()
