@@ -1186,6 +1186,17 @@ Public Class Form1
                     Dim msgBoxAndEventLogText As String = "The reserved space for restore points on the system drive appears to be set correctly, something else appears to be wrong. Auto-correction of system configurations may cause unintended side-effects. The auto-correction routine has halted."
 
                     Functions.eventLogFunctions.writeToSystemEventLog(msgBoxAndEventLogText, EventLogEntryType.Error)
+
+                    enableFormElements()
+
+                    Functions.wait.closePleaseWaitWindow()
+                    systemRestorePoints.Dispose()
+                    giveFeedbackAfterCreatingRestorePoint(result)
+                    loadRestorePointsFromSystemIntoList()
+
+                    txtRestorePointDescription.Text = Nothing
+                    doTheGrayingOfTheRestorePointNameTextBox()
+
                     MsgBox(msgBoxAndEventLogText & vbCrLf & vbCrLf & "If you want to try and correct it, go to the Utilities menu and click on ""Manually Fix System Restore"".", MsgBoxStyle.Exclamation, strMessageBoxTitle)
 
                     Exit Sub
