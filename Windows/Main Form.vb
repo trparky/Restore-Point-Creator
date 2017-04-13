@@ -1168,7 +1168,7 @@ Public Class Form1
 
                         Functions.eventLogFunctions.writeToSystemEventLog("The system returned error code 1058 (ERROR_SERVICE_DISABLED). Attempting to correct it by setting up reserved system restore point space and enabling system restore on the system drive.")
 
-                        If MsgBox("The system has returned error code 1058 (ERROR_SERVICE_DISABLED). System Restore Point Creator can go about fixing this issue but it could have unintended consequences." & vbCrLf & vbCrLf & "Do you want System Restore Point Creator to attempt repairs to your system?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "System Error 1058 (ERROR_SERVICE_DISABLED) -- System Restore Point Creator") = MsgBoxResult.Yes Then
+                        If MsgBox("The system has returned error code 1058 (ERROR_SERVICE_DISABLED). System Restore Point Creator can go about fixing this issue but it could have unintended consequences." & vbCrLf & vbCrLf & "Do you want System Restore Point Creator to attempt repairs to your system?", MsgBoxStyle.Question + MsgBoxStyle.YesNo + MsgBoxStyle.ApplicationModal, "System Error 1058 (ERROR_SERVICE_DISABLED) -- System Restore Point Creator") = MsgBoxResult.Yes Then
                             Functions.vss.executeVSSAdminCommand(globalVariables.systemDriveLetter)
                             Functions.vss.setShadowStorageSize(globalVariables.systemDriveLetter, newSize)
                             Functions.vss.enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
