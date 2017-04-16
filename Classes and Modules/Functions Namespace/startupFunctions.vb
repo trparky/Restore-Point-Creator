@@ -306,7 +306,7 @@ Namespace Functions.startupFunctions
             MsgBox("Unable to create Registry Key for program in HKEY_LOCAL_MACHINE\SOFTWARE. Restore Point Creator can't continue. Please check with your System Administrator to see if you have access rights to HKEY_LOCAL_MACHINE.", MsgBoxStyle.Critical, "Restore Point Creator")
         End Sub
 
-        Private Sub handleLockedSettingsFile(ex As IOException)
+        Private Sub handleLockedSettingsFile(ex As Exception)
             eventLogFunctions.writeCrashToEventLog(ex)
             eventLogFunctions.writeToSystemEventLog("Unable to open application settings file, it appears to be locked by another process.", EventLogEntryType.Error)
             MsgBox("Unable to open application settings file, it appears to be locked by another process." & vbCrLf & vbCrLf & "The program will now close.", MsgBoxStyle.Critical, "Restore Point Creator")
