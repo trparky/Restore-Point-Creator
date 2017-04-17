@@ -190,6 +190,34 @@ Namespace Functions.startupFunctions
 
         Public Sub deleteOldRestorePoints()
             Try
+                ' First we read it as a String and store it in memory as a String.
+                Dim maxDaysFromRegistryAsString As String = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("MaxDays", 15)
+                maxDaysFromRegistryAsString = maxDaysFromRegistryAsString.Trim ' Then we trim it.
+                Dim maxDays As Short ' We now make a Short variable.
+
+                ' Check to see if the String is a valid Short value.
+                If Short.TryParse(maxDaysFromRegistryAsString, maxDays) = False And My.Application.CommandLineArgs.Count <> 2 Then
+                    Exit Sub
+                End If
+
+                If My.Settings.maxDaysAtRelaunch <> -1 Then
+                    maxDays = My.Settings.maxDaysAtRelaunch
+                    My.Settings.maxDaysAtRelaunch = -1
+                    My.Settings.Save()
+                End If
+
+                If My.Application.CommandLineArgs.Count = 2 Then
+                    ' OK, the user provided a second command line argument so let's check it out.
+                    If My.Application.CommandLineArgs(1).Trim.StartsWith("-maxdays", StringComparison.OrdinalIgnoreCase) Then
+                        ' Let's try and parse the value that the user gave us. If it parses then what's inside the IF statement will not execute and this is just fine; things are OK so we can continue as normal.
+                        If Not Short.TryParse(My.Application.CommandLineArgs(1).Trim.caseInsensitiveReplace("-maxdays=", "").Trim, maxDays) Then
+                            ' We tried to parse it and we failed so we give the user an error message.
+                            Console.WriteLine("ERROR: You have provided an invalid numeric input, please try again.")
+                            Process.GetCurrentProcess.Kill()
+                        End If
+                    End If
+                End If
+
                 ' Get all System Restore Points from the Windows Management System and puts then in the systemRestorePoints variable.
                 Dim systemRestorePoints As ManagementObjectSearcher = New ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
                 Dim systemRestorePointCreationDate As Date
@@ -200,17 +228,6 @@ Namespace Functions.startupFunctions
                 Dim boolValueFromRegistryAsString As String = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey).GetValue("Log Restore Point Deletions", "False")
                 boolValueFromRegistryAsString = boolValueFromRegistryAsString.Trim ' Then we trim it.
                 Dim boolLogDeletedRestorePoints As Boolean ' We now make a Boolean variable.
-
-                ' First we read it as a String and store it in memory as a String.
-                Dim maxDaysFromRegistryAsString As String = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("MaxDays", 15)
-                maxDaysFromRegistryAsString = maxDaysFromRegistryAsString.Trim ' Then we trim it.
-                Dim maxDays As Short ' We now make a Short variable.
-
-                ' Check to see if the String is a valid Short value.
-                If Short.TryParse(maxDaysFromRegistryAsString, maxDays) = False Then
-                    ' Nope, now we exit this subroutine since we have no valid data now.
-                    Exit Sub
-                End If
 
                 ' Check to see if the String is a valid Boolean String value.
                 If Boolean.TryParse(boolValueFromRegistryAsString.Trim, boolLogDeletedRestorePoints) = False Then

@@ -118,6 +118,20 @@ Namespace My
                     Functions.taskStuff.runProgramUsingTaskWrapper()
                 ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.deleteOldRestorePoints) Then
                     If Not Functions.privilegeChecks.areWeAnAdministrator() Then
+                        If My.Application.CommandLineArgs.Count = 2 Then
+                            ' OK, the user provided a second command line argument so let's check it out.
+                            If My.Application.CommandLineArgs(1).Trim.StartsWith("-maxdays", StringComparison.OrdinalIgnoreCase) Then
+                                ' Let's try and parse the value that the user gave us. If it parses then what's inside the IF statement will not execute and this is just fine; things are OK so we can continue as normal.
+                                If Not Short.TryParse(My.Application.CommandLineArgs(1).Trim.caseInsensitiveReplace("-maxdays=", "").Trim, My.Settings.maxDaysAtRelaunch) Then
+                                    ' We tried to parse it and we failed so we give the user an error message.
+                                    Console.WriteLine("ERROR: You have provided an invalid numeric input, please try again.")
+                                    Process.GetCurrentProcess.Kill()
+                                End If
+
+                                My.Settings.Save()
+                            End If
+                        End If
+
                         Functions.taskStuff.runProgramUsingTaskWrapper()
                         e.Cancel = True
                         Exit Sub
