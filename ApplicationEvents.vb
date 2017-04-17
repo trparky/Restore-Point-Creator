@@ -117,9 +117,11 @@ Namespace My
 
                     Functions.taskStuff.runProgramUsingTaskWrapper()
                 ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.deleteOldRestorePoints) Then
-                    Functions.taskStuff.runProgramUsingTaskWrapper()
-                    e.Cancel = True
-                    Exit Sub
+                    If Not Functions.privilegeChecks.areWeAnAdministrator() Then
+                        Functions.taskStuff.runProgramUsingTaskWrapper()
+                        e.Cancel = True
+                        Exit Sub
+                    End If
                 ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints) And Not boolAreWeAnAdministrator Then
                     ' Let's put the setting back to the default value of 0.
                     My.Settings.deleteOldRestorePointCommandLineCount = 0
