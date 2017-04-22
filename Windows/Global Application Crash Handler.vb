@@ -401,18 +401,21 @@ Friend Class ThreadExceptionHandler
     Public Sub Application_ThreadException(ByVal sender As Object, ByVal exceptionObject As Threading.ThreadExceptionEventArgs)
         Try
             If exceptionHandler.handleCrashWithAnErrorOrRedirectUserInstead(exceptionObject.Exception) = True Then
-            	Try
-                	Functions.miniDump.MiniDump.MiniDumpToFile(globalVariables.strDumpFilePath)
-            	Catch Ex As Exception
-            		' Does nothing
-            	End Try
+                Try
+                    Functions.miniDump.MiniDump.MiniDumpToFile(globalVariables.strDumpFilePath)
+                Catch Ex As Exception
+                    ' Does nothing
+                End Try
 
-                Dim crashWindow As New frmCrash
-                Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
-                crashWindow.exceptionMessage = exceptionObject.Exception.Message
-                crashWindow.exceptionStackTrace = exceptionObject.Exception.StackTrace
-                crashWindow.exceptionType = exceptionObject.Exception.GetType.ToString
-                crashWindow.ShowDialog()
+                Try
+                    Dim crashWindow As New frmCrash
+                    Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
+                    crashWindow.exceptionMessage = exceptionObject.Exception.Message
+                    crashWindow.exceptionStackTrace = exceptionObject.Exception.StackTrace
+                    crashWindow.exceptionType = exceptionObject.Exception.GetType.ToString
+                    crashWindow.ShowDialog()
+                Catch ex As exception
+                End Try
 
                 Dim currentProcess As Process = Process.GetCurrentProcess()
                 currentProcess.Kill()
