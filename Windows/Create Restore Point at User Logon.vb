@@ -125,11 +125,29 @@ Public Class Create_Restore_Point_at_User_Logon
         End Try
     End Function
 
+    Private Sub deleteAtUserLogonTask()
+        Try
+            Dim taskService As New TaskService
+            Dim taskFolderObject As TaskFolder = Functions.taskStuff.getOurTaskFolder(taskService)
+
+            taskFolderObject.DeleteTask("Create a Restore Point at User Logon", False)
+
+            taskFolderObject.Dispose()
+            taskService.Dispose()
+
+            taskFolderObject = Nothing
+            taskService = Nothing
+        Catch ex As Exception
+            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
+            exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
+        End Try
+    End Sub
+
     Private Sub btnCreateTask_Click(sender As Object, e As EventArgs) Handles btnCreateTask.Click
         Dim delayedTime As Short = 0
 
         If doesAtUserLoginTaskExist(delayedTime) = True Then
-            Functions.taskStuff.deleteAtUserLogonTask()
+            deleteAtUserLogonTask()
         End If
 
         If chkDelayed.Checked Then
@@ -250,7 +268,7 @@ Public Class Create_Restore_Point_at_User_Logon
         Dim delayedTime As Short = 0
 
         If doesAtUserLoginTaskExist(delayedTime) = True Then
-            Functions.taskStuff.deleteAtUserLogonTask()
+            deleteAtUserLogonTask()
             btnDeleteTask.Enabled = False
             boolThingsChanged = False
             lblIndication.Text = "Create Restore Point at User Login: Disabled"
