@@ -2864,7 +2864,7 @@ Public Class Form1
 
         stringBuilder.AppendLine("Restore Point Creator")
         stringBuilder.AppendLine("Written By Tom Parkison")
-        stringBuilder.AppendLine("Copyright Thomas Parkison 2012-2017.")
+        stringBuilder.AppendLine("Copyright Thomas Parkison 2012-2018.")
         stringBuilder.AppendLine()
 
         If globalVariables.version.boolBeta Then
