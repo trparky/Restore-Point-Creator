@@ -2,6 +2,7 @@
 
 Public Class Create_Restore_Point_at_User_Logon
     Private boolThingsChanged As Boolean = False
+    Private strTaskName As String = "Create a Restore Point at User Logon (" & Environment.UserName & ")"
 
     Private Sub chkDelayed_Click(sender As Object, e As EventArgs) Handles chkDelayed.Click
         If chkDelayed.Checked Then
@@ -55,7 +56,7 @@ Public Class Create_Restore_Point_at_User_Logon
 
                     If newTask.Validate() Then
                         Dim taskFolderObject As TaskFolder = Functions.taskStuff.getOurTaskFolder(taskServiceObject)
-                        taskFolderObject.RegisterTaskDefinition("Create a Restore Point at User Logon (" & Environment.UserName & ")", newTask)
+                        taskFolderObject.RegisterTaskDefinition(strTaskName, newTask)
 
                         taskFolderObject.Dispose()
                         newTask.Dispose()
@@ -76,7 +77,7 @@ Public Class Create_Restore_Point_at_User_Logon
             Dim taskObject As Task
 
             Using taskServiceObject As TaskService = New TaskService() ' Creates a new instance of the TaskService.
-                taskObject = taskServiceObject.GetTask(globalVariables.taskFolder & "\Create a Restore Point at User Logon (" & Environment.UserName & ")") ' Gets the task.
+                taskObject = taskServiceObject.GetTask(globalVariables.taskFolder & "\" & strTaskName) ' Gets the task.
 
                 ' Makes sure that the task exists and we don't get a Null Reference Exception.
                 If taskObject IsNot Nothing Then
@@ -130,7 +131,7 @@ Public Class Create_Restore_Point_at_User_Logon
             Dim taskService As New TaskService
             Dim taskFolderObject As TaskFolder = Functions.taskStuff.getOurTaskFolder(taskService)
 
-            taskFolderObject.DeleteTask("Create a Restore Point at User Logon", False)
+            taskFolderObject.DeleteTask(strTaskName, False)
 
             taskFolderObject.Dispose()
             taskService.Dispose()
@@ -212,7 +213,7 @@ Public Class Create_Restore_Point_at_User_Logon
         End Try
 
         Dim taskFolderObject As TaskFolder = Functions.taskStuff.getOurTaskFolder(taskService)
-        taskFolderObject.RegisterTaskDefinition("Create a Restore Point at User Logon (" & Environment.UserName & ")", newTask)
+        taskFolderObject.RegisterTaskDefinition(strTaskName, newTask)
 
         taskFolderObject.Dispose()
         newTask.Dispose()
