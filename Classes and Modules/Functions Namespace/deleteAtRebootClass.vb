@@ -3,7 +3,7 @@
 Namespace Functions
     ''' <summary>This class manages the pending operations at system reboot.</summary>
     Public Class deleteAtReboot
-        Private pendingOperations As List(Of deleteAtRebootClass) = loadStagedPendingOperations()
+        Private pendingOperations As List(Of deleteAtRebootClass)
         Private boolThingsChanged As Boolean = False
 
         ''' <summary>This class manages the pending operations at system reboot.</summary>
@@ -125,10 +125,7 @@ Namespace Functions
                 Next
 
                 Dim valuesToBeSavedToTheRegistry(itemsToBeSavedToTheRegistry.Count - 1) As String
-
-                For i = 0 To itemsToBeSavedToTheRegistry.Count - 1
-                    valuesToBeSavedToTheRegistry(i) = itemsToBeSavedToTheRegistry.Item(i)
-                Next
+                itemsToBeSavedToTheRegistry.CopyTo(valuesToBeSavedToTheRegistry, 0)
 
                 registryKey.SetValue("PendingFileRenameOperations", valuesToBeSavedToTheRegistry, RegistryValueKind.MultiString)
             End If
