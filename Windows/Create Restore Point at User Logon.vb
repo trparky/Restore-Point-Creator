@@ -56,6 +56,7 @@ Public Class Create_Restore_Point_at_User_Logon
 
                     If newTask.Validate() Then
                         Dim taskFolderObject As TaskFolder = Functions.taskStuff.getOurTaskFolder(taskServiceObject)
+                        Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Creating scheduled task ""{0}"" in ""{1}"".", strTaskName, taskFolderObject.Name))
                         taskFolderObject.RegisterTaskDefinition(strTaskName, newTask)
 
                         taskFolderObject.Dispose()
@@ -213,6 +214,7 @@ Public Class Create_Restore_Point_at_User_Logon
         End Try
 
         Dim taskFolderObject As TaskFolder = Functions.taskStuff.getOurTaskFolder(taskService)
+        Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Creating scheduled task ""{0}"" in ""{1}"".", strTaskName, taskFolderObject.Name))
         taskFolderObject.RegisterTaskDefinition(strTaskName, newTask)
 
         taskFolderObject.Dispose()
