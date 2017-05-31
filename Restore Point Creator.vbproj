@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -65,19 +65,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ICSharpCode.SharpZipLib">
-      <HintPath>..\ICSharpCode.SharpZipLib.dll</HintPath>
+      <HintPath>DLLs\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Annotations">
-      <HintPath>..\JetBrains.Annotations.dll</HintPath>
+      <HintPath>DLLs\JetBrains.Annotations.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Win32.TaskScheduler, Version=2.5.14.0, Culture=neutral, PublicKeyToken=0d013ddd5178a2ae, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Microsoft.Win32.TaskScheduler.dll</HintPath>
+      <HintPath>DLLs\Microsoft.Win32.TaskScheduler.dll</HintPath>
     </Reference>
     <Reference Include="PresentationFramework" />
     <Reference Include="SmoothProgressBar, Version=1.0.5617.18178, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SmoothProgressBar.dll</HintPath>
+      <HintPath>DLLs\SmoothProgressBar.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
