@@ -25,12 +25,17 @@ Public Class frmCrash
     End Sub
 
     Private Sub frmCrash_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        If boolSubmitted = False Then
-            If MsgBox("Are you sure you want to close this window? You have not submitted the crash data yet.", MsgBoxStyle.Question + MsgBoxStyle.YesNo, Me.Text) = MsgBoxResult.No Then
-                e.Cancel = True
-                Exit Sub
+        Try
+            If boolSubmitted = False Then
+                If MsgBox("Are you sure you want to close this window? You have not submitted the crash data yet.", MsgBoxStyle.Question + MsgBoxStyle.YesNo, Me.Text) = MsgBoxResult.No Then
+                    e.Cancel = True
+                    Exit Sub
+                End If
             End If
-        End If
+        Catch ex As Exception
+            Functions.eventLogFunctions.writeToSystemEventLog("A crash occurred in the FormClosing event of the Global Application Crash Handler.", EventLogEntryType.Error)
+            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+        End Try
 
         Process.GetCurrentProcess.Kill()
     End Sub
