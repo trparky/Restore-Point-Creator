@@ -25,12 +25,6 @@ Public Class Please_Wait
             NativeMethod.SetWindowPos(Me.Handle, NativeMethod.HWND_TOPMOST, 0, 0, 0, 0, NativeMethod.TOPMOST_FLAGS)
         End If
 
-        Try
-            Me.BringToFront()
-            Me.Focus()
-        Catch ex As Exception
-        End Try
-
         Control.CheckForIllegalCrossThreadCalls = False
         SmoothProgressBar1.ProgressBarColor = My.Settings.barColor
         progressBarChanger.Enabled = True
