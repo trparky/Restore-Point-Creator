@@ -89,15 +89,15 @@ Namespace Functions.wmi
         End Sub
 
         Public Sub doDeletingOfXNumberOfRestorePoints(ByVal shortHowManyToKeep As Short)
-            Dim systemRestorePoints As New Management.ManagementObjectSearcher("root\Default", "Select * FROM SystemRestore")
+            Dim managementObjectSearcher As New Management.ManagementObjectSearcher("root\Default", "Select * FROM SystemRestore")
 
-            If systemRestorePoints IsNot Nothing Then
-                If systemRestorePoints.Get.Count <> 0 Then
-                    Dim numberOfRestorePointsToBeDeleted As Short = systemRestorePoints.Get.Count - shortHowManyToKeep
+            If managementObjectSearcher IsNot Nothing Then
+                If managementObjectSearcher.Get.Count <> 0 Then
+                    Dim numberOfRestorePointsToBeDeleted As Short = managementObjectSearcher.Get.Count - shortHowManyToKeep
 
                     If numberOfRestorePointsToBeDeleted < 0 Or numberOfRestorePointsToBeDeleted = 0 Then
-                        systemRestorePoints.Dispose()
-                        systemRestorePoints = Nothing
+                        managementObjectSearcher.Dispose()
+                        managementObjectSearcher = Nothing
                         Exit Sub
                     Else
                         If numberOfRestorePointsToBeDeleted = 1 Then
@@ -106,23 +106,23 @@ Namespace Functions.wmi
                             eventLogFunctions.writeToSystemEventLog("Preparing to delete " & numberOfRestorePointsToBeDeleted & " restore points.")
                         End If
 
-                        For Each systemRestorePoint As Management.ManagementObject In systemRestorePoints.Get()
+                        For Each managementObject As Management.ManagementObject In managementObjectSearcher.Get()
                             If numberOfRestorePointsToBeDeleted = 0 Then
                                 Exit For
                             Else
                                 numberOfRestorePointsToBeDeleted -= 1
 
-                                Dim restorePointCreationDate As Date = restorePointStuff.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime").ToString)
-                                eventLogFunctions.writeToSystemEventLog(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", systemRestorePoint("Description").ToString, restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
+                                Dim restorePointCreationDate As Date = restorePointStuff.parseSystemRestorePointCreationDate(managementObject("CreationTime").ToString)
+                                eventLogFunctions.writeToSystemEventLog(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", managementObject("Description").ToString, restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
 
-                                APIs.NativeMethods.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber").ToString))
+                                APIs.NativeMethods.SRRemoveRestorePoint(Integer.Parse(managementObject("SequenceNumber").ToString))
                             End If
                         Next
                     End If
                 End If
 
-                systemRestorePoints.Dispose()
-                systemRestorePoints = Nothing
+                managementObjectSearcher.Dispose()
+                managementObjectSearcher = Nothing
             End If
         End Sub
 
@@ -136,13 +136,13 @@ Namespace Functions.wmi
 
         Public Function getNumberOfRestorePoints() As Integer
             Try
-                Dim systemRestorePointsManagementObjectSearcher As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
+                Dim managementObjectSearcher As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
 
-                If systemRestorePointsManagementObjectSearcher IsNot Nothing Then
-                    Dim restorePointsOnSystemManagementObjectCollection As Management.ManagementObjectCollection = systemRestorePointsManagementObjectSearcher.Get()
+                If managementObjectSearcher IsNot Nothing Then
+                    Dim managementObjectCollection As Management.ManagementObjectCollection = managementObjectSearcher.Get()
 
-                    If restorePointsOnSystemManagementObjectCollection IsNot Nothing Then
-                        Return restorePointsOnSystemManagementObjectCollection.Count
+                    If managementObjectCollection IsNot Nothing Then
+                        Return managementObjectCollection.Count
                     Else
                         Return 0
                     End If
@@ -239,13 +239,13 @@ Namespace Functions.wmi
 
         Private Function getRestorePointName(id As Long) As String
             Try
-                Dim systemRestorePoints As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
+                Dim managementObjectSearcher As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
 
-                If systemRestorePoints IsNot Nothing Then
-                    If (systemRestorePoints.Get().Count = 0) = False Then
-                        For Each systemRestorePoint As Management.ManagementObject In systemRestorePoints.Get()
-                            If Long.Parse(systemRestorePoint("SequenceNumber").ToString) = id Then
-                                Return systemRestorePoint("Description").ToString.ToString
+                If managementObjectSearcher IsNot Nothing Then
+                    If (managementObjectSearcher.Get().Count = 0) = False Then
+                        For Each managementObject As Management.ManagementObject In managementObjectSearcher.Get()
+                            If Long.Parse(managementObject("SequenceNumber").ToString) = id Then
+                                Return managementObject("Description").ToString.ToString
                             End If
                         Next
                     End If
@@ -272,8 +272,8 @@ Namespace Functions.wmi
                     ' Checks to see if there are any System Restore Points to be listed.
                     If (systemRestorePoints.Get().Count = 0) = False Then
                         ' Loops through systemRestorePoints.
-                        For Each systemRestorePoint As Management.ManagementObject In systemRestorePoints.Get()
-                            systemRestoreIDs.Add(systemRestorePoint("SequenceNumber").ToString)
+                        For Each managementObject As Management.ManagementObject In systemRestorePoints.Get()
+                            systemRestoreIDs.Add(managementObject("SequenceNumber").ToString)
                         Next
 
                         If systemRestoreIDs.Count = 0 Then
@@ -306,21 +306,21 @@ Namespace Functions.wmi
                 Dim newestSystemRestoreID As Integer = 0 ' Resets the newest System Restore ID to 0.
 
                 ' Get all System Restore Points from the Windows Management System and puts then in the systemRestorePoints variable.
-                Dim systemRestorePoints As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
+                Dim managementObjectSearcher As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
 
-                If systemRestorePoints IsNot Nothing Then
+                If managementObjectSearcher IsNot Nothing Then
                     Dim systemRestoreIDs As New ArrayList
                     Dim restorePointNameOnSystem As String
 
                     ' Checks to see if there are any System Restore Points to be listed.
-                    If systemRestorePoints.Get().Count <> 0 Then
+                    If managementObjectSearcher.Get().Count <> 0 Then
                         ' Loops through systemRestorePoints.
-                        For Each systemRestorePoint As Management.ManagementObject In systemRestorePoints.Get()
-                            restorePointNameOnSystem = systemRestorePoint("Description").ToString.Trim
+                        For Each managementObject As Management.ManagementObject In managementObjectSearcher.Get()
+                            restorePointNameOnSystem = managementObject("Description").ToString.Trim
 
                             ' We need only the Restore Point IDs made by this program, nothing else.
                             If restorePointNameOnSystem = globalVariables.strDefaultNameForScheduledTasks Or restorePointNameOnSystem = strRestorePointDescription Then
-                                systemRestoreIDs.Add(systemRestorePoint("SequenceNumber").ToString)
+                                systemRestoreIDs.Add(managementObject("SequenceNumber").ToString)
                             End If
                         Next
 
@@ -352,16 +352,16 @@ Namespace Functions.wmi
 
         Public Function getSystemProcessor() As supportClasses.processorInfoClass
             Try
-                Dim searcher As New Management.ManagementObjectSearcher("root\CIMV2", "Select * FROM Win32_Processor")
+                Dim managementObjectSearcher As New Management.ManagementObjectSearcher("root\CIMV2", "Select * FROM Win32_Processor")
 
-                If searcher IsNot Nothing Then
-                    Dim queryObj As Management.ManagementObjectCollection = searcher.Get()
+                If managementObjectSearcher IsNot Nothing Then
+                    Dim managementObjectCollection As Management.ManagementObjectCollection = managementObjectSearcher.Get()
 
-                    Dim rawProcessorName As String = queryObj(0)("Name").ToString.Trim.caseInsensitiveReplace("\((?:R|TM)\)", "", False)
+                    Dim rawProcessorName As String = managementObjectCollection(0)("Name").ToString.Trim.caseInsensitiveReplace("\((?:R|TM)\)", "", False)
 
                     Dim processorInfo As New supportClasses.processorInfoClass
                     processorInfo.strProcessor = rawProcessorName
-                    processorInfo.strNumberOfCores = queryObj(0)("NumberOfCores").ToString
+                    processorInfo.strNumberOfCores = managementObjectCollection(0)("NumberOfCores").ToString
                     Return processorInfo
                 Else
                     Dim processorInfo As New supportClasses.processorInfoClass
