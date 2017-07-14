@@ -95,7 +95,7 @@ Namespace Functions.eventLogFunctions
                 stringBuilder.AppendLine("System Information")
                 stringBuilder.AppendLine("Time of Crash: " & Now.ToString)
                 stringBuilder.AppendLine("Operating System: " & osVersionInfo.getFullOSVersionString())
-                stringBuilder.AppendLine("System RAM: " & wmi.getSystemRAM())
+                stringBuilder.AppendLine("System RAM: " & support.getSystemRAM())
 
                 Dim processorInfo As supportClasses.processorInfoClass = wmi.getSystemProcessor()
                 stringBuilder.AppendLine("CPU: " & processorInfo.strProcessor)

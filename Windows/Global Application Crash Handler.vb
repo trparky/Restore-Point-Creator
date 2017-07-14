@@ -54,7 +54,7 @@ Public Class frmCrash
         stringBuilder.AppendLine("System Information")
         stringBuilder.AppendLine("Time of Crash: " & Now.ToString)
         stringBuilder.AppendLine("Operating System: " & Functions.osVersionInfo.getFullOSVersionString())
-        stringBuilder.AppendLine("System RAM: " & Functions.wmi.getSystemRAM())
+        stringBuilder.AppendLine("System RAM: " & Functions.support.getSystemRAM())
 
         Dim processorInfo As Functions.supportClasses.processorInfoClass = Functions.wmi.getSystemProcessor()
         stringBuilder.AppendLine("CPU: " & processorInfo.strProcessor)
