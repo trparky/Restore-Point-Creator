@@ -25,12 +25,17 @@ Public Class frmCrash
     End Sub
 
     Private Sub frmCrash_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        If boolSubmitted = False Then
-            If MsgBox("Are you sure you want to close this window? You have not submitted the crash data yet.", MsgBoxStyle.Question + MsgBoxStyle.YesNo, Me.Text) = MsgBoxResult.No Then
-                e.Cancel = True
-                Exit Sub
+        Try
+            If boolSubmitted = False Then
+                If MsgBox("Are you sure you want to close this window? You have not submitted the crash data yet.", MsgBoxStyle.Question + MsgBoxStyle.YesNo, Me.Text) = MsgBoxResult.No Then
+                    e.Cancel = True
+                    Exit Sub
+                End If
             End If
-        End If
+        Catch ex As Exception
+            Functions.eventLogFunctions.writeToSystemEventLog("A crash occurred in the FormClosing event of the Global Application Crash Handler.", EventLogEntryType.Error)
+            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+        End Try
 
         Process.GetCurrentProcess.Kill()
     End Sub
@@ -49,7 +54,7 @@ Public Class frmCrash
         stringBuilder.AppendLine("System Information")
         stringBuilder.AppendLine("Time of Crash: " & Now.ToString)
         stringBuilder.AppendLine("Operating System: " & Functions.osVersionInfo.getFullOSVersionString())
-        stringBuilder.AppendLine("System RAM: " & Functions.wmi.getSystemRAM())
+        stringBuilder.AppendLine("System RAM: " & Functions.support.getSystemRAM())
 
         Dim processorInfo As Functions.supportClasses.processorInfoClass = Functions.wmi.getSystemProcessor()
         stringBuilder.AppendLine("CPU: " & processorInfo.strProcessor)
@@ -400,31 +405,8 @@ Friend Class ThreadExceptionHandler
     '''
     Public Sub Application_ThreadException(ByVal sender As Object, ByVal exceptionObject As Threading.ThreadExceptionEventArgs)
         Try
-            If exceptionHandler.handleCrashWithAnErrorOrRedirectUserInstead(exceptionObject.Exception) = True Then
-            	Try
-                	Functions.miniDump.MiniDump.MiniDumpToFile(globalVariables.strDumpFilePath)
-            	Catch Ex As Exception
-            		' Does nothing
-            	End Try
-
-                Dim crashWindow As New frmCrash
-                Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
-                crashWindow.exceptionMessage = exceptionObject.Exception.Message
-                crashWindow.exceptionStackTrace = exceptionObject.Exception.StackTrace
-                crashWindow.exceptionType = exceptionObject.Exception.GetType.ToString
-                crashWindow.ShowDialog()
-
-                Dim currentProcess As Process = Process.GetCurrentProcess()
-                currentProcess.Kill()
-            End If
-        Catch
-            ' Fatal error, terminate program
-            Try
-                MessageBox.Show("Fatal Error", "Fatal Error", MessageBoxButtons.OK, MessageBoxIcon.Stop)
-            Finally
-                Dim currentProcess As Process = Process.GetCurrentProcess()
-                currentProcess.Kill()
-            End Try
+            writeCrashToEventLogAndGiveErrorMessage(exceptionObject.Exception)
+        Catch ex As Exception
         End Try
     End Sub
 
@@ -432,16 +414,18 @@ Friend Class ThreadExceptionHandler
     ''' Handles the thread exception.
     '''
     Public Sub Application_UnhandledException(sender As Object, exceptionObject As UnhandledExceptionEventArgs)
-        Functions.eventLogFunctions.writeCrashToEventLog(exceptionObject.ExceptionObject)
+        Try
+            writeCrashToEventLogAndGiveErrorMessage(exceptionObject.ExceptionObject)
+        Catch ex As Exception
+        End Try
+    End Sub
 
-        Dim crashWindow As New frmCrash
-        Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
-        crashWindow.exceptionMessage = exceptionObject.ExceptionObject.Exception.Message
-        crashWindow.exceptionStackTrace = exceptionObject.ExceptionObject.Exception.StackTrace
-        crashWindow.exceptionType = exceptionObject.ExceptionObject.Exception.GetType.ToString
-        crashWindow.ShowDialog()
-
-        Dim currentProcess As Process = Process.GetCurrentProcess()
-        Environment.Exit(1)
+    Private Sub writeCrashToEventLogAndGiveErrorMessage(exceptionObject As Exception)
+        Try
+            Functions.eventLogFunctions.writeCrashToEventLog(exceptionObject)
+            MsgBox("A fatal error occurred and the program will now close. Please check the application event log for more details.", MsgBoxStyle.Critical, "Restore Point Creator Fatal Program Crash")
+            Process.GetCurrentProcess.Kill()
+        Catch ex As Exception
+        End Try
     End Sub
 End Class

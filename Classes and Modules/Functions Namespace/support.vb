@@ -836,5 +836,13 @@ Namespace Functions.support
         Public Function isNumeric(input As String) As Boolean
             Return Regex.IsMatch(input.Trim, "\A-{0,1}[0-9.]*\Z")
         End Function
+
+        Public Function getSystemRAM() As String
+            Try
+                Return support.bytesToHumanSize((New Devices.ComputerInfo()).TotalPhysicalMemory, True)
+            Catch ex As Exception
+                Return "Unknown amount of System RAM"
+            End Try
+        End Function
     End Module
 End Namespace

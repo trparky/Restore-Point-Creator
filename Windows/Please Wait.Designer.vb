@@ -75,6 +75,7 @@ Partial Class Please_Wait
         Me.Name = "Please_Wait"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Please Wait..."
+        Me.TopMost = True
         Me.ResumeLayout(False)
         Me.PerformLayout()
 

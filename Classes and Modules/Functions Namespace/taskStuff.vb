@@ -21,24 +21,6 @@ Namespace Functions.taskStuff
             End Try
         End Function
 
-        Public Sub deleteAtUserLogonTask()
-            Try
-                Dim taskService As New TaskScheduler.TaskService
-                Dim taskFolderObject As TaskScheduler.TaskFolder = getOurTaskFolder(taskService)
-
-                taskFolderObject.DeleteTask("Create a Restore Point at User Logon", False)
-
-                taskFolderObject.Dispose()
-                taskService.Dispose()
-
-                taskFolderObject = Nothing
-                taskService = Nothing
-            Catch ex As Exception
-                Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
-                exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
-            End Try
-        End Sub
-
         Public Function doesTaskExist(ByVal nameOfTask As String, ByRef taskObject As TaskScheduler.Task) As Boolean
             Try
                 Using taskServiceObject As TaskScheduler.TaskService = New TaskScheduler.TaskService()
@@ -166,6 +148,7 @@ Namespace Functions.taskStuff
                 End Try
 
                 Dim taskFolderObject As TaskScheduler.TaskFolder = getOurTaskFolder(taskService)
+                eventLogFunctions.writeToSystemEventLog(String.Format("Creating scheduled task ""{0}"" in ""{1}"".", taskName, taskFolderObject.Name))
                 taskFolderObject.RegisterTaskDefinition(taskName, newTask)
 
                 taskFolderObject.Dispose()

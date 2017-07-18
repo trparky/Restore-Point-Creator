@@ -61,8 +61,7 @@ Partial Class Update_Message
         '
         'lblTheUpdateWillDownload
         '
-        Me.lblTheUpdateWillDownload.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblTheUpdateWillDownload.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblTheUpdateWillDownload.AutoSize = True
         Me.lblTheUpdateWillDownload.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblTheUpdateWillDownload.Location = New System.Drawing.Point(33, 238)

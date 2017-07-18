@@ -13,18 +13,27 @@ Namespace Functions.wmi
             Try
                 Dim managementObjectSearcher As New Management.ManagementObjectSearcher("root\CIMV2", String.Format("SELECT Capacity FROM Win32_Volume WHERE DriveLetter = '{0}'", driveLetter))
 
-                If managementObjectSearcher.Get.Count = 0 Then
-                    Return 0
-                Else
+                If managementObjectSearcher IsNot Nothing Then
                     Dim managementObjectCollection As Management.ManagementObjectCollection = managementObjectSearcher.Get()
-                    Dim capacityString As String = managementObjectCollection(0)("Capacity").ToString
-                    Dim uLongCapacity As ULong
 
-                    If ULong.TryParse(capacityString, uLongCapacity) Then
-                        Return uLongCapacity
+                    If managementObjectCollection IsNot Nothing Then
+                        If managementObjectCollection.Count = 0 Then
+                            Return 0
+                        Else
+                            Dim capacityString As String = managementObjectCollection(0)("Capacity").ToString
+                            Dim uLongCapacity As ULong
+
+                            If ULong.TryParse(capacityString, uLongCapacity) Then
+                                Return uLongCapacity
+                            Else
+                                Return 0
+                            End If
+                        End If
                     Else
                         Return 0
                     End If
+                Else
+                    Return 0
                 End If
             Catch err As Management.ManagementException
                 Return 0
@@ -44,21 +53,31 @@ Namespace Functions.wmi
                 Dim wmiQueryObject As New Management.ObjectQuery(String.Format("SELECT * FROM Win32_Volume Where DriveLetter='{0}'", driveLetter))
                 Dim managementObjectSearcher As New Management.ManagementObjectSearcher(wmiQueryObject)
 
-                If managementObjectSearcher.Get.Count = 0 Then
-                    managementObjectSearcher.Dispose()
-
-                    boolResult = False
-                    Return Nothing
-                Else
+                If managementObjectSearcher IsNot Nothing Then
                     Dim managementObjectCollection As Management.ManagementObjectCollection = managementObjectSearcher.Get()
 
-                    Dim deviceID As String = managementObjectCollection(0)("DeviceID").ToString
+                    If managementObjectCollection IsNot Nothing Then
+                        If managementObjectCollection.Count = 0 Then
+                            managementObjectSearcher.Dispose()
 
-                    managementObjectSearcher.Dispose()
-                    managementObjectCollection.Dispose()
+                            boolResult = False
+                            Return Nothing
+                        Else
+                            Dim deviceID As String = managementObjectCollection(0)("DeviceID").ToString
 
-                    boolResult = True
-                    Return deviceID
+                            managementObjectSearcher.Dispose()
+                            managementObjectCollection.Dispose()
+
+                            boolResult = True
+                            Return deviceID
+                        End If
+                    Else
+                        boolResult = False
+                        Return Nothing
+                    End If
+                Else
+                    boolResult = False
+                    Return Nothing
                 End If
             Catch ex As Management.ManagementException
                 eventLogFunctions.writeCrashToEventLog(ex)
@@ -80,39 +99,49 @@ Namespace Functions.wmi
         End Sub
 
         Public Sub doDeletingOfXNumberOfRestorePoints(ByVal shortHowManyToKeep As Short)
-            Dim systemRestorePoints As New Management.ManagementObjectSearcher("root\Default", "Select * FROM SystemRestore")
+            Try
+                Dim managementObjectSearcher As New Management.ManagementObjectSearcher("root\Default", "Select * FROM SystemRestore")
 
-            If systemRestorePoints.Get.Count <> 0 Then
-                Dim numberOfRestorePointsToBeDeleted As Short = systemRestorePoints.Get.Count - shortHowManyToKeep
+                If managementObjectSearcher IsNot Nothing Then
+                    Dim managementObjectCollection As Management.ManagementObjectCollection = managementObjectSearcher.Get()
 
-                If numberOfRestorePointsToBeDeleted < 0 Or numberOfRestorePointsToBeDeleted = 0 Then
-                    systemRestorePoints.Dispose()
-                    systemRestorePoints = Nothing
-                    Exit Sub
-                Else
-                    If numberOfRestorePointsToBeDeleted = 1 Then
-                        eventLogFunctions.writeToSystemEventLog("Preparing to delete 1 restore point.")
-                    Else
-                        eventLogFunctions.writeToSystemEventLog("Preparing to delete " & numberOfRestorePointsToBeDeleted & " restore points.")
-                    End If
+                    If managementObjectCollection IsNot Nothing Then
+                        If managementObjectCollection.Count <> 0 Then
+                            Dim numberOfRestorePointsToBeDeleted As Short = managementObjectCollection.Count - shortHowManyToKeep
 
-                    For Each systemRestorePoint As Management.ManagementObject In systemRestorePoints.Get()
-                        If numberOfRestorePointsToBeDeleted = 0 Then
-                            Exit For
-                        Else
-                            numberOfRestorePointsToBeDeleted -= 1
+                            If numberOfRestorePointsToBeDeleted < 0 Or numberOfRestorePointsToBeDeleted = 0 Then
+                                managementObjectSearcher.Dispose()
+                                managementObjectSearcher = Nothing
+                                Exit Sub
+                            Else
+                                If numberOfRestorePointsToBeDeleted = 1 Then
+                                    eventLogFunctions.writeToSystemEventLog("Preparing to delete 1 restore point.")
+                                Else
+                                    eventLogFunctions.writeToSystemEventLog("Preparing to delete " & numberOfRestorePointsToBeDeleted & " restore points.")
+                                End If
 
-                            Dim restorePointCreationDate As Date = restorePointStuff.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime").ToString)
-                            eventLogFunctions.writeToSystemEventLog(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", systemRestorePoint("Description").ToString, restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
+                                For Each managementObject As Management.ManagementObject In managementObjectCollection
+                                    If numberOfRestorePointsToBeDeleted = 0 Then
+                                        Exit For
+                                    Else
+                                        numberOfRestorePointsToBeDeleted -= 1
 
-                            APIs.NativeMethods.SRRemoveRestorePoint(Integer.Parse(systemRestorePoint("SequenceNumber").ToString))
+                                        Dim restorePointCreationDate As Date = restorePointStuff.parseSystemRestorePointCreationDate(managementObject("CreationTime").ToString)
+                                        eventLogFunctions.writeToSystemEventLog(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", managementObject("Description").ToString, restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
+
+                                        APIs.NativeMethods.SRRemoveRestorePoint(Integer.Parse(managementObject("SequenceNumber").ToString))
+                                    End If
+                                Next
+                            End If
                         End If
-                    Next
-                End If
-            End If
 
-            systemRestorePoints.Dispose()
-            systemRestorePoints = Nothing
+                        managementObjectSearcher.Dispose()
+                        managementObjectSearcher = Nothing
+                    End If
+                End If
+            Catch ex As Exception
+                eventLogFunctions.writeCrashToEventLog(ex)
+            End Try
         End Sub
 
         Public Function checkToSeeIfSystemRestoreIsEnabledOnSystemDrive() As Boolean
@@ -125,13 +154,16 @@ Namespace Functions.wmi
 
         Public Function getNumberOfRestorePoints() As Integer
             Try
-                Dim systemRestorePointsManagementObjectSearcher As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
+                Dim managementObjectSearcher As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
 
-                If systemRestorePointsManagementObjectSearcher IsNot Nothing Then
-                    Dim restorePointsOnSystemManagementObjectCollection As Management.ManagementObjectCollection = systemRestorePointsManagementObjectSearcher.Get()
+                If managementObjectSearcher IsNot Nothing Then
+                    Dim managementObjectCollection As Management.ManagementObjectCollection = managementObjectSearcher.Get()
 
-                    If restorePointsOnSystemManagementObjectCollection IsNot Nothing Then
-                        Return restorePointsOnSystemManagementObjectCollection.Count
+                    If managementObjectCollection IsNot Nothing Then
+                        managementObjectSearcher.Dispose()
+                        Return managementObjectCollection.Count
+                    Else
+                        Return 0
                     End If
                 End If
 
@@ -143,8 +175,6 @@ Namespace Functions.wmi
 
         Public Function createRestorePoint(restorePointName As String, restorePointType As restorePointStuff.RestoreType, ByRef restorePointID As Long) As Integer
             Try
-                vss.checkForAndEnableSystemRestoreIfNeeded()
-
                 Dim managementScope As New Management.ManagementScope("\\localhost\root\default")
                 Dim managementPath As New Management.ManagementPath("SystemRestore")
                 Dim managementOptions As New Management.ObjectGetOptions()
@@ -198,19 +228,26 @@ Namespace Functions.wmi
 
         Public Sub restoreToSystemRestorePoint(point As Long)
             Try
-                eventLogFunctions.writeToSystemEventLog("Restoring system back to System Restore Point ID " & point & " (" & wmi.getRestorePointName(point) & ").", EventLogEntryType.Information)
+                Dim boolResult As Boolean
+                Dim strRestorePointName As String = getRestorePointName(point, boolResult)
 
-                Dim managementScope As New Management.ManagementScope("\\localhost\root\default")
-                Dim managementPath As New Management.ManagementPath("SystemRestore")
-                Dim managementOptions As New Management.ObjectGetOptions()
-                Dim managementClass As New Management.ManagementClass(managementScope, managementPath, managementOptions)
+                If boolResult Then
+                    eventLogFunctions.writeToSystemEventLog("Restoring system back to System Restore Point ID " & point & " (" & strRestorePointName & ").", EventLogEntryType.Information)
 
-                Dim managementParameters As Management.ManagementBaseObject = managementClass.GetMethodParameters("Restore")
-                managementParameters("SequenceNumber") = point
+                    Dim managementScope As New Management.ManagementScope("\\localhost\root\default")
+                    Dim managementPath As New Management.ManagementPath("SystemRestore")
+                    Dim managementOptions As New Management.ObjectGetOptions()
+                    Dim managementClass As New Management.ManagementClass(managementScope, managementPath, managementOptions)
 
-                Dim oOutParams As Management.ManagementBaseObject = managementClass.InvokeMethod("Restore", managementParameters, Nothing)
+                    Dim managementParameters As Management.ManagementBaseObject = managementClass.GetMethodParameters("Restore")
+                    managementParameters("SequenceNumber") = point
 
-                support.rebootSystem()
+                    Dim oOutParams As Management.ManagementBaseObject = managementClass.InvokeMethod("Restore", managementParameters, Nothing)
+
+                    support.rebootSystem()
+                Else
+                    MsgBox("Unable to retrieve restore point name from system, System Restore Restoration Process halted.", MsgBoxStyle.Critical, "Restore Point Creator")
+                End If
             Catch ex4 As ArgumentException
                 eventLogFunctions.writeCrashToEventLog(ex4)
                 MsgBox("Unable to restore system to selected restore point, a COM Exception has occurred. Restore process aborted.", MsgBoxStyle.Critical, "Restore Point Creator")
@@ -221,27 +258,36 @@ Namespace Functions.wmi
                 MsgBox("Unable to load required system assemblies to perform system operation. Please refer to the Application Event Log for more details and to submit the crash event to me." & vbCrLf & vbCrLf & "This program will now close.", MsgBoxStyle.Critical, "Restore Point Creator FileLoadException Handler")
                 Process.GetCurrentProcess.Kill()
             Catch ex As Exception
-                Threading.Thread.CurrentThread.CurrentUICulture = New System.Globalization.CultureInfo("en-US")
+                Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
                 exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
             End Try
         End Sub
 
-        Private Function getRestorePointName(id As Long) As String
+        Private Function getRestorePointName(id As Long, ByRef boolResult As Boolean) As String
             Try
-                Dim systemRestorePoints As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
+                Dim managementObjectSearcher As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
 
-                If (systemRestorePoints.Get().Count = 0) = False Then
-                    For Each systemRestorePoint As Management.ManagementObject In systemRestorePoints.Get()
-                        If Long.Parse(systemRestorePoint("SequenceNumber").ToString) = id Then
-                            Return systemRestorePoint("Description").ToString.ToString
+                If managementObjectSearcher IsNot Nothing Then
+                    Dim managementObjectCollection As Management.ManagementObjectCollection = managementObjectSearcher.Get()
+
+                    If managementObjectCollection IsNot Nothing Then
+                        If managementObjectCollection.Count <> 0 Then
+                            For Each managementObject As Management.ManagementObject In managementObjectCollection
+                                If Long.Parse(managementObject("SequenceNumber").ToString) = id Then
+                                    boolResult = True
+                                    Return managementObject("Description").ToString.ToString
+                                End If
+                            Next
                         End If
-                    Next
+                    End If
                 End If
 
                 eventLogFunctions.writeToSystemEventLog("Unable to find description for restore point ID " & id & ".", EventLogEntryType.Error)
+                boolResult = False
                 Return "ERROR_NO_DESCRIPTION"
             Catch ex As Exception
                 eventLogFunctions.writeToSystemEventLog("Unable to find description for restore point ID " & id & ".", EventLogEntryType.Error)
+                boolResult = False
                 Return "ERROR_NO_DESCRIPTION"
             End Try
         End Function
@@ -253,25 +299,35 @@ Namespace Functions.wmi
                 ' Get all System Restore Points from the Windows Management System and puts then in the systemRestorePoints variable.
                 Dim systemRestorePoints As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
 
-                Dim systemRestoreIDs As New ArrayList
+                If systemRestorePoints IsNot Nothing Then
+                    Dim managementObjectCollection As Management.ManagementObjectCollection = systemRestorePoints.Get()
 
-                ' Checks to see if there are any System Restore Points to be listed.
-                If (systemRestorePoints.Get().Count = 0) = False Then
-                    ' Loops through systemRestorePoints.
-                    For Each systemRestorePoint As Management.ManagementObject In systemRestorePoints.Get()
-                        systemRestoreIDs.Add(systemRestorePoint("SequenceNumber").ToString)
-                    Next
+                    If managementObjectCollection IsNot Nothing Then
+                        Dim systemRestoreIDs As New ArrayList
 
-                    If systemRestoreIDs.Count = 0 Then
-                        newestSystemRestoreID = 0
+                        ' Checks to see if there are any System Restore Points to be listed.
+                        If managementObjectCollection.Count <> 0 Then
+                            ' Loops through systemRestorePoints.
+                            For Each managementObject As Management.ManagementObject In managementObjectCollection
+                                systemRestoreIDs.Add(managementObject("SequenceNumber").ToString)
+                            Next
+
+                            If systemRestoreIDs.Count = 0 Then
+                                newestSystemRestoreID = 0
+                            Else
+                                newestSystemRestoreID = Integer.Parse(systemRestoreIDs.Item(systemRestoreIDs.Count - 1))
+                            End If
+                        Else
+                            newestSystemRestoreID = 0
+                        End If
+
+                        Return newestSystemRestoreID
                     Else
-                        newestSystemRestoreID = Integer.Parse(systemRestoreIDs.Item(systemRestoreIDs.Count - 1))
+                        Return 0
                     End If
                 Else
-                    newestSystemRestoreID = 0
+                    Return 0
                 End If
-
-                Return newestSystemRestoreID
             Catch ex3 As UnauthorizedAccessException
                 Return 0
             Catch ex2 As Management.ManagementException
@@ -289,65 +345,82 @@ Namespace Functions.wmi
                 Dim newestSystemRestoreID As Integer = 0 ' Resets the newest System Restore ID to 0.
 
                 ' Get all System Restore Points from the Windows Management System and puts then in the systemRestorePoints variable.
-                Dim systemRestorePoints As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
+                Dim managementObjectSearcher As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
 
-                Dim systemRestoreIDs As New ArrayList
-                Dim restorePointNameOnSystem As String
+                If managementObjectSearcher IsNot Nothing Then
+                    Dim managementObjectCollection As Management.ManagementObjectCollection = managementObjectSearcher.Get()
 
-                ' Checks to see if there are any System Restore Points to be listed.
-                If systemRestorePoints.Get().Count <> 0 Then
-                    ' Loops through systemRestorePoints.
-                    For Each systemRestorePoint As Management.ManagementObject In systemRestorePoints.Get()
-                        restorePointNameOnSystem = systemRestorePoint("Description").ToString.Trim
+                    If managementObjectCollection IsNot Nothing Then
+                        Dim systemRestoreIDs As New ArrayList
+                        Dim restorePointNameOnSystem As String
 
-                        ' We need only the Restore Point IDs made by this program, nothing else.
-                        If restorePointNameOnSystem = globalVariables.strDefaultNameForScheduledTasks Or restorePointNameOnSystem = strRestorePointDescription Then
-                            systemRestoreIDs.Add(systemRestorePoint("SequenceNumber").ToString)
+                        ' Checks to see if there are any System Restore Points to be listed.
+                        If managementObjectCollection.Count <> 0 Then
+                            ' Loops through systemRestorePoints.
+                            For Each managementObject As Management.ManagementObject In managementObjectCollection
+                                restorePointNameOnSystem = managementObject("Description").ToString.Trim
+
+                                ' We need only the Restore Point IDs made by this program, nothing else.
+                                If restorePointNameOnSystem.Trim.Equals(globalVariables.strDefaultNameForScheduledTasks.Trim, StringComparison.OrdinalIgnoreCase) Or restorePointNameOnSystem.Trim.Equals(strRestorePointDescription.Trim, StringComparison.OrdinalIgnoreCase) Then
+                                    systemRestoreIDs.Add(managementObject("SequenceNumber").ToString)
+                                End If
+                            Next
+
+                            If systemRestoreIDs.Count = 0 Then
+                                Return 0
+                            Else
+                                systemRestoreIDs.Sort()
+                                Return Integer.Parse(systemRestoreIDs.Item(systemRestoreIDs.Count - 1))
+                            End If
+                        Else
+                            Return 0
                         End If
-                    Next
-
-                    If systemRestoreIDs.Count = 0 Then
-                        Return 0
                     Else
-                        systemRestoreIDs.Sort()
-                        Return Integer.Parse(systemRestoreIDs.Item(systemRestoreIDs.Count - 1))
+                        Return 0
                     End If
                 Else
                     Return 0
                 End If
-
-                'Return newestSystemRestoreID
             Catch ex As Exception
                 Return 0
             End Try
         End Function
 
-        Public Function getSystemRAM() As String
+        Public Function getSystemProcessor() As supportClasses.processorInfoClass
             Try
-                Dim computerInfo As New Devices.ComputerInfo()
-                Return support.bytesToHumanSize(computerInfo.TotalPhysicalMemory, True)
+                Dim managementObjectSearcher As New Management.ManagementObjectSearcher("root\CIMV2", "Select * FROM Win32_Processor")
+
+                If managementObjectSearcher IsNot Nothing Then
+                    Dim managementObjectCollection As Management.ManagementObjectCollection = managementObjectSearcher.Get()
+
+                    If managementObjectCollection IsNot Nothing Then
+                        Dim rawProcessorName As String = managementObjectCollection(0)("Name").ToString.Trim.caseInsensitiveReplace("\((?:R|TM)\)", "", False)
+                        Return createProcessorInfoClassObject(rawProcessorName, managementObjectCollection(0)("NumberOfCores").ToString)
+                    Else
+                        Return createProcessorInfoClassObject()
+                    End If
+                Else
+                    Return createProcessorInfoClassObject()
+                End If
             Catch ex As Exception
-                Return "Unknown amount of System RAM"
+                Return createProcessorInfoClassObject()
             End Try
         End Function
 
-        Public Function getSystemProcessor() As supportClasses.processorInfoClass
-            Try
-                Dim searcher As New Management.ManagementObjectSearcher("root\CIMV2", "Select * FROM Win32_Processor")
-                Dim queryObj As Management.ManagementObjectCollection = searcher.Get()
+        Private Function createProcessorInfoClassObject() As supportClasses.processorInfoClass
+            Dim processorInfoClassObject As New supportClasses.processorInfoClass()
+            processorInfoClassObject.strProcessor = "unknown"
+            processorInfoClassObject.strNumberOfCores = "unknown"
 
-                Dim rawProcessorName As String = queryObj(0)("Name").ToString.Trim.caseInsensitiveReplace("\((?:R|TM)\)", "", False)
+            Return processorInfoClassObject
+        End Function
 
-                Dim processorInfo As New supportClasses.processorInfoClass
-                processorInfo.strProcessor = rawProcessorName
-                processorInfo.strNumberOfCores = queryObj(0)("NumberOfCores").ToString
-                Return processorInfo
-            Catch ex As Exception
-                Dim processorInfo As New supportClasses.processorInfoClass
-                processorInfo.strProcessor = "unknown"
-                processorInfo.strNumberOfCores = "unknown"
-                Return processorInfo
-            End Try
+        Private Function createProcessorInfoClassObject(strProcessorName As String, strNumberOfCores As String) As supportClasses.processorInfoClass
+            Dim processorInfoClassObject As New supportClasses.processorInfoClass()
+            processorInfoClassObject.strProcessor = strProcessorName
+            processorInfoClassObject.strNumberOfCores = strNumberOfCores
+
+            Return processorInfoClassObject
         End Function
     End Module
 End Namespace

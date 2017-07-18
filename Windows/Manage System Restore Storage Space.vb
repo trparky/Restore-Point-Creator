@@ -75,6 +75,8 @@ Public Class frmManageSystemRestoreStorageSpace
         percentageIndicator.ProgressBarColor = My.Settings.barColor
 
         loadDriveData(globalVariables.systemDriveLetter)
+
+        calculateWindowSize()
     End Sub
 
     ' driveLetter is just that, "C:"
@@ -241,16 +243,22 @@ Public Class frmManageSystemRestoreStorageSpace
     End Sub
 
     Private Sub showDrivesPanel()
-        Me.Size = New Size(469, 217)
-
         drivePanel.Visible = True
         settingsPanel.Location = New Point(75, 5)
+
+        calculateWindowSize()
     End Sub
 
     Private Sub hideDrivesPanel()
-        Me.Size = New Size(400, 217)
-
         drivePanel.Visible = False
         settingsPanel.Location = New Point(5, 5)
+
+        calculateWindowSize()
+    End Sub
+
+    Private Sub calculateWindowSize()
+        Dim shortHeight As Short = chkAdvancedMode.Location.Y + chkAdvancedMode.Size.Height + 35
+        Dim shortWidth As Short = settingsPanel.Location.X + settingsPanel.Size.Width + 15
+        Me.Size = New Size(shortWidth, shortHeight)
     End Sub
 End Class

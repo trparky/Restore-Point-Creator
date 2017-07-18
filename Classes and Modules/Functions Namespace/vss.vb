@@ -157,45 +157,6 @@
             End Try
         End Sub
 
-        Private Sub askUserToFixSystemRestore()
-            If Not privilegeChecks.areWeRunningAsSystemUser() Then
-                If MsgBox("System Restore Point Creator has detected that System Restore is not enabled on your system. System Restore Point Creator can go about fixing this issue but it could have unintended consequences." & vbCrLf & vbCrLf & "Do you want System Restore Point Creator to attempt repairs to your system?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "System Restore Point Creator") = MsgBoxResult.Yes Then
-                    executeVSSAdminCommand(globalVariables.systemDriveLetter)
-                    enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
-                Else
-                    MsgBox("You have chosen not to repair your system. System Restore Point creation has failed.", MsgBoxStyle.Exclamation, "System Restore Point Creator")
-                End If
-            End If
-        End Sub
-
-        Public Sub checkForAndEnableSystemRestoreIfNeeded()
-            Try
-                If Not wmi.checkToSeeIfSystemRestoreIsEnabledOnSystemDrive() Then
-                    eventLogFunctions.writeToSystemEventLog("System Restore appears to not be enabled on this system.", EventLogEntryType.Information)
-
-                    Dim boolGetVSSDataResult As Boolean
-                    Dim shadowStorageDetails As supportClasses.ShadowStorageData = getData(globalVariables.systemDriveLetter, boolGetVSSDataResult)
-
-                    If boolGetVSSDataResult Then
-                        eventLogFunctions.writeToSystemEventLog(String.Format("The old max space assigned for System Restore Points was {0} ({1} Bytes).", support.bytesToHumanSize(shadowStorageDetails.MaxSpace), shadowStorageDetails.MaxSpace.ToString), EventLogEntryType.Information)
-
-                        If shadowStorageDetails.MaxSpace = 0 Then
-                            askUserToFixSystemRestore()
-                        End If
-                    Else
-                        askUserToFixSystemRestore()
-                    End If
-                End If
-            Catch ex As Threading.ThreadAbortException
-                ' Does nothing
-            Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
-                eventLogFunctions.writeToSystemEventLog("System Restore appears to not be enabled on this system.", EventLogEntryType.Information)
-
-                askUserToFixSystemRestore()
-            End Try
-        End Sub
-
         ''' <summary>Activates System Restore on a given system drive.</summary>
         ''' <param name="driveLetter">The system drive letter you want to enable System Restore on.</param>
         ''' <example>functions.enableSystemRestoreOnDriveWMI("C:")</example>

@@ -828,13 +828,6 @@ Public Class Form1
         End Try
     End Sub
 
-    Private Sub checkForAndEnableSystemRestoreIfNeededSub()
-        Try
-            Functions.vss.checkForAndEnableSystemRestoreIfNeeded()
-        Catch ex As Exception
-        End Try
-    End Sub
-
     Private Sub showDonationNotice()
         Try
             If boolShowDonationMessage = True Then
@@ -1175,7 +1168,7 @@ Public Class Form1
 
                         Functions.eventLogFunctions.writeToSystemEventLog("The system returned error code 1058 (ERROR_SERVICE_DISABLED). Attempting to correct it by setting up reserved system restore point space and enabling system restore on the system drive.")
 
-                        If MsgBox("The system has returned error code 1058 (ERROR_SERVICE_DISABLED). System Restore Point Creator can go about fixing this issue but it could have unintended consequences." & vbCrLf & vbCrLf & "Do you want System Restore Point Creator to attempt repairs to your system?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "System Error 1058 (ERROR_SERVICE_DISABLED) -- System Restore Point Creator") = MsgBoxResult.Yes Then
+                        If MsgBox("The system has returned error code 1058 (ERROR_SERVICE_DISABLED). System Restore Point Creator can go about fixing this issue but it could have unintended consequences." & vbCrLf & vbCrLf & "Do you want System Restore Point Creator to attempt repairs to your system?", MsgBoxStyle.Question + MsgBoxStyle.YesNo + MsgBoxStyle.ApplicationModal, "System Error 1058 (ERROR_SERVICE_DISABLED) -- System Restore Point Creator") = MsgBoxResult.Yes Then
                             Functions.vss.executeVSSAdminCommand(globalVariables.systemDriveLetter)
                             Functions.vss.setShadowStorageSize(globalVariables.systemDriveLetter, newSize)
                             Functions.vss.enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
@@ -1193,6 +1186,17 @@ Public Class Form1
                     Dim msgBoxAndEventLogText As String = "The reserved space for restore points on the system drive appears to be set correctly, something else appears to be wrong. Auto-correction of system configurations may cause unintended side-effects. The auto-correction routine has halted."
 
                     Functions.eventLogFunctions.writeToSystemEventLog(msgBoxAndEventLogText, EventLogEntryType.Error)
+
+                    enableFormElements()
+
+                    Functions.wait.closePleaseWaitWindow()
+                    systemRestorePoints.Dispose()
+                    giveFeedbackAfterCreatingRestorePoint(result)
+                    loadRestorePointsFromSystemIntoList()
+
+                    txtRestorePointDescription.Text = Nothing
+                    doTheGrayingOfTheRestorePointNameTextBox()
+
                     MsgBox(msgBoxAndEventLogText & vbCrLf & vbCrLf & "If you want to try and correct it, go to the Utilities menu and click on ""Manually Fix System Restore"".", MsgBoxStyle.Exclamation, strMessageBoxTitle)
 
                     Exit Sub
@@ -2206,8 +2210,6 @@ Public Class Form1
                 End If
             End If
 
-            Threading.ThreadPool.QueueUserWorkItem(AddressOf checkForAndEnableSystemRestoreIfNeededSub)
-
             boolDoneLoading = True
             systemRestorePointsList.Select()
 
@@ -2862,7 +2864,9 @@ Public Class Form1
 
         stringBuilder.AppendLine("Restore Point Creator")
         stringBuilder.AppendLine("Written By Tom Parkison")
-        stringBuilder.AppendLine("Copyright Thomas Parkison 2012-2017.")
+        stringBuilder.AppendLine("Copyright Thomas Parkison 2012-2018.")
+        stringBuilder.AppendLine()
+        stringBuilder.AppendLine("This program uses the Microsoft.Win32.TaskScheduler library version 2.5.23 to interface with the Windows Task Scheduler, copyright David Hall.")
         stringBuilder.AppendLine()
 
         If globalVariables.version.boolBeta Then

@@ -83,7 +83,6 @@
     Private Sub Update_Message_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         PictureBox1.Image = SystemIcons.Information.ToBitmap()
         Control.CheckForIllegalCrossThreadCalls = False
-        Me.Size = My.Settings.updateMessageDialogSize
         chkShowPartialBetaChangeLogs.Checked = My.Settings.showPartialBetaChangeLogs
 
         If My.Settings.useSSL = True Then
@@ -131,6 +130,11 @@
             lblCurrentVersion.Text = String.Format("Current Version: {0}", globalVariables.version.strFullVersionString)
         End If
 
+        If My.Settings.updateNotificationWindowLocation.X <> 0 And My.Settings.updateNotificationWindowLocation.Y <> 0 Then
+            Me.Location = Functions.support.verifyWindowLocation(My.Settings.updateNotificationWindowLocation)
+        End If
+
+        Me.Size = My.Settings.updateMessageDialogSize
         timerCountdown.Enabled = True
     End Sub
 
@@ -158,6 +162,7 @@
     End Sub
 
     Private Sub Update_Message_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        My.Settings.updateNotificationWindowLocation = Me.Location
         My.Settings.updateMessageDialogSize = Me.Size
     End Sub
 

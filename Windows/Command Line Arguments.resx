@@ -132,6 +132,7 @@ It is important to put the "-name" argument AFTER the "-createrestorepoint" argu
 "-viewchangelog" This loads the official change log.
 "-eventlog" This loads program's Event Log viewer.
 "-deleteoldrestorepoints" This deletes old restore points as per your user preferences.
+"-deleteoldrestorepoints -maxdays=(0-9)" This deletes old restore points as per your provided number.
 
 "-keepxnumberofrestorepoints -count=(0-9)" This tells the program how many restore points to keep and it deletes any older restore
 points to meet that number.</value>
