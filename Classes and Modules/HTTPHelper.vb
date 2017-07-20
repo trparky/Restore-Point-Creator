@@ -235,7 +235,7 @@ End Class
 
 ''' <summary>Allows you to easily POST and upload files to a remote HTTP server without you, the programmer, knowing anything about how it all works. This class does it all for you. It handles adding a User Agent String, additional HTTP Request Headers, string data to your HTTP POST data, and files to be uploaded in the HTTP POST data.</summary>
 Public Class httpHelper
-    Private Const classVersion As String = "1.290"
+    Private Const classVersion As String = "1.295"
 
     Private strUserAgentString As String = Nothing
     Private boolUseProxy As Boolean = False
@@ -743,10 +743,11 @@ Public Class httpHelper
                 Exit Sub
             End If
         Else
-            Dim formFileInstance As New FormFile
-            formFileInstance.formName = strFormName
-            formFileInstance.localFilePath = strLocalFilePath
-            formFileInstance.remoteFileName = strRemoteFileName
+            Dim formFileInstance As New FormFile With {
+                .formName = strFormName,
+                .localFilePath = strLocalFilePath,
+                .remoteFileName = strRemoteFileName
+            }
 
             If strContentType = Nothing Then
                 Dim contentType As String
@@ -838,10 +839,11 @@ beginAgain:
             ' into the class instance by the programmer who's using this class in his/her program.
             If boolRunDownloadStatusUpdatePluginInSeparateThread Then
                 If downloadStatusUpdaterThread Is Nothing Then
-                    downloadStatusUpdaterThread = New Threading.Thread(AddressOf downloadStatusUpdaterThreadSubroutine)
-                    downloadStatusUpdaterThread.IsBackground = True
-                    downloadStatusUpdaterThread.Priority = Threading.ThreadPriority.Lowest
-                    downloadStatusUpdaterThread.Name = "HTTPHelper Class Download Status Updating Thread"
+                    downloadStatusUpdaterThread = New Threading.Thread(AddressOf downloadStatusUpdaterThreadSubroutine) With {
+                        .IsBackground = True,
+                        .Priority = Threading.ThreadPriority.Lowest,
+                        .Name = "HTTPHelper Class Download Status Updating Thread"
+                    }
                     downloadStatusUpdaterThread.Start()
                 End If
             Else
