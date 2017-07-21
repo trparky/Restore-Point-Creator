@@ -115,12 +115,7 @@ Public Class frmTaskScheduler
         Me.Location = Functions.support.verifyWindowLocation(My.Settings.TaskSchedulerWindowLocation)
         checkWindowsTaskScheduler()
 
-        Dim boolValueDeleteOldRestorePointsAsString As String = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Delete Old Restore Points", "False").Trim
-        Dim boolValueDeleteOldRestorePoints As Boolean
-
-        If Boolean.TryParse(boolValueDeleteOldRestorePointsAsString, boolValueDeleteOldRestorePoints) = True Then
-            chkDeleteOldRestorePoints.Checked = boolValueDeleteOldRestorePoints
-        End If
+        chkDeleteOldRestorePoints.Checked = Functions.registryStuff.getBooleanValueFromRegistry(Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False), "Delete Old Restore Points", False)
 
         txtDays.Text = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("MaxDays", 15).ToString
         txtDaysDelete.Text = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("MaxDays", 15).ToString

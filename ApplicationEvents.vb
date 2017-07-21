@@ -296,19 +296,14 @@ Namespace My
                 registryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
 
                 If registryKey IsNot Nothing Then
-                    Boolean.TryParse(registryKey.GetValue("Keep X Amount of Restore Points", "False"), globalVariables.KeepXAmountOfRestorePoints)
+                    globalVariables.KeepXAmountOfRestorePoints = Functions.registryStuff.getBooleanValueFromRegistry(registryKey, "Keep X Amount of Restore Points", False)
 
                     If globalVariables.KeepXAmountOfRestorePoints = True Then
                         Short.TryParse(registryKey.GetValue("Keep X Amount of Restore Points Value", "-10"), globalVariables.KeepXAmountofRestorePointsValue)
                     End If
 
-                    If Boolean.TryParse(registryKey.GetValue("Enable System Logging", "True"), globalVariables.boolLogToSystemLog) = False Then
-                        globalVariables.boolLogToSystemLog = True
-                    End If
-
-                    If Boolean.TryParse(registryKey.GetValue("Log Program Loads and Exits to Event Log", "True"), globalVariables.boolLogLoadsAndExits) = False Then
-                        globalVariables.boolLogLoadsAndExits = True
-                    End If
+                    globalVariables.boolLogToSystemLog = Functions.registryStuff.getBooleanValueFromRegistry(registryKey, "Enable System Logging", True)
+                    globalVariables.boolLogLoadsAndExits = Functions.registryStuff.getBooleanValueFromRegistry(registryKey, "Log Program Loads and Exits to Event Log", True)
 
                     registryKey.Close()
                     registryKey.Dispose()
@@ -393,11 +388,7 @@ Namespace My
                             If registryKey IsNot Nothing Then
                                 restorePointNameForScheduledTasks = registryKey.GetValue("Custom Name for Scheduled Restore Points", globalVariables.strDefaultNameForScheduledTasks)
 
-                                If Boolean.TryParse(registryKey.GetValue("Extended Logging For Scheduled Tasks", "True"), boolExtendedLoggingForScheduledTasks) Then
-                                    boolExtendedLoggingForScheduledTasks = boolExtendedLoggingForScheduledTasks
-                                Else
-                                    boolExtendedLoggingForScheduledTasks = True
-                                End If
+                                boolExtendedLoggingForScheduledTasks = Functions.registryStuff.getBooleanValueFromRegistry(registryKey, "Extended Logging For Scheduled Tasks", True)
 
                                 registryKey.Close()
                                 registryKey.Dispose()
@@ -426,15 +417,8 @@ Namespace My
 
                             If boolExtendedLoggingForScheduledTasks = True Then Functions.restorePointStuff.writeSystemRestorePointsToApplicationLogs()
 
-                            Dim boolValueFromRegistryAsString As String = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Delete Old Restore Points", "False").Trim
-                            Dim boolValueFromRegistry As Boolean
-
-                            ' This checks if we have valid data from the Registry value.  It attempts to parse it and passes the value of the parses data to boolValueFromRegistry.
-                            If Boolean.TryParse(boolValueFromRegistryAsString, boolValueFromRegistry) = True Then
-                                ' OK, we do have valid data, let's continue.
-                                If boolValueFromRegistryAsString = True Then
-                                    Functions.startupFunctions.deleteOldRestorePoints()
-                                End If
+                            If Functions.registryStuff.getBooleanValueFromRegistry(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False), "Delete Old Restore Points", False) Then
+                                Functions.startupFunctions.deleteOldRestorePoints()
                             End If
 
                             If globalVariables.KeepXAmountOfRestorePoints = True Then
