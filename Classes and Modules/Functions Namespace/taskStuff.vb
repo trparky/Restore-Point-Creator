@@ -371,11 +371,7 @@ Namespace Functions.taskStuff
                         ' value from the Registry cannot be parsed, we give the boolNoTask variable a default value of False.
                         ' If the value is False, we use the Task Wrapper to launch the program. If the value is True, we prompt
                         ' the user for a UAC prompt instead.
-                        If Boolean.TryParse(registryKey.GetValue("No Task", "False"), boolNoTask) = False Then
-                            ' We weren't able to parse the value from the Registry so let's
-                            ' give the boolNoTask variable a default value of False.
-                            boolNoTask = False
-                        End If
+                        boolNoTask = registryStuff.getBooleanValueFromRegistry(registryKey, "No Task", False)
 
                         ' And let's close the Registry key.
                         registryKey.Close()

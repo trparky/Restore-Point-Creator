@@ -218,15 +218,10 @@ Namespace My
                 Exit Sub
             End If
 #End If
-            ' Reads a special Registry entry from the Registry that instructs the program to not run with the Task Wrapper.
-            If Boolean.TryParse(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey).GetValue("No Task", "False"), boolNoTask) Then
-                ' Checks to see if the Registry value was True and if we aren't an Admin.
-                If boolNoTask = True And boolAreWeAnAdministrator = False Then
-                    Functions.support.reRunWithAdminUserRights() ' OK, we relaunch the process with full Administrator privileges with a UAC prompt.
-                End If
-            Else
-                ' This is in case we couldn't parse what came from the Registry.
-                boolNoTask = False
+            boolNoTask = Functions.registryStuff.getBooleanValueFromRegistry(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey), "No Task", False)
+
+            If boolNoTask And Not boolAreWeAnAdministrator Then
+                Functions.support.reRunWithAdminUserRights() ' OK, we relaunch the process with full Administrator privileges with a UAC prompt.
             End If
 
             If Not boolAreWeInSafeMode And boolAreWeAnAdministrator And My.Application.CommandLineArgs.Count > 0 Then
