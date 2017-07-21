@@ -144,7 +144,7 @@ Namespace Functions.registryStuff
         ''' <param name="registryKey">The Registry Object you want to act on.</param>
         ''' <param name="boolCloseAfterSettingValue">This is an optional Boolean value, this is normally set to False.</param>
         Public Sub setBooleanValueInRegistry(ByRef registryKey As RegistryKey, ByVal strValueNameToSetInRegistry As String, ByVal boolValueToSet As Boolean, Optional boolCloseAfterSettingValue As Boolean = False)
-            setValueInRegistry(registryKey, strValueNameToSetInRegistry, boolValueToSet, boolCloseAfterSettingValue)
+            setValueInRegistry(registryKey, strValueNameToSetInRegistry, boolValueToSet.ToString, boolCloseAfterSettingValue)
         End Sub
 
         ''' <summary>Gets a setting from the application's Registry key.</summary>
