@@ -27,7 +27,6 @@
 
                 While eventInstance IsNot Nothing
                     If eventInstance.ProviderName.stringCompare(globalVariables.eventLog.strSystemRestorePointCreator) Or eventInstance.ProviderName.caseInsensitiveContains(globalVariables.eventLog.strSystemRestorePointCreator) Then
-
                         Try
                             itemAdd = New myListViewItemTypes.eventLogListEntry(eventInstance.LevelDisplayName)
                         Catch ex As Eventing.Reader.EventLogNotFoundException
@@ -78,7 +77,7 @@
     End Sub
 
     Sub loadEventLog()
-        Me.Cursor = Cursors.WaitCursor
+        Invoke(Sub() Me.Cursor = Cursors.WaitCursor)
         Dim itemsToPutInToList As New List(Of myListViewItemTypes.eventLogListEntry)
 
         Dim timeStamp As New Stopwatch
@@ -87,18 +86,20 @@
         loadEventLogData(globalVariables.eventLog.strApplication, itemsToPutInToList)
         loadEventLogData(globalVariables.eventLog.strSystemRestorePointCreator, itemsToPutInToList)
 
-        lblLogEntryCount.Text = "Entries in Event Log: " & itemsToPutInToList.Count.ToString("N0")
-        eventLogList.Items.Clear()
-        eventLogList.Items.AddRange(itemsToPutInToList.ToArray())
-        eventLogList.Sort()
+        Me.Invoke(Sub()
+                      lblLogEntryCount.Text = "Entries in Event Log: " & itemsToPutInToList.Count.ToString("N0")
+                      eventLogList.Items.Clear()
+                      eventLogList.Items.AddRange(itemsToPutInToList.ToArray())
+                      eventLogList.Sort()
 
-        Me.Cursor = Cursors.Default
-        boolDoneLoading = True
-        eventLogLoadingThread = Nothing
+                      Me.Cursor = Cursors.Default
+                      boolDoneLoading = True
+                      eventLogLoadingThread = Nothing
 
-        Functions.wait.closePleaseWaitWindow()
-        timeStamp.Stop()
-        lblProcessedIn.Text = String.Format("Event Log Loaded and Processed in {0}ms ({1} seconds).", timeStamp.ElapsedMilliseconds.ToString("N0"), Math.Round(timeStamp.Elapsed.TotalSeconds, 2))
+                      Functions.wait.closePleaseWaitWindow()
+                      timeStamp.Stop()
+                      lblProcessedIn.Text = String.Format("Event Log Loaded and Processed in {0}ms ({1} seconds).", timeStamp.ElapsedMilliseconds.ToString("N0"), Math.Round(timeStamp.Elapsed.TotalSeconds, 2))
+                  End Sub)
     End Sub
 
     Private Sub eventLogForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
@@ -179,7 +180,6 @@
     Private Sub eventLog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Location = Functions.support.verifyWindowLocation(My.Settings.eventLogFormWindowLocation)
         chkAskMeToSubmitIfViewingAnExceptionEntry.Checked = My.Settings.boolAskMeToSubmitIfViewingAnExceptionEntry
-        Control.CheckForIllegalCrossThreadCalls = False
         applySavedSorting()
     End Sub
 
