@@ -28,8 +28,9 @@
 
     Sub loadChangeLogData()
         Try
-            Dim strChangeLog As String = Nothing, urlToLoadDataFrom As String = Nothing
-
+            Dim strChangeLog As String = Nothing
+            Dim urlToLoadDataFrom As String = Nothing
+            Dim versionStringToFindAndReplace As String
             Dim httpHelper As httpHelper = Functions.http.createNewHTTPHelperObject()
 
             If versionUpdate = versionUpdateType.standardVersionUpdate Or versionUpdate = versionUpdateType.totallyNewVersionUpdate Then
@@ -37,10 +38,10 @@
             ElseIf versionUpdate = versionUpdateType.betaVersionUpdate Or versionUpdate = versionUpdateType.releaseCandidateVersionUpdate Then
                 urlToLoadDataFrom = globalVariables.webURLs.core.strBetaDetails
 
-                If My.Settings.showPartialBetaChangeLogs = True Then
-                    If globalVariables.version.boolBeta = True Then
+                If My.Settings.showPartialBetaChangeLogs Then
+                    If globalVariables.version.boolBeta Then
                         httpHelper.addPOSTData("beta", globalVariables.version.shortBetaVersion)
-                    ElseIf globalVariables.version.boolReleaseCandidate = True Then
+                    ElseIf globalVariables.version.boolReleaseCandidate Then
                         httpHelper.addPOSTData("rc", globalVariables.version.shortReleaseCandidateVersion)
                     End If
                 End If
@@ -52,13 +53,13 @@
             httpHelper.addPOSTData("build", globalVariables.version.shortBuild)
 
             Try
-                If httpHelper.getWebData(urlToLoadDataFrom, strChangeLog) = True Then
+                If httpHelper.getWebData(urlToLoadDataFrom, strChangeLog) Then
                     If versionUpdate = versionUpdateType.betaVersionUpdate Or versionUpdate = versionUpdateType.releaseCandidateVersionUpdate Then
-                        If globalVariables.version.boolBeta = True Then
-                            Dim versionStringToFindAndReplace As String = String.Format("Public Beta {0} Changes", globalVariables.version.shortBetaVersion)
+                        If globalVariables.version.boolBeta Then
+                            versionStringToFindAndReplace = String.Format("Public Beta {0} Changes", globalVariables.version.shortBetaVersion)
                             strChangeLog = strChangeLog.Replace(versionStringToFindAndReplace, versionStringToFindAndReplace & " (Currently Installed Version)")
-                        ElseIf globalVariables.version.boolReleaseCandidate = True Then
-                            Dim versionStringToFindAndReplace As String = String.Format("Release Candidate {0} Changes", globalVariables.version.shortReleaseCandidateVersion)
+                        ElseIf globalVariables.version.boolReleaseCandidate Then
+                            versionStringToFindAndReplace = String.Format("Release Candidate {0} Changes", globalVariables.version.shortReleaseCandidateVersion)
                             strChangeLog = strChangeLog.Replace(versionStringToFindAndReplace, versionStringToFindAndReplace & " (Currently Installed Version)")
                         End If
                     End If
@@ -85,7 +86,7 @@
         Control.CheckForIllegalCrossThreadCalls = False
         chkShowPartialBetaChangeLogs.Checked = My.Settings.showPartialBetaChangeLogs
 
-        If My.Settings.useSSL = True Then
+        If My.Settings.useSSL Then
             ToolTip1.SetToolTip(btnYes, "Download Secured by SSL.")
             imgSSL.Visible = True
             lblTheUpdateWillDownload.Location = New Point(33, 238)
@@ -104,7 +105,7 @@
         Me.Icon = My.Resources.RestorePoint_noBackground_2
         Media.SystemSounds.Asterisk.Play()
 
-        If My.Settings.askToUpgrade = True Then
+        If My.Settings.askToUpgrade Then
             lblTheUpdateWillDownload.Text = "Do you want to upgrade to this new version?"
             TableLayoutPanel1.Visible = True
         Else
@@ -122,9 +123,9 @@
             lblTopUpdateMessage.Text = String.Format("There is an updated Release Candidate version of System Restore Point Creator. Version {0} Build {1} {2}.", globalVariables.version.versionStringWithoutBuild, remoteBuild, strRemoteBetaRCVersion)
         End If
 
-        If globalVariables.version.boolBeta = True Then
+        If globalVariables.version.boolBeta Then
             lblCurrentVersion.Text = String.Format("Current Version: {0} Public Beta {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion)
-        ElseIf globalVariables.version.boolReleaseCandidate = True Then
+        ElseIf globalVariables.version.boolReleaseCandidate Then
             lblCurrentVersion.Text = String.Format("Current Version: {0} Release Candidate {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion)
         Else
             lblCurrentVersion.Text = String.Format("Current Version: {0}", globalVariables.version.strFullVersionString)
@@ -200,7 +201,7 @@
     End Sub
 
     Sub disableCountdown()
-        If timerCountdown.Enabled = True Then
+        If timerCountdown.Enabled Then
             timerCountdown.Enabled = False
             lblCountdown.Text = "  "
             ToolTip1.SetToolTip(lblCountdown, "Update countdown disabled.")
