@@ -103,6 +103,12 @@ Namespace Functions.eventLogFunctions
                     stringBuilder.AppendLine("Debug Mode: False")
                 End If
 
+                If globalVariables.version.boolDebugBuild Then
+                    stringBuilder.AppendLine("Debug Build: True")
+                Else
+                    stringBuilder.AppendLine("Debug Build: False")
+                End If
+
                 Dim processorInfo As supportClasses.processorInfoClass = wmi.getSystemProcessor()
                 stringBuilder.AppendLine("CPU: " & processorInfo.strProcessor)
                 stringBuilder.AppendLine("Number of Cores: " & processorInfo.strNumberOfCores.ToString)
