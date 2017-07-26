@@ -7,7 +7,7 @@ Namespace Functions.listViewSorter
 
         Private intColumnNumber As Integer
         Private soSortOrder As SortOrder
-        Private regExNumberParser As New Regex("^\d{1,3}(,\d{3})*(\.\d+)?$", RegexOptions.Compiled) '
+        Private regExNumberParser As New Regex("\A[,0-9]+\Z", RegexOptions.Compiled) '
 
         Public Sub New(ByVal intInputColumnNumber As Integer, ByVal soInputSortOrder As SortOrder)
             intColumnNumber = intInputColumnNumber
