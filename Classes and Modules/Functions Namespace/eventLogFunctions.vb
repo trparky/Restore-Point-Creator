@@ -97,6 +97,12 @@ Namespace Functions.eventLogFunctions
                 stringBuilder.AppendLine("Operating System: " & osVersionInfo.getFullOSVersionString())
                 stringBuilder.AppendLine("System RAM: " & support.getSystemRAM())
 
+                If Debugger.IsAttached Then
+                    stringBuilder.AppendLine("Debug Mode: True")
+                Else
+                    stringBuilder.AppendLine("Debug Mode: False")
+                End If
+
                 Dim processorInfo As supportClasses.processorInfoClass = wmi.getSystemProcessor()
                 stringBuilder.AppendLine("CPU: " & processorInfo.strProcessor)
                 stringBuilder.AppendLine("Number of Cores: " & processorInfo.strNumberOfCores.ToString)
