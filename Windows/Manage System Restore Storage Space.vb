@@ -71,7 +71,6 @@ Public Class frmManageSystemRestoreStorageSpace
 
         chkConfirmNewSmallerSize.Checked = My.Settings.confirmSmallerRestorePointSpaceSetting
         Me.Location = Functions.support.verifyWindowLocation(My.Settings.ManageSystemRestoreStorageSpaceWindowLocation)
-        Control.CheckForIllegalCrossThreadCalls = False
         percentageIndicator.ProgressBarColor = My.Settings.barColor
 
         loadDriveData(globalVariables.systemDriveLetter)
@@ -133,7 +132,7 @@ Public Class frmManageSystemRestoreStorageSpace
                     percentageIndicator.ProgressBarColor = My.Settings.barColor
                 End If
 
-                lblUsedShadowStorageSpace.Text = String.Format("Used Shadow Storage Space: {0} of {1} ({2}% Used)", Functions.support.bytesToHumanSize(shadowStorageStatistics.UsedSpace), strHumanSize, percentage)
+                lblUsedShadowStorageSpace.Invoke(Sub() lblUsedShadowStorageSpace.Text = String.Format("Used Shadow Storage Space: {0} of {1} ({2}% Used)", Functions.support.bytesToHumanSize(shadowStorageStatistics.UsedSpace), strHumanSize, percentage))
 
                 If strHumanSize.Contains("Bytes") Then
                     listSizeType.SelectedIndex = 0
@@ -150,28 +149,28 @@ Public Class frmManageSystemRestoreStorageSpace
                 txtSize.Text = Regex.Replace(strHumanSize, "(?:Bytes|KBs|MBs|GBs|TBs|PBs)", "", RegexOptions.IgnoreCase).Trim
             Else
                 ' If it errors out, do this.
-                lblUsedShadowStorageSpace.Text = "Used Shadow Storage Space: (None Allocated)"
+                lblUsedShadowStorageSpace.Invoke(Sub() lblUsedShadowStorageSpace.Text = "Used Shadow Storage Space: (None Allocated)")
                 percentageIndicator.Value = 0
             End If
         Catch ex As Exception
             ' If it errors out, do this.
-            lblUsedShadowStorageSpace.Text = "Used Shadow Storage Space: (None Allocated)"
+            lblUsedShadowStorageSpace.Invoke(Sub() lblUsedShadowStorageSpace.Text = "Used Shadow Storage Space: (None Allocated)")
             percentageIndicator.Value = 0
         End Try
     End Sub
 
-    Sub setSize(ByVal dblSize As Double)
+    Sub setSize(ByVal dblSize As Double, listSizeType As String)
         Dim newSize As Long
 
-        If listSizeType.Text = "Kilobytes" Then
+        If listSizeType = "Kilobytes" Then
             newSize = dblSize * kilobytesInBytes
-        ElseIf listSizeType.Text = "Megabytes" Then
+        ElseIf listSizeType = "Megabytes" Then
             newSize = dblSize * megabytesInBytes
-        ElseIf listSizeType.Text = "Gigabytes" Then
+        ElseIf listSizeType = "Gigabytes" Then
             newSize = dblSize * gigabytesInBytes
-        ElseIf listSizeType.Text = "Terabytes" Then
+        ElseIf listSizeType = "Terabytes" Then
             newSize = dblSize * terabytesInBytes
-        ElseIf listSizeType.Text = "% (Percentage)" Then
+        ElseIf listSizeType = "% (Percentage)" Then
             dblSize = dblSize / 100
             newSize = getSizeOfDrive(strDriveLetterWeAreWorkingWith) * dblSize
         End If
@@ -209,7 +208,8 @@ Public Class frmManageSystemRestoreStorageSpace
                 Exit Sub
             End If
 
-            Threading.ThreadPool.QueueUserWorkItem(Sub() setSize(dblSize))
+            Dim strListSizeType As String = listSizeType.Text
+            Threading.ThreadPool.QueueUserWorkItem(Sub() setSize(dblSize, strListSizeType))
         Else
             MsgBox("Invalid numerical input.", MsgBoxStyle.Critical, Me.Text)
         End If
