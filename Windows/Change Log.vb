@@ -21,13 +21,14 @@
 
     Private Sub Change_Log_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Size = My.Settings.changeLogWindowSize
-        Control.CheckForIllegalCrossThreadCalls = False
     End Sub
 
     Sub loadChangelogSub()
         Try
-            RichTextBox1.Text = "Loading Change Log from web site..."
-            AbortToolStripMenuItem.Visible = True
+            Me.Invoke(Sub()
+                          RichTextBox1.Text = "Loading Change Log from web site..."
+                          AbortToolStripMenuItem.Visible = True
+                      End Sub)
 
             Dim changeLogData As String = Nothing
             Dim httpHelper As httpHelper = Functions.http.createNewHTTPHelperObject()
@@ -37,23 +38,25 @@
                     Dim stringWeAreLookingFor As String = String.Format("Version {0}.{1} Build {2}", globalVariables.version.shortMajor, globalVariables.version.shortMinor, globalVariables.version.shortBuild)
                     changeLogData = changeLogData.Replace(stringWeAreLookingFor, stringWeAreLookingFor & " (Currently Installed Version)")
 
-                    RichTextBox1.Rtf = changeLogData
+                    Me.Invoke(Sub() RichTextBox1.Rtf = changeLogData)
                     changeLogData = Nothing
                 Else
-                    RichTextBox1.Text = "There was an error loading the official changelog."
+                    Me.Invoke(Sub() RichTextBox1.Text = "There was an error loading the official changelog.")
                     Exit Sub
                 End If
             Catch ex As Exception
                 Exit Sub
             End Try
         Catch ex2 As Threading.ThreadAbortException
-            RichTextBox1.Text = "Change log loading aborted."
+            Me.Invoke(Sub() RichTextBox1.Text = "Change log loading aborted.")
         Catch ex As Exception
-            RichTextBox1.Text = "Error loading change log data."
+            Me.Invoke(Sub() RichTextBox1.Text = "Error loading change log data.")
         Finally
-            Functions.wait.closePleaseWaitWindow()
-            loadThread = Nothing
-            AbortToolStripMenuItem.Visible = False
+            Me.Invoke(Sub()
+                          Functions.wait.closePleaseWaitWindow()
+                          loadThread = Nothing
+                          AbortToolStripMenuItem.Visible = False
+                      End Sub)
         End Try
     End Sub
 
