@@ -28,7 +28,6 @@ Partial Class eventLogForm
         Me.ColumnHeader2 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ColumnHeader3 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ColumnHeader4 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
-        Me.ColumnHeader5 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.imageList = New System.Windows.Forms.ImageList(Me.components)
         Me.eventLogText = New System.Windows.Forms.TextBox()
         Me.btnRefreshEvents = New System.Windows.Forms.Button()
@@ -57,7 +56,7 @@ Partial Class eventLogForm
         Me.eventLogList.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.eventLogList.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader1, Me.ColumnHeader2, Me.ColumnHeader3, Me.ColumnHeader4, Me.ColumnHeader5})
+        Me.eventLogList.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader1, Me.ColumnHeader2, Me.ColumnHeader3, Me.ColumnHeader4})
         Me.eventLogList.FullRowSelect = True
         Me.eventLogList.Location = New System.Drawing.Point(3, 3)
         Me.eventLogList.MultiSelect = False
@@ -87,11 +86,6 @@ Partial Class eventLogForm
         '
         Me.ColumnHeader4.Text = "Log Source"
         Me.ColumnHeader4.Width = 95
-        '
-        'ColumnHeader5
-        '
-        Me.ColumnHeader5.Text = "*"
-        Me.ColumnHeader5.Width = 18
         '
         'imageList
         '
@@ -306,7 +300,6 @@ Partial Class eventLogForm
     Friend WithEvents chkAskMeToSubmitIfViewingAnExceptionEntry As CheckBox
     Friend WithEvents btnSearch As Button
     Friend WithEvents btnClear As Button
-    Friend WithEvents ColumnHeader5 As ColumnHeader
     Friend WithEvents btnExportLogs As Button
     Friend WithEvents SaveFileDialog1 As SaveFileDialog
 End Class

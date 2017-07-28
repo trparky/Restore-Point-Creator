@@ -8,9 +8,8 @@
     Private previousSearchType As Search_Event_Log.searceType
 
     Private selectedIndex As Long
-    Private boolDidSortingChange As Boolean = False
-    Private boolDidWeDoASearch As Boolean = False
     Private longEntriesFound As Long = 0
+    Private eventLogContents As New List(Of myListViewItemTypes.eventLogListEntry)
 
     Sub loadEventLogData(ByVal strEventLog As String, ByRef itemsToPutInToList As List(Of myListViewItemTypes.eventLogListEntry))
         Dim itemAdd As myListViewItemTypes.eventLogListEntry
@@ -78,19 +77,17 @@
 
     Sub loadEventLog()
         Invoke(Sub() Me.Cursor = Cursors.WaitCursor)
-        Dim itemsToPutInToList As New List(Of myListViewItemTypes.eventLogListEntry)
+        eventLogContents.Clear() ' Cleans our cached log entries in memory.
 
         Dim timeStamp As New Stopwatch
         timeStamp.Start()
 
-        loadEventLogData(globalVariables.eventLog.strApplication, itemsToPutInToList)
-        loadEventLogData(globalVariables.eventLog.strSystemRestorePointCreator, itemsToPutInToList)
+        loadEventLogData(globalVariables.eventLog.strApplication, eventLogContents)
+        loadEventLogData(globalVariables.eventLog.strSystemRestorePointCreator, eventLogContents)
 
         Me.Invoke(Sub()
-                      lblLogEntryCount.Text = "Entries in Event Log: " & itemsToPutInToList.Count.ToString("N0")
-                      eventLogList.Items.Clear()
-                      eventLogList.Items.AddRange(itemsToPutInToList.ToArray())
-                      eventLogList.Sort()
+                      lblLogEntryCount.Text = "Entries in Event Log: " & eventLogContents.Count.ToString("N0")
+                      loadEventLogContentsIntoList()
 
                       Me.Cursor = Cursors.Default
                       boolDoneLoading = True
@@ -232,8 +229,6 @@
 
     Private Sub eventLogList_ColumnWidthChanged(sender As Object, e As ColumnWidthChangedEventArgs) Handles eventLogList.ColumnWidthChanged
         If boolDoneLoading = True Then
-            If ColumnHeader5.Width <> 18 Then ColumnHeader5.Width = 18
-
             My.Settings.eventLogColumn1Size = ColumnHeader1.Width
             My.Settings.eventLogColumn2Size = ColumnHeader2.Width
             My.Settings.eventLogColumn3Size = ColumnHeader3.Width
@@ -334,29 +329,7 @@
         End Try
     End Sub
 
-    Sub highlightItemInList(ByRef item As ListViewItem, ByRef longEntriesFound As Long)
-        item.SubItems(4).Text = "*"
-        item.BackColor = Color.LightBlue
-        longEntriesFound += 1
-    End Sub
-
     Private Sub btnSearch_Click(sender As Object, e As EventArgs) Handles btnSearch.Click
-        clearSearchResults()
-
-        If boolDidWeDoASearch Then
-            eventLogList.BeginUpdate()
-
-            For Each item As ListViewItem In eventLogList.Items
-                If item.SubItems(4).Text.Equals("*") Then
-                    item.SubItems(4).Text = ""
-                    item.BackColor = eventLogList.BackColor
-                End If
-            Next
-
-            eventLogList.EndUpdate()
-            boolDidWeDoASearch = False
-        End If
-
         Dim searchWindow As New Search_Event_Log
         searchWindow.StartPosition = FormStartPosition.CenterParent
         searchWindow.txtSearchTerms.Text = rawSearchTerms
@@ -382,44 +355,50 @@
             searchWindow = Nothing
 
             longEntriesFound = 0
-            boolDidWeDoASearch = True
 
-            For Each item As myListViewItemTypes.eventLogListEntry In eventLogList.Items
+            eventLogList.Items.Clear()
+
+            For Each item As myListViewItemTypes.eventLogListEntry In eventLogContents
                 With item
-                    If boolUseRegEx = True Then
+                    If boolUseRegEx Then
                         If searchType = Search_Event_Log.searceType.typeAny And .strEventLogText.regExSearch(searchTerms) Then
-                            highlightItemInList(item, longEntriesFound)
+                            eventLogList.Items.Add(item)
+                            longEntriesFound += 1
                         ElseIf searchType = Search_Event_Log.searceType.typeError And .shortLevelType = EventLogEntryType.Error And .strEventLogText.regExSearch(searchTerms) Then
-                            highlightItemInList(item, longEntriesFound)
+                            eventLogList.Items.Add(item)
+                            longEntriesFound += 1
                         ElseIf searchType = Search_Event_Log.searceType.typeInfo And .shortLevelType = EventLogEntryType.Information And .strEventLogText.regExSearch(searchTerms) Then
-                            highlightItemInList(item, longEntriesFound)
+                            eventLogList.Items.Add(item)
+                            longEntriesFound += 1
                         End If
-                    ElseIf boolCaseInsensitive = True Then
+                    ElseIf boolCaseInsensitive Then
                         If searchType = Search_Event_Log.searceType.typeAny And .strEventLogText.caseInsensitiveContains(searchTerms) Then
-                            highlightItemInList(item, longEntriesFound)
+                            eventLogList.Items.Add(item)
+                            longEntriesFound += 1
                         ElseIf searchType = Search_Event_Log.searceType.typeError And .shortLevelType = EventLogEntryType.Error And .strEventLogText.caseInsensitiveContains(searchTerms) Then
-                            highlightItemInList(item, longEntriesFound)
+                            eventLogList.Items.Add(item)
+                            longEntriesFound += 1
                         ElseIf searchType = Search_Event_Log.searceType.typeInfo And .shortLevelType = EventLogEntryType.Information And .strEventLogText.caseInsensitiveContains(searchTerms) Then
-                            highlightItemInList(item, longEntriesFound)
+                            eventLogList.Items.Add(item)
+                            longEntriesFound += 1
                         End If
                     Else
                         If searchType = Search_Event_Log.searceType.typeAny And .strEventLogText.Contains(searchTerms) Then
-                            highlightItemInList(item, longEntriesFound)
+                            eventLogList.Items.Add(item)
+                            longEntriesFound += 1
                         ElseIf searchType = Search_Event_Log.searceType.typeError And .shortLevelType = EventLogEntryType.Error And .strEventLogText.Contains(searchTerms) Then
-                            highlightItemInList(item, longEntriesFound)
+                            eventLogList.Items.Add(item)
+                            longEntriesFound += 1
                         ElseIf searchType = Search_Event_Log.searceType.typeInfo And .shortLevelType = EventLogEntryType.Information And .strEventLogText.Contains(searchTerms) Then
-                            highlightItemInList(item, longEntriesFound)
+                            eventLogList.Items.Add(item)
+                            longEntriesFound += 1
                         End If
                     End If
                 End With
-
             Next
 
             If longEntriesFound <> 0 Then
-                eventLogList.ListViewItemSorter = New Functions.listViewSorter.ListViewComparer(4, SortOrder.Descending)
-                eventLogList.Sort()
                 eventLogList.EnsureVisible(0)
-                boolDidSortingChange = True
 
                 Dim strEntriesFound As String
                 If longEntriesFound = 1 Then
@@ -428,7 +407,7 @@
                     strEntriesFound = longEntriesFound & " log entries were found."
                 End If
 
-                MsgBox("Search complete. " & strEntriesFound & " The event log entries that contain your search terms have been highlighted in blue.", MsgBoxStyle.Information, Me.Text)
+                MsgBox("Search complete. " & strEntriesFound, MsgBoxStyle.Information, Me.Text)
             Else
                 MsgBox("Search complete. No results found.", MsgBoxStyle.Information, Me.Text)
             End If
@@ -465,22 +444,13 @@
     End Sub
 
     Private Sub btnClear_Click(sender As Object, e As EventArgs) Handles btnClear.Click
-        clearSearchResults()
+        loadEventLogContentsIntoList()
     End Sub
 
-    Sub clearSearchResults()
-        If boolDidSortingChange Then
-            rawSearchTerms = Nothing
-
-            For Each item As ListViewItem In eventLogList.Items
-                item.SubItems(4).Text = ""
-                item.BackColor = eventLogList.BackColor
-            Next
-
-            eventLogList.ListViewItemSorter = New Functions.listViewSorter.ListViewComparer(1, SortOrder.Descending)
-            eventLogList.Sort()
-
-            boolDidSortingChange = False
-        End If
+    Sub loadEventLogContentsIntoList()
+        rawSearchTerms = Nothing
+        eventLogList.Items.Clear()
+        eventLogList.Items.AddRange(eventLogContents.ToArray())
+        eventLogList.Sort()
     End Sub
 End Class
