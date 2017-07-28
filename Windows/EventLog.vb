@@ -8,7 +8,6 @@
     Private previousSearchType As Search_Event_Log.searceType
 
     Private selectedIndex As Long
-    Private longEntriesFound As Long = 0
     Private eventLogContents As New List(Of myListViewItemTypes.eventLogListEntry)
 
     Sub loadEventLogData(ByVal strEventLog As String, ByRef itemsToPutInToList As List(Of myListViewItemTypes.eventLogListEntry))
@@ -354,8 +353,6 @@
             searchWindow.Dispose()
             searchWindow = Nothing
 
-            longEntriesFound = 0
-
             eventLogList.Items.Clear()
 
             For Each item As myListViewItemTypes.eventLogListEntry In eventLogContents
@@ -363,48 +360,37 @@
                     If boolUseRegEx Then
                         If searchType = Search_Event_Log.searceType.typeAny And .strEventLogText.regExSearch(searchTerms) Then
                             eventLogList.Items.Add(item)
-                            longEntriesFound += 1
                         ElseIf searchType = Search_Event_Log.searceType.typeError And .shortLevelType = EventLogEntryType.Error And .strEventLogText.regExSearch(searchTerms) Then
                             eventLogList.Items.Add(item)
-                            longEntriesFound += 1
                         ElseIf searchType = Search_Event_Log.searceType.typeInfo And .shortLevelType = EventLogEntryType.Information And .strEventLogText.regExSearch(searchTerms) Then
                             eventLogList.Items.Add(item)
-                            longEntriesFound += 1
                         End If
                     ElseIf boolCaseInsensitive Then
                         If searchType = Search_Event_Log.searceType.typeAny And .strEventLogText.caseInsensitiveContains(searchTerms) Then
                             eventLogList.Items.Add(item)
-                            longEntriesFound += 1
                         ElseIf searchType = Search_Event_Log.searceType.typeError And .shortLevelType = EventLogEntryType.Error And .strEventLogText.caseInsensitiveContains(searchTerms) Then
                             eventLogList.Items.Add(item)
-                            longEntriesFound += 1
                         ElseIf searchType = Search_Event_Log.searceType.typeInfo And .shortLevelType = EventLogEntryType.Information And .strEventLogText.caseInsensitiveContains(searchTerms) Then
                             eventLogList.Items.Add(item)
-                            longEntriesFound += 1
                         End If
                     Else
                         If searchType = Search_Event_Log.searceType.typeAny And .strEventLogText.Contains(searchTerms) Then
                             eventLogList.Items.Add(item)
-                            longEntriesFound += 1
                         ElseIf searchType = Search_Event_Log.searceType.typeError And .shortLevelType = EventLogEntryType.Error And .strEventLogText.Contains(searchTerms) Then
                             eventLogList.Items.Add(item)
-                            longEntriesFound += 1
                         ElseIf searchType = Search_Event_Log.searceType.typeInfo And .shortLevelType = EventLogEntryType.Information And .strEventLogText.Contains(searchTerms) Then
                             eventLogList.Items.Add(item)
-                            longEntriesFound += 1
                         End If
                     End If
                 End With
             Next
 
-            If longEntriesFound <> 0 Then
-                eventLogList.EnsureVisible(0)
-
+            If eventLogList.Items.Count <> 0 Then
                 Dim strEntriesFound As String
-                If longEntriesFound = 1 Then
+                If eventLogList.Items.Count = 1 Then
                     strEntriesFound = "1 log entry was found."
                 Else
-                    strEntriesFound = longEntriesFound & " log entries were found."
+                    strEntriesFound = eventLogList.Items.Count.ToString & " log entries were found."
                 End If
 
                 MsgBox("Search complete. " & strEntriesFound, MsgBoxStyle.Information, Me.Text)
