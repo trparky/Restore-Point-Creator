@@ -5,7 +5,6 @@ Imports System.Text
 Imports System.Runtime.InteropServices
 Imports System.Management
 Imports ICSharpCode.SharpZipLib.Zip
-Imports System.StringComparison
 #End Region
 
 Public Class Form1
@@ -244,7 +243,7 @@ Public Class Form1
                     execActionPath = DirectCast(action, TaskScheduler.ExecAction).Path.Replace("""", "")
 
                     ' We check if the current task ExecAction path is different than the current process's EXE path.
-                    If execActionPath.stringCompare(Application.ExecutablePath) = False Then
+                    If execActionPath.Equals(Application.ExecutablePath, StringComparison.OrdinalIgnoreCase) = False Then
                         task.Definition.Actions.Remove(action)
                         actions.Add(New TaskScheduler.ExecAction(Application.ExecutablePath, commandLineArgument))
                         task.RegisterChanges()
@@ -1529,7 +1528,7 @@ Public Class Form1
             ' 2. If the remote version (5.8, 5.9, etc.) does not equal the current version of the program (5.8, 5.9, etc.).
             ' If both conditions are met then that means that a new .1 version has been released (5.8, 5.9, etc.) and that
             ' we need to upgrade the user to the latest release branch version first.
-            If (My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta, OrdinalIgnoreCase) Or My.Settings.updateChannel.Equals(globalVariables.updateChannels.tom, OrdinalIgnoreCase)) And remoteVersion <> globalVariables.version.versionStringWithoutBuild Then
+            If (My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta, StringComparison.OrdinalIgnoreCase) Or My.Settings.updateChannel.Equals(globalVariables.updateChannels.tom, StringComparison.OrdinalIgnoreCase)) And remoteVersion <> globalVariables.version.versionStringWithoutBuild Then
                 ' OK, both conditions were met so we need to set some stuff up for later use in this function.
 
                 boolSetTriggerUpdateAtNextRuntimeSetting = True ' We need to tell this sub-routine to set a trigger in the Registry that triggers an update check at the next program launch.
@@ -2414,7 +2413,7 @@ Public Class Form1
 
         If importBackupDialog.ShowDialog() = DialogResult.OK Then
             If IO.File.Exists(importBackupDialog.FileName) = True Then
-                If New IO.FileInfo(importBackupDialog.FileName).Extension.Equals(".resbakx", OrdinalIgnoreCase) Then
+                If New IO.FileInfo(importBackupDialog.FileName).Extension.Equals(".resbakx", StringComparison.OrdinalIgnoreCase) Then
                     Functions.importExportSettings.importSettingsFromXMLFile(importBackupDialog.FileName, strMessageBoxTitle)
                 Else
                     Functions.importExportSettings.importSettingsFromLegacyBackupFile(importBackupDialog.FileName, strMessageBoxTitle)
@@ -2901,7 +2900,7 @@ Public Class Form1
         Dim registryShowDonationMessageValue As String = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey).GetValue("Show Donation Message", "True").ToString.Trim
         Dim boolRegistryShowDonationMessageValue As Boolean
 
-        If registryShowDonationMessageValue.stringCompare("true") Or registryShowDonationMessageValue.stringCompare("false") Then
+        If registryShowDonationMessageValue.Equals("true", StringComparison.OrdinalIgnoreCase) Or registryShowDonationMessageValue.Equals("false", StringComparison.OrdinalIgnoreCase) Then
             boolRegistryShowDonationMessageValue = Boolean.Parse(registryShowDonationMessageValue)
         Else
             boolRegistryShowDonationMessageValue = True
@@ -3249,7 +3248,7 @@ Public Class Form1
     End Sub
 
     Private Sub btnRefreshRestorePoints_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnRefreshRestorePoints.Click
-        If btnRefreshRestorePoints.Text.stringCompare("Refresh List of System Restore Points") Then
+        If btnRefreshRestorePoints.Text.Equals("Refresh List of System Restore Points", StringComparison.OrdinalIgnoreCase) Then
             Functions.wait.createPleaseWaitWindow("Loading Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
             Threading.ThreadPool.QueueUserWorkItem(AddressOf loadRestorePointsFromSystemIntoList)
             Functions.wait.openPleaseWaitWindow()

@@ -1,6 +1,5 @@
 ﻿Imports System.ComponentModel
 Imports ICSharpCode.SharpZipLib.Zip
-Imports System.Text
 
 Public Class Official_Contact_Form
     Protected Const apiAccessCode As String = "YWiIMIyGVVFEunRpDF5PNIF2yzcADdBxneRmWDlLpMTCoVFEunRWiIMIyRmWnRpDF"
@@ -83,29 +82,29 @@ Public Class Official_Contact_Form
             If boolHTTPResponseResult = True Then
                 If boolDoWeHaveAttachments = True Then Functions.wait.closePleaseWaitWindow()
 
-                If strHTTPResponse.stringCompare("ok") Then
+                If strHTTPResponse.Equals("ok", StringComparison.OrdinalIgnoreCase) Then
                     listAttachedFiles.Items.Clear()
                     If IO.File.Exists(zipFilePath) Then IO.File.Delete(zipFilePath)
 
                     MsgBox("Your email to the developer has been sent. This window will now close.", MsgBoxStyle.Information, Me.Text)
                     Me.Close()
-                ElseIf strHTTPResponse.stringCompare("error-invalid-email") Then
+                ElseIf strHTTPResponse.Equals("error-invalid-email", StringComparison.OrdinalIgnoreCase) Then
                     MsgBox("Invalid email address. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                ElseIf strHTTPResponse.stringCompare("email-server-said-user-doesnt-exist") Then
+                ElseIf strHTTPResponse.Equals("email-server-said-user-doesnt-exist", StringComparison.OrdinalIgnoreCase) Then
                     MsgBox("The remote email server said that the email address doesn't exist. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                ElseIf strHTTPResponse.stringCompare("dns-error") Then
+                ElseIf strHTTPResponse.Equals("dns-error", StringComparison.OrdinalIgnoreCase) Then
                     MsgBox("The domain name doesn't exist. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                ElseIf strHTTPResponse.stringCompare("server-connect-error") Then
+                ElseIf strHTTPResponse.Equals("server-connect-error", StringComparison.OrdinalIgnoreCase) Then
                     MsgBox("Unable to contact mail server, more than likely your email address is invalid. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                ElseIf strHTTPResponse.stringCompare("invalid-email-syntax") Then
+                ElseIf strHTTPResponse.Equals("invalid-email-syntax", StringComparison.OrdinalIgnoreCase) Then
                     MsgBox("The email address didn't pass syntax validation. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                ElseIf strHTTPResponse.stringCompare("no-email-servers-contactable") Then
+                ElseIf strHTTPResponse.Equals("no-email-servers-contactable", StringComparison.OrdinalIgnoreCase) Then
                     MsgBox("No mail servers found, more than likely your email address is invalid. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                ElseIf strHTTPResponse.stringCompare("no-access-allowed") Then
+                ElseIf strHTTPResponse.Equals("no-access-allowed", StringComparison.OrdinalIgnoreCase) Then
                     MsgBox("Error accessing server side script.", MsgBoxStyle.Critical, Me.Text)
-                ElseIf strHTTPResponse.stringCompare("error-no-message-found") Then
+                ElseIf strHTTPResponse.Equals("error-no-message-found", StringComparison.OrdinalIgnoreCase) Then
                     MsgBox("No message found. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                ElseIf strHTTPResponse.stringCompare("file_attachment_failure") Then
+                ElseIf strHTTPResponse.Equals("file_attachment_failure", StringComparison.OrdinalIgnoreCase) Then
                     MsgBox("File attachment failure. Please try again.", MsgBoxStyle.Critical, Me.Text)
                 End If
 
@@ -163,7 +162,7 @@ Public Class Official_Contact_Form
         If OpenFileDialog1.ShowDialog() = DialogResult.OK Then
             Dim fileInfo As New IO.FileInfo(OpenFileDialog1.FileName)
 
-            If fileInfo.Extension.stringCompare(".png") Or fileInfo.Extension.stringCompare(".jpg") Or fileInfo.Extension.stringCompare(".jpeg") Or fileInfo.Extension.stringCompare(".txt") Or fileInfo.Extension.stringCompare(".log") Or fileInfo.Extension.stringCompare(".reslog") Then
+            If fileInfo.Extension.Equals(".png", StringComparison.OrdinalIgnoreCase) Or fileInfo.Extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase) Or fileInfo.Extension.Equals(".jpeg", StringComparison.OrdinalIgnoreCase) Or fileInfo.Extension.Equals(".txt", StringComparison.OrdinalIgnoreCase) Or fileInfo.Extension.Equals(".log", StringComparison.OrdinalIgnoreCase) Or fileInfo.Extension.Equals(".reslog", StringComparison.OrdinalIgnoreCase) Then
                 If doesFileExistInList(OpenFileDialog1.FileName.ToString) = True Then
                     MsgBox("A file by the name of " & Chr(34) & New IO.FileInfo(OpenFileDialog1.FileName.ToString).Name & Chr(34) & " already exists in the list of attached files.", MsgBoxStyle.Information, Me.Text)
                 Else
@@ -195,7 +194,7 @@ Public Class Official_Contact_Form
 
             For Each item As String In listAttachedFiles.Items
                 item = New IO.FileInfo(item).Name
-                If item.stringCompare(strFileToCheckForExistanceOf) Then Return True
+                If item.Equals(strFileToCheckForExistanceOf, StringComparison.OrdinalIgnoreCase) Then Return True
             Next
 
             Return False

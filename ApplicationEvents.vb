@@ -97,17 +97,17 @@ Namespace My
             If My.Application.CommandLineArgs.Count >= 1 Then
                 commandLineArgument = My.Application.CommandLineArgs(0).Trim
 
-                If commandLineArgument.stringCompare(globalVariables.commandLineSwitches.viewChangeLog) Then
+                If commandLineArgument.Equals(globalVariables.commandLineSwitches.viewChangeLog, StringComparison.OrdinalIgnoreCase) Then
                     Dim changeLog As New Change_Log
                     changeLog.ShowDialog()
                     e.Cancel = True
                     Exit Sub
-                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.viewEventLog) Then
+                ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.viewEventLog, StringComparison.OrdinalIgnoreCase) Then
                     Dim eventLogForm As New eventLogForm
                     eventLogForm.ShowDialog()
                     e.Cancel = True
                     Exit Sub
-                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.createRestorePoint) Then
+                ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.createRestorePoint, StringComparison.OrdinalIgnoreCase) Then
                     If My.Application.CommandLineArgs.Count = 2 Then
                         If My.Application.CommandLineArgs(1).Trim.StartsWith("-name", StringComparison.OrdinalIgnoreCase) Then
                             My.Settings.savedRestorePointFromCommandLine = My.Application.CommandLineArgs(1).Trim.caseInsensitiveReplace("-name=", "")
@@ -116,7 +116,7 @@ Namespace My
                     End If
 
                     Functions.taskStuff.runProgramUsingTaskWrapper()
-                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.deleteOldRestorePoints) Then
+                ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.deleteOldRestorePoints, StringComparison.OrdinalIgnoreCase) Then
                     If Not Functions.privilegeChecks.areWeAnAdministrator() Then
                         If My.Application.CommandLineArgs.Count = 2 Then
                             ' OK, the user provided a second command line argument so let's check it out.
@@ -136,7 +136,7 @@ Namespace My
                         e.Cancel = True
                         Exit Sub
                     End If
-                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints) And Not boolAreWeAnAdministrator Then
+                ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints, StringComparison.OrdinalIgnoreCase) And Not boolAreWeAnAdministrator Then
                     ' Let's put the setting back to the default value of 0.
                     My.Settings.deleteOldRestorePointCommandLineCount = 0
                     My.Settings.Save()
@@ -227,7 +227,7 @@ Namespace My
             If Not boolAreWeInSafeMode And boolAreWeAnAdministrator And My.Application.CommandLineArgs.Count > 0 Then
                 commandLineArgument = My.Application.CommandLineArgs(0)
 
-                If commandLineArgument.stringCompare("-update") Or commandLineArgument.stringCompare("-updatewithoutuninstallinfoupdate") Then
+                If commandLineArgument.Equals("-update", StringComparison.OrdinalIgnoreCase) Or commandLineArgument.Equals("-updatewithoutuninstallinfoupdate", StringComparison.OrdinalIgnoreCase) Then
                     Functions.startupFunctions.performApplicationUpdate(commandLineArgument)
                     e.Cancel = True
                     Exit Sub
@@ -263,15 +263,15 @@ Namespace My
                     If boolAreWeAnAdministrator = True And My.Application.CommandLineArgs.Count = 1 Then
                         commandLineArgument = My.Application.CommandLineArgs(0)
 
-                        If commandLineArgument.stringCompare("-createtasks") Then
+                        If commandLineArgument.Equals("-createtasks", StringComparison.OrdinalIgnoreCase) Then
                             Functions.eventLogFunctions.writeToSystemEventLog("The program was called with an obsolete command line argument, specifically ""-createtasks"". The program has ignored the command and exited.", EventLogEntryType.Information)
                             Process.GetCurrentProcess.Kill()
-                        ElseIf commandLineArgument.stringCompare("-fixruntimetasks") Then
+                        ElseIf commandLineArgument.Equals("-fixruntimetasks", StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.repairRuntimeTasks()
 
                             e.Cancel = True
                             Exit Sub
-                        ElseIf commandLineArgument.stringCompare("-deletealltasks") Then
+                        ElseIf commandLineArgument.Equals("-deletealltasks", StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.deleteAllTasks()
                         End If
                     End If
@@ -314,7 +314,7 @@ Namespace My
                     If My.Application.CommandLineArgs.Count >= 1 Then
                         commandLineArgument = My.Application.CommandLineArgs(0)
 
-                        If commandLineArgument.stringCompare(globalVariables.commandLineSwitches.createRestorePoint) Then
+                        If commandLineArgument.Equals(globalVariables.commandLineSwitches.createRestorePoint, StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.giveSafeModeErrorMessage(boolAreWeInSafeMode)
                             Functions.eventLogFunctions.writeToSystemEventLog("Activated JumpList Task.", EventLogEntryType.Information)
 
@@ -343,7 +343,7 @@ Namespace My
 
                             e.Cancel = True
                             Exit Sub
-                        ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.createCustomRestorePoint) Then
+                        ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.createCustomRestorePoint, StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.giveSafeModeErrorMessage(boolAreWeInSafeMode)
                             Functions.eventLogFunctions.writeToSystemEventLog("Activated JumpList Task.", EventLogEntryType.Information)
 
@@ -373,7 +373,7 @@ Namespace My
 
                             e.Cancel = True
                             Exit Sub
-                        ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.scheduledRestorePoint) Then
+                        ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.scheduledRestorePoint, StringComparison.OrdinalIgnoreCase) Then
                             Dim restorePointNameForScheduledTasks As String = globalVariables.strDefaultNameForScheduledTasks
                             Dim boolExtendedLoggingForScheduledTasks As Boolean = True
                             Dim oldNewestRestorePointID As Integer
@@ -424,7 +424,7 @@ Namespace My
 
                             e.Cancel = True
                             Exit Sub
-                        ElseIf commandLineArgument.stringCompare("-restoretopoint") Then
+                        ElseIf commandLineArgument.Equals("-restoretopoint", StringComparison.OrdinalIgnoreCase) Then
                             ' The first thing we do is disable Safe Mode boot so the user doesn't get trapped in Safe Mode.
                             Functions.support.removeSafeModeBoot()
 
@@ -468,11 +468,11 @@ Namespace My
 
                             e.Cancel = True
                             Exit Sub
-                        ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.deleteOldRestorePoints) Then
+                        ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.deleteOldRestorePoints, StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.deleteOldRestorePoints()
                             e.Cancel = True
                             Exit Sub
-                        ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints) Then
+                        ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints, StringComparison.OrdinalIgnoreCase) Then
                             Dim deleteOldRestorePointCommandLineCount As Short
 
                             ' This checks if the user provided a "-count" argument.
@@ -552,7 +552,7 @@ Namespace My
 
                             e.Cancel = True
                             Exit Sub
-                        ElseIf commandLineArgument.stringCompare("-prefscleanup") Then
+                        ElseIf commandLineArgument.Equals("-prefscleanup", StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.prefsCleanup()
                         End If
                     Else

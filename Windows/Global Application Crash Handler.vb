@@ -178,61 +178,61 @@ Public Class frmCrash
                 If boolDoWeHaveAttachments = True Then Functions.wait.closePleaseWaitWindow()
                 deleteTempFiles()
 
-                If strHTTPResponse.stringCompare("ok") Then
+                If strHTTPResponse.Equals("ok", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = True
                     MsgBox("Crash data has been submitted. The program will now close.", MsgBoxStyle.Information, "Restore Point Creator Crash Reporter")
                     Me.Close()
-                ElseIf strHTTPResponse.stringCompare("error") Then
+                ElseIf strHTTPResponse.Equals("error", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
                     MsgBox("There was an error in submission. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
-                ElseIf strHTTPResponse.stringCompare("error-invalid-email") Then
+                ElseIf strHTTPResponse.Equals("error-invalid-email", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
                     MsgBox("Invalid email address. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
-                ElseIf strHTTPResponse.stringCompare("email-server-said-user-doesnt-exist") Then
+                ElseIf strHTTPResponse.Equals("email-server-said-user-doesnt-exist", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
                     MsgBox("The remote email server said that the email address doesn't exist. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
-                ElseIf strHTTPResponse.stringCompare("no-email-servers-contactable") Then
+                ElseIf strHTTPResponse.Equals("no-email-servers-contactable", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
                     MsgBox("No mail servers found, more than likely your email address is invalid. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
-                ElseIf strHTTPResponse.stringCompare("dns-error") Then
+                ElseIf strHTTPResponse.Equals("dns-error", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
                     MsgBox("The domain name doesn't exist. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
-                ElseIf strHTTPResponse.stringCompare("server-connect-error") Then
+                ElseIf strHTTPResponse.Equals("server-connect-error", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
                     MsgBox("Unable to contact mail server, more than likely your email address is invalid. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
-                ElseIf strHTTPResponse.stringCompare("error-no-crash-data-found") Then
+                ElseIf strHTTPResponse.Equals("error-no-crash-data-found", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
                     MsgBox("Something went wrong, no crash data found in submission data. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
-                ElseIf strHTTPResponse.stringCompare("error-no-program-code-found") Then
+                ElseIf strHTTPResponse.Equals("error-no-program-code-found", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
                     MsgBox("Something went wrong, no program code found in submission data. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
-                ElseIf strHTTPResponse.stringCompare("error-no-email-address-found") Then
+                ElseIf strHTTPResponse.Equals("error-no-email-address-found", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
                     MsgBox("Something went wrong, no email address found in submission data. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
-                ElseIf strHTTPResponse.stringCompare("error-no-name-found") Then
+                ElseIf strHTTPResponse.Equals("error-no-name-found", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
                     MsgBox("Something went wrong, no name found in submission data. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
-                ElseIf strHTTPResponse.stringCompare("invalid-email-syntax") Then
+                ElseIf strHTTPResponse.Equals("invalid-email-syntax", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True

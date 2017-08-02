@@ -301,11 +301,11 @@ Namespace Functions.support
                         processExecutablePathFileInfo = New IO.FileInfo(processExecutablePath)
 
                         If boolFullFilePathPassed = True Then
-                            If stringCompare(strFileName, processExecutablePathFileInfo.FullName) = True Then
+                            If strFileName.Equals(processExecutablePathFileInfo.FullName, StringComparison.OrdinalIgnoreCase) = True Then
                                 killProcess(process.Id, True)
                             End If
                         ElseIf boolFullFilePathPassed = False Then
-                            If stringCompare(strFileName, processExecutablePathFileInfo.Name) = True Then
+                            If strFileName.Equals(processExecutablePathFileInfo.Name, StringComparison.OrdinalIgnoreCase) = True Then
                                 killProcess(process.Id, True)
                             End If
                         End If
@@ -349,7 +349,7 @@ Namespace Functions.support
 
                         ' This checks to see if the programmer wants to delete the file if it exists in this function.
                         If boolDeleteTargetIfExists = True Then
-                            If stringCompare(extractionTargetFileInfo.Extension, ".exe") Then
+                            If extractionTargetFileInfo.Extension.Equals(".exe", StringComparison.OrdinalIgnoreCase) Then
                                 ' If the file is an EXE file, let's try and kill any parent processes first.
                                 If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                                     eventLogFunctions.writeToSystemEventLog(String.Format("Since this file is an EXE file we need to check for any processes that have this file as the parent executable file.{2}{2}Killing any possible processes that have a parent executable of {0}{1}{0}.", Chr(34), extractionTargetFileInfo.FullName, vbCrLf), EventLogEntryType.Information)

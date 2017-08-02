@@ -34,7 +34,7 @@ Namespace Functions.checksum
 
                         ' Now we do the actual checksum verification by passing the name of the file to the SHA256() function
                         ' which calculates the checksum of the file on disk. We then compare it to the checksum from the web.
-                        If SHA256ChecksumStream(memStream).stringCompare(checksumFromWeb) Then
+                        If SHA256ChecksumStream(memStream).Equals(checksumFromWeb, StringComparison.OrdinalIgnoreCase) Then
                             Return True ' OK, things are good; the file passed checksum verification so we return True.
                         Else
                             ' The checksums don't match. Oops.
@@ -83,7 +83,7 @@ Namespace Functions.checksum
 
                         ' Now we do the actual checksum verification by passing the name of the file to the SHA256() function
                         ' which calculates the checksum of the file on disk. We then compare it to the checksum from the web.
-                        If SHA256ChecksumFile(fileToVerify).stringCompare(checksumFromWeb) Then
+                        If SHA256ChecksumFile(fileToVerify).Equals(checksumFromWeb, StringComparison.OrdinalIgnoreCase) Then
                             Return True ' OK, things are good; the file passed checksum verification so we return True.
                         Else
                             ' The checksums don't match. Oops.

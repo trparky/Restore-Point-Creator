@@ -8,7 +8,7 @@ Namespace Functions.importExportSettings
             Dim fileInfo As New IO.FileInfo(strPathToFile)
             Dim iniFile As New IniFile
 
-            If fileInfo.Extension.stringCompare(".ini") Then
+            If fileInfo.Extension.Equals(".ini", StringComparison.OrdinalIgnoreCase) Then
                 iniFile.loadINIFileFromFile(strPathToFile)
             Else
                 Dim streamReader As New IO.StreamReader(strPathToFile)

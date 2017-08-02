@@ -53,15 +53,6 @@ Module StringExtensions
         Return (index >= 0)
     End Function
 
-    <Extension()>
-    Public Function stringCompare(str1 As String, str2 As String, Optional boolCaseInsensitive As Boolean = True) As Boolean
-        If boolCaseInsensitive = True Then
-            Return str1.Trim.Equals(str2.Trim, StringComparison.OrdinalIgnoreCase)
-        Else
-            Return str1.Trim.Equals(str2.Trim, StringComparison.Ordinal)
-        End If
-    End Function
-
     ''' <summary>This function performs RegEx search on a String. This function operates a lot like Contains().</summary>
     ''' <param name="needle">The String containing what you want to search for.</param>
     ''' <param name="boolDoEscaping">A Boolean value. Normally you would pass a correct RegEx pattern to this function so normally this value would be False.</param>

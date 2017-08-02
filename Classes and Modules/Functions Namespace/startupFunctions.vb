@@ -400,7 +400,7 @@ Namespace Functions.startupFunctions
 
                     Dim restorePointCreatorMainEXEName As String = currentProcessFileName.caseInsensitiveReplace(".new.exe", "")
 
-                    If commandLineArgument.stringCompare("-update") Then
+                    If commandLineArgument.Equals("-update", StringComparison.OrdinalIgnoreCase) Then
                         registryStuff.updateRestorePointCreatorUninstallationInfo()
 
                         If globalVariables.version.boolBeta = True Then

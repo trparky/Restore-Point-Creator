@@ -24,7 +24,7 @@
                 eventInstance = logReader.ReadEvent()
 
                 While eventInstance IsNot Nothing
-                    If eventInstance.ProviderName.stringCompare(globalVariables.eventLog.strSystemRestorePointCreator) Or eventInstance.ProviderName.caseInsensitiveContains(globalVariables.eventLog.strSystemRestorePointCreator) Then
+                    If eventInstance.ProviderName.Equals(globalVariables.eventLog.strSystemRestorePointCreator, StringComparison.OrdinalIgnoreCase) Or eventInstance.ProviderName.caseInsensitiveContains(globalVariables.eventLog.strSystemRestorePointCreator) Then
                         Try
                             itemAdd = New myListViewItemTypes.eventLogListEntry(eventInstance.LevelDisplayName)
                         Catch ex As Eventing.Reader.EventLogNotFoundException
