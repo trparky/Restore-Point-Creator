@@ -477,6 +477,8 @@ Public Class Form1
                 toolStripAutomaticallyCheckForUpdates.Checked = True
                 Threading.ThreadPool.QueueUserWorkItem(Sub() formLoadCheckForUpdatesRoutine())
             End If
+        Catch ex2 As IO.IOException
+            handleConfigFileAccessViolation(ex2)
         Catch ex As Exception
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
@@ -2213,10 +2215,22 @@ Public Class Form1
             systemRestorePointsList.Select()
 
             My.Settings.boolFirstRun = False
+        Catch ex2 As IO.IOException
+            handleConfigFileAccessViolation(ex2)
         Catch ex As Exception
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, "Main Form Load" & vbCrLf & vbCrLf & ex.Message, ex.StackTrace, ex.GetType)
         End Try
+    End Sub
+
+    Private Sub handleConfigFileAccessViolation(ex As IO.IOException)
+        If ex.Message.caseInsensitiveContains("user.config") Then
+            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeToSystemEventLog("Unable to open application settings file, it appears to be locked by another process.", EventLogEntryType.Error)
+            MsgBox("Unable to open application settings file, it appears to be locked by another process." & vbCrLf & vbCrLf & "The program will now close.", MsgBoxStyle.Critical, "Restore Point Creator")
+
+            Process.GetCurrentProcess.Kill()
+        End If
     End Sub
 
     Private Sub systemRestorePointsList_ColumnClick(sender As Object, e As ColumnClickEventArgs) Handles systemRestorePointsList.ColumnClick
