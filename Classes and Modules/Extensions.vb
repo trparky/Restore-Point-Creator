@@ -50,7 +50,7 @@ Module StringExtensions
     <Extension()>
     Public Function caseInsensitiveContains(haystack As String, needle As String) As Boolean
         Dim index As Integer = haystack.IndexOf(needle, StringComparison.OrdinalIgnoreCase)
-        Return (index > 0)
+        Return (index >= 0)
     End Function
 
     ''' <summary>This function performs RegEx search on a String. This function operates a lot like Contains().</summary>
