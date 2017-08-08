@@ -11,7 +11,10 @@
             Try
                 If globalVariables.windows.frmPleaseWait IsNot Nothing Then
                     If parentForm Is Nothing Then
-                        If globalVariables.windows.frmPleaseWait IsNot Nothing Then globalVariables.windows.frmPleaseWait.ShowDialog()
+                        If globalVariables.windows.frmPleaseWait IsNot Nothing Then
+                            Threading.Thread.Sleep(50)
+                            globalVariables.windows.frmPleaseWait.ShowDialog()
+                        End If
                     Else
                         If globalVariables.windows.frmPleaseWait IsNot Nothing Then
                             Dim _parentForm As Form = parentForm
