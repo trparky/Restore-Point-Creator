@@ -6,7 +6,7 @@ Namespace Functions.registryStuff
         Public Function getFileAssociation(ByVal fileExtension As String, ByRef associatedApplication As String) As Boolean
             Try
                 fileExtension = fileExtension.ToLower.Trim
-                If fileExtension.StartsWith(".") = False Then
+                If Not fileExtension.StartsWith(".") Then
                     fileExtension = "." & fileExtension
                 End If
 
@@ -31,7 +31,7 @@ Namespace Functions.registryStuff
                 If installerRegistryPath IsNot Nothing Then
                     displayName = installerRegistryPath.GetValue("DisplayName", "")
 
-                    If displayName.caseInsensitiveContains("restore point creator") = True Then
+                    If displayName.caseInsensitiveContains("restore point creator") Then
                         If globalVariables.version.boolBeta Then
                             installerRegistryPath.SetValue("DisplayName", String.Format("Restore Point Creator version {0} Public Beta {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion), RegistryValueKind.String)
                         ElseIf globalVariables.version.boolReleaseCandidate Then
@@ -137,13 +137,13 @@ Namespace Functions.registryStuff
             Try
                 Dim boolTemp As Boolean, strDefaultValue As String
 
-                If boolDefaultValue = True Then
+                If boolDefaultValue Then
                     strDefaultValue = globalVariables.booleans.strTrue
                 Else
                     strDefaultValue = globalVariables.booleans.strFalse
                 End If
 
-                If Boolean.TryParse(registryObject.GetValue(valueToGetFromRegistry, strDefaultValue), boolTemp) = False Then
+                If Not Boolean.TryParse(registryObject.GetValue(valueToGetFromRegistry, strDefaultValue), boolTemp) Then
                     boolTemp = boolDefaultValue
                 End If
 
