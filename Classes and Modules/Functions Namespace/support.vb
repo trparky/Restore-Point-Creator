@@ -511,7 +511,7 @@ Namespace Functions.support
                 Dim processObject As New Process()
                 processObject.StartInfo.FileName = commandToExecute
 
-                If commandLineArgument <> Nothing Then
+                If commandLineArgument IsNot Nothing Then
                     processObject.StartInfo.Arguments = commandLineArgument
                 End If
 

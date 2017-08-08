@@ -81,7 +81,7 @@ Public Class Form1
                 If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint\command", False) IsNot Nothing Then
                     valueInRegistry = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint\command", False).GetValue(vbNullString, Nothing)
 
-                    If valueInRegistry <> Nothing Then
+                    If valueInRegistry IsNot Nothing Then
                         ' We check if the current Registry path is different than the current process's EXE path.
                         If valueInRegistry.caseInsensitiveContains(Application.ExecutablePath) = False Then
                             ' OK, it doesn't match the current process's EXE path.
@@ -115,7 +115,7 @@ Public Class Form1
                 If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point\command", False) IsNot Nothing Then
                     valueInRegistry = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point\command", False).GetValue(vbNullString, Nothing)
 
-                    If valueInRegistry <> Nothing Then
+                    If valueInRegistry IsNot Nothing Then
                         ' We check if the current Registry path is different than the current process's EXE path.
                         If valueInRegistry.caseInsensitiveContains(Application.ExecutablePath) = False Then
                             ' OK, it doesn't match the current process's EXE path.
@@ -151,7 +151,7 @@ Public Class Form1
                     ' OK, it does exist so let's go on with the process of checking for the validity of the entries.
                     valueInRegistry = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator\command", False).GetValue(vbNullString, Nothing)
 
-                    If valueInRegistry <> Nothing Then
+                    If valueInRegistry IsNot Nothing Then
                         ' We check if the current Registry path is different than the current process's EXE path.
                         If valueInRegistry.caseInsensitiveContains(Application.ExecutablePath) = False Then
                             ' OK, it doesn't match the current process's EXE path.
@@ -1979,7 +1979,7 @@ Public Class Form1
     End Sub
 
     Private Sub txtRestorePointDescription_TextChanged(sender As Object, e As EventArgs) Handles txtRestorePointDescription.TextChanged
-        If txtRestorePointDescription.Text.caseInsensitiveContains(strTypeYourRestorePointName) = False And txtRestorePointDescription.Text.Trim <> Nothing And Functions.support.areWeInSafeMode() = False Then
+        If txtRestorePointDescription.Text.caseInsensitiveContains(strTypeYourRestorePointName) = False And txtRestorePointDescription.Text.Trim IsNot Nothing And Functions.support.areWeInSafeMode() = False Then
             btnCreate.Enabled = True
         ElseIf txtRestorePointDescription.Text.caseInsensitiveContains(strTypeYourRestorePointName) = True Then
             doTheGrayingOfTheRestorePointNameTextBox()

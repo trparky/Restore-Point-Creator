@@ -122,7 +122,7 @@ Public Class Disk_Space_Usage
                         ' Creates the Drive or Mount Point data label.
 
                         ' If the drive has no drive label, why display one?
-                        If currentDrive.VolumeLabel <> Nothing Then
+                        If currentDrive.VolumeLabel IsNot Nothing Then
                             ' Creates the "Drive Label:" header.
                             xPosition = createLabel("Drive Label:", xPosition + 10, yPosition, True)
 

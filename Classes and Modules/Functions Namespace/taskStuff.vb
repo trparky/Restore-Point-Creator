@@ -202,7 +202,7 @@ Namespace Functions.taskStuff
                 Dim strEvery As String = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Every", Nothing)
 
                 ' Checks to see if the value in the Registry existed, if it exists then it shouldn't equal "nothing".
-                If strEvery <> Nothing Then
+                If strEvery IsNot Nothing Then
                     ' Good, the Every setting existed in the Registry. So let's continue the work here.
 
                     Dim shortEvery As Short ' Creates a Short variable with a name of everyShort.
