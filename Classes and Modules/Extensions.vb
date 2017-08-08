@@ -11,7 +11,6 @@ Module DateExtensions
             inputDate = DateAdd(DateInterval.Hour, -1, inputDate)
         End If
 
-        'Return DateDiff(DateInterval.Second, #1/1/1970#, inputDate)
         Return DateDiff(DateInterval.Second, New DateTime(1970, 1, 1, 0, 0, 0, 0), inputDate)
     End Function
 End Module
