@@ -3,25 +3,6 @@ Imports Microsoft.Win32
 
 Namespace Functions.registryStuff
     Module registryStuff
-        Private Function getFileTypeHandler(fileType As String) As String
-            Try
-                Dim registryKey As RegistryKey = Registry.ClassesRoot.OpenSubKey(fileType, False)
-
-                If registryKey IsNot Nothing Then
-                    Dim fileTypeNameInRegistry As String = registryKey.GetValue("")
-                    Dim registryKey2 As RegistryKey = Registry.ClassesRoot.OpenSubKey(fileTypeNameInRegistry & "\shell\open\command", False)
-
-                    If registryKey2 IsNot Nothing Then
-                        Return registryKey2.GetValue("").ToString.Replace("""", "").Replace("%1", "").Trim
-                    End If
-                End If
-
-                Return ""
-            Catch ex As Exception
-                Return ""
-            End Try
-        End Function
-
         Public Function getFileAssociation(ByVal fileExtension As String, ByRef associatedApplication As String) As Boolean
             Try
                 fileExtension = fileExtension.ToLower.Trim
