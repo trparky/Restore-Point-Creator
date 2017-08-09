@@ -257,6 +257,7 @@ Public Class Disk_Space_Usage
     End Sub
 
     Private Sub Disk_Space_Usage_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        threadMaximumSizeSettingThread.Abort()
         My.Settings.DiskSpaceUsageWindowLocation = Me.Location
         globalVariables.windows.frmDiskSpaceUsageWindow.Dispose()
         globalVariables.windows.frmDiskSpaceUsageWindow = Nothing
@@ -323,7 +324,6 @@ Public Class Disk_Space_Usage
     End Sub
 
     Private Sub Disk_Space_Usage_Resize(sender As Object, e As EventArgs) Handles Me.Resize
-        If Me.Width <> 859 Then Me.Width = 859
         doTheResizingOfTheBars()
     End Sub
 
@@ -392,11 +392,6 @@ Public Class Disk_Space_Usage
         Try
             Me.Size = My.Settings.diskUsageWindowSize
             chkShowFullDisksAsRed.Checked = My.Settings.ShowFullDisksAsRed
-
-            If Me.Size.Width <> 859 Then
-                Me.Size = New Size(859, Me.Size.Height)
-                My.Settings.diskUsageWindowSize = Me.Size
-            End If
         Catch ex As Exception
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
@@ -424,7 +419,27 @@ Public Class Disk_Space_Usage
         Next
     End Sub
 
+    Private threadMaximumSizeSettingThread As Threading.Thread
+
     Private Sub Disk_Space_Usage_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.MaximumSize = New Size(859, Screen.FromControl(Me).Bounds.Height)
         Me.Location = Functions.support.verifyWindowLocation(My.Settings.DiskSpaceUsageWindowLocation)
+
+        ' I know that this is a hack but I can't seem to find the proper system event
+        ' to handle resetting the screen height limitations when changing monitors.
+        threadMaximumSizeSettingThread = New Threading.Thread(AddressOf maximumSizeSettingThreadSub)
+        threadMaximumSizeSettingThread.IsBackground = True
+        threadMaximumSizeSettingThread.Priority = Threading.ThreadPriority.Lowest
+        threadMaximumSizeSettingThread.Start()
+    End Sub
+
+    Private Sub maximumSizeSettingThreadSub()
+        Try
+startAgain:
+            Me.MaximumSize = New Size(859, Screen.FromControl(Me).Bounds.Height)
+            Threading.Thread.Sleep(500)
+            GoTo startAgain
+        Catch ex As Exception
+        End Try
     End Sub
 End Class

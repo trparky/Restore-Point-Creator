@@ -99,7 +99,7 @@ Partial Class Disk_Space_Usage
         Me.Icon = Global.Restore_Point_Creator.My.Resources.Resources.RestorePoint_noBackground_2
         Me.KeyPreview = True
         Me.MaximizeBox = False
-        Me.MinimumSize = New System.Drawing.Size(756, 229)
+        Me.MinimumSize = New System.Drawing.Size(859, 229)
         Me.Name = "Disk_Space_Usage"
         Me.Text = "Disk Space Usage"
         Me.ResumeLayout(False)
