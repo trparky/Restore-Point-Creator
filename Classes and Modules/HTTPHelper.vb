@@ -235,7 +235,7 @@ End Class
 
 ''' <summary>Allows you to easily POST and upload files to a remote HTTP server without you, the programmer, knowing anything about how it all works. This class does it all for you. It handles adding a User Agent String, additional HTTP Request Headers, string data to your HTTP POST data, and files to be uploaded in the HTTP POST data.</summary>
 Public Class httpHelper
-    Private Const classVersion As String = "1.295"
+    Private Const classVersion As String = "1.300"
 
     Private strUserAgentString As String = Nothing
     Private boolUseProxy As Boolean = False
@@ -591,7 +591,7 @@ Public Class httpHelper
     ''' <param name="throwExceptionIfDataAlreadyExists">This tells the function if it should throw an exception if the data already exists in the POST data.</param>
     ''' <exception cref="dataAlreadyExistsException">If this function throws a dataAlreadyExistsException, you forgot to add some data for your POST variable.</exception>
     Public Sub addPOSTData(strName As String, strValue As String, Optional throwExceptionIfDataAlreadyExists As Boolean = False)
-        If strValue.Trim = Nothing Then
+        If String.IsNullOrEmpty(strValue.Trim) Then
             lastException = New dataMissingException(String.Format("Data was missing for the {0}{1}{0} POST variable.", Chr(34), strName))
             Throw lastException
         End If
@@ -610,7 +610,7 @@ Public Class httpHelper
     ''' <param name="strValue">The value of the data to post.</param>
     ''' <exception cref="dataAlreadyExistsException">If this function throws a dataAlreadyExistsException, you forgot to add some data for your POST variable.</exception>
     Public Sub addGETData(strName As String, strValue As String, Optional throwExceptionIfDataAlreadyExists As Boolean = False)
-        If strValue.Trim = Nothing Then
+        If String.IsNullOrEmpty(strValue.Trim) Then
             lastException = New dataMissingException(String.Format("Data was missing for the {0}{1}{0} GET variable.", Chr(34), strName))
             Throw lastException
         End If
@@ -749,7 +749,7 @@ Public Class httpHelper
                 .remoteFileName = strRemoteFileName
             }
 
-            If strContentType = Nothing Then
+            If String.IsNullOrEmpty(strContentType) Then
                 Dim contentType As String
                 Dim regPath As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(fileInfo.Extension.ToLower, False)
 
@@ -760,7 +760,7 @@ Public Class httpHelper
                     contentType = regPath.GetValue("Content Type", Nothing).ToString
                 End If
 
-                If contentType = Nothing Then
+                If String.IsNullOrEmpty(contentType) Then
                     lastException = New noMimeTypeFoundException("No MIME Type found for " & fileInfo.Extension.ToLower)
                     Throw lastException
                 Else
@@ -1342,7 +1342,7 @@ beginAgain:
                     If TypeOf entry.Value Is FormFile Then
                         formFileObjectInstance = DirectCast(entry.Value, FormFile)
 
-                        If formFileObjectInstance.remoteFileName = Nothing Then
+                        If String.IsNullOrEmpty(formFileObjectInstance.remoteFileName) Then
                             fileInfo = New FileInfo(formFileObjectInstance.localFilePath)
 
                             header = String.Format("Content-Disposition: form-data; name={0}{1}{0}; filename={0}{2}{0}", Chr(34), entry.Key, fileInfo.Name)
