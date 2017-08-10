@@ -1629,6 +1629,7 @@ Public Class Form1
         Dim listViewItem As myListViewItemTypes.restorePointEntryItem
         Dim listOfRestorePoints As New List(Of myListViewItemTypes.restorePointEntryItem)
         Dim restorePointAge As Double
+        Dim stopWatch As Stopwatch = Stopwatch.StartNew()
 
         Try
             btnRefreshRestorePoints.Text = "Abort Refreshing System Restore Points"
@@ -1718,6 +1719,9 @@ Public Class Form1
                         If listOfRestorePoints.Count = 0 Then
                             newestSystemRestoreID = 0
                         Else
+                            stopWatch.Stop()
+                            If stopWatch.Elapsed.Milliseconds < 1000 Then Threading.Thread.Sleep(1000 - stopWatch.Elapsed.Milliseconds)
+
                             ' Adds the list of System Restore Points that we created earlier in this routine to the System Restore Points list on the GUI.
                             systemRestorePointsList.Items.AddRange(listOfRestorePoints.ToArray())
 

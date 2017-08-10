@@ -87,6 +87,7 @@ Public Class Disk_Space_Usage
             Dim usedSpacePercentage, freeSpacePercentage, shadowStorageUsedPercentage, shadowStorageFreeSpacePercentage As Double
             Dim yPosition As Integer = 10
             Dim xPosition As Integer = 12
+            Dim stopWatch As Stopwatch = Stopwatch.StartNew()
 
             For Each currentDrive As IO.DriveInfo In My.Computer.FileSystem.Drives
                 xPosition = 12 ' Resets the X position back to the beginning of the line.
@@ -238,7 +239,12 @@ Public Class Disk_Space_Usage
                 Catch ex As IO.IOException
 
                 End Try
+
+                Threading.Thread.Sleep(100)
             Next
+
+            stopWatch.Stop()
+            If stopWatch.Elapsed.Milliseconds < 1000 Then Threading.Thread.Sleep(1000 - stopWatch.Elapsed.Milliseconds)
         Catch ex As Exception
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)

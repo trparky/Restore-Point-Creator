@@ -83,6 +83,8 @@
         loadEventLogData(globalVariables.eventLog.strApplication, eventLogContents)
         loadEventLogData(globalVariables.eventLog.strSystemRestorePointCreator, eventLogContents)
 
+        If timeStamp.Elapsed.Milliseconds < 1000 Then Threading.Thread.Sleep(1000 - timeStamp.Elapsed.Milliseconds)
+
         Me.Invoke(Sub()
                       lblLogEntryCount.Text = "Entries in Event Log: " & eventLogContents.Count.ToString("N0")
                       loadEventLogContentsIntoList()

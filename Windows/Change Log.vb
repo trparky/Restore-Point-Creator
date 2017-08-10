@@ -32,6 +32,7 @@
 
             Dim changeLogData As String = Nothing
             Dim httpHelper As httpHelper = Functions.http.createNewHTTPHelperObject()
+            Dim stopWatch As Stopwatch = Stopwatch.StartNew()
 
             Try
                 If httpHelper.getWebData(globalVariables.webURLs.core.strFullChangeLog, changeLogData) = True Then
@@ -40,6 +41,9 @@
 
                     Me.Invoke(Sub() RichTextBox1.Rtf = changeLogData)
                     changeLogData = Nothing
+
+                    stopWatch.Stop()
+                    If stopWatch.Elapsed.Milliseconds < 1000 Then Threading.Thread.Sleep(1000 - stopWatch.Elapsed.Milliseconds)
                 Else
                     Me.Invoke(Sub() RichTextBox1.Text = "There was an error loading the official changelog.")
                     Exit Sub
