@@ -208,8 +208,7 @@ Public Class Official_Contact_Form
     Private Sub btnAttachEventLogs_Click(sender As Object, e As EventArgs) Handles btnAttachEventLogs.Click
         Try
             Dim logCount As ULong = 0
-            Dim timeStamp As New Stopwatch
-            timeStamp.Start()
+            Dim timeStamp As Stopwatch = Stopwatch.StartNew()
 
             If Functions.eventLogFunctions.exportLogsToFile(strFileToHaveDataExportedTo, logCount) Then
                 timeStamp.Stop()

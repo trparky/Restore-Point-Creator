@@ -78,8 +78,7 @@
         Invoke(Sub() Me.Cursor = Cursors.WaitCursor)
         eventLogContents.Clear() ' Cleans our cached log entries in memory.
 
-        Dim timeStamp As New Stopwatch
-        timeStamp.Start()
+        Dim timeStamp As Stopwatch = Stopwatch.StartNew()
 
         loadEventLogData(globalVariables.eventLog.strApplication, eventLogContents)
         loadEventLogData(globalVariables.eventLog.strSystemRestorePointCreator, eventLogContents)
