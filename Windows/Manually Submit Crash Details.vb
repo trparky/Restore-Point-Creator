@@ -185,7 +185,7 @@
     End Sub
 
     Private Sub btnSubmitData_Click(sender As Object, e As EventArgs) Handles btnSubmitData.Click
-        If txtEmail.Text.Trim = Nothing Then
+        If String.IsNullOrEmpty(txtEmail.Text.Trim) Then
             MsgBox("You must provide your email address.", MsgBoxStyle.Critical, Me.Text)
             Exit Sub
         End If

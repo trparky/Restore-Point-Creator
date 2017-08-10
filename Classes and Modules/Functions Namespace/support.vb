@@ -676,7 +676,7 @@ Namespace Functions.support
                 With shortCut
                     .TargetPath = pathToExecutable
 
-                    If (arguments = Nothing) = False Then
+                    If Not String.IsNullOrEmpty(arguments) Then
                         .Arguments = arguments
                     End If
 

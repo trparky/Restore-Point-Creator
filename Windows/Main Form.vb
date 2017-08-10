@@ -921,7 +921,7 @@ Public Class Form1
         If txtRestorePointDescription.Text.caseInsensitiveContains(strTypeYourRestorePointName) = True Then
             txtRestorePointDescription.ForeColor = Color.DimGray
             btnCreate.Enabled = False
-        ElseIf txtRestorePointDescription.Text.Trim = Nothing Then
+        ElseIf String.IsNullOrEmpty(txtRestorePointDescription.Text.Trim) Then
             txtRestorePointDescription.Text = strTypeYourRestorePointName
             txtRestorePointDescription.ForeColor = Color.DimGray
             btnCreate.Enabled = False
@@ -3199,7 +3199,7 @@ Public Class Form1
             Exit Sub
         End If
 
-        If txtRestorePointDescription.Text = Nothing Then Exit Sub
+        If String.IsNullOrEmpty(txtRestorePointDescription.Text) Then Exit Sub
 
         txtRestorePointDescription.Text = txtRestorePointDescription.Text.Trim
 

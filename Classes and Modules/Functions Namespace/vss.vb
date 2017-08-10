@@ -140,7 +140,7 @@
                 Dim shadowStorageUsePercentage As Double
 
                 If shadowStorageStatistics IsNot Nothing And boolGetVSSDataResult = True Then
-                    If (shadowStorageStatistics.UsedSpace = Nothing) = False And (shadowStorageStatistics.MaxSpace = Nothing) = False Then
+                    If Not shadowStorageStatistics.UsedSpace.Equals(Nothing) And Not shadowStorageStatistics.MaxSpace.Equals(Nothing) Then
                         shadowStorageUsePercentage = support.calculatePercentageValue(shadowStorageStatistics.UsedSpace, shadowStorageStatistics.MaxSpace)
 
                         If shadowStorageUsePercentage > globalVariables.warningPercentage Then
