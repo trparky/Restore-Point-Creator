@@ -141,21 +141,25 @@ Namespace Functions.support
             Try
                 Dim exceptionType As Type = rawExceptionObject.GetType
 
-                If exceptionType.Equals(GetType(IO.FileNotFoundException)) Or
-                    exceptionType.Equals(GetType(IO.FileLoadException)) Or
-                    exceptionType.Equals(GetType(Runtime.InteropServices.COMException)) Or
-                    exceptionType.Equals(GetType(IO.IOException)) Or
-                    exceptionType.Equals(GetType(ArgumentOutOfRangeException)) Or
-                    exceptionType.Equals(GetType(FormatException)) Or
-                    exceptionType.Equals(GetType(ComponentModel.Win32Exception)) Or
-                    exceptionType.Equals(GetType(XPath.XPathException)) Or
-                    exceptionType.Equals(GetType(XmlException)) Or
-                    exceptionType.Equals(GetType(InvalidOperationException)) Or
-                    exceptionType.Equals(GetType(myExceptions.integerTryParseException)) Or
-                    exceptionType.Equals(GetType(IO.DirectoryNotFoundException)) Or
-                    exceptionType.Equals(GetType(Management.ManagementException)) Or
-                    exceptionType.Equals(GetType(ObjectDisposedException)) Then
+                Dim listExceptionTypes As New List(Of Type) From {
+                    GetType(IO.FileNotFoundException),
+                    GetType(IO.FileLoadException),
+                    GetType(Runtime.InteropServices.COMException),
+                    GetType(IO.IOException),
+                    GetType(ArgumentOutOfRangeException),
+                    GetType(FormatException),
+                    GetType(ComponentModel.Win32Exception),
+                    GetType(XPath.XPathException),
+                    GetType(XmlException),
+                    GetType(InvalidOperationException),
+                    GetType(myExceptions.integerTryParseException),
+                    GetType(IO.DirectoryNotFoundException),
+                    GetType(Management.ManagementException),
+                    GetType(ObjectDisposedException),
+                    GetType(StackOverflowException)
+                }
 
+                If listExceptionTypes.Contains(exceptionType) Then
                     stringBuilder.AppendLine()
                     stringBuilder.AppendLine("Additional " & rawExceptionObject.GetType.ToString & " Data")
 
@@ -219,6 +223,10 @@ Namespace Functions.support
                         Dim Win32ExceptionObject As ComponentModel.Win32Exception = DirectCast(rawExceptionObject, ComponentModel.Win32Exception)
                         stringBuilder.AppendLine(String.Format("Error Code: {0} ({1})", Win32ExceptionObject.ErrorCode, convertErrorCodeToHex(Win32ExceptionObject.ErrorCode)))
                         stringBuilder.AppendLine(String.Format("Native Error Code: {0} ({1})", Win32ExceptionObject.NativeErrorCode, convertErrorCodeToHex(Win32ExceptionObject.NativeErrorCode)))
+                    ElseIf exceptionType.Equals(GetType(StackOverflowException)) Then
+                        Dim StackOverflowExceptionObject As StackOverflowException = DirectCast(rawExceptionObject, StackOverflowException)
+                        stringBuilder.AppendLine(String.Format("Source: {0}", StackOverflowExceptionObject.Source))
+                        addJSONedExtendedExceptionDataPackage(StackOverflowExceptionObject, stringBuilder)
                     End If
 
                     addJSONedExtendedExceptionDataPackage(rawExceptionObject, stringBuilder)
