@@ -13,18 +13,13 @@ Namespace Functions
 
         ''' <summary>This saves any and all changes to the system Registry.</summary>
         Public Sub save()
-            If boolThingsChanged Then
-                saveStagedPendingOperations()
-            End If
+            If boolThingsChanged Then saveStagedPendingOperations()
         End Sub
 
         ''' <summary>This closes out this class instance.</summary>
         ''' <param name="boolSaveChanges">This is an optional parameter. Set to True if you want to save any and all changes back to the system Registry.</param>
         Public Sub dispose(Optional boolSaveChanges As Boolean = False)
-            If boolSaveChanges And boolThingsChanged Then
-                saveStagedPendingOperations()
-            End If
-
+            If boolSaveChanges And boolThingsChanged Then saveStagedPendingOperations()
             pendingOperations.Clear()
         End Sub
 
@@ -32,7 +27,7 @@ Namespace Functions
         ''' <param name="strFileToBeRemoved">The name of the file that's in the operations queue that needs to be removed.</param>
         ''' <param name="boolExactMatch">This is an optional parameter. If True then the function will do an exact match check, if False the function will simply remove an item from the operations queue if the file to be worked on contains the value of the strFileToBeRemoved input parameter.</param>
         Public Sub removeItem(strFileToBeRemoved As String, Optional boolExactMatch As Boolean = False)
-            If pendingOperations.Count <> 0 Then
+            If Not pendingOperations.Count.Equals(0) Then
                 For Each item As deleteAtRebootClass In pendingOperations
                     If boolExactMatch Then
                         If item.strFileToBeWorkedOn.Equals(strFileToBeRemoved, StringComparison.OrdinalIgnoreCase) Then
@@ -91,7 +86,7 @@ Namespace Functions
                         strFileToBeWorkedOn = pendingOperations(i).Replace("\??\", "")
                         strFileToBeRenamedTo = pendingOperations(i + 1).Replace("\??\", "")
 
-                        If pendingOperations(i + 1).Trim = "" Then
+                        If String.IsNullOrEmpty(pendingOperations(i + 1).Trim) Then
                             _pendingOperations.Add(New deleteAtRebootClass(strFileToBeWorkedOn))
                         Else
                             _pendingOperations.Add(New deleteAtRebootClass(strFileToBeWorkedOn, strFileToBeRenamedTo))
