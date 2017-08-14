@@ -118,7 +118,9 @@ Namespace Functions.support
 
         Public Function convertErrorCodeToHex(input As Long) As String
             Try
-                Return input.ToString("x").caseInsensitiveReplace("ffffffff", "0x").ToString.ToUpper
+            	Dim strHexValue As String = input.ToString("x").caseInsensitiveReplace("ffffffff", "0x").ToString.ToUpper
+            	If Not strHexValue.StartsWith("0x", StringComparison.OrdinalIgnoreCase) Then strHexValue = "0x" & strHexValue
+                Return strHexValue
             Catch ex As Exception
                 Return Nothing
             End Try
