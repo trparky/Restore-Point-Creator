@@ -25,6 +25,7 @@
 #End Region
 
     Private shortCountDown As Short = 30
+    Private currentScreen As Screen = Screen.FromControl(Me)
 
     Sub loadChangeLogData()
         Try
@@ -82,6 +83,7 @@
     End Sub
 
     Private Sub Update_Message_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.MaximumSize = New Size(788, Screen.FromControl(Me).Bounds.Height)
         PictureBox1.Image = SystemIcons.Information.ToBitmap()
         Control.CheckForIllegalCrossThreadCalls = False
         chkShowPartialBetaChangeLogs.Checked = My.Settings.showPartialBetaChangeLogs
@@ -173,10 +175,6 @@
         Threading.ThreadPool.QueueUserWorkItem(AddressOf loadChangeLogData)
     End Sub
 
-    Private Sub Update_Message_Resize(sender As Object, e As EventArgs) Handles Me.Resize
-        If Me.Width <> 788 Then Me.Width = 788
-    End Sub
-
     Private Sub chkShowPartialBetaChangeLogs_Click(sender As Object, e As EventArgs) Handles chkShowPartialBetaChangeLogs.Click
         disableCountdown()
         txtChanges.Text = "Loading Change Log Data... Please Wait."
@@ -222,5 +220,18 @@
 
     Private Sub txtChanges_Click(sender As Object, e As EventArgs) Handles txtChanges.Click
         Me.BringToFront()
+    End Sub
+
+    Private Sub Update_Message_LocationChanged(sender As Object, e As EventArgs) Handles Me.LocationChanged
+        Try
+            If currentScreen IsNot Nothing Then
+                If Not currentScreen.Equals(Screen.FromControl(Me)) Then
+                    currentScreen = Screen.FromControl(Me)
+                    Me.MaximumSize = New Size(788, Screen.FromControl(Me).Bounds.Height)
+                End If
+            End If
+        Catch ex As Exception
+            ' Does nothing.
+        End Try
     End Sub
 End Class
