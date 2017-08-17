@@ -1,8 +1,8 @@
 ﻿Public Class eventLogForm
     Private m_SortingColumn As ColumnHeader
-    Private eventLogLoadingThread As Threading.Thread
     Private boolDoneLoading As Boolean = False
     Private oldSplitterDifference As Integer
+    Private boolAreWeLoadingTheEventLogData As Boolean = False
 
     Private rawSearchTerms As String = Nothing
     Private previousSearchType As Search_Event_Log.searceType
@@ -75,6 +75,7 @@
     End Sub
 
     Sub loadEventLog()
+        boolAreWeLoadingTheEventLogData = True
         Invoke(Sub() Me.Cursor = Cursors.WaitCursor)
         eventLogContents.Clear() ' Cleans our cached log entries in memory.
 
@@ -91,9 +92,9 @@
 
                       Me.Cursor = Cursors.Default
                       boolDoneLoading = True
-                      eventLogLoadingThread = Nothing
+                      boolAreWeLoadingTheEventLogData = False
 
-                      Functions.wait.closePleaseWaitWindow()
+                      closePleaseWaitPanel()
                       timeStamp.Stop()
                       lblProcessedIn.Text = String.Format("Event Log Loaded and Processed in {0}ms ({1} seconds).", timeStamp.ElapsedMilliseconds.ToString("N0"), Math.Round(timeStamp.Elapsed.TotalSeconds, 2))
                   End Sub)
@@ -106,18 +107,13 @@
             globalVariables.windows.eventLogForm.Dispose()
             globalVariables.windows.eventLogForm = Nothing
         End If
-
-        If eventLogLoadingThread IsNot Nothing Then
-            eventLogLoadingThread.Abort()
-        End If
     End Sub
 
     Private Sub eventLogForm_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         If e.KeyCode = Keys.F5 Then
-            If eventLogLoadingThread Is Nothing Then
-                Functions.wait.createPleaseWaitWindow("Loading Event Log Data... Please Wait.", False, enums.howToCenterWindow.parent, False)
+            If Not boolAreWeLoadingTheEventLogData Then
+                openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
                 Threading.ThreadPool.QueueUserWorkItem(AddressOf loadEventLog)
-                Functions.wait.openPleaseWaitWindow()
             End If
         End If
     End Sub
@@ -238,10 +234,9 @@
     End Sub
 
     Private Sub btnRefreshEvents_Click(sender As Object, e As EventArgs) Handles btnRefreshEvents.Click
-        If eventLogLoadingThread Is Nothing Then
-            Functions.wait.createPleaseWaitWindow("Loading Event Log Data... Please Wait.", False, enums.howToCenterWindow.parent, False)
+        If Not boolAreWeLoadingTheEventLogData Then
+            openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
             Threading.ThreadPool.QueueUserWorkItem(AddressOf loadEventLog)
-            Functions.wait.openPleaseWaitWindow()
         End If
     End Sub
 
@@ -293,9 +288,8 @@
 
         boolDoneLoading = True
 
-        Functions.wait.createPleaseWaitWindow("Loading Event Log Data... Please Wait.", False, enums.howToCenterWindow.parent, False)
+        openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
         Threading.ThreadPool.QueueUserWorkItem(AddressOf loadEventLog)
-        Functions.wait.openPleaseWaitWindow()
     End Sub
 
     Private Sub chkAskMeToSubmitIfViewingAnExceptionEntry_Click(sender As Object, e As EventArgs) Handles chkAskMeToSubmitIfViewingAnExceptionEntry.Click
@@ -440,4 +434,77 @@
         eventLogList.Items.AddRange(eventLogContents.ToArray())
         eventLogList.Sort()
     End Sub
+
+#Region "--== Please Wait Panel Code ==--"
+    Private strPleaseWaitLabelText As String
+
+    Private Sub centerPleaseWaitPanel()
+        pleaseWaitPanel.Location = New Point(
+            (Me.ClientSize.Width / 2) - (pleaseWaitPanel.Size.Width / 2),
+            (Me.ClientSize.Height / 2) - (pleaseWaitPanel.Size.Height / 2))
+        pleaseWaitPanel.Anchor = AnchorStyles.None
+    End Sub
+
+    Private Sub openPleaseWaitPanel(strInputPleaseWaitLabelText As String)
+        btnRefreshEvents.Enabled = False
+        btnOpenEventLog.Enabled = False
+        btnSearch.Enabled = False
+        btnClear.Enabled = False
+        btnExportLogs.Enabled = False
+        chkAskMeToSubmitIfViewingAnExceptionEntry.Enabled = False
+        eventLogList.Enabled = False
+        eventLogText.Enabled = False
+
+        pleaseWaitProgressBar.ProgressBarColor = My.Settings.barColor
+        strPleaseWaitLabelText = strInputPleaseWaitLabelText
+        pleaseWaitlblLabel.Text = strInputPleaseWaitLabelText
+        centerPleaseWaitPanel()
+        pleaseWaitPanel.Visible = True
+        pleaseWaitProgressBar.Value = 0
+        pleaseWaitProgressBarChanger.Enabled = True
+        pleaseWaitMessageChanger.Enabled = True
+        pleaseWaitBorderText.BackColor = My.Settings.pleaseWaitBorderColor
+        pleaseWaitBorderText.ForeColor = My.Settings.pleaseWaitBorderTextColor
+    End Sub
+
+    Private Sub closePleaseWaitPanel()
+        btnRefreshEvents.Enabled = True
+        btnOpenEventLog.Enabled = True
+        btnSearch.Enabled = True
+        btnClear.Enabled = True
+        btnExportLogs.Enabled = True
+        chkAskMeToSubmitIfViewingAnExceptionEntry.Enabled = True
+        eventLogList.Enabled = True
+        eventLogText.Enabled = True
+
+        pleaseWaitPanel.Visible = False
+        pleaseWaitProgressBarChanger.Enabled = False
+        pleaseWaitMessageChanger.Enabled = False
+        pleaseWaitProgressBar.Value = 0
+    End Sub
+
+    Private Sub pleaseWaitProgressBarChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitProgressBarChanger.Tick
+        If pleaseWaitProgressBar.Value < 100 Then
+            pleaseWaitProgressBar.Value += 1
+        Else
+            pleaseWaitProgressBar.Value = 0
+        End If
+    End Sub
+
+    Private Sub pleaseWaitMessageChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitMessageChanger.Tick
+        If pleaseWaitBorderText.Text = "Please Wait..." Then
+            pleaseWaitBorderText.Text = "Please Wait"
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText
+        ElseIf pleaseWaitBorderText.Text = "Please Wait" Then
+            pleaseWaitBorderText.Text = "Please Wait."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait." Then
+            pleaseWaitBorderText.Text = "Please Wait.."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & ".."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait.." Then
+            pleaseWaitBorderText.Text = "Please Wait..."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "..."
+        End If
+    End Sub
+#End Region
 End Class

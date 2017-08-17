@@ -858,7 +858,7 @@ Public Class Form1
             Dim memoryStream As New IO.MemoryStream()
 
             If Functions.http.downloadFile(globalVariables.webURLs.updateBranch.debug.strProgramZIP, memoryStream) = False Then
-                Functions.wait.closePleaseWaitWindow()
+                closePleaseWaitPanel()
                 MsgBox("There was an error while downloading required files, please check the Event Log for more details.", MsgBoxStyle.Critical, strMessageBoxTitle)
 
                 memoryStream.Close()
@@ -1026,7 +1026,7 @@ Public Class Form1
                     Threading.Thread.Sleep(500)
                 End While
 
-                Functions.wait.closePleaseWaitWindow()
+                closePleaseWaitPanel()
 
                 systemRestorePoints.Dispose()
                 systemRestorePoints = Nothing
@@ -1067,9 +1067,8 @@ Public Class Form1
         btnDeleteRestorePoint.Enabled = False
         stripDelete.Enabled = False
 
-        Functions.wait.createPleaseWaitWindow("Deleting Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
+        openPleaseWaitPanel("Deleting Restore Points... Please Wait.")
         Threading.ThreadPool.QueueUserWorkItem(Sub() deleteOldRestorePoints(maxAgeInput))
-        Functions.wait.openPleaseWaitWindow()
     End Sub
 
     Private Sub disableFormElements()
@@ -1190,7 +1189,7 @@ Public Class Form1
 
                     enableFormElements()
 
-                    Functions.wait.closePleaseWaitWindow()
+                    closePleaseWaitPanel()
                     systemRestorePoints.Dispose()
                     giveFeedbackAfterCreatingRestorePoint(result)
                     loadRestorePointsFromSystemIntoList()
@@ -1213,7 +1212,7 @@ Public Class Form1
                     Functions.eventLogFunctions.writeToSystemEventLog("The system restore point API returned an error code (" & result & ").", EventLogEntryType.Warning)
                 End If
 
-                Functions.wait.closePleaseWaitWindow()
+                closePleaseWaitPanel()
 
                 MsgBox(String.Format("There was an error while attempting to creating the restore point. The error code returned from the system was ""{0}"" ({1}).", result, Functions.support.convertErrorCodeToHex(result)), MsgBoxStyle.Critical, strMessageBoxTitle)
                 Exit Sub
@@ -1231,7 +1230,7 @@ Public Class Form1
 
             enableFormElements()
 
-            Functions.wait.closePleaseWaitWindow()
+            closePleaseWaitPanel()
             systemRestorePoints.Dispose()
             giveFeedbackAfterCreatingRestorePoint(result)
             loadRestorePointsFromSystemIntoList()
@@ -1247,7 +1246,7 @@ Public Class Form1
     End Sub
 
     Private Sub giveDownloadErrorMessage()
-        Functions.wait.closePleaseWaitWindow()
+        closePleaseWaitPanel()
         MsgBox("There was an error while downloading required files, please check the Event Log for more details.", MsgBoxStyle.Critical, strMessageBoxTitle)
     End Sub
 
@@ -1460,7 +1459,7 @@ Public Class Form1
     End Sub
 
     Private Sub openThePleaseWaitWindowAndStartTheDownloadThread(Optional boolOverrideUserUpdateChannelPreferences As Boolean = False)
-        Functions.wait.createPleaseWaitWindow("Downloading update... Please Wait.", False, enums.howToCenterWindow.parent, False)
+        openPleaseWaitPanel("Downloading update... Please Wait.")
 
         Threading.ThreadPool.QueueUserWorkItem(Sub()
                                                    Try
@@ -1468,8 +1467,6 @@ Public Class Form1
                                                    Catch ex As Threading.ThreadAbortException
                                                    End Try
                                                End Sub)
-
-        Functions.wait.openPleaseWaitWindow(Me)
     End Sub
 
     Private Sub userInitiatedCheckForUpdates()
@@ -1632,8 +1629,6 @@ Public Class Form1
         Dim stopWatch As Stopwatch = Stopwatch.StartNew()
 
         Try
-            btnRefreshRestorePoints.Text = "Abort Refreshing System Restore Points"
-
             systemRestorePointsList.Enabled = False
             systemRestorePointsList.Items.Clear() ' Clears the System Restore Points list on the GUI of existing items.
 
@@ -1751,16 +1746,16 @@ Public Class Form1
                 End If
             End If
         Catch ex8 As IO.FileNotFoundException
-            Functions.wait.closePleaseWaitWindow()
+            closePleaseWaitPanel()
             MsgBox("There has been an error while trying to load the System Restore Points on your system." & vbCrLf & vbCrLf & "Please go to System Restore Point Utilities and click on Manually Fix System Restore and follow the prompts. It will ask you reboot your computer so please save all work before you do so.", MsgBoxStyle.Critical, strMessageBoxTitle)
         Catch ex7 As Functions.myExceptions.integerTryParseException
-            Functions.wait.closePleaseWaitWindow()
+            closePleaseWaitPanel()
             Functions.eventLogFunctions.writeCrashToEventLog(ex7)
             MsgBox("There was a serious error while loading the restore points on your system. The restore point IDs appear to have been mangled and can't be parsed into an Integer like it should be. The loading of restore points has been halted." & vbCrLf & vbCrLf & "The value that was returned by the system was... " & ex7.strThatCouldNotBeParsedIntoAnInteger, MsgBoxStyle.Critical, strMessageBoxTitle)
         Catch ex6 As ObjectDisposedException
             Functions.eventLogFunctions.writeCrashToEventLog(ex6)
 
-            Functions.wait.closePleaseWaitWindow()
+            closePleaseWaitPanel()
 
             Exit Sub
         Catch ex5 As UnauthorizedAccessException
@@ -1775,7 +1770,7 @@ Public Class Form1
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex2, ex2.Message, ex2.StackTrace, ex2.GetType)
         Finally
-            Functions.wait.closePleaseWaitWindow()
+            closePleaseWaitPanel()
 
             systemRestorePointsList.Enabled = True
 
@@ -1803,7 +1798,7 @@ Public Class Form1
         Try
             disableFormElements()
             Functions.wmi.restoreToSystemRestorePoint(systemRestorePointIndex)
-            Functions.wait.closePleaseWaitWindow()
+            closePleaseWaitPanel()
         Catch ex2 As Threading.ThreadAbortException
             ' Does nothing.
         Catch ex As Exception
@@ -1814,7 +1809,7 @@ Public Class Form1
     End Sub
 
     Private Sub afterDeleteSelectedRestorePoints(restorePointsToBeDeleted As Dictionary(Of String, restorePointInfo))
-        Functions.wait.closePleaseWaitWindow()
+        closePleaseWaitPanel()
 
         Dim boolMultiMode As Boolean = False
 
@@ -1885,7 +1880,7 @@ Public Class Form1
                 toolStripDeleteOldRestorePoints.Enabled = True
                 btnDeleteRestorePoint.Enabled = True
                 stripDelete.Enabled = True
-                Functions.wait.closePleaseWaitWindow()
+                closePleaseWaitPanel()
                 Exit Sub
             End If
 
@@ -1943,7 +1938,7 @@ Public Class Form1
             toolStripDeleteOldRestorePoints.Enabled = True
             btnDeleteRestorePoint.Enabled = True
             stripDelete.Enabled = True
-            Functions.wait.closePleaseWaitWindow()
+            closePleaseWaitPanel()
         End Try
     End Sub
 #End Region
@@ -2108,9 +2103,8 @@ Public Class Form1
 
     Private Sub Form1_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         If e.KeyCode = Keys.F5 Then
-            Functions.wait.createPleaseWaitWindow("Loading Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
+            openPleaseWaitPanel("Loading Restore Points... Please Wait.")
             Threading.ThreadPool.QueueUserWorkItem(AddressOf loadRestorePointsFromSystemIntoList)
-            Functions.wait.openPleaseWaitWindow()
         End If
     End Sub
 
@@ -2129,11 +2123,9 @@ Public Class Form1
         Control.CheckForIllegalCrossThreadCalls = False
 
         Threading.Thread.Sleep(750)
-        Functions.wait.createPleaseWaitWindow("Loading Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
 
+        openPleaseWaitPanel("Loading Restore Points... Please Wait.")
         Threading.ThreadPool.QueueUserWorkItem(AddressOf startSystemRestorePointListLoadThreadSub)
-
-        Functions.wait.openPleaseWaitWindow()
     End Sub
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -2589,7 +2581,7 @@ Public Class Form1
         Dim msgBoxResult As MsgBoxResult = MsgBox("The debug build is a build that's not optimized for normal use but may help in the process of debugging crashes and other issues that you may have with the program. The debug build outputs far more crash data than the release type build." & vbCrLf & vbCrLf & "Are you sure you want to switch to the debug build?", MsgBoxStyle.Question + MsgBoxStyle.YesNo)
 
         If msgBoxResult = MsgBoxResult.Yes Then
-            Functions.wait.createPleaseWaitWindow("Downloading Debug Build... Please Wait.", False, enums.howToCenterWindow.parent, True)
+            openPleaseWaitPanel("Downloading Debug Build... Please Wait.")
             Threading.ThreadPool.QueueUserWorkItem(AddressOf switchToDebugBuildDownloadThreadSub)
         End If
     End Sub
@@ -2960,12 +2952,9 @@ Public Class Form1
 
         If result = MsgBoxResult.Yes Then
             disableFormElements()
-            Functions.wait.createPleaseWaitWindow("Deleting Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
-
+            openPleaseWaitPanel("Deleting Restore Points... Please Wait.")
             toolStripDeleteAllRestorePoints.Enabled = False
             Threading.ThreadPool.QueueUserWorkItem(AddressOf deleteAllRestorePointsThread)
-
-            Functions.wait.openPleaseWaitWindow()
         Else
             MsgBox("Restore points not deleted.", MsgBoxStyle.Information, strMessageBoxTitle)
         End If
@@ -3075,6 +3064,64 @@ Public Class Form1
 
     Private Sub HelpToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles HelpToolStripMenuItem.Click
         Functions.support.launchURLInWebBrowser(globalVariables.webURLs.webPages.strHelpVideos, "An error occurred when trying to launch the Help Videos URL in your default browser. The URL has been copied to your Windows Clipboard for you to paste into the address bar in the browser of your choice.")
+    End Sub
+
+    Private Sub SetPleaseWaitBorderTextColorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetPleaseWaitBorderTextColorToolStripMenuItem.Click
+        If My.Settings.customColors2 IsNot Nothing Then
+            Dim integerArray(My.Settings.customColors2.Count - 1) As Integer
+
+            For i = 0 To My.Settings.customColors2.Count - 1
+                integerArray(i) = Integer.Parse(My.Settings.customColors2(i))
+            Next
+
+            ColorDialog.CustomColors = integerArray
+            integerArray = Nothing
+        End If
+
+        ColorDialog.Color = My.Settings.pleaseWaitBorderTextColor
+
+        If ColorDialog.ShowDialog() = DialogResult.OK Then
+            My.Settings.pleaseWaitBorderTextColor = ColorDialog.Color
+
+            Dim temp As New Specialized.StringCollection
+            For Each entry As String In ColorDialog.CustomColors
+                temp.Add(entry)
+            Next
+            My.Settings.customColors2 = temp
+            My.Settings.Save()
+            temp = Nothing
+
+            MsgBox("Color Preference Saved.", MsgBoxStyle.Information, "Setting Saved")
+        End If
+    End Sub
+
+    Private Sub SetPleaseWaitBorderColorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetPleaseWaitBorderColorToolStripMenuItem.Click
+        If My.Settings.customColors2 IsNot Nothing Then
+            Dim integerArray(My.Settings.customColors2.Count - 1) As Integer
+
+            For i = 0 To My.Settings.customColors2.Count - 1
+                integerArray(i) = Integer.Parse(My.Settings.customColors2(i))
+            Next
+
+            ColorDialog.CustomColors = integerArray
+            integerArray = Nothing
+        End If
+
+        ColorDialog.Color = My.Settings.pleaseWaitBorderColor
+
+        If ColorDialog.ShowDialog() = DialogResult.OK Then
+            My.Settings.pleaseWaitBorderColor = ColorDialog.Color
+
+            Dim temp As New Specialized.StringCollection
+            For Each entry As String In ColorDialog.CustomColors
+                temp.Add(entry)
+            Next
+            My.Settings.customColors2 = temp
+            My.Settings.Save()
+            temp = Nothing
+
+            MsgBox("Color Preference Saved.", MsgBoxStyle.Information, "Setting Saved")
+        End If
     End Sub
 
     Private Sub SetBarColorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetBarColorToolStripMenuItem.Click
@@ -3188,9 +3235,8 @@ Public Class Form1
             Exit Sub
         End If
 
-        Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", False, enums.howToCenterWindow.parent, False)
+        openPleaseWaitPanel("Creating Restore Point... Please Wait.")
         Threading.ThreadPool.QueueUserWorkItem(Sub() unifiedCreateSystemRestorePoint(defaultCustomRestorePointName))
-        Functions.wait.openPleaseWaitWindow()
     End Sub
 
     Private Sub btnCreate_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnCreate.Click
@@ -3214,9 +3260,8 @@ Public Class Form1
         End If
 
         If msgBoxResult = MsgBoxResult.Yes Then
-            Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", False, enums.howToCenterWindow.parent, False)
+            openPleaseWaitPanel("Creating Restore Point... Please Wait.")
             Threading.ThreadPool.QueueUserWorkItem(Sub() unifiedCreateSystemRestorePoint(txtRestorePointDescription.Text))
-            Functions.wait.openPleaseWaitWindow()
         End If
     End Sub
 
@@ -3233,9 +3278,8 @@ Public Class Form1
         End If
 
         If msgBoxResult = MsgBoxResult.Yes Then
-            Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", False, enums.howToCenterWindow.parent, False)
+            openPleaseWaitPanel("Creating Restore Point... Please Wait.")
             Threading.ThreadPool.QueueUserWorkItem(Sub() unifiedCreateSystemRestorePoint())
-            Functions.wait.openPleaseWaitWindow()
         End If
     End Sub
 
@@ -3253,9 +3297,8 @@ Public Class Form1
         Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot after the restoration process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, selectedRestorePoint.strRestorePointName, selectedRestorePoint.strRestorePointDate, selectedRestorePoint.strRestorePointType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
 
         If msgboxResult = MsgBoxResult.Yes Then
-            Functions.wait.createPleaseWaitWindow("Beginning the Restore Process... Please Wait.", False, enums.howToCenterWindow.parent, False)
+            openPleaseWaitPanel("Beginning the Restore Process... Please Wait.")
             Threading.ThreadPool.QueueUserWorkItem(Sub() restoreSystemRestorePoint(selectedRestorePoint.intRestorePointID))
-            Functions.wait.openPleaseWaitWindow()
         Else
             MsgBox("Your system has NOT been restored to the selected System Restore Point.", MsgBoxStyle.Information, strMessageBoxTitle)
         End If
@@ -3267,9 +3310,8 @@ Public Class Form1
 
     Private Sub btnRefreshRestorePoints_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnRefreshRestorePoints.Click
         If btnRefreshRestorePoints.Text.Equals("Refresh List of System Restore Points", StringComparison.OrdinalIgnoreCase) Then
-            Functions.wait.createPleaseWaitWindow("Loading Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
+            openPleaseWaitPanel("Loading Restore Points... Please Wait.")
             Threading.ThreadPool.QueueUserWorkItem(AddressOf loadRestorePointsFromSystemIntoList)
-            Functions.wait.openPleaseWaitWindow()
         End If
     End Sub
 
@@ -3373,9 +3415,8 @@ Public Class Form1
         End If
 
         If restorePointIDsToBeDeleted.Count > 0 Then
-            Functions.wait.createPleaseWaitWindow("Deleting Restore Points... Please Wait.", False, enums.howToCenterWindow.parent, False)
+            openPleaseWaitPanel("Deleting Restore Points... Please Wait.")
             Threading.ThreadPool.QueueUserWorkItem(Sub() deleteSelectedRestorePoints(restorePointIDsToBeDeleted, toolStripLogRestorePointDeletions.Checked))
-            Functions.wait.openPleaseWaitWindow()
         Else
             systemRestorePointsList.Enabled = True
             giveFeedbackToUser("No System Restore Points were deleted.")
@@ -3389,6 +3430,81 @@ Public Class Form1
         InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
+    End Sub
+#End Region
+
+#Region "--== Please Wait Panel Code ==--"
+    Private strPleaseWaitLabelText As String
+
+    Private Sub centerPleaseWaitPanel()
+        pleaseWaitPanel.Location = New Point(
+            (Me.ClientSize.Width / 2) - (pleaseWaitPanel.Size.Width / 2),
+            (Me.ClientSize.Height / 2) - (pleaseWaitPanel.Size.Height / 2))
+        pleaseWaitPanel.Anchor = AnchorStyles.None
+    End Sub
+
+    Private Sub openPleaseWaitPanel(strInputPleaseWaitLabelText As String)
+        btnRestoreToRestorePoint.Enabled = False
+        btnDeleteRestorePoint.Enabled = False
+        btnRestoreToRestorePointSafeMode.Enabled = False
+        txtRestorePointDescription.Enabled = False
+        btnCreate.Enabled = False
+        btnCreateSystemCheckpoint.Enabled = False
+        btnCreateRestorePointNameWithDefaultName.Enabled = False
+        btnRefreshRestorePoints.Enabled = False
+
+        'Dim color As Windows.Media.Color = Windows.SystemColors.ActiveBorderColor
+        'pleaseWaitBorderText.BackColor = Drawing.Color.FromArgb(color.A, color.R, color.G, color.B)
+
+        strPleaseWaitLabelText = strInputPleaseWaitLabelText
+        pleaseWaitProgressBar.ProgressBarColor = My.Settings.barColor
+        pleaseWaitlblLabel.Text = strInputPleaseWaitLabelText
+        centerPleaseWaitPanel()
+        pleaseWaitPanel.Visible = True
+        pleaseWaitProgressBar.Value = 0
+        pleaseWaitProgressBarChanger.Enabled = True
+        pleaseWaitMessageChanger.Enabled = True
+        pleaseWaitBorderText.BackColor = My.Settings.pleaseWaitBorderColor
+        pleaseWaitBorderText.ForeColor = My.Settings.pleaseWaitBorderTextColor
+    End Sub
+
+    Private Sub closePleaseWaitPanel()
+        btnRestoreToRestorePoint.Enabled = True
+        btnDeleteRestorePoint.Enabled = True
+        btnRestoreToRestorePointSafeMode.Enabled = True
+        txtRestorePointDescription.Enabled = True
+        btnCreateSystemCheckpoint.Enabled = True
+        btnCreateRestorePointNameWithDefaultName.Enabled = True
+        btnRefreshRestorePoints.Enabled = True
+
+        pleaseWaitPanel.Visible = False
+        pleaseWaitProgressBarChanger.Enabled = False
+        pleaseWaitMessageChanger.Enabled = False
+        pleaseWaitProgressBar.Value = 0
+    End Sub
+
+    Private Sub pleaseWaitProgressBarChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitProgressBarChanger.Tick
+        If pleaseWaitProgressBar.Value < 100 Then
+            pleaseWaitProgressBar.Value += 1
+        Else
+            pleaseWaitProgressBar.Value = 0
+        End If
+    End Sub
+
+    Private Sub pleaseWaitMessageChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitMessageChanger.Tick
+        If pleaseWaitBorderText.Text = "Please Wait..." Then
+            pleaseWaitBorderText.Text = "Please Wait"
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText
+        ElseIf pleaseWaitBorderText.Text = "Please Wait" Then
+            pleaseWaitBorderText.Text = "Please Wait."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait." Then
+            pleaseWaitBorderText.Text = "Please Wait.."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & ".."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait.." Then
+            pleaseWaitBorderText.Text = "Please Wait..."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "..."
+        End If
     End Sub
 #End Region
 End Class

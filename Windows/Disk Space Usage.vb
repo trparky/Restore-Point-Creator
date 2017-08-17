@@ -250,7 +250,7 @@ Public Class Disk_Space_Usage
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
         Finally
             btnRefresh.Invoke(Sub() btnRefresh.Enabled = True)
-            Functions.wait.closePleaseWaitWindow()
+            closePleaseWaitPanel()
             doTheResizingOfTheBars()
             GC.Collect()
         End Try
@@ -279,9 +279,8 @@ Public Class Disk_Space_Usage
         Try
             If Me.IsHandleCreated = True Then
                 If GroupBox1.IsHandleCreated = True Then
-                    Functions.wait.createPleaseWaitWindow("Loading Disk Space Usage Information... Please Wait.", False, enums.howToCenterWindow.parent, False)
+                    openPleaseWaitPanel("Loading Disk Space Usage Information... Please Wait.")
                     Threading.ThreadPool.QueueUserWorkItem(AddressOf loadDiskSpaceUsageData)
-                    Functions.wait.openPleaseWaitWindow(Me)
                 End If
             Else
                 Threading.Thread.Sleep(100)
@@ -304,9 +303,8 @@ Public Class Disk_Space_Usage
         Try
             GroupBox1.Controls.Clear()
 
-            Functions.wait.createPleaseWaitWindow("Loading Disk Space Usage Information... Please Wait.", False, enums.howToCenterWindow.parent, False)
+            openPleaseWaitPanel("Loading Disk Space Usage Information... Please Wait.")
             Threading.ThreadPool.QueueUserWorkItem(AddressOf loadDiskSpaceUsageData)
-            Functions.wait.openPleaseWaitWindow(Me)
         Catch ex As Exception
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
@@ -443,4 +441,67 @@ Public Class Disk_Space_Usage
             ' Does nothing.
         End Try
     End Sub
+
+#Region "--== Please Wait Panel Code ==--"
+    Private strPleaseWaitLabelText As String
+
+    Private Sub centerPleaseWaitPanel()
+        pleaseWaitPanel.Location = New Point(
+            (Me.ClientSize.Width / 2) - (pleaseWaitPanel.Size.Width / 2),
+            (Me.ClientSize.Height / 2) - (pleaseWaitPanel.Size.Height / 2))
+        pleaseWaitPanel.Anchor = AnchorStyles.None
+    End Sub
+
+    Private Sub openPleaseWaitPanel(strInputPleaseWaitLabelText As String)
+        btnManageSystemRestoreStorageSize.Enabled = False
+        btnSetBarColor.Enabled = False
+        chkShowFullDisksAsRed.Enabled = False
+
+        pleaseWaitProgressBar.ProgressBarColor = My.Settings.barColor
+        strPleaseWaitLabelText = strInputPleaseWaitLabelText
+        pleaseWaitlblLabel.Text = strInputPleaseWaitLabelText
+        centerPleaseWaitPanel()
+        pleaseWaitPanel.Visible = True
+        pleaseWaitProgressBar.Value = 0
+        pleaseWaitProgressBarChanger.Enabled = True
+        pleaseWaitMessageChanger.Enabled = True
+        pleaseWaitBorderText.BackColor = My.Settings.pleaseWaitBorderColor
+        pleaseWaitBorderText.ForeColor = My.Settings.pleaseWaitBorderTextColor
+    End Sub
+
+    Private Sub closePleaseWaitPanel()
+        btnManageSystemRestoreStorageSize.Enabled = True
+        btnSetBarColor.Enabled = True
+        chkShowFullDisksAsRed.Enabled = True
+
+        pleaseWaitPanel.Visible = False
+        pleaseWaitProgressBarChanger.Enabled = False
+        pleaseWaitMessageChanger.Enabled = False
+        pleaseWaitProgressBar.Value = 0
+    End Sub
+
+    Private Sub pleaseWaitProgressBarChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitProgressBarChanger.Tick
+        If pleaseWaitProgressBar.Value < 100 Then
+            pleaseWaitProgressBar.Value += 1
+        Else
+            pleaseWaitProgressBar.Value = 0
+        End If
+    End Sub
+
+    Private Sub pleaseWaitMessageChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitMessageChanger.Tick
+        If pleaseWaitBorderText.Text = "Please Wait..." Then
+            pleaseWaitBorderText.Text = "Please Wait"
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText
+        ElseIf pleaseWaitBorderText.Text = "Please Wait" Then
+            pleaseWaitBorderText.Text = "Please Wait."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait." Then
+            pleaseWaitBorderText.Text = "Please Wait.."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & ".."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait.." Then
+            pleaseWaitBorderText.Text = "Please Wait..."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "..."
+        End If
+    End Sub
+#End Region
 End Class

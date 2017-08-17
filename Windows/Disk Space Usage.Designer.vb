@@ -30,6 +30,13 @@ Partial Class Disk_Space_Usage
         Me.ColorDialog = New System.Windows.Forms.ColorDialog()
         Me.btnSetBarColor = New System.Windows.Forms.Button()
         Me.chkShowFullDisksAsRed = New System.Windows.Forms.CheckBox()
+        Me.pleaseWaitPanel = New System.Windows.Forms.Panel()
+        Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
+        Me.pleaseWaitBorderText = New System.Windows.Forms.Label()
+        Me.pleaseWaitlblLabel = New System.Windows.Forms.Label()
+        Me.pleaseWaitProgressBar = New Tom.SmoothProgressBar()
+        Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
+        Me.pleaseWaitPanel.SuspendLayout()
         Me.SuspendLayout()
         '
         'btnRefresh
@@ -86,11 +93,63 @@ Partial Class Disk_Space_Usage
         Me.chkShowFullDisksAsRed.Text = "Show disks with near-full usage as red"
         Me.chkShowFullDisksAsRed.UseVisualStyleBackColor = True
         '
+        'pleaseWaitPanel
+        '
+        Me.pleaseWaitPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.pleaseWaitPanel.Controls.Add(Me.pleaseWaitlblLabel)
+        Me.pleaseWaitPanel.Controls.Add(Me.pleaseWaitProgressBar)
+        Me.pleaseWaitPanel.Controls.Add(Me.pleaseWaitBorderText)
+        Me.pleaseWaitPanel.Location = New System.Drawing.Point(275, 63)
+        Me.pleaseWaitPanel.Name = "pleaseWaitPanel"
+        Me.pleaseWaitPanel.Size = New System.Drawing.Size(293, 86)
+        Me.pleaseWaitPanel.TabIndex = 43
+        Me.pleaseWaitPanel.Visible = False
+        '
+        'pleaseWaitProgressBarChanger
+        '
+        Me.pleaseWaitProgressBarChanger.Interval = 25
+        '
+        'pleaseWaitBorderText
+        '
+        Me.pleaseWaitBorderText.BackColor = System.Drawing.Color.SkyBlue
+        Me.pleaseWaitBorderText.Location = New System.Drawing.Point(0, 0)
+        Me.pleaseWaitBorderText.Name = "pleaseWaitBorderText"
+        Me.pleaseWaitBorderText.Padding = New System.Windows.Forms.Padding(3, 0, 0, 0)
+        Me.pleaseWaitBorderText.Size = New System.Drawing.Size(292, 23)
+        Me.pleaseWaitBorderText.TabIndex = 5
+        Me.pleaseWaitBorderText.Text = "Please Wait..."
+        Me.pleaseWaitBorderText.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'pleaseWaitlblLabel
+        '
+        Me.pleaseWaitlblLabel.AutoSize = True
+        Me.pleaseWaitlblLabel.Location = New System.Drawing.Point(3, 32)
+        Me.pleaseWaitlblLabel.Name = "pleaseWaitlblLabel"
+        Me.pleaseWaitlblLabel.Size = New System.Drawing.Size(39, 13)
+        Me.pleaseWaitlblLabel.TabIndex = 7
+        Me.pleaseWaitlblLabel.Text = "Label1"
+        '
+        'pleaseWaitProgressBar
+        '
+        Me.pleaseWaitProgressBar.Location = New System.Drawing.Point(6, 57)
+        Me.pleaseWaitProgressBar.Maximum = 100
+        Me.pleaseWaitProgressBar.Minimum = 0
+        Me.pleaseWaitProgressBar.Name = "pleaseWaitProgressBar"
+        Me.pleaseWaitProgressBar.ProgressBarColor = System.Drawing.Color.Blue
+        Me.pleaseWaitProgressBar.Size = New System.Drawing.Size(268, 19)
+        Me.pleaseWaitProgressBar.TabIndex = 6
+        Me.pleaseWaitProgressBar.Value = 0
+        '
+        'pleaseWaitMessageChanger
+        '
+        Me.pleaseWaitMessageChanger.Interval = 250
+        '
         'Disk_Space_Usage
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.ClientSize = New System.Drawing.Size(843, 191)
+        Me.Controls.Add(Me.pleaseWaitPanel)
         Me.Controls.Add(Me.chkShowFullDisksAsRed)
         Me.Controls.Add(Me.btnSetBarColor)
         Me.Controls.Add(Me.btnManageSystemRestoreStorageSize)
@@ -102,6 +161,8 @@ Partial Class Disk_Space_Usage
         Me.MinimumSize = New System.Drawing.Size(859, 229)
         Me.Name = "Disk_Space_Usage"
         Me.Text = "Disk Space Usage"
+        Me.pleaseWaitPanel.ResumeLayout(False)
+        Me.pleaseWaitPanel.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -113,4 +174,10 @@ Partial Class Disk_Space_Usage
     Friend WithEvents ColorDialog As System.Windows.Forms.ColorDialog
     Friend WithEvents btnSetBarColor As System.Windows.Forms.Button
     Friend WithEvents chkShowFullDisksAsRed As CheckBox
+    Friend WithEvents pleaseWaitPanel As Panel
+    Friend WithEvents pleaseWaitProgressBarChanger As Timer
+    Friend WithEvents pleaseWaitBorderText As Label
+    Friend WithEvents pleaseWaitlblLabel As Label
+    Friend WithEvents pleaseWaitProgressBar As Tom.SmoothProgressBar
+    Friend WithEvents pleaseWaitMessageChanger As Timer
 End Class

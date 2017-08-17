@@ -1,7 +1,7 @@
 ﻿Public Class Change_Log
     Dim loadThread As Threading.Thread
 
-    Private Sub Change_Log_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+    Private Sub Change_Log_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         If loadThread IsNot Nothing Then
             loadThread.Abort()
         End If
@@ -13,9 +13,8 @@
 
     Sub loadChangelog()
         If loadThread Is Nothing Then
-            Functions.wait.createPleaseWaitWindow("Loading Official Change Log... Please Wait.", False, enums.howToCenterWindow.parent, False)
+            openPleaseWaitPanel("Loading Official Change Log... Please Wait.")
             Threading.ThreadPool.QueueUserWorkItem(AddressOf loadChangelogSub)
-            Functions.wait.openPleaseWaitWindow()
         End If
     End Sub
 
@@ -57,7 +56,7 @@
             Me.Invoke(Sub() RichTextBox1.Text = "Error loading change log data.")
         Finally
             Me.Invoke(Sub()
-                          Functions.wait.closePleaseWaitWindow()
+                          closePleaseWaitPanel()
                           loadThread = Nothing
                           AbortToolStripMenuItem.Visible = False
                       End Sub)
@@ -72,13 +71,68 @@
         loadChangelog()
     End Sub
 
-    Private Sub Change_Log_Shown(sender As Object, e As EventArgs) Handles Me.Shown
+    Private Sub Change_Log_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
         loadChangelog()
     End Sub
 
-    Private Sub Change_Log_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
+    Private Sub Change_Log_KeyUp(sender As Object, e As KeyEventArgs) Handles MyBase.KeyUp
         If e.KeyCode = Keys.F5 Then
             loadChangelog()
         End If
     End Sub
+
+#Region "--== Please Wait Panel Code ==--"
+    Private strPleaseWaitLabelText As String
+
+    Private Sub centerPleaseWaitPanel()
+        pleaseWaitPanel.Location = New Point(
+            (Me.ClientSize.Width / 2) - (pleaseWaitPanel.Size.Width / 2),
+            (Me.ClientSize.Height / 2) - (pleaseWaitPanel.Size.Height / 2))
+        pleaseWaitPanel.Anchor = AnchorStyles.None
+    End Sub
+
+    Private Sub openPleaseWaitPanel(strInputPleaseWaitLabelText As String)
+        strPleaseWaitLabelText = strInputPleaseWaitLabelText
+        pleaseWaitProgressBar.ProgressBarColor = My.Settings.barColor
+        pleaseWaitlblLabel.Text = strInputPleaseWaitLabelText
+        centerPleaseWaitPanel()
+        pleaseWaitPanel.Visible = True
+        pleaseWaitProgressBar.Value = 0
+        pleaseWaitProgressBarChanger.Enabled = True
+        pleaseWaitMessageChanger.Enabled = True
+        pleaseWaitBorderText.BackColor = My.Settings.pleaseWaitBorderColor
+        pleaseWaitBorderText.ForeColor = My.Settings.pleaseWaitBorderTextColor
+    End Sub
+
+    Private Sub closePleaseWaitPanel()
+        pleaseWaitPanel.Visible = False
+        pleaseWaitProgressBarChanger.Enabled = False
+        pleaseWaitMessageChanger.Enabled = False
+        pleaseWaitProgressBar.Value = 0
+    End Sub
+
+    Private Sub pleaseWaitProgressBarChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitProgressBarChanger.Tick
+        If pleaseWaitProgressBar.Value < 100 Then
+            pleaseWaitProgressBar.Value += 1
+        Else
+            pleaseWaitProgressBar.Value = 0
+        End If
+    End Sub
+
+    Private Sub pleaseWaitMessageChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitMessageChanger.Tick
+        If pleaseWaitBorderText.Text = "Please Wait..." Then
+            pleaseWaitBorderText.Text = "Please Wait"
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText
+        ElseIf pleaseWaitBorderText.Text = "Please Wait" Then
+            pleaseWaitBorderText.Text = "Please Wait."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait." Then
+            pleaseWaitBorderText.Text = "Please Wait.."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & ".."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait.." Then
+            pleaseWaitBorderText.Text = "Please Wait..."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "..."
+        End If
+    End Sub
+#End Region
 End Class
