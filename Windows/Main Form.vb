@@ -1026,6 +1026,8 @@ Public Class Form1
                     Threading.Thread.Sleep(500)
                 End While
 
+                lblCurrentRestorePointsLabel.Text = String.Format("Current Restore Points ({0})", systemRestorePointsList.Items.Count)
+
                 closePleaseWaitPanel()
 
                 systemRestorePoints.Dispose()
@@ -1915,6 +1917,8 @@ Public Class Form1
                 systemRestorePoint.Dispose()
                 systemRestorePoint = Nothing
             Next
+
+            lblCurrentRestorePointsLabel.Text = String.Format("Current Restore Points ({0})", systemRestorePointsList.Items.Count)
 
             If toolStripLogRestorePointDeletions.Checked Then
                 If numberOfOldRestorePointsDeleted = 0 Then
