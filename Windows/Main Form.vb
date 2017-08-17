@@ -3317,7 +3317,7 @@ Public Class Form1
 
     Private Sub btnDeleteRestorePoint_Click(sender As Object, e As EventArgs) Handles btnDeleteRestorePoint.Click
         If systemRestorePointsList.SelectedItems.Count = 0 Then
-            MsgBox("You must select one Or more System Restore Points to delete.", MsgBoxStyle.Information, strMessageBoxTitle)
+            MsgBox("You must select one or more System Restore Points to delete.", MsgBoxStyle.Information, strMessageBoxTitle)
             Exit Sub
         End If
 
