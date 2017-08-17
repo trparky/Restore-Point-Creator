@@ -1820,6 +1820,7 @@ Public Class Form1
         Next
 
         systemRestorePointsList.Enabled = True
+        lblCurrentRestorePointsLabel.Text = String.Format("Current Restore Points ({0})", systemRestorePointsList.Items.Count)
 
         If ShowMessageBoxAfterSuccessfulDeletionOfRestorePointsToolStripMenuItem.Checked Then
             If boolMultiMode Then
