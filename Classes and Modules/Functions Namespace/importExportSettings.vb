@@ -86,15 +86,6 @@ Namespace Functions.importExportSettings
                         If Integer.TryParse(iniFileValue, tempInteger) Then
                             My.Settings(iniFileKeyName) = Color.FromArgb(tempInteger)
                         End If
-                    ElseIf iniFileValue.StartsWith("System.Collections.Specialized.StringCollection") Then
-                        iniFileValue = iniFileValue.caseInsensitiveReplace("System.Collections.Specialized.StringCollection,", "")
-                        Dim deJSONedObject As String() = (New Web.Script.Serialization.JavaScriptSerializer).Deserialize(iniFileValue, GetType(String()))
-
-                        Dim tempStringCollection As New Specialized.StringCollection
-                        For i = 0 To deJSONedObject.Count - 1
-                            tempStringCollection.Add(deJSONedObject(i))
-                        Next
-                        My.Settings(iniFileKeyName) = tempStringCollection
                     ElseIf iniFileValue.StartsWith("System.Drawing.Point") Then
                         iniFileValue = iniFileValue.caseInsensitiveReplace("System.Drawing.Point,", "").Trim
                         Dim pointParts() As String = iniFileValue.Split("|")
@@ -127,7 +118,6 @@ Namespace Functions.importExportSettings
             Dim exportedSettingsArray As New List(Of exportedSettings)
             Dim exportedSettingsObject As exportedSettings
             Dim settingType As Type
-            Dim stringCollection As Specialized.StringCollection
             Dim point As Point, size As Size
 
             For Each settingProperty As Configuration.SettingsPropertyValue In My.Settings.PropertyValues
@@ -148,16 +138,6 @@ Namespace Functions.importExportSettings
                         size = DirectCast(settingProperty.PropertyValue, Size)
                         exportedSettingsObject.value = size.Height & "|" & size.Width
                         size = Nothing
-                    ElseIf settingType = GetType(Specialized.StringCollection) Then
-                        stringCollection = DirectCast(settingProperty.PropertyValue, Specialized.StringCollection)
-
-                        Dim tempArray(stringCollection.Count - 1) As String
-                        stringCollection.CopyTo(tempArray, 0)
-
-                        exportedSettingsObject.value = (New Web.Script.Serialization.JavaScriptSerializer).Serialize(tempArray)
-
-                        stringCollection = Nothing
-                        tempArray = Nothing
                     ElseIf settingType = GetType(Date) Or settingType = GetType(DateTime) Then
                         exportedSettingsObject.value = DirectCast(settingProperty.PropertyValue, Date).ToUniversalTime
                     Else
@@ -271,15 +251,6 @@ Namespace Functions.importExportSettings
                             splitArray = item.value.split("|")
                             My.Settings(item.strName) = New Size() With {.Height = splitArray(0), .Width = splitArray(1)}
                             splitArray = Nothing
-                        ElseIf type = GetType(Specialized.StringCollection) Then
-                            Dim deJSONedObject As String() = (New Web.Script.Serialization.JavaScriptSerializer).Deserialize(item.value, GetType(String()))
-
-                            Dim tempStringCollection As New Specialized.StringCollection
-                            For i = 0 To deJSONedObject.Count - 1
-                                tempStringCollection.Add(deJSONedObject(i))
-                            Next
-
-                            My.Settings(item.strName) = tempStringCollection
                         ElseIf type = GetType(Date) Then
                             My.Settings(item.strName) = DirectCast(item.value, Date).ToLocalTime
                         Else
