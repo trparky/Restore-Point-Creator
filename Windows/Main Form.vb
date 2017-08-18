@@ -1463,12 +1463,10 @@ Public Class Form1
     Private Sub openThePleaseWaitWindowAndStartTheDownloadThread(Optional boolOverrideUserUpdateChannelPreferences As Boolean = False)
         openPleaseWaitPanel("Downloading update... Please Wait.")
 
-        Threading.ThreadPool.QueueUserWorkItem(Sub()
-                                                   Try
-                                                       downloadAndDoTheUpdate(boolOverrideUserUpdateChannelPreferences)
-                                                   Catch ex As Threading.ThreadAbortException
-                                                   End Try
-                                               End Sub)
+        Try
+            downloadAndDoTheUpdate(boolOverrideUserUpdateChannelPreferences)
+        Catch ex As Threading.ThreadAbortException
+        End Try
     End Sub
 
     Private Sub userInitiatedCheckForUpdates()
