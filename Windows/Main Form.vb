@@ -2104,10 +2104,7 @@ Public Class Form1
     End Sub
 
     Private Sub Form1_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
-        If e.KeyCode = Keys.F5 Then
-            openPleaseWaitPanel("Loading Restore Points... Please Wait.")
-            Threading.ThreadPool.QueueUserWorkItem(AddressOf loadRestorePointsFromSystemIntoList)
-        End If
+        If e.KeyCode = Keys.F5 Then btnRefreshRestorePoints.PerformClick()
     End Sub
 
     Private Sub Form1_Shown(sender As Object, e As EventArgs) Handles Me.Shown
