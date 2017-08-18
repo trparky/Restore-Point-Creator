@@ -939,8 +939,7 @@ Public Class Form1
                 columnIndexes(column.DisplayIndex) = index.ToString()
             Next
 
-            My.Settings.restorePointListColumnOrder = New Specialized.StringCollection
-            My.Settings.restorePointListColumnOrder.AddRange(columnIndexes)
+            My.Settings.restorePointListColumnOrder2 = (New Web.Script.Serialization.JavaScriptSerializer).Serialize(columnIndexes)
         Catch ex As Exception
             Functions.eventLogFunctions.writeToSystemEventLog("Error saving restore point list column ordering.", EventLogEntryType.Error)
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
@@ -949,8 +948,8 @@ Public Class Form1
 
     Private Sub loadRestorePointListColumnOrder()
         Try
-            If My.Settings.restorePointListColumnOrder IsNot Nothing Then
-                Dim columnIndexes As Specialized.StringCollection = My.Settings.restorePointListColumnOrder
+            If Not String.IsNullOrEmpty(My.Settings.restorePointListColumnOrder2) Then
+                Dim columnIndexes As String() = (New Web.Script.Serialization.JavaScriptSerializer).Deserialize(Of String())(My.Settings.restorePointListColumnOrder2)
                 Dim displayIndex, index As Integer
 
                 For displayIndex = 0 To columnIndexes.Count - 1
@@ -959,7 +958,7 @@ Public Class Form1
                 Next
             End If
         Catch ex As Exception
-            My.Settings.restorePointListColumnOrder = Nothing
+            My.Settings.restorePointListColumnOrder2 = Nothing
             Functions.eventLogFunctions.writeToSystemEventLog("Error loading saved restore point list column ordering.", EventLogEntryType.Error)
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
         End Try

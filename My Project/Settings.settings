@@ -143,9 +143,6 @@
     <Setting Name="column5Size" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">71</Value>
     </Setting>
-    <Setting Name="restorePointListColumnOrder" Type="System.Collections.Specialized.StringCollection" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="roundRestorePointAgeNumber" Type="System.Int16" Scope="User">
       <Value Profile="(Default)">2</Value>
     </Setting>
@@ -234,6 +231,9 @@
       <Value Profile="(Default)">SkyBlue</Value>
     </Setting>
     <Setting Name="customColors3" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="restorePointListColumnOrder2" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

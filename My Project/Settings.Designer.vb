@@ -618,17 +618,6 @@ Namespace My
         End Property
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute()>  _
-        Public Property restorePointListColumnOrder() As Global.System.Collections.Specialized.StringCollection
-            Get
-                Return CType(Me("restorePointListColumnOrder"),Global.System.Collections.Specialized.StringCollection)
-            End Get
-            Set
-                Me("restorePointListColumnOrder") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.DefaultSettingValueAttribute("2")>  _
         Public Property roundRestorePointAgeNumber() As Short
@@ -985,6 +974,18 @@ Namespace My
             End Get
             Set
                 Me("customColors3") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property restorePointListColumnOrder2() As String
+            Get
+                Return CType(Me("restorePointListColumnOrder2"),String)
+            End Get
+            Set
+                Me("restorePointListColumnOrder2") = value
             End Set
         End Property
     End Class
