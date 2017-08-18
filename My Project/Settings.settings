@@ -236,8 +236,5 @@
     <Setting Name="pleaseWaitBorderColor" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">SkyBlue</Value>
     </Setting>
-    <Setting Name="pleaseWaitBorderTextColor" Type="System.Drawing.Color" Scope="User">
-      <Value Profile="(Default)">White</Value>
-    </Setting>
   </Settings>
 </SettingsFile>

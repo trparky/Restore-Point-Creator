@@ -466,7 +466,7 @@ Public Class Disk_Space_Usage
         pleaseWaitProgressBarChanger.Enabled = True
         pleaseWaitMessageChanger.Enabled = True
         pleaseWaitBorderText.BackColor = My.Settings.pleaseWaitBorderColor
-        pleaseWaitBorderText.ForeColor = My.Settings.pleaseWaitBorderTextColor
+        pleaseWaitBorderText.ForeColor = globalVariables.pleaseWaitPanelFontColor
     End Sub
 
     Private Sub closePleaseWaitPanel()

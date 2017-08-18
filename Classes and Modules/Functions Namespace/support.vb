@@ -12,6 +12,11 @@ Namespace Functions.support
     End Enum
 
     Module support
+        Public Function getGoodTextColorBasedUponBackgroundColor(input As Color) As Color
+            Dim intCombinedTotal As Short = Integer.Parse(input.R.ToString) + Integer.Parse(input.G.ToString) + Integer.Parse(input.B.ToString)
+            Return If((intCombinedTotal / 3) < 128, Color.White, Color.Black)
+        End Function
+
         Public Function verifyWindowLocation(point As Point) As Point
             If point.X < 0 Or point.Y < 0 Then
                 Return New Point(0, 0)
@@ -118,8 +123,8 @@ Namespace Functions.support
 
         Public Function convertErrorCodeToHex(input As Long) As String
             Try
-            	Dim strHexValue As String = input.ToString("x").caseInsensitiveReplace("ffffffff", "0x").ToString.ToUpper
-            	If Not strHexValue.StartsWith("0x", StringComparison.OrdinalIgnoreCase) Then strHexValue = "0x" & strHexValue
+                Dim strHexValue As String = input.ToString("x").caseInsensitiveReplace("ffffffff", "0x").ToString.ToUpper
+                If Not strHexValue.StartsWith("0x", StringComparison.OrdinalIgnoreCase) Then strHexValue = "0x" & strHexValue
                 Return strHexValue
             Catch ex As Exception
                 Return Nothing

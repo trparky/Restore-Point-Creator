@@ -3069,35 +3069,6 @@ Public Class Form1
         Functions.support.launchURLInWebBrowser(globalVariables.webURLs.webPages.strHelpVideos, "An error occurred when trying to launch the Help Videos URL in your default browser. The URL has been copied to your Windows Clipboard for you to paste into the address bar in the browser of your choice.")
     End Sub
 
-    Private Sub SetPleaseWaitBorderTextColorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetPleaseWaitBorderTextColorToolStripMenuItem.Click
-        If My.Settings.customColors2 IsNot Nothing Then
-            Dim integerArray(My.Settings.customColors2.Count - 1) As Integer
-
-            For i = 0 To My.Settings.customColors2.Count - 1
-                integerArray(i) = Integer.Parse(My.Settings.customColors2(i))
-            Next
-
-            ColorDialog.CustomColors = integerArray
-            integerArray = Nothing
-        End If
-
-        ColorDialog.Color = My.Settings.pleaseWaitBorderTextColor
-
-        If ColorDialog.ShowDialog() = DialogResult.OK Then
-            My.Settings.pleaseWaitBorderTextColor = ColorDialog.Color
-
-            Dim temp As New Specialized.StringCollection
-            For Each entry As String In ColorDialog.CustomColors
-                temp.Add(entry)
-            Next
-            My.Settings.customColors2 = temp
-            My.Settings.Save()
-            temp = Nothing
-
-            MsgBox("Color Preference Saved.", MsgBoxStyle.Information, "Setting Saved")
-        End If
-    End Sub
-
     Private Sub SetPleaseWaitBorderColorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetPleaseWaitBorderColorToolStripMenuItem.Click
         If My.Settings.customColors2 IsNot Nothing Then
             Dim integerArray(My.Settings.customColors2.Count - 1) As Integer
@@ -3114,6 +3085,7 @@ Public Class Form1
 
         If ColorDialog.ShowDialog() = DialogResult.OK Then
             My.Settings.pleaseWaitBorderColor = ColorDialog.Color
+            globalVariables.pleaseWaitPanelFontColor = Functions.support.getGoodTextColorBasedUponBackgroundColor(My.Settings.pleaseWaitBorderColor)
 
             Dim temp As New Specialized.StringCollection
             For Each entry As String In ColorDialog.CustomColors
@@ -3468,7 +3440,7 @@ Public Class Form1
         pleaseWaitProgressBarChanger.Enabled = True
         pleaseWaitMessageChanger.Enabled = True
         pleaseWaitBorderText.BackColor = My.Settings.pleaseWaitBorderColor
-        pleaseWaitBorderText.ForeColor = My.Settings.pleaseWaitBorderTextColor
+        pleaseWaitBorderText.ForeColor = globalVariables.pleaseWaitPanelFontColor
     End Sub
 
     Private Sub closePleaseWaitPanel()

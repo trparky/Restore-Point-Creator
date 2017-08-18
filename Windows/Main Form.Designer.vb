@@ -85,7 +85,6 @@ Partial Class Form1
         Me.ToolStripMenuItem5 = New System.Windows.Forms.ToolStripSeparator()
         Me.SetBarColorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SetPleaseWaitBorderColorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.SetPleaseWaitBorderTextColorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem1 = New System.Windows.Forms.ToolStripSeparator()
         Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.toolStripClear = New System.Windows.Forms.ToolStripMenuItem()
@@ -497,7 +496,7 @@ Partial Class Form1
         '
         'OptionsToolStripMenuItem
         '
-        Me.OptionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveSafeModeBootOptionToolStripMenuItem, Me.InterfaceTooBigToolStripMenuItem, Me.AdditionalOptionsAndSettingsToolStripMenuItem, Me.ConfigurationBackupRestoreToolStripMenuItem, Me.ToolStripMenuItem5, Me.SetBarColorToolStripMenuItem, Me.SetPleaseWaitBorderColorToolStripMenuItem, Me.SetPleaseWaitBorderTextColorToolStripMenuItem, Me.ToolStripMenuItem1, Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem, Me.toolStripClear, Me.toolStripMyComputer, Me.CreateRestorePointAtUserLogonToolStripMenuItem, Me.ConfigureProxyToolStripMenuItem, Me.SetWindowsActivePowerPlanSettingsForWakeTimersBackToDefaultToolStripMenuItem, Me.KeepXAmountOfRestorePointsToolStripMenuItem, Me.DefaultCustomRestorePointNameToolStripMenuItem, Me.ConfigureHTTPTimeoutToolStripMenuItem, Me.ToolStripMenuItem3, Me.SoftwareUpdateSettingsToolStripMenuItem, Me.NotificationOptionsToolStripMenuItem, Me.UseSSLToolStripMenuItem, Me.lineBeforeDebugMenuItem, Me.SwitchToDebugBuildToolStripMenuItem})
+        Me.OptionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveSafeModeBootOptionToolStripMenuItem, Me.InterfaceTooBigToolStripMenuItem, Me.AdditionalOptionsAndSettingsToolStripMenuItem, Me.ConfigurationBackupRestoreToolStripMenuItem, Me.ToolStripMenuItem5, Me.SetBarColorToolStripMenuItem, Me.SetPleaseWaitBorderColorToolStripMenuItem, Me.ToolStripMenuItem1, Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem, Me.toolStripClear, Me.toolStripMyComputer, Me.CreateRestorePointAtUserLogonToolStripMenuItem, Me.ConfigureProxyToolStripMenuItem, Me.SetWindowsActivePowerPlanSettingsForWakeTimersBackToDefaultToolStripMenuItem, Me.KeepXAmountOfRestorePointsToolStripMenuItem, Me.DefaultCustomRestorePointNameToolStripMenuItem, Me.ConfigureHTTPTimeoutToolStripMenuItem, Me.ToolStripMenuItem3, Me.SoftwareUpdateSettingsToolStripMenuItem, Me.NotificationOptionsToolStripMenuItem, Me.UseSSLToolStripMenuItem, Me.lineBeforeDebugMenuItem, Me.SwitchToDebugBuildToolStripMenuItem})
         Me.OptionsToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.settings
         Me.OptionsToolStripMenuItem.Name = "OptionsToolStripMenuItem"
         Me.OptionsToolStripMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.AsNeeded
@@ -647,13 +646,6 @@ Partial Class Form1
         Me.SetPleaseWaitBorderColorToolStripMenuItem.Name = "SetPleaseWaitBorderColorToolStripMenuItem"
         Me.SetPleaseWaitBorderColorToolStripMenuItem.Size = New System.Drawing.Size(431, 22)
         Me.SetPleaseWaitBorderColorToolStripMenuItem.Text = "Set Please Wait Border Color"
-        '
-        'SetPleaseWaitBorderTextColorToolStripMenuItem
-        '
-        Me.SetPleaseWaitBorderTextColorToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.color_wheel
-        Me.SetPleaseWaitBorderTextColorToolStripMenuItem.Name = "SetPleaseWaitBorderTextColorToolStripMenuItem"
-        Me.SetPleaseWaitBorderTextColorToolStripMenuItem.Size = New System.Drawing.Size(431, 22)
-        Me.SetPleaseWaitBorderTextColorToolStripMenuItem.Text = "Set Please Wait Border Text Color"
         '
         'ToolStripMenuItem1
         '
@@ -1212,6 +1204,5 @@ Partial Class Form1
     Friend WithEvents pleaseWaitProgressBar As Tom.SmoothProgressBar
     Friend WithEvents pleaseWaitMessageChanger As Timer
     Friend WithEvents SetPleaseWaitBorderColorToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents SetPleaseWaitBorderTextColorToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripMenuItem1 As ToolStripSeparator
 End Class
