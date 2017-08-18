@@ -347,29 +347,13 @@ Public Class Disk_Space_Usage
 
     Private Sub btnSetBarColor_Click(sender As Object, e As EventArgs) Handles btnSetBarColor.Click
         Try
-            If My.Settings.customColors2 IsNot Nothing Then
-                Dim integerArray As Integer()
-                ReDim integerArray(My.Settings.customColors2.Count - 1)
-
-                For i = 0 To My.Settings.customColors2.Count - 1
-                    integerArray(i) = Integer.Parse(My.Settings.customColors2(i))
-                Next
-
-                ColorDialog.CustomColors = integerArray
-                integerArray = Nothing
-            End If
+            ColorDialog.CustomColors = Functions.support.loadCustomColors()
 
             ColorDialog.Color = My.Settings.barColor
             ColorDialog.ShowDialog()
             My.Settings.barColor = ColorDialog.Color
 
-            Dim temp As New Specialized.StringCollection
-            For Each entry As String In ColorDialog.CustomColors
-                temp.Add(entry)
-            Next
-            My.Settings.customColors2 = temp
-            My.Settings.Save()
-            temp = Nothing
+            Functions.support.saveCustomColors(ColorDialog.CustomColors)
 
             Dim smoothProgressBarObject As SmoothProgressBar
 

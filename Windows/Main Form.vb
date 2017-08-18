@@ -3070,60 +3070,24 @@ Public Class Form1
     End Sub
 
     Private Sub SetPleaseWaitBorderColorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetPleaseWaitBorderColorToolStripMenuItem.Click
-        If My.Settings.customColors2 IsNot Nothing Then
-            Dim integerArray(My.Settings.customColors2.Count - 1) As Integer
-
-            For i = 0 To My.Settings.customColors2.Count - 1
-                integerArray(i) = Integer.Parse(My.Settings.customColors2(i))
-            Next
-
-            ColorDialog.CustomColors = integerArray
-            integerArray = Nothing
-        End If
-
+        ColorDialog.CustomColors = Functions.support.loadCustomColors()
         ColorDialog.Color = My.Settings.pleaseWaitBorderColor
 
         If ColorDialog.ShowDialog() = DialogResult.OK Then
             My.Settings.pleaseWaitBorderColor = ColorDialog.Color
             globalVariables.pleaseWaitPanelFontColor = Functions.support.getGoodTextColorBasedUponBackgroundColor(My.Settings.pleaseWaitBorderColor)
-
-            Dim temp As New Specialized.StringCollection
-            For Each entry As String In ColorDialog.CustomColors
-                temp.Add(entry)
-            Next
-            My.Settings.customColors2 = temp
-            My.Settings.Save()
-            temp = Nothing
-
+            Functions.support.saveCustomColors(ColorDialog.CustomColors)
             MsgBox("Color Preference Saved.", MsgBoxStyle.Information, "Setting Saved")
         End If
     End Sub
 
     Private Sub SetBarColorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetBarColorToolStripMenuItem.Click
-        If My.Settings.customColors2 IsNot Nothing Then
-            Dim integerArray(My.Settings.customColors2.Count - 1) As Integer
-
-            For i = 0 To My.Settings.customColors2.Count - 1
-                integerArray(i) = Integer.Parse(My.Settings.customColors2(i))
-            Next
-
-            ColorDialog.CustomColors = integerArray
-            integerArray = Nothing
-        End If
-
+        ColorDialog.CustomColors = Functions.support.loadCustomColors()
         ColorDialog.Color = My.Settings.barColor
 
         If ColorDialog.ShowDialog() = DialogResult.OK Then
             My.Settings.barColor = ColorDialog.Color
-
-            Dim temp As New Specialized.StringCollection
-            For Each entry As String In ColorDialog.CustomColors
-                temp.Add(entry)
-            Next
-            My.Settings.customColors2 = temp
-            My.Settings.Save()
-            temp = Nothing
-
+            Functions.support.saveCustomColors(ColorDialog.CustomColors)
             MsgBox("Color Preference Saved.", MsgBoxStyle.Information, "Setting Saved")
         End If
     End Sub

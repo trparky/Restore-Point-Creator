@@ -12,6 +12,18 @@ Namespace Functions.support
     End Enum
 
     Module support
+        Public Function loadCustomColors() As Integer()
+            If Not String.IsNullOrEmpty(My.Settings.customColors3) Then
+                Return (New Web.Script.Serialization.JavaScriptSerializer).Deserialize(Of Integer())(My.Settings.customColors3)
+            Else
+                Return Nothing
+            End If
+        End Function
+
+        Public Sub saveCustomColors(input As Integer())
+            My.Settings.customColors3 = (New Web.Script.Serialization.JavaScriptSerializer).Serialize(input)
+        End Sub
+
         Public Function getGoodTextColorBasedUponBackgroundColor(input As Color) As Color
             Dim intCombinedTotal As Short = Integer.Parse(input.R.ToString) + Integer.Parse(input.G.ToString) + Integer.Parse(input.B.ToString)
             Return If((intCombinedTotal / 3) < 128, Color.White, Color.Black)

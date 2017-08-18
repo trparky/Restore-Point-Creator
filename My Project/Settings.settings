@@ -62,9 +62,6 @@
     <Setting Name="debug" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="customColors2" Type="System.Collections.Specialized.StringCollection" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="updateChannel" Type="System.String" Scope="User">
       <Value Profile="(Default)">stable</Value>
     </Setting>
@@ -235,6 +232,9 @@
     </Setting>
     <Setting Name="pleaseWaitBorderColor" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">SkyBlue</Value>
+    </Setting>
+    <Setting Name="customColors3" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

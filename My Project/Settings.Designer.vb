@@ -295,17 +295,6 @@ Namespace My
         End Property
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute()>  _
-        Public Property customColors2() As Global.System.Collections.Specialized.StringCollection
-            Get
-                Return CType(Me("customColors2"),Global.System.Collections.Specialized.StringCollection)
-            End Get
-            Set
-                Me("customColors2") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.DefaultSettingValueAttribute("stable")>  _
         Public Property updateChannel() As String
@@ -984,6 +973,18 @@ Namespace My
             End Get
             Set
                 Me("pleaseWaitBorderColor") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property customColors3() As String
+            Get
+                Return CType(Me("customColors3"),String)
+            End Get
+            Set
+                Me("customColors3") = value
             End Set
         End Property
     End Class
