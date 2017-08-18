@@ -3387,6 +3387,7 @@ Public Class Form1
         btnCreateSystemCheckpoint.Enabled = False
         btnCreateRestorePointNameWithDefaultName.Enabled = False
         btnRefreshRestorePoints.Enabled = False
+        MenuStrip1.Enabled = False
 
         'Dim color As Windows.Media.Color = Windows.SystemColors.ActiveBorderColor
         'pleaseWaitBorderText.BackColor = Drawing.Color.FromArgb(color.A, color.R, color.G, color.B)
@@ -3411,6 +3412,7 @@ Public Class Form1
         btnCreateSystemCheckpoint.Enabled = True
         btnCreateRestorePointNameWithDefaultName.Enabled = True
         btnRefreshRestorePoints.Enabled = True
+        MenuStrip1.Enabled = True
 
         pleaseWaitPanel.Visible = False
         pleaseWaitProgressBarChanger.Enabled = False
