@@ -1461,7 +1461,7 @@ Public Class Form1
     End Sub
 
     Private Sub openThePleaseWaitWindowAndStartTheDownloadThread(Optional boolOverrideUserUpdateChannelPreferences As Boolean = False)
-        openPleaseWaitPanel("Downloading update... Please Wait.")
+        Me.Invoke(Sub() openPleaseWaitPanel("Downloading update... Please Wait."))
 
         Try
             downloadAndDoTheUpdate(boolOverrideUserUpdateChannelPreferences)
