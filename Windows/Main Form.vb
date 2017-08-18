@@ -665,7 +665,7 @@ Public Class Form1
             .strRemoteBetaRCVersion = strRemoteBetaRCVersion
         }
 
-        updateMessageDialog.ShowDialog(Me)
+        updateMessageDialog.ShowDialog()
 
         Dim response As Update_Message.userResponse = updateMessageDialog.dialogResponse
 
