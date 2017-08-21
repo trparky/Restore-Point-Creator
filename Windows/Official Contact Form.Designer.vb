@@ -38,8 +38,12 @@ Partial Class Official_Contact_Form
         Me.Label4 = New System.Windows.Forms.Label()
         Me.btnClear = New System.Windows.Forms.Button()
         Me.btnDeleteAttachment = New System.Windows.Forms.Button()
-        Me.listAttachedFiles = New System.Windows.Forms.ListBox()
         Me.btnAttachEventLogs = New System.Windows.Forms.Button()
+        Me.maxSize = New Tom.SmoothProgressBar()
+        Me.lblTotalFileSize = New System.Windows.Forms.Label()
+        Me.listAttachedFiles = New System.Windows.Forms.ListView()
+        Me.ColumnHeader1 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
+        Me.ColumnHeader2 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.TableLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -100,7 +104,7 @@ Partial Class Official_Contact_Form
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.btnClose, 0, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.btnSubmit, 0, 0)
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(10, 525)
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(10, 566)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 1
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
@@ -184,14 +188,6 @@ Partial Class Official_Contact_Form
         Me.btnDeleteAttachment.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.btnDeleteAttachment.UseVisualStyleBackColor = True
         '
-        'listAttachedFiles
-        '
-        Me.listAttachedFiles.FormattingEnabled = True
-        Me.listAttachedFiles.Location = New System.Drawing.Point(10, 346)
-        Me.listAttachedFiles.Name = "listAttachedFiles"
-        Me.listAttachedFiles.Size = New System.Drawing.Size(378, 173)
-        Me.listAttachedFiles.TabIndex = 13
-        '
         'btnAttachEventLogs
         '
         Me.btnAttachEventLogs.Image = Global.Restore_Point_Creator.My.Resources.Resources.textBlock
@@ -204,13 +200,56 @@ Partial Class Official_Contact_Form
         Me.btnAttachEventLogs.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.btnAttachEventLogs.UseVisualStyleBackColor = True
         '
+        'maxSize
+        '
+        Me.maxSize.Location = New System.Drawing.Point(10, 538)
+        Me.maxSize.Maximum = 100
+        Me.maxSize.Minimum = 0
+        Me.maxSize.Name = "maxSize"
+        Me.maxSize.ProgressBarColor = System.Drawing.Color.LightGreen
+        Me.maxSize.Size = New System.Drawing.Size(491, 22)
+        Me.maxSize.TabIndex = 15
+        Me.maxSize.Value = 0
+        '
+        'lblTotalFileSize
+        '
+        Me.lblTotalFileSize.AutoSize = True
+        Me.lblTotalFileSize.Location = New System.Drawing.Point(7, 522)
+        Me.lblTotalFileSize.Name = "lblTotalFileSize"
+        Me.lblTotalFileSize.Size = New System.Drawing.Size(275, 13)
+        Me.lblTotalFileSize.TabIndex = 16
+        Me.lblTotalFileSize.Text = "You have attached 0 KB of the maximum 6 MBs allowed."
+        '
+        'listAttachedFiles
+        '
+        Me.listAttachedFiles.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader1, Me.ColumnHeader2})
+        Me.listAttachedFiles.FullRowSelect = True
+        Me.listAttachedFiles.Location = New System.Drawing.Point(10, 346)
+        Me.listAttachedFiles.Name = "listAttachedFiles"
+        Me.listAttachedFiles.Size = New System.Drawing.Size(378, 171)
+        Me.listAttachedFiles.TabIndex = 17
+        Me.listAttachedFiles.UseCompatibleStateImageBehavior = False
+        Me.listAttachedFiles.View = System.Windows.Forms.View.Details
+        '
+        'ColumnHeader1
+        '
+        Me.ColumnHeader1.Text = "File Name"
+        Me.ColumnHeader1.Width = 269
+        '
+        'ColumnHeader2
+        '
+        Me.ColumnHeader2.Text = "Size"
+        Me.ColumnHeader2.Width = 69
+        '
         'Official_Contact_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
-        Me.ClientSize = New System.Drawing.Size(509, 561)
-        Me.Controls.Add(Me.btnAttachEventLogs)
+        Me.ClientSize = New System.Drawing.Size(509, 603)
         Me.Controls.Add(Me.listAttachedFiles)
+        Me.Controls.Add(Me.lblTotalFileSize)
+        Me.Controls.Add(Me.maxSize)
+        Me.Controls.Add(Me.btnAttachEventLogs)
         Me.Controls.Add(Me.btnDeleteAttachment)
         Me.Controls.Add(Me.btnClear)
         Me.Controls.Add(Me.Label4)
@@ -248,6 +287,10 @@ Partial Class Official_Contact_Form
     Friend WithEvents Label4 As Label
     Friend WithEvents btnClear As Button
     Friend WithEvents btnDeleteAttachment As Button
-    Friend WithEvents listAttachedFiles As ListBox
     Friend WithEvents btnAttachEventLogs As Button
+    Friend WithEvents maxSize As Tom.SmoothProgressBar
+    Friend WithEvents lblTotalFileSize As Label
+    Friend WithEvents listAttachedFiles As ListView
+    Friend WithEvents ColumnHeader1 As ColumnHeader
+    Friend WithEvents ColumnHeader2 As ColumnHeader
 End Class

@@ -4,6 +4,7 @@ Imports ICSharpCode.SharpZipLib.Zip
 Public Class Official_Contact_Form
     Protected Const apiAccessCode As String = "YWiIMIyGVVFEunRpDF5PNIF2yzcADdBxneRmWDlLpMTCoVFEunRWiIMIyRmWnRpDF"
     Private strFileToHaveDataExportedTo As String = IO.Path.Combine(IO.Path.GetTempPath(), "event log entries.reslogx")
+    Private Const intMaxSize As Integer = 6291456
 
     Private Sub btnClose_Click(sender As Object, e As EventArgs) Handles btnClose.Click
         Me.Close()
@@ -148,10 +149,22 @@ Public Class Official_Contact_Form
     End Sub
 
     Private Sub Official_Contact_Form_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        maxSize.ProgressBarColor = My.Settings.barColor
+
         If My.Settings.useSSL = True Then
             btnSubmit.Image = My.Resources.lock
             ToolTip.SetToolTip(btnSubmit, "Secured by SSL.")
         End If
+    End Sub
+
+    Private Sub addFileToList(strFileName As String)
+        Dim listViewItem As New myListViewItemTypes.contactFormFileListItem With {
+            .Text = strFileName,
+            .strFileName = strFileName,
+            .longFileSize = New IO.FileInfo(strFileName).Length
+        }
+        listViewItem.SubItems.Add(Functions.support.bytesToHumanSize(listViewItem.longFileSize))
+        listAttachedFiles.Items.Add(listViewItem)
     End Sub
 
     Private Sub btnBrowseForAttachment_Click(sender As Object, e As EventArgs) Handles btnBrowse.Click
@@ -166,7 +179,8 @@ Public Class Official_Contact_Form
                 If doesFileExistInList(OpenFileDialog1.FileName.ToString) = True Then
                     MsgBox("A file by the name of " & Chr(34) & New IO.FileInfo(OpenFileDialog1.FileName.ToString).Name & Chr(34) & " already exists in the list of attached files.", MsgBoxStyle.Information, Me.Text)
                 Else
-                    listAttachedFiles.Items.Add(OpenFileDialog1.FileName.ToString)
+                    addFileToList(OpenFileDialog1.FileName.ToString)
+                    calculateTotalSize()
                 End If
             Else
                 MsgBox("Invalid file attachment.", MsgBoxStyle.Information, Me.Text)
@@ -175,15 +189,19 @@ Public Class Official_Contact_Form
     End Sub
 
     Private Sub btnDeleteAttachment_Click(sender As Object, e As EventArgs) Handles btnDeleteAttachment.Click
-        Dim strFileToBeRemoved As String = listAttachedFiles.Text
-        If listAttachedFiles.SelectedItems.Count <> 0 Then listAttachedFiles.Items.Remove(listAttachedFiles.SelectedItems(0))
-
-        If strFileToBeRemoved.EndsWith(".reslog", StringComparison.OrdinalIgnoreCase) = True Then
-            Try
-                IO.File.Delete(strFileToBeRemoved)
-            Catch ex As Exception
-            End Try
+        If listAttachedFiles.SelectedItems.Count > 0 Then
+            For Each item As myListViewItemTypes.contactFormFileListItem In listAttachedFiles.SelectedItems
+                If item.strFileName.EndsWith(".reslog", StringComparison.OrdinalIgnoreCase) Or item.strFileName.EndsWith(".reslogx", StringComparison.OrdinalIgnoreCase) Then
+                    Try
+                        IO.File.Delete(item.strFileName)
+                    Catch ex As Exception
+                    End Try
+                End If
+                item.Remove()
+            Next
         End If
+
+        calculateTotalSize()
     End Sub
 
     Function doesFileExistInList(strFileToCheckForExistanceOf As String) As Boolean
@@ -192,9 +210,8 @@ Public Class Official_Contact_Form
         Else
             strFileToCheckForExistanceOf = New IO.FileInfo(strFileToCheckForExistanceOf).Name
 
-            For Each item As String In listAttachedFiles.Items
-                item = New IO.FileInfo(item).Name
-                If item.Equals(strFileToCheckForExistanceOf, StringComparison.OrdinalIgnoreCase) Then Return True
+            For Each item As myListViewItemTypes.contactFormFileListItem In listAttachedFiles.Items
+                If New IO.FileInfo(item.strFileName).Name.Equals(strFileToCheckForExistanceOf, StringComparison.OrdinalIgnoreCase) Then Return True
             Next
 
             Return False
@@ -203,6 +220,7 @@ Public Class Official_Contact_Form
 
     Private Sub btnClear_Click(sender As Object, e As EventArgs) Handles btnClear.Click
         listAttachedFiles.Items.Clear()
+        maxSize.Value = 0
     End Sub
 
     Private Sub btnAttachEventLogs_Click(sender As Object, e As EventArgs) Handles btnAttachEventLogs.Click
@@ -214,7 +232,8 @@ Public Class Official_Contact_Form
                 timeStamp.Stop()
 
                 btnAttachEventLogs.Enabled = False
-                listAttachedFiles.Items.Add(strFileToHaveDataExportedTo)
+                addFileToList(strFileToHaveDataExportedTo)
+                calculateTotalSize()
 
                 MsgBox(String.Format("{0} log entries have been successfully exported and added to the list of attached files.{1}{1}Application Event Log exported in {2}ms ({3} seconds).", logCount, vbCrLf, timeStamp.ElapsedMilliseconds, Math.Round(timeStamp.Elapsed.TotalSeconds, 3)), MsgBoxStyle.Information, Me.Text)
             Else
@@ -234,6 +253,23 @@ Public Class Official_Contact_Form
                 IO.File.Delete(strFileToHaveDataExportedTo)
             Catch ex As Exception
             End Try
+        End If
+    End Sub
+
+    Sub calculateTotalSize()
+        btnSubmit.Enabled = True
+        Dim size As Integer
+
+        For Each item As myListViewItemTypes.contactFormFileListItem In listAttachedFiles.Items
+            size += item.longFileSize
+        Next
+
+        lblTotalFileSize.Text = String.Format("You have attached {0} of the maximum {1} allowed.", Functions.support.bytesToHumanSize(size), Functions.support.bytesToHumanSize(intMaxSize))
+        maxSize.Value = Math.Round((size / intMaxSize) * 100, 0)
+
+        If size > intMaxSize Then
+            btnSubmit.Enabled = False
+            MsgBox("You have exceeded the maximum amount of data that is allowed by this form, please reduce the amount of files you have attached." & vbCrLf & vbCrLf & "You are limited to 2 MBs of data.", MsgBoxStyle.Information, Me.Text)
         End If
     End Sub
 End Class
