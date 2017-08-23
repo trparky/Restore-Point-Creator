@@ -14,14 +14,18 @@ Namespace Functions.support
     Module support
         Public Function getDWMGlassColor() As Color
             Try
-                Dim color As UInteger, blend As Boolean
-                NativeMethod.NativeMethod.DwmGetColorizationColor(color, blend)
-                Dim strHexColor As String = color.ToString("x")
-                Dim a As Integer = Convert.ToInt32(strHexColor.Substring(0, 2), 16)
-                Dim r As Integer = Convert.ToInt32(strHexColor.Substring(2, 2), 16)
-                Dim g As Integer = Convert.ToInt32(strHexColor.Substring(4, 2), 16)
-                Dim b As Integer = Convert.ToInt32(strHexColor.Substring(6, 2), 16)
-                Return Drawing.Color.FromArgb(a, r, g, b)
+                If osVersionInfo.isThisWindows8x() Or osVersionInfo.isThisWindows10() Then
+                    Dim color As UInteger, blend As Boolean
+                    NativeMethod.NativeMethod.DwmGetColorizationColor(color, blend)
+                    Dim strHexColor As String = color.ToString("x")
+                    Dim a As Integer = Convert.ToInt32(strHexColor.Substring(0, 2), 16)
+                    Dim r As Integer = Convert.ToInt32(strHexColor.Substring(2, 2), 16)
+                    Dim g As Integer = Convert.ToInt32(strHexColor.Substring(4, 2), 16)
+                    Dim b As Integer = Convert.ToInt32(strHexColor.Substring(6, 2), 16)
+                    Return Drawing.Color.FromArgb(a, r, g, b)
+                Else
+                    Return Color.SkyBlue
+                End If
             Catch ex As Exception
                 eventLogFunctions.writeCrashToEventLog(ex)
                 Return Color.SkyBlue
