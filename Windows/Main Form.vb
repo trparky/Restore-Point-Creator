@@ -2171,6 +2171,12 @@ Public Class Form1
                 addSpecialRegistryKeysToWindows8ToFixWindows8SystemRestorePoint()
             End If
 
+            ' This hides the "Set Please Wait Border Color" options for Windows 8 and Windows 10 machines.
+            If Functions.osVersionInfo.isThisWindows8x() Or Functions.osVersionInfo.isThisWindows10() Then
+                SetPleaseWaitBorderColorToolStripMenuItem.Visible = False
+                barBelowColorSettings.Visible = False
+            End If
+
             addShortCutForEventLogToUsersStartMenu()
             loadPreferences()
             checkForMyComputerRightClickOption()
@@ -3071,6 +3077,18 @@ Public Class Form1
 
         If ColorDialog.ShowDialog() = DialogResult.OK Then
             My.Settings.barColor = ColorDialog.Color
+            Functions.support.saveCustomColors(ColorDialog.CustomColors)
+            MsgBox("Color Preference Saved.", MsgBoxStyle.Information, "Setting Saved")
+        End If
+    End Sub
+
+    Private Sub SetPleaseWaitBorderColorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetPleaseWaitBorderColorToolStripMenuItem.Click
+        ColorDialog.CustomColors = Functions.support.loadCustomColors()
+        ColorDialog.Color = My.Settings.pleaseWaitBorderColor
+
+        If ColorDialog.ShowDialog() = DialogResult.OK Then
+            My.Settings.pleaseWaitBorderColor = ColorDialog.Color
+            globalVariables.pleaseWaitPanelFontColor = Functions.support.getGoodTextColorBasedUponBackgroundColor(My.Settings.pleaseWaitBorderColor)
             Functions.support.saveCustomColors(ColorDialog.CustomColors)
             MsgBox("Color Preference Saved.", MsgBoxStyle.Information, "Setting Saved")
         End If

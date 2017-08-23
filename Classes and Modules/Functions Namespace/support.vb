@@ -14,7 +14,10 @@ Namespace Functions.support
     Module support
         Public Function getDWMGlassColor() As Color
             Try
+                ' This checks to see if we are running on Windows 8 or Windows 10 since the API we're accessing
+                ' here really only works correctly on those versions of Windows; not anything older than that.
                 If osVersionInfo.isThisWindows8x() Or osVersionInfo.isThisWindows10() Then
+                    ' Yep, we're on Windows 8 or Windows 10 so lets go ahead and use that special API.
                     Dim color As UInteger, blend As Boolean
                     NativeMethod.NativeMethod.DwmGetColorizationColor(color, blend)
                     Dim strHexColor As String = color.ToString("x")
@@ -24,11 +27,13 @@ Namespace Functions.support
                     Dim b As Integer = Convert.ToInt32(strHexColor.Substring(6, 2), 16)
                     Return Drawing.Color.FromArgb(a, r, g, b)
                 Else
-                    Return Color.SkyBlue
+                    ' This is for Windows Vista and Windows 7 machines.
+                    Return My.Settings.pleaseWaitBorderColor
                 End If
             Catch ex As Exception
+                ' This is if something goes wrong while trying to parse what Windows gave us as the window's border color.
                 eventLogFunctions.writeCrashToEventLog(ex)
-                Return Color.SkyBlue
+                Return My.Settings.pleaseWaitBorderColor
             End Try
         End Function
 

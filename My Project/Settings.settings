@@ -233,5 +233,8 @@
     <Setting Name="restorePointListColumnOrder2" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="pleaseWaitBorderColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">SkyBlue</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
