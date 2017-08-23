@@ -3088,7 +3088,13 @@ Public Class Form1
 
         If ColorDialog.ShowDialog() = DialogResult.OK Then
             My.Settings.pleaseWaitBorderColor = ColorDialog.Color
+
+            globalVariables.pleaseWaitPanelColor = ColorDialog.Color
             globalVariables.pleaseWaitPanelFontColor = Functions.support.getGoodTextColorBasedUponBackgroundColor(My.Settings.pleaseWaitBorderColor)
+
+            pleaseWaitBorderText.BackColor = globalVariables.pleaseWaitPanelColor
+            pleaseWaitBorderText.ForeColor = globalVariables.pleaseWaitPanelFontColor
+
             Functions.support.saveCustomColors(ColorDialog.CustomColors)
             MsgBox("Color Preference Saved.", MsgBoxStyle.Information, "Setting Saved")
         End If
