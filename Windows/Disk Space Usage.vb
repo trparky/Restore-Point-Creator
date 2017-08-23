@@ -449,7 +449,7 @@ Public Class Disk_Space_Usage
         pleaseWaitProgressBar.Value = 0
         pleaseWaitProgressBarChanger.Enabled = True
         pleaseWaitMessageChanger.Enabled = True
-        pleaseWaitBorderText.BackColor = My.Settings.pleaseWaitBorderColor
+        pleaseWaitBorderText.BackColor = globalVariables.pleaseWaitPanelColor
         pleaseWaitBorderText.ForeColor = globalVariables.pleaseWaitPanelFontColor
     End Sub
 

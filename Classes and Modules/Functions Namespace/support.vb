@@ -12,6 +12,22 @@ Namespace Functions.support
     End Enum
 
     Module support
+        Public Function getDWMGlassColor() As Color
+            Try
+                Dim color As UInteger, blend As Boolean
+                NativeMethod.NativeMethod.DwmGetColorizationColor(color, blend)
+                Dim strHexColor As String = color.ToString("x")
+                Dim a As Integer = Convert.ToInt32(strHexColor.Substring(0, 2), 16)
+                Dim r As Integer = Convert.ToInt32(strHexColor.Substring(2, 2), 16)
+                Dim g As Integer = Convert.ToInt32(strHexColor.Substring(4, 2), 16)
+                Dim b As Integer = Convert.ToInt32(strHexColor.Substring(6, 2), 16)
+                Return Drawing.Color.FromArgb(a, r, g, b)
+            Catch ex As Exception
+                eventLogFunctions.writeCrashToEventLog(ex)
+                Return Color.SkyBlue
+            End Try
+        End Function
+
         Public Function loadCustomColors() As Integer()
             If Not String.IsNullOrEmpty(My.Settings.customColors3) Then
                 Return (New Web.Script.Serialization.JavaScriptSerializer).Deserialize(Of Integer())(My.Settings.customColors3)

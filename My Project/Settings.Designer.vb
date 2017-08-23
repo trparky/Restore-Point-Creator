@@ -955,18 +955,6 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("SkyBlue")>  _
-        Public Property pleaseWaitBorderColor() As Global.System.Drawing.Color
-            Get
-                Return CType(Me("pleaseWaitBorderColor"),Global.System.Drawing.Color)
-            End Get
-            Set
-                Me("pleaseWaitBorderColor") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.DefaultSettingValueAttribute("")>  _
         Public Property customColors3() As String
             Get

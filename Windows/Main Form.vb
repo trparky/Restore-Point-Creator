@@ -3065,18 +3065,6 @@ Public Class Form1
         Functions.support.launchURLInWebBrowser(globalVariables.webURLs.webPages.strHelpVideos, "An error occurred when trying to launch the Help Videos URL in your default browser. The URL has been copied to your Windows Clipboard for you to paste into the address bar in the browser of your choice.")
     End Sub
 
-    Private Sub SetPleaseWaitBorderColorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetPleaseWaitBorderColorToolStripMenuItem.Click
-        ColorDialog.CustomColors = Functions.support.loadCustomColors()
-        ColorDialog.Color = My.Settings.pleaseWaitBorderColor
-
-        If ColorDialog.ShowDialog() = DialogResult.OK Then
-            My.Settings.pleaseWaitBorderColor = ColorDialog.Color
-            globalVariables.pleaseWaitPanelFontColor = Functions.support.getGoodTextColorBasedUponBackgroundColor(My.Settings.pleaseWaitBorderColor)
-            Functions.support.saveCustomColors(ColorDialog.CustomColors)
-            MsgBox("Color Preference Saved.", MsgBoxStyle.Information, "Setting Saved")
-        End If
-    End Sub
-
     Private Sub SetBarColorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetBarColorToolStripMenuItem.Click
         ColorDialog.CustomColors = Functions.support.loadCustomColors()
         ColorDialog.Color = My.Settings.barColor
@@ -3389,9 +3377,6 @@ Public Class Form1
         btnRefreshRestorePoints.Enabled = False
         MenuStrip1.Enabled = False
 
-        'Dim color As Windows.Media.Color = Windows.SystemColors.ActiveBorderColor
-        'pleaseWaitBorderText.BackColor = Drawing.Color.FromArgb(color.A, color.R, color.G, color.B)
-
         strPleaseWaitLabelText = strInputPleaseWaitLabelText
         pleaseWaitProgressBar.ProgressBarColor = My.Settings.barColor
         pleaseWaitlblLabel.Text = strInputPleaseWaitLabelText
@@ -3400,7 +3385,7 @@ Public Class Form1
         pleaseWaitProgressBar.Value = 0
         pleaseWaitProgressBarChanger.Enabled = True
         pleaseWaitMessageChanger.Enabled = True
-        pleaseWaitBorderText.BackColor = My.Settings.pleaseWaitBorderColor
+        pleaseWaitBorderText.BackColor = globalVariables.pleaseWaitPanelColor
         pleaseWaitBorderText.ForeColor = globalVariables.pleaseWaitPanelFontColor
     End Sub
 
