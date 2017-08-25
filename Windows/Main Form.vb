@@ -3251,10 +3251,6 @@ Public Class Form1
         End If
     End Sub
 
-    Private Sub btnClose_Click(sender As Object, e As EventArgs)
-        Me.Close()
-    End Sub
-
     Private Sub btnRefreshRestorePoints_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnRefreshRestorePoints.Click
         If btnRefreshRestorePoints.Text.Equals("Refresh List of System Restore Points", StringComparison.OrdinalIgnoreCase) Then
             openPleaseWaitPanel("Loading Restore Points... Please Wait.")
