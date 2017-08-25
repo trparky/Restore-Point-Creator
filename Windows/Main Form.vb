@@ -1951,26 +1951,6 @@ Public Class Form1
         txtRestorePointDescription.Text = ""
     End Sub
 
-    Private Sub ConfirmRestorePointDeletionsInBatchesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConfirmRestorePointDeletionsInBatchesToolStripMenuItem.Click
-        My.Settings.multiConfirmRestorePointDeletions = ConfirmRestorePointDeletionsInBatchesToolStripMenuItem.Checked
-    End Sub
-
-    Private Sub chkShowVersionInTitleBarToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles chkShowVersionInTitleBarToolStripMenuItem.Click
-        My.Settings.boolShowVersionInWindowTitle = chkShowVersionInTitleBarToolStripMenuItem.Checked
-
-        If My.Settings.boolShowVersionInWindowTitle = True Then
-            If globalVariables.version.boolBeta Then
-                Me.Text = String.Format("Restore Point Creator ({0} Public Beta {1})", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion)
-            ElseIf globalVariables.version.boolReleaseCandidate Then
-                Me.Text = String.Format("Restore Point Creator ({0} Release Candidate {1})", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion)
-            Else
-                Me.Text = "Restore Point Creator (" & globalVariables.version.strFullVersionString & ")"
-            End If
-        Else
-            Me.Text = "Restore Point Creator"
-        End If
-    End Sub
-
     Private Sub txtRestorePointDescription_Leave(sender As Object, e As EventArgs) Handles txtRestorePointDescription.Leave
         doTheGrayingOfTheRestorePointNameTextBox()
     End Sub
@@ -2318,6 +2298,26 @@ Public Class Form1
             End If
         Else
             MsgBox("You have chosen to not use this tool therefore nothing has been done to your system.", MsgBoxStyle.Information, strMessageBoxTitle)
+        End If
+    End Sub
+
+    Private Sub ConfirmRestorePointDeletionsInBatchesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ConfirmRestorePointDeletionsInBatchesToolStripMenuItem.Click
+        My.Settings.multiConfirmRestorePointDeletions = ConfirmRestorePointDeletionsInBatchesToolStripMenuItem.Checked
+    End Sub
+
+    Private Sub chkShowVersionInTitleBarToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles chkShowVersionInTitleBarToolStripMenuItem.Click
+        My.Settings.boolShowVersionInWindowTitle = chkShowVersionInTitleBarToolStripMenuItem.Checked
+
+        If My.Settings.boolShowVersionInWindowTitle = True Then
+            If globalVariables.version.boolBeta Then
+                Me.Text = String.Format("Restore Point Creator ({0} Public Beta {1})", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion)
+            ElseIf globalVariables.version.boolReleaseCandidate Then
+                Me.Text = String.Format("Restore Point Creator ({0} Release Candidate {1})", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion)
+            Else
+                Me.Text = "Restore Point Creator (" & globalVariables.version.strFullVersionString & ")"
+            End If
+        Else
+            Me.Text = "Restore Point Creator"
         End If
     End Sub
 
