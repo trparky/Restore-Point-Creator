@@ -33,11 +33,8 @@ Public Class Official_Contact_Form
                 Dim zipFileObject As ZipFile = ZipFile.Create(zipFilePath) ' Creates a new ZIP file.
                 zipFileObject.BeginUpdate() ' We need to open the ZIP file for writing.
 
-                Dim fileToAdd As String
-
-                For i = 0 To listAttachedFiles.Items.Count - 1
-                    fileToAdd = listAttachedFiles.Items.Item(i).ToString
-                    zipFileObject.Add(fileToAdd, New IO.FileInfo(fileToAdd).Name) ' Adds the file to the ZIP file.
+                For Each item As myListViewItemTypes.contactFormFileListItem In listAttachedFiles.Items
+                    zipFileObject.Add(item.strFileName, New IO.FileInfo(item.strFileName).Name) ' Adds the file to the ZIP file.
                 Next
 
                 zipFileObject.CommitUpdate() ' Commits the added file(s) to the ZIP file.
