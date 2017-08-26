@@ -140,4 +140,10 @@ or anything of the like.
 
 Believe me, I hate spam just as much as you do.</value>
   </data>
+  <metadata name="pleaseWaitMessageChanger.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>106, 20</value>
+  </metadata>
+  <metadata name="pleaseWaitProgressBarChanger.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>311, 20</value>
+  </metadata>
 </root>

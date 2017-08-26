@@ -44,7 +44,14 @@ Partial Class Official_Contact_Form
         Me.listAttachedFiles = New System.Windows.Forms.ListView()
         Me.ColumnHeader1 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ColumnHeader2 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
+        Me.pleaseWaitPanel = New System.Windows.Forms.Panel()
+        Me.pleaseWaitBorderText = New System.Windows.Forms.Label()
+        Me.pleaseWaitlblLabel = New System.Windows.Forms.Label()
+        Me.pleaseWaitProgressBar = New Tom.SmoothProgressBar()
+        Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
+        Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
         Me.TableLayoutPanel1.SuspendLayout()
+        Me.pleaseWaitPanel.SuspendLayout()
         Me.SuspendLayout()
         '
         'Label1
@@ -241,11 +248,63 @@ Partial Class Official_Contact_Form
         Me.ColumnHeader2.Text = "Size"
         Me.ColumnHeader2.Width = 69
         '
+        'pleaseWaitPanel
+        '
+        Me.pleaseWaitPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.pleaseWaitPanel.Controls.Add(Me.pleaseWaitBorderText)
+        Me.pleaseWaitPanel.Controls.Add(Me.pleaseWaitlblLabel)
+        Me.pleaseWaitPanel.Controls.Add(Me.pleaseWaitProgressBar)
+        Me.pleaseWaitPanel.Location = New System.Drawing.Point(108, 258)
+        Me.pleaseWaitPanel.Name = "pleaseWaitPanel"
+        Me.pleaseWaitPanel.Size = New System.Drawing.Size(293, 86)
+        Me.pleaseWaitPanel.TabIndex = 49
+        Me.pleaseWaitPanel.Visible = False
+        '
+        'pleaseWaitBorderText
+        '
+        Me.pleaseWaitBorderText.BackColor = System.Drawing.Color.SkyBlue
+        Me.pleaseWaitBorderText.Location = New System.Drawing.Point(0, 0)
+        Me.pleaseWaitBorderText.Name = "pleaseWaitBorderText"
+        Me.pleaseWaitBorderText.Padding = New System.Windows.Forms.Padding(3, 0, 0, 0)
+        Me.pleaseWaitBorderText.Size = New System.Drawing.Size(292, 23)
+        Me.pleaseWaitBorderText.TabIndex = 4
+        Me.pleaseWaitBorderText.Text = "Please Wait..."
+        Me.pleaseWaitBorderText.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'pleaseWaitlblLabel
+        '
+        Me.pleaseWaitlblLabel.AutoSize = True
+        Me.pleaseWaitlblLabel.Location = New System.Drawing.Point(3, 31)
+        Me.pleaseWaitlblLabel.Name = "pleaseWaitlblLabel"
+        Me.pleaseWaitlblLabel.Size = New System.Drawing.Size(39, 13)
+        Me.pleaseWaitlblLabel.TabIndex = 3
+        Me.pleaseWaitlblLabel.Text = "Label1"
+        '
+        'pleaseWaitProgressBar
+        '
+        Me.pleaseWaitProgressBar.Location = New System.Drawing.Point(6, 56)
+        Me.pleaseWaitProgressBar.Maximum = 100
+        Me.pleaseWaitProgressBar.Minimum = 0
+        Me.pleaseWaitProgressBar.Name = "pleaseWaitProgressBar"
+        Me.pleaseWaitProgressBar.ProgressBarColor = System.Drawing.Color.Blue
+        Me.pleaseWaitProgressBar.Size = New System.Drawing.Size(268, 19)
+        Me.pleaseWaitProgressBar.TabIndex = 2
+        Me.pleaseWaitProgressBar.Value = 0
+        '
+        'pleaseWaitMessageChanger
+        '
+        Me.pleaseWaitMessageChanger.Interval = 250
+        '
+        'pleaseWaitProgressBarChanger
+        '
+        Me.pleaseWaitProgressBarChanger.Interval = 25
+        '
         'Official_Contact_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.ClientSize = New System.Drawing.Size(509, 603)
+        Me.Controls.Add(Me.pleaseWaitPanel)
         Me.Controls.Add(Me.listAttachedFiles)
         Me.Controls.Add(Me.lblTotalFileSize)
         Me.Controls.Add(Me.maxSize)
@@ -267,6 +326,8 @@ Partial Class Official_Contact_Form
         Me.Name = "Official_Contact_Form"
         Me.Text = "Official Contact Form"
         Me.TableLayoutPanel1.ResumeLayout(False)
+        Me.pleaseWaitPanel.ResumeLayout(False)
+        Me.pleaseWaitPanel.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -293,4 +354,10 @@ Partial Class Official_Contact_Form
     Friend WithEvents listAttachedFiles As ListView
     Friend WithEvents ColumnHeader1 As ColumnHeader
     Friend WithEvents ColumnHeader2 As ColumnHeader
+    Friend WithEvents pleaseWaitPanel As Panel
+    Friend WithEvents pleaseWaitBorderText As Label
+    Friend WithEvents pleaseWaitlblLabel As Label
+    Friend WithEvents pleaseWaitProgressBar As Tom.SmoothProgressBar
+    Friend WithEvents pleaseWaitMessageChanger As Timer
+    Friend WithEvents pleaseWaitProgressBarChanger As Timer
 End Class

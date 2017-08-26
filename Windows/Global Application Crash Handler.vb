@@ -175,7 +175,7 @@ Public Class frmCrash
             End If
 
             If boolHTTPResult = True Then
-                If boolDoWeHaveAttachments = True Then Functions.wait.closePleaseWaitWindow()
+                If boolDoWeHaveAttachments = True Then closePleaseWaitPanel()
                 deleteTempFiles()
 
                 If strHTTPResponse.Equals("ok", StringComparison.OrdinalIgnoreCase) Then
@@ -244,7 +244,7 @@ Public Class frmCrash
                     Debug.WriteLine("HTTP Response = " & strHTTPResponse)
                 End If
             Else
-                If boolDoWeHaveAttachments = True Then Functions.wait.closePleaseWaitWindow()
+                If boolDoWeHaveAttachments = True Then closePleaseWaitPanel()
                 deleteTempFiles()
 
                 boolSubmitted = False
@@ -253,7 +253,7 @@ Public Class frmCrash
                 MsgBox("Something went wrong while submitting data. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
             End If
         Catch ex As Exception
-            If boolDoWeHaveAttachments = True Then Functions.wait.closePleaseWaitWindow()
+            If boolDoWeHaveAttachments = True Then closePleaseWaitPanel()
             deleteTempFiles()
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
         End Try
@@ -275,25 +275,92 @@ Public Class frmCrash
         End If
 
         If boolDoWeHaveAttachmentsInLine = True Then
-            Functions.wait.createPleaseWaitWindow("Compressing and Sending Data... Please Wait.", False, enums.howToCenterWindow.parent, False)
+            openPleaseWaitPanel("Compressing and Sending Data... Please Wait.")
         End If
 
         Threading.ThreadPool.QueueUserWorkItem(AddressOf dataSubmitThread)
-
-        If boolDoWeHaveAttachmentsInLine = True Then
-            Functions.wait.openPleaseWaitWindow(Me)
-        End If
     End Sub
 
     Private Sub btnClose_Click(sender As Object, e As EventArgs) Handles btnClose.Click
         If boolSubmitted = False Then
             If MsgBox("Are you sure you want to close this window? You have not submitted the crash data yet.", MsgBoxStyle.Question + MsgBoxStyle.YesNo, Me.Text) = MsgBoxResult.Yes Then
                 boolSubmitted = True
-	            Functions.support.deleteFileWithNoException(globalVariables.strDumpFilePath)
+                Functions.support.deleteFileWithNoException(globalVariables.strDumpFilePath)
                 Me.Close()
             End If
         End If
     End Sub
+
+#Region "--== Please Wait Panel Code ==--"
+    Private strPleaseWaitLabelText As String
+
+    Private Sub centerPleaseWaitPanel()
+        pleaseWaitPanel.Location = New Point(
+            (Me.ClientSize.Width / 2) - (pleaseWaitPanel.Size.Width / 2),
+            (Me.ClientSize.Height / 2) - (pleaseWaitPanel.Size.Height / 2))
+        pleaseWaitPanel.Anchor = AnchorStyles.None
+    End Sub
+
+    Private Sub openPleaseWaitPanel(strInputPleaseWaitLabelText As String)
+        txtName.Enabled = False
+        txtDoing.Enabled = False
+        txtEmail.Enabled = False
+        chkReproducable.Enabled = False
+        chkSendLogs.Enabled = False
+        btnClose.Enabled = False
+        btnSubmitData.Enabled = False
+
+        strPleaseWaitLabelText = strInputPleaseWaitLabelText
+        pleaseWaitProgressBar.ProgressBarColor = My.Settings.barColor
+        pleaseWaitlblLabel.Text = strInputPleaseWaitLabelText
+        centerPleaseWaitPanel()
+        pleaseWaitPanel.Visible = True
+        pleaseWaitProgressBar.Value = 0
+        pleaseWaitProgressBarChanger.Enabled = True
+        pleaseWaitMessageChanger.Enabled = True
+        pleaseWaitBorderText.BackColor = globalVariables.pleaseWaitPanelColor
+        pleaseWaitBorderText.ForeColor = globalVariables.pleaseWaitPanelFontColor
+    End Sub
+
+    Private Sub closePleaseWaitPanel()
+        txtName.Enabled = True
+        txtDoing.Enabled = True
+        txtEmail.Enabled = True
+        chkReproducable.Enabled = True
+        chkSendLogs.Enabled = True
+        btnClose.Enabled = True
+        btnSubmitData.Enabled = True
+
+        pleaseWaitPanel.Visible = False
+        pleaseWaitProgressBarChanger.Enabled = False
+        pleaseWaitMessageChanger.Enabled = False
+        pleaseWaitProgressBar.Value = 0
+    End Sub
+
+    Private Sub pleaseWaitProgressBarChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitProgressBarChanger.Tick
+        If pleaseWaitProgressBar.Value < 100 Then
+            pleaseWaitProgressBar.Value += 1
+        Else
+            pleaseWaitProgressBar.Value = 0
+        End If
+    End Sub
+
+    Private Sub pleaseWaitMessageChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitMessageChanger.Tick
+        If pleaseWaitBorderText.Text = "Please Wait..." Then
+            pleaseWaitBorderText.Text = "Please Wait"
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText
+        ElseIf pleaseWaitBorderText.Text = "Please Wait" Then
+            pleaseWaitBorderText.Text = "Please Wait."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait." Then
+            pleaseWaitBorderText.Text = "Please Wait.."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & ".."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait.." Then
+            pleaseWaitBorderText.Text = "Please Wait..."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "..."
+        End If
+    End Sub
+#End Region
 End Class
 
 Namespace exceptionHandler

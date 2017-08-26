@@ -101,7 +101,7 @@
             End If
 
             If boolHTTPResult = True Then
-                Functions.wait.closePleaseWaitWindow()
+                closePleaseWaitPanel()
                 Debug.WriteLine(httpHelper.getHTTPResponseHeaders.ToString)
                 deleteTempFiles()
 
@@ -170,7 +170,7 @@
                     Me.btnClose.Enabled = True
                 End If
             Else
-                Functions.wait.closePleaseWaitWindow()
+                closePleaseWaitPanel()
                 deleteTempFiles()
 
                 boolSubmitted = False
@@ -179,7 +179,7 @@
                 MsgBox("Something went wrong while submitting data. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
             End If
         Catch ex As Exception
-            Functions.wait.closePleaseWaitWindow()
+            closePleaseWaitPanel()
             deleteTempFiles()
         End Try
     End Sub
@@ -191,13 +191,80 @@
         End If
 
         If chkSendLogs.Checked = True Then
-            Functions.wait.createPleaseWaitWindow("Compressing and Sending Data... Please Wait.", False, enums.howToCenterWindow.parent, False)
+            openPleaseWaitPanel("Compressing and Sending Data... Please Wait.")
         End If
 
         Threading.ThreadPool.QueueUserWorkItem(AddressOf dataSubmitThread)
+    End Sub
 
-        If chkSendLogs.Checked = True Then
-            Functions.wait.openPleaseWaitWindow(Me)
+#Region "--== Please Wait Panel Code ==--"
+    Private strPleaseWaitLabelText As String
+
+    Private Sub centerPleaseWaitPanel()
+        pleaseWaitPanel.Location = New Point(
+            (Me.ClientSize.Width / 2) - (pleaseWaitPanel.Size.Width / 2),
+            (Me.ClientSize.Height / 2) - (pleaseWaitPanel.Size.Height / 2))
+        pleaseWaitPanel.Anchor = AnchorStyles.None
+    End Sub
+
+    Private Sub openPleaseWaitPanel(strInputPleaseWaitLabelText As String)
+        txtName.Enabled = False
+        txtDoing.Enabled = False
+        txtEmail.Enabled = False
+        chkReproducable.Enabled = False
+        chkSendLogs.Enabled = False
+        btnClose.Enabled = False
+        btnSubmitData.Enabled = False
+
+        strPleaseWaitLabelText = strInputPleaseWaitLabelText
+        pleaseWaitProgressBar.ProgressBarColor = My.Settings.barColor
+        pleaseWaitlblLabel.Text = strInputPleaseWaitLabelText
+        centerPleaseWaitPanel()
+        pleaseWaitPanel.Visible = True
+        pleaseWaitProgressBar.Value = 0
+        pleaseWaitProgressBarChanger.Enabled = True
+        pleaseWaitMessageChanger.Enabled = True
+        pleaseWaitBorderText.BackColor = globalVariables.pleaseWaitPanelColor
+        pleaseWaitBorderText.ForeColor = globalVariables.pleaseWaitPanelFontColor
+    End Sub
+
+    Private Sub closePleaseWaitPanel()
+        txtName.Enabled = True
+        txtDoing.Enabled = True
+        txtEmail.Enabled = True
+        chkReproducable.Enabled = True
+        chkSendLogs.Enabled = True
+        btnClose.Enabled = True
+        btnSubmitData.Enabled = True
+
+        pleaseWaitPanel.Visible = False
+        pleaseWaitProgressBarChanger.Enabled = False
+        pleaseWaitMessageChanger.Enabled = False
+        pleaseWaitProgressBar.Value = 0
+    End Sub
+
+    Private Sub pleaseWaitProgressBarChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitProgressBarChanger.Tick
+        If pleaseWaitProgressBar.Value < 100 Then
+            pleaseWaitProgressBar.Value += 1
+        Else
+            pleaseWaitProgressBar.Value = 0
         End If
     End Sub
+
+    Private Sub pleaseWaitMessageChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitMessageChanger.Tick
+        If pleaseWaitBorderText.Text = "Please Wait..." Then
+            pleaseWaitBorderText.Text = "Please Wait"
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText
+        ElseIf pleaseWaitBorderText.Text = "Please Wait" Then
+            pleaseWaitBorderText.Text = "Please Wait."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait." Then
+            pleaseWaitBorderText.Text = "Please Wait.."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & ".."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait.." Then
+            pleaseWaitBorderText.Text = "Please Wait..."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "..."
+        End If
+    End Sub
+#End Region
 End Class

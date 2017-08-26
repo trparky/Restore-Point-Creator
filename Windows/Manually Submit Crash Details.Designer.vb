@@ -38,7 +38,14 @@ Partial Class frmManuallySubmitCrashData
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.chkSendLogs = New System.Windows.Forms.CheckBox()
         Me.Label6 = New System.Windows.Forms.Label()
+        Me.pleaseWaitPanel = New System.Windows.Forms.Panel()
+        Me.pleaseWaitBorderText = New System.Windows.Forms.Label()
+        Me.pleaseWaitlblLabel = New System.Windows.Forms.Label()
+        Me.pleaseWaitProgressBar = New Tom.SmoothProgressBar()
+        Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
+        Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
         Me.TableLayoutPanel1.SuspendLayout()
+        Me.pleaseWaitPanel.SuspendLayout()
         Me.SuspendLayout()
         '
         'btnClose
@@ -171,11 +178,63 @@ Partial Class frmManuallySubmitCrashData
         Me.Label6.TabIndex = 46
         Me.Label6.Text = resources.GetString("Label6.Text")
         '
+        'pleaseWaitPanel
+        '
+        Me.pleaseWaitPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.pleaseWaitPanel.Controls.Add(Me.pleaseWaitBorderText)
+        Me.pleaseWaitPanel.Controls.Add(Me.pleaseWaitlblLabel)
+        Me.pleaseWaitPanel.Controls.Add(Me.pleaseWaitProgressBar)
+        Me.pleaseWaitPanel.Location = New System.Drawing.Point(103, 211)
+        Me.pleaseWaitPanel.Name = "pleaseWaitPanel"
+        Me.pleaseWaitPanel.Size = New System.Drawing.Size(293, 86)
+        Me.pleaseWaitPanel.TabIndex = 47
+        Me.pleaseWaitPanel.Visible = False
+        '
+        'pleaseWaitBorderText
+        '
+        Me.pleaseWaitBorderText.BackColor = System.Drawing.Color.SkyBlue
+        Me.pleaseWaitBorderText.Location = New System.Drawing.Point(0, 0)
+        Me.pleaseWaitBorderText.Name = "pleaseWaitBorderText"
+        Me.pleaseWaitBorderText.Padding = New System.Windows.Forms.Padding(3, 0, 0, 0)
+        Me.pleaseWaitBorderText.Size = New System.Drawing.Size(292, 23)
+        Me.pleaseWaitBorderText.TabIndex = 4
+        Me.pleaseWaitBorderText.Text = "Please Wait..."
+        Me.pleaseWaitBorderText.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'pleaseWaitlblLabel
+        '
+        Me.pleaseWaitlblLabel.AutoSize = True
+        Me.pleaseWaitlblLabel.Location = New System.Drawing.Point(3, 31)
+        Me.pleaseWaitlblLabel.Name = "pleaseWaitlblLabel"
+        Me.pleaseWaitlblLabel.Size = New System.Drawing.Size(39, 13)
+        Me.pleaseWaitlblLabel.TabIndex = 3
+        Me.pleaseWaitlblLabel.Text = "Label1"
+        '
+        'pleaseWaitProgressBar
+        '
+        Me.pleaseWaitProgressBar.Location = New System.Drawing.Point(6, 56)
+        Me.pleaseWaitProgressBar.Maximum = 100
+        Me.pleaseWaitProgressBar.Minimum = 0
+        Me.pleaseWaitProgressBar.Name = "pleaseWaitProgressBar"
+        Me.pleaseWaitProgressBar.ProgressBarColor = System.Drawing.Color.Blue
+        Me.pleaseWaitProgressBar.Size = New System.Drawing.Size(268, 19)
+        Me.pleaseWaitProgressBar.TabIndex = 2
+        Me.pleaseWaitProgressBar.Value = 0
+        '
+        'pleaseWaitMessageChanger
+        '
+        Me.pleaseWaitMessageChanger.Interval = 250
+        '
+        'pleaseWaitProgressBarChanger
+        '
+        Me.pleaseWaitProgressBarChanger.Interval = 25
+        '
         'frmManuallySubmitCrashData
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.ClientSize = New System.Drawing.Size(498, 509)
+        Me.Controls.Add(Me.pleaseWaitPanel)
         Me.Controls.Add(Me.Label6)
         Me.Controls.Add(Me.chkSendLogs)
         Me.Controls.Add(Me.TableLayoutPanel1)
@@ -193,6 +252,8 @@ Partial Class frmManuallySubmitCrashData
         Me.Name = "frmManuallySubmitCrashData"
         Me.Text = "Manually Submit Crash Details"
         Me.TableLayoutPanel1.ResumeLayout(False)
+        Me.pleaseWaitPanel.ResumeLayout(False)
+        Me.pleaseWaitPanel.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -212,4 +273,10 @@ Partial Class frmManuallySubmitCrashData
     Friend WithEvents TableLayoutPanel1 As TableLayoutPanel
     Friend WithEvents chkSendLogs As CheckBox
     Friend WithEvents Label6 As Label
+    Friend WithEvents pleaseWaitPanel As Panel
+    Friend WithEvents pleaseWaitBorderText As Label
+    Friend WithEvents pleaseWaitlblLabel As Label
+    Friend WithEvents pleaseWaitProgressBar As Tom.SmoothProgressBar
+    Friend WithEvents pleaseWaitMessageChanger As Timer
+    Friend WithEvents pleaseWaitProgressBarChanger As Timer
 End Class

@@ -45,6 +45,7 @@ Public Class Official_Contact_Form
             Catch ex As Exception
                 enableFormElements()
                 Functions.eventLogFunctions.writeCrashToEventLog(ex)
+                closePleaseWaitPanel()
                 MsgBox("There was an error while preparing your file attachments for submission. Please see the Event Log for more details.", MsgBoxStyle.Critical, Me.Text)
                 Exit Sub
             End Try
@@ -62,6 +63,7 @@ Public Class Official_Contact_Form
             Try
                 httpHelper.addFileUpload("attachment", zipFilePath, Nothing, "application/zip")
             Catch ex As IO.FileNotFoundException
+                closePleaseWaitPanel()
                 MsgBox("The file attachment you have chosen doesn't exist.", MsgBoxStyle.Critical, Me.Text)
                 enableFormElements()
                 Exit Sub
@@ -81,7 +83,7 @@ Public Class Official_Contact_Form
             End If
 
             If boolHTTPResponseResult = True Then
-                If boolDoWeHaveAttachments = True Then Functions.wait.closePleaseWaitWindow()
+                If boolDoWeHaveAttachments = True Then closePleaseWaitPanel()
 
                 If strHTTPResponse.Equals("ok", StringComparison.OrdinalIgnoreCase) Then
                     listAttachedFiles.Items.Clear()
@@ -111,10 +113,12 @@ Public Class Official_Contact_Form
 
                 btnSubmit.Enabled = True
             Else
+                closePleaseWaitPanel()
                 MsgBox("Error accessing server side script.", MsgBoxStyle.Critical, Me.Text)
             End If
         Catch ex As Exception
         Finally
+            closePleaseWaitPanel()
             enableFormElements()
         End Try
     End Sub
@@ -138,14 +142,10 @@ Public Class Official_Contact_Form
         disableFormElements()
 
         If listAttachedFiles.Items.Count <> 0 Then
-            Functions.wait.createPleaseWaitWindow("Compressing and Sending Data... Please Wait.", False, enums.howToCenterWindow.parent, False)
+            openPleaseWaitPanel("Compressing and Sending Data... Please Wait.")
         End If
 
         Threading.ThreadPool.QueueUserWorkItem(AddressOf dataSubmitThread)
-
-        If listAttachedFiles.Items.Count <> 0 Then
-            Functions.wait.openPleaseWaitWindow(Me)
-        End If
     End Sub
 
     Private Sub Official_Contact_Form_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -272,4 +272,81 @@ Public Class Official_Contact_Form
             MsgBox("You have exceeded the maximum amount of data that is allowed by this form, please reduce the amount of files you have attached." & vbCrLf & vbCrLf & "You are limited to 2 MBs of data.", MsgBoxStyle.Information, Me.Text)
         End If
     End Sub
+
+#Region "--== Please Wait Panel Code ==--"
+    Private strPleaseWaitLabelText As String
+
+    Private Sub centerPleaseWaitPanel()
+        pleaseWaitPanel.Location = New Point(
+            (Me.ClientSize.Width / 2) - (pleaseWaitPanel.Size.Width / 2),
+            (Me.ClientSize.Height / 2) - (pleaseWaitPanel.Size.Height / 2))
+        pleaseWaitPanel.Anchor = AnchorStyles.None
+    End Sub
+
+    Private Sub openPleaseWaitPanel(strInputPleaseWaitLabelText As String)
+        txtName.Enabled = False
+        txtMessage.Enabled = False
+        txtEmail.Enabled = False
+        btnClose.Enabled = False
+        btnSubmit.Enabled = False
+        btnAttachEventLogs.Enabled = False
+        btnBrowse.Enabled = False
+        btnClear.Enabled = False
+        btnDeleteAttachment.Enabled = False
+        listAttachedFiles.Enabled = False
+
+        strPleaseWaitLabelText = strInputPleaseWaitLabelText
+        pleaseWaitProgressBar.ProgressBarColor = My.Settings.barColor
+        pleaseWaitlblLabel.Text = strInputPleaseWaitLabelText
+        centerPleaseWaitPanel()
+        pleaseWaitPanel.Visible = True
+        pleaseWaitProgressBar.Value = 0
+        pleaseWaitProgressBarChanger.Enabled = True
+        pleaseWaitMessageChanger.Enabled = True
+        pleaseWaitBorderText.BackColor = globalVariables.pleaseWaitPanelColor
+        pleaseWaitBorderText.ForeColor = globalVariables.pleaseWaitPanelFontColor
+    End Sub
+
+    Private Sub closePleaseWaitPanel()
+        txtName.Enabled = True
+        txtMessage.Enabled = True
+        txtEmail.Enabled = True
+        btnClose.Enabled = True
+        btnSubmit.Enabled = True
+        btnAttachEventLogs.Enabled = True
+        btnBrowse.Enabled = True
+        btnClear.Enabled = True
+        btnDeleteAttachment.Enabled = True
+        listAttachedFiles.Enabled = True
+
+        pleaseWaitPanel.Visible = False
+        pleaseWaitProgressBarChanger.Enabled = False
+        pleaseWaitMessageChanger.Enabled = False
+        pleaseWaitProgressBar.Value = 0
+    End Sub
+
+    Private Sub pleaseWaitProgressBarChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitProgressBarChanger.Tick
+        If pleaseWaitProgressBar.Value < 100 Then
+            pleaseWaitProgressBar.Value += 1
+        Else
+            pleaseWaitProgressBar.Value = 0
+        End If
+    End Sub
+
+    Private Sub pleaseWaitMessageChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitMessageChanger.Tick
+        If pleaseWaitBorderText.Text = "Please Wait..." Then
+            pleaseWaitBorderText.Text = "Please Wait"
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText
+        ElseIf pleaseWaitBorderText.Text = "Please Wait" Then
+            pleaseWaitBorderText.Text = "Please Wait."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait." Then
+            pleaseWaitBorderText.Text = "Please Wait.."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & ".."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait.." Then
+            pleaseWaitBorderText.Text = "Please Wait..."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "..."
+        End If
+    End Sub
+#End Region
 End Class
