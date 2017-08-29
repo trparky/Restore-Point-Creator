@@ -5,6 +5,7 @@ Public Class Disk_Space_Usage
     Private formLoadDiskDataAttempts As Short = 0
     Private boldFont As New Font("Microsoft Sans Serif", 8.25, FontStyle.Bold)
     Private currentScreen As Screen = Screen.FromControl(Me)
+    Private workingThread As Threading.Thread
 
     Sub manualFixSub(Optional drive As String = "C:")
         If (globalVariables.windows.frmManageSystemRestoreStorageSpace Is Nothing) Then
@@ -245,14 +246,22 @@ Public Class Disk_Space_Usage
 
             stopWatch.Stop()
             If stopWatch.Elapsed.Milliseconds < 1000 Then Threading.Thread.Sleep(1000 - stopWatch.Elapsed.Milliseconds)
-        Catch ex As Exception
-            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
-            exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
-        Finally
+
             btnRefresh.Invoke(Sub() btnRefresh.Enabled = True)
             closePleaseWaitPanel()
             doTheResizingOfTheBars()
             GC.Collect()
+        Catch ex As Threading.ThreadAbortException
+        Catch ex As Exception
+            Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
+            exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
+
+            btnRefresh.Invoke(Sub() btnRefresh.Enabled = True)
+            closePleaseWaitPanel()
+            doTheResizingOfTheBars()
+            GC.Collect()
+        Finally
+            workingThread = Nothing
         End Try
     End Sub
 
@@ -264,6 +273,10 @@ Public Class Disk_Space_Usage
     End Sub
 
     Private Sub Disk_Space_Usage_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        If workingThread IsNot Nothing Then
+            workingThread.Abort()
+        End If
+
         My.Settings.DiskSpaceUsageWindowLocation = Me.Location
         globalVariables.windows.frmDiskSpaceUsageWindow.Dispose()
         globalVariables.windows.frmDiskSpaceUsageWindow = Nothing
@@ -280,7 +293,11 @@ Public Class Disk_Space_Usage
             If Me.IsHandleCreated = True Then
                 If GroupBox1.IsHandleCreated = True Then
                     openPleaseWaitPanel("Loading Disk Space Usage Information... Please Wait.")
-                    Threading.ThreadPool.QueueUserWorkItem(AddressOf loadDiskSpaceUsageData)
+
+                    workingThread = New Threading.Thread(AddressOf loadDiskSpaceUsageData)
+                    workingThread.Name = "Disk Space Usage Data Loading Thread"
+                    workingThread.IsBackground = True
+                    workingThread.Start()
                 End If
             Else
                 Threading.Thread.Sleep(100)
@@ -304,7 +321,11 @@ Public Class Disk_Space_Usage
             GroupBox1.Controls.Clear()
 
             openPleaseWaitPanel("Loading Disk Space Usage Information... Please Wait.")
-            Threading.ThreadPool.QueueUserWorkItem(AddressOf loadDiskSpaceUsageData)
+
+            workingThread = New Threading.Thread(AddressOf loadDiskSpaceUsageData)
+            workingThread.Name = "Disk Space Usage Data Loading Thread"
+            workingThread.IsBackground = True
+            workingThread.Start()
         Catch ex As Exception
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
