@@ -9,6 +9,7 @@
 
     Private selectedIndex As Long
     Private eventLogContents As New List(Of myListViewItemTypes.eventLogListEntry)
+    Private workingThread As Threading.Thread
 
     Sub loadEventLogData(ByVal strEventLog As String, ByRef itemsToPutInToList As List(Of myListViewItemTypes.eventLogListEntry))
         Dim itemAdd As myListViewItemTypes.eventLogListEntry
@@ -68,6 +69,7 @@
                 logReader = Nothing
                 eventLogQuery = Nothing
             End If
+        Catch ex As Threading.ThreadAbortException
         Catch ex As Exception
             MsgBox(ex.Message)
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
@@ -75,32 +77,41 @@
     End Sub
 
     Sub loadEventLog()
-        boolAreWeLoadingTheEventLogData = True
-        Invoke(Sub() Me.Cursor = Cursors.WaitCursor)
-        eventLogContents.Clear() ' Cleans our cached log entries in memory.
+        Try
+            boolAreWeLoadingTheEventLogData = True
+            Invoke(Sub() Me.Cursor = Cursors.WaitCursor)
+            eventLogContents.Clear() ' Cleans our cached log entries in memory.
 
-        Dim timeStamp As Stopwatch = Stopwatch.StartNew()
+            Dim timeStamp As Stopwatch = Stopwatch.StartNew()
 
-        loadEventLogData(globalVariables.eventLog.strApplication, eventLogContents)
-        loadEventLogData(globalVariables.eventLog.strSystemRestorePointCreator, eventLogContents)
+            loadEventLogData(globalVariables.eventLog.strApplication, eventLogContents)
+            loadEventLogData(globalVariables.eventLog.strSystemRestorePointCreator, eventLogContents)
 
-        If timeStamp.Elapsed.Milliseconds < 1000 Then Threading.Thread.Sleep(1000 - timeStamp.Elapsed.Milliseconds)
+            If timeStamp.Elapsed.Milliseconds < 1000 Then Threading.Thread.Sleep(1000 - timeStamp.Elapsed.Milliseconds)
 
-        Me.Invoke(Sub()
-                      lblLogEntryCount.Text = "Entries in Event Log: " & eventLogContents.Count.ToString("N0")
-                      loadEventLogContentsIntoList()
+            Me.Invoke(Sub()
+                          lblLogEntryCount.Text = "Entries in Event Log: " & eventLogContents.Count.ToString("N0")
+                          loadEventLogContentsIntoList()
 
-                      Me.Cursor = Cursors.Default
-                      boolDoneLoading = True
-                      boolAreWeLoadingTheEventLogData = False
+                          Me.Cursor = Cursors.Default
+                          boolDoneLoading = True
+                          boolAreWeLoadingTheEventLogData = False
 
-                      closePleaseWaitPanel()
-                      timeStamp.Stop()
-                      lblProcessedIn.Text = String.Format("Event Log Loaded and Processed in {0}ms ({1} seconds).", timeStamp.ElapsedMilliseconds.ToString("N0"), Math.Round(timeStamp.Elapsed.TotalSeconds, 2))
-                  End Sub)
+                          closePleaseWaitPanel()
+                          timeStamp.Stop()
+                          lblProcessedIn.Text = String.Format("Event Log Loaded and Processed in {0}ms ({1} seconds).", timeStamp.ElapsedMilliseconds.ToString("N0"), Math.Round(timeStamp.Elapsed.TotalSeconds, 2))
+                      End Sub)
+        Catch ex As Threading.ThreadAbortException
+        Finally
+            workingThread = Nothing
+        End Try
     End Sub
 
     Private Sub eventLogForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        If workingThread IsNot Nothing Then
+            workingThread.Abort()
+        End If
+
         My.Settings.eventLogFormWindowLocation = Me.Location
 
         If globalVariables.windows.eventLogForm IsNot Nothing Then
@@ -113,7 +124,11 @@
         If e.KeyCode = Keys.F5 Then
             If Not boolAreWeLoadingTheEventLogData Then
                 openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
-                Threading.ThreadPool.QueueUserWorkItem(AddressOf loadEventLog)
+
+                workingThread = New Threading.Thread(AddressOf loadEventLog)
+                workingThread.Name = "Event Log Data Loading Thread"
+                workingThread.IsBackground = True
+                workingThread.Start()
             End If
         End If
     End Sub
@@ -236,7 +251,11 @@
     Private Sub btnRefreshEvents_Click(sender As Object, e As EventArgs) Handles btnRefreshEvents.Click
         If Not boolAreWeLoadingTheEventLogData Then
             openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
-            Threading.ThreadPool.QueueUserWorkItem(AddressOf loadEventLog)
+
+            workingThread = New Threading.Thread(AddressOf loadEventLog)
+            workingThread.Name = "Event Log Data Loading Thread"
+            workingThread.IsBackground = True
+            workingThread.Start()
         End If
     End Sub
 
@@ -289,7 +308,11 @@
         boolDoneLoading = True
 
         openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
-        Threading.ThreadPool.QueueUserWorkItem(AddressOf loadEventLog)
+
+        workingThread = New Threading.Thread(AddressOf loadEventLog)
+        workingThread.Name = "Event Log Data Loading Thread"
+        workingThread.IsBackground = True
+        workingThread.Start()
     End Sub
 
     Private Sub chkAskMeToSubmitIfViewingAnExceptionEntry_Click(sender As Object, e As EventArgs) Handles chkAskMeToSubmitIfViewingAnExceptionEntry.Click
