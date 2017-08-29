@@ -281,16 +281,7 @@ Public Class Official_Contact_Form
     End Sub
 
     Private Sub openPleaseWaitPanel(strInputPleaseWaitLabelText As String)
-        txtName.Enabled = False
-        txtMessage.Enabled = False
-        txtEmail.Enabled = False
-        btnClose.Enabled = False
-        btnSubmit.Enabled = False
-        btnAttachEventLogs.Enabled = False
-        btnBrowse.Enabled = False
-        btnClear.Enabled = False
-        btnDeleteAttachment.Enabled = False
-        listAttachedFiles.Enabled = False
+        Functions.support.disableControlsOnForm(Me)
 
         strPleaseWaitLabelText = strInputPleaseWaitLabelText
         pleaseWaitProgressBar.ProgressBarColor = My.Settings.barColor
@@ -305,16 +296,7 @@ Public Class Official_Contact_Form
     End Sub
 
     Private Sub closePleaseWaitPanel()
-        txtName.Enabled = True
-        txtMessage.Enabled = True
-        txtEmail.Enabled = True
-        btnClose.Enabled = True
-        btnSubmit.Enabled = True
-        btnAttachEventLogs.Enabled = True
-        btnBrowse.Enabled = True
-        btnClear.Enabled = True
-        btnDeleteAttachment.Enabled = True
-        listAttachedFiles.Enabled = True
+        Functions.support.enableControlsOnForm(Me)
 
         pleaseWaitPanel.Visible = False
         pleaseWaitProgressBarChanger.Enabled = False

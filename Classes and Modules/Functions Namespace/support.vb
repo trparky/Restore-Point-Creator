@@ -12,6 +12,18 @@ Namespace Functions.support
     End Enum
 
     Module support
+        Public Sub enableControlsOnForm(ByRef formToWorkOn As Form)
+            For Each control As Control In formToWorkOn.Controls
+                If Not control.GetType.Equals(GetType(Timer)) And Not control.Name.caseInsensitiveContains("pleasewait") Then control.Enabled = True
+            Next
+        End Sub
+
+        Public Sub disableControlsOnForm(ByRef formToWorkOn As Form)
+            For Each control As Control In formToWorkOn.Controls
+                If Not control.GetType.Equals(GetType(Timer)) And Not control.Name.caseInsensitiveContains("pleasewait") Then control.Enabled = False
+            Next
+        End Sub
+
         Public Function getDWMGlassColor() As Color
             Try
                 ' This checks to see if we are running on Windows 8 or Windows 10 since the API we're accessing

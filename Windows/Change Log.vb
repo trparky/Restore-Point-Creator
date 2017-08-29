@@ -107,6 +107,8 @@
     End Sub
 
     Private Sub openPleaseWaitPanel(strInputPleaseWaitLabelText As String)
+        Functions.support.disableControlsOnForm(Me)
+
         strPleaseWaitLabelText = strInputPleaseWaitLabelText
         pleaseWaitProgressBar.ProgressBarColor = My.Settings.barColor
         pleaseWaitlblLabel.Text = strInputPleaseWaitLabelText
@@ -120,6 +122,8 @@
     End Sub
 
     Private Sub closePleaseWaitPanel()
+        Functions.support.enableControlsOnForm(Me)
+
         pleaseWaitPanel.Visible = False
         pleaseWaitProgressBarChanger.Enabled = False
         pleaseWaitMessageChanger.Enabled = False

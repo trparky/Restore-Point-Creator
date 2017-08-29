@@ -3387,15 +3387,7 @@ Public Class Form1
     End Sub
 
     Private Sub openPleaseWaitPanel(strInputPleaseWaitLabelText As String)
-        btnRestoreToRestorePoint.Enabled = False
-        btnDeleteRestorePoint.Enabled = False
-        btnRestoreToRestorePointSafeMode.Enabled = False
-        txtRestorePointDescription.Enabled = False
-        btnCreate.Enabled = False
-        btnCreateSystemCheckpoint.Enabled = False
-        btnCreateRestorePointNameWithDefaultName.Enabled = False
-        btnRefreshRestorePoints.Enabled = False
-        MenuStrip1.Enabled = False
+        Functions.support.disableControlsOnForm(Me)
 
         strPleaseWaitLabelText = strInputPleaseWaitLabelText
         pleaseWaitProgressBar.ProgressBarColor = My.Settings.barColor
@@ -3410,14 +3402,7 @@ Public Class Form1
     End Sub
 
     Private Sub closePleaseWaitPanel()
-        btnRestoreToRestorePoint.Enabled = True
-        btnDeleteRestorePoint.Enabled = True
-        btnRestoreToRestorePointSafeMode.Enabled = True
-        txtRestorePointDescription.Enabled = True
-        btnCreateSystemCheckpoint.Enabled = True
-        btnCreateRestorePointNameWithDefaultName.Enabled = True
-        btnRefreshRestorePoints.Enabled = True
-        MenuStrip1.Enabled = True
+        Functions.support.enableControlsOnForm(Me)
 
         pleaseWaitPanel.Visible = False
         pleaseWaitProgressBarChanger.Enabled = False

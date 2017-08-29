@@ -469,14 +469,7 @@
     End Sub
 
     Private Sub openPleaseWaitPanel(strInputPleaseWaitLabelText As String)
-        btnRefreshEvents.Enabled = False
-        btnOpenEventLog.Enabled = False
-        btnSearch.Enabled = False
-        btnClear.Enabled = False
-        btnExportLogs.Enabled = False
-        chkAskMeToSubmitIfViewingAnExceptionEntry.Enabled = False
-        eventLogList.Enabled = False
-        eventLogText.Enabled = False
+        Functions.support.disableControlsOnForm(Me)
 
         pleaseWaitProgressBar.ProgressBarColor = My.Settings.barColor
         strPleaseWaitLabelText = strInputPleaseWaitLabelText
@@ -491,14 +484,7 @@
     End Sub
 
     Private Sub closePleaseWaitPanel()
-        btnRefreshEvents.Enabled = True
-        btnOpenEventLog.Enabled = True
-        btnSearch.Enabled = True
-        btnClear.Enabled = True
-        btnExportLogs.Enabled = True
-        chkAskMeToSubmitIfViewingAnExceptionEntry.Enabled = True
-        eventLogList.Enabled = True
-        eventLogText.Enabled = True
+        Functions.support.enableControlsOnForm(Me)
 
         pleaseWaitPanel.Visible = False
         pleaseWaitProgressBarChanger.Enabled = False

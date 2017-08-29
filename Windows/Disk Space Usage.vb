@@ -458,9 +458,7 @@ Public Class Disk_Space_Usage
     End Sub
 
     Private Sub openPleaseWaitPanel(strInputPleaseWaitLabelText As String)
-        btnManageSystemRestoreStorageSize.Enabled = False
-        btnSetBarColor.Enabled = False
-        chkShowFullDisksAsRed.Enabled = False
+        Functions.support.disableControlsOnForm(Me)
 
         pleaseWaitProgressBar.ProgressBarColor = My.Settings.barColor
         strPleaseWaitLabelText = strInputPleaseWaitLabelText
@@ -475,9 +473,7 @@ Public Class Disk_Space_Usage
     End Sub
 
     Private Sub closePleaseWaitPanel()
-        btnManageSystemRestoreStorageSize.Enabled = True
-        btnSetBarColor.Enabled = True
-        chkShowFullDisksAsRed.Enabled = True
+        Functions.support.enableControlsOnForm(Me)
 
         pleaseWaitPanel.Visible = False
         pleaseWaitProgressBarChanger.Enabled = False

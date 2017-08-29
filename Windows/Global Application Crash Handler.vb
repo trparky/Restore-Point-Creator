@@ -302,13 +302,7 @@ Public Class frmCrash
     End Sub
 
     Private Sub openPleaseWaitPanel(strInputPleaseWaitLabelText As String)
-        txtName.Enabled = False
-        txtDoing.Enabled = False
-        txtEmail.Enabled = False
-        chkReproducable.Enabled = False
-        chkSendLogs.Enabled = False
-        btnClose.Enabled = False
-        btnSubmitData.Enabled = False
+        Functions.support.disableControlsOnForm(Me)
 
         strPleaseWaitLabelText = strInputPleaseWaitLabelText
         pleaseWaitProgressBar.ProgressBarColor = My.Settings.barColor
@@ -323,13 +317,7 @@ Public Class frmCrash
     End Sub
 
     Private Sub closePleaseWaitPanel()
-        txtName.Enabled = True
-        txtDoing.Enabled = True
-        txtEmail.Enabled = True
-        chkReproducable.Enabled = True
-        chkSendLogs.Enabled = True
-        btnClose.Enabled = True
-        btnSubmitData.Enabled = True
+        Functions.support.enableControlsOnForm(Me)
 
         pleaseWaitPanel.Visible = False
         pleaseWaitProgressBarChanger.Enabled = False
