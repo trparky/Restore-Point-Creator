@@ -1,10 +1,8 @@
 ﻿Public Class Change_Log
-    Private loadThread As Threading.Thread
+    Private workingThread As Threading.Thread
 
     Private Sub Change_Log_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
-        If loadThread IsNot Nothing Then
-            loadThread.Abort()
-        End If
+        If workingThread IsNot Nothing Then workingThread.Abort()
 
         My.Settings.changeLogWindowSize = Me.Size
         globalVariables.windows.frmChangeLog.Dispose()
@@ -12,13 +10,13 @@
     End Sub
 
     Sub loadChangelog()
-        If loadThread Is Nothing Then
+        If workingThread Is Nothing Then
             openPleaseWaitPanel("Loading Official Change Log... Please Wait.")
 
-            loadThread = New Threading.Thread(AddressOf loadChangelogSub)
-            loadThread.Name = "Change Log Loading Thread"
-            loadThread.IsBackground = True
-            loadThread.Start()
+            workingThread = New Threading.Thread(AddressOf loadChangelogSub)
+            workingThread.Name = "Change Log Loading Thread"
+            workingThread.IsBackground = True
+            workingThread.Start()
         End If
     End Sub
 
@@ -50,14 +48,14 @@
 
                     Me.Invoke(Sub()
                                   closePleaseWaitPanel()
-                                  loadThread = Nothing
+                                  workingThread = Nothing
                                   AbortToolStripMenuItem.Visible = False
                               End Sub)
                 Else
                     Me.Invoke(Sub()
                                   RichTextBox1.Text = "There was an error loading the official changelog."
                                   closePleaseWaitPanel()
-                                  loadThread = Nothing
+                                  workingThread = Nothing
                                   AbortToolStripMenuItem.Visible = False
                               End Sub)
                     Exit Sub
@@ -66,20 +64,20 @@
                 Exit Sub
             End Try
         Catch ex2 As Threading.ThreadAbortException
-            loadThread = Nothing
         Catch ex As Exception
             Me.Invoke(Sub()
                           RichTextBox1.Text = "Error loading change log data."
                           closePleaseWaitPanel()
-                          loadThread = Nothing
+                          workingThread = Nothing
                           AbortToolStripMenuItem.Visible = False
                       End Sub)
         Finally
+            workingThread = Nothing
         End Try
     End Sub
 
     Private Sub AbortToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AbortToolStripMenuItem.Click
-        loadThread.Abort()
+        workingThread.Abort()
     End Sub
 
     Private Sub ReloadToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ReloadToolStripMenuItem.Click

@@ -273,9 +273,7 @@ Public Class Disk_Space_Usage
     End Sub
 
     Private Sub Disk_Space_Usage_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        If workingThread IsNot Nothing Then
-            workingThread.Abort()
-        End If
+        If workingThread IsNot Nothing Then workingThread.Abort()
 
         My.Settings.DiskSpaceUsageWindowLocation = Me.Location
         globalVariables.windows.frmDiskSpaceUsageWindow.Dispose()
@@ -310,7 +308,6 @@ Public Class Disk_Space_Usage
                 formLoadDiskData()
             End If
         Catch ex As Exception
-
         End Try
     End Sub
 
