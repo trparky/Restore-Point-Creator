@@ -19,6 +19,11 @@ Namespace My
         End Sub
 
         Private Sub MyApplication_Startup(sender As Object, e As ApplicationServices.StartupEventArgs) Handles Me.Startup
+            Try
+                Process.GetCurrentProcess.PriorityClass = ProcessPriorityClass.Normal
+            Catch ex As Exception
+            End Try
+
             exceptionHandler.loadExceptionHandler()
             Functions.startupFunctions.validateSettings()
 
