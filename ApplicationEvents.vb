@@ -18,12 +18,20 @@ Namespace My
             Process.GetCurrentProcess.Kill()
         End Sub
 
-        Private Sub MyApplication_Startup(sender As Object, e As ApplicationServices.StartupEventArgs) Handles Me.Startup
+        Private Sub setProcessPriorities()
             Try
                 Process.GetCurrentProcess.PriorityClass = ProcessPriorityClass.Normal
             Catch ex As Exception
             End Try
 
+            Try
+                Functions.IOPriority.SetIOPriority(Functions.IOPriority.IOPrioritySetting.Normal)
+            Catch ex As Exception
+            End Try
+        End Sub
+
+        Private Sub MyApplication_Startup(sender As Object, e As ApplicationServices.StartupEventArgs) Handles Me.Startup
+            setProcessPriorities()
             exceptionHandler.loadExceptionHandler()
             Functions.startupFunctions.validateSettings()
 
