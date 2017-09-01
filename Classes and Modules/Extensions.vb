@@ -1,6 +1,35 @@
 ﻿Imports System.Runtime.CompilerServices
 Imports System.Text.RegularExpressions
 
+Module ProcessExtensions
+    Private Function FindIndexedProcessName(pid As Integer) As String
+        Dim processName As String = Process.GetProcessById(pid).ProcessName
+        Dim processesByName As Process() = Process.GetProcessesByName(processName)
+        Dim processIndexdName As String = Nothing
+
+        For index As Integer = 0 To processesByName.Length - 1
+            processIndexdName = If(index = 0, processName, processName + "#" + index)
+
+            Using performanceCounterObject As New PerformanceCounter("Process", "ID Process", processIndexdName)
+                If CInt(performanceCounterObject.NextValue()).Equals(pid) Then Return processIndexdName
+            End Using
+        Next
+
+        Return processIndexdName
+    End Function
+
+    Private Function FindPidFromIndexedProcessName(indexedProcessName As String) As Process
+        Using performanceCounterObject As New PerformanceCounter("Process", "Creating Process ID", indexedProcessName)
+            Return Process.GetProcessById(CInt(performanceCounterObject.NextValue()))
+        End Using
+    End Function
+
+    <Extension()>
+    Public Function Parent(process As Process) As Process
+        Return FindPidFromIndexedProcessName(FindIndexedProcessName(process.Id))
+    End Function
+End Module
+
 Module DateExtensions
     ''' <summary>Converts .NET Date Objects to a standard 64-bit Integer-based UNIX Timestamp.</summary>
     ''' <param name="inputDate">A .NET Date Object.</param>
