@@ -210,7 +210,9 @@ Namespace Functions.support
                     GetType(IO.DirectoryNotFoundException),
                     GetType(Management.ManagementException),
                     GetType(ObjectDisposedException),
-                    GetType(StackOverflowException)
+                    GetType(StackOverflowException),
+                    GetType(PlatformNotSupportedException),
+                    GetType(NotSupportedException)
                 }
 
                 If listExceptionTypes.Contains(exceptionType) Then
@@ -224,6 +226,10 @@ Namespace Functions.support
                         If Not String.IsNullOrEmpty(FileNotFoundExceptionObject.FusionLog) Then
                             stringBuilder.AppendLine("Reason: " & FileNotFoundExceptionObject.FusionLog)
                         End If
+                    ElseIf exceptionType.Equals(GetType(PlatformNotSupportedException)) Then
+                        stringBuilder.AppendLine("Source: " & DirectCast(rawExceptionObject, PlatformNotSupportedException).Source)
+                    ElseIf exceptionType.Equals(GetType(NotSupportedException)) Then
+                        stringBuilder.AppendLine("Source: " & DirectCast(rawExceptionObject, NotSupportedException).Source)
                     ElseIf exceptionType.Equals(GetType(Management.ManagementException)) Then
                         Dim ManagementExceptionObject As Management.ManagementException = DirectCast(rawExceptionObject, Management.ManagementException)
                         stringBuilder.AppendLine("Source: " & ManagementExceptionObject.Source)
