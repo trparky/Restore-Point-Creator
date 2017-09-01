@@ -19,16 +19,28 @@ Namespace My
         End Sub
 
         Private Sub setProcessPriorities()
-            Try
-                Process.GetCurrentProcess.PriorityClass = ProcessPriorityClass.Normal
-            Catch ex As Exception
-            End Try
+            If Functions.privilegeChecks.areWeAnAdministrator() Then
+                If areWeRunningAsATask() Then
+                    Try
+                        Process.GetCurrentProcess.PriorityClass = ProcessPriorityClass.Normal
+                    Catch ex As Exception
+                    End Try
 
-            Try
-                Functions.IOPriority.SetIOPriority(Functions.IOPriority.IOPrioritySetting.Normal)
-            Catch ex As Exception
-            End Try
+                    Try
+                        Functions.IOPriority.SetIOPriority(Functions.IOPriority.IOPrioritySetting.Normal)
+                    Catch ex As Exception
+                    End Try
+                End If
+            End If
         End Sub
+
+        Private Function areWeRunningAsATask() As Boolean
+            Try
+                Return Process.GetCurrentProcess.Parent.ProcessName.caseInsensitiveContains("svchost")
+            Catch ex As Exception
+                Return False
+            End Try
+        End Function
 
         Private Sub MyApplication_Startup(sender As Object, e As ApplicationServices.StartupEventArgs) Handles Me.Startup
             setProcessPriorities()
