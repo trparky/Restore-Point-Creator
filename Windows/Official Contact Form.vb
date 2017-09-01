@@ -1,10 +1,10 @@
 ﻿Imports System.ComponentModel
 Imports ICSharpCode.SharpZipLib.Zip
-Imports System.Text
 
 Public Class Official_Contact_Form
     Protected Const apiAccessCode As String = "YWiIMIyGVVFEunRpDF5PNIF2yzcADdBxneRmWDlLpMTCoVFEunRWiIMIyRmWnRpDF"
     Private strFileToHaveDataExportedTo As String = IO.Path.Combine(IO.Path.GetTempPath(), "event log entries.reslogx")
+    Private Const intMaxSize As Integer = 6291456
 
     Private Sub btnClose_Click(sender As Object, e As EventArgs) Handles btnClose.Click
         Me.Close()
@@ -33,11 +33,8 @@ Public Class Official_Contact_Form
                 Dim zipFileObject As ZipFile = ZipFile.Create(zipFilePath) ' Creates a new ZIP file.
                 zipFileObject.BeginUpdate() ' We need to open the ZIP file for writing.
 
-                Dim fileToAdd As String
-
-                For i = 0 To listAttachedFiles.Items.Count - 1
-                    fileToAdd = listAttachedFiles.Items.Item(i).ToString
-                    zipFileObject.Add(fileToAdd, New IO.FileInfo(fileToAdd).Name) ' Adds the file to the ZIP file.
+                For Each item As myListViewItemTypes.contactFormFileListItem In listAttachedFiles.Items
+                    zipFileObject.Add(item.strFileName, New IO.FileInfo(item.strFileName).Name) ' Adds the file to the ZIP file.
                 Next
 
                 zipFileObject.CommitUpdate() ' Commits the added file(s) to the ZIP file.
@@ -45,6 +42,7 @@ Public Class Official_Contact_Form
             Catch ex As Exception
                 enableFormElements()
                 Functions.eventLogFunctions.writeCrashToEventLog(ex)
+                closePleaseWaitPanel()
                 MsgBox("There was an error while preparing your file attachments for submission. Please see the Event Log for more details.", MsgBoxStyle.Critical, Me.Text)
                 Exit Sub
             End Try
@@ -62,6 +60,7 @@ Public Class Official_Contact_Form
             Try
                 httpHelper.addFileUpload("attachment", zipFilePath, Nothing, "application/zip")
             Catch ex As IO.FileNotFoundException
+                closePleaseWaitPanel()
                 MsgBox("The file attachment you have chosen doesn't exist.", MsgBoxStyle.Critical, Me.Text)
                 enableFormElements()
                 Exit Sub
@@ -81,40 +80,42 @@ Public Class Official_Contact_Form
             End If
 
             If boolHTTPResponseResult = True Then
-                If boolDoWeHaveAttachments = True Then Functions.wait.closePleaseWaitWindow()
+                If boolDoWeHaveAttachments = True Then closePleaseWaitPanel()
 
-                If strHTTPResponse.stringCompare("ok") Then
+                If strHTTPResponse.Equals("ok", StringComparison.OrdinalIgnoreCase) Then
                     listAttachedFiles.Items.Clear()
                     If IO.File.Exists(zipFilePath) Then IO.File.Delete(zipFilePath)
 
                     MsgBox("Your email to the developer has been sent. This window will now close.", MsgBoxStyle.Information, Me.Text)
                     Me.Close()
-                ElseIf strHTTPResponse.stringCompare("error-invalid-email") Then
+                ElseIf strHTTPResponse.Equals("error-invalid-email", StringComparison.OrdinalIgnoreCase) Then
                     MsgBox("Invalid email address. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                ElseIf strHTTPResponse.stringCompare("email-server-said-user-doesnt-exist") Then
+                ElseIf strHTTPResponse.Equals("email-server-said-user-doesnt-exist", StringComparison.OrdinalIgnoreCase) Then
                     MsgBox("The remote email server said that the email address doesn't exist. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                ElseIf strHTTPResponse.stringCompare("dns-error") Then
+                ElseIf strHTTPResponse.Equals("dns-error", StringComparison.OrdinalIgnoreCase) Then
                     MsgBox("The domain name doesn't exist. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                ElseIf strHTTPResponse.stringCompare("server-connect-error") Then
+                ElseIf strHTTPResponse.Equals("server-connect-error", StringComparison.OrdinalIgnoreCase) Then
                     MsgBox("Unable to contact mail server, more than likely your email address is invalid. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                ElseIf strHTTPResponse.stringCompare("invalid-email-syntax") Then
+                ElseIf strHTTPResponse.Equals("invalid-email-syntax", StringComparison.OrdinalIgnoreCase) Then
                     MsgBox("The email address didn't pass syntax validation. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                ElseIf strHTTPResponse.stringCompare("no-email-servers-contactable") Then
+                ElseIf strHTTPResponse.Equals("no-email-servers-contactable", StringComparison.OrdinalIgnoreCase) Then
                     MsgBox("No mail servers found, more than likely your email address is invalid. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                ElseIf strHTTPResponse.stringCompare("no-access-allowed") Then
+                ElseIf strHTTPResponse.Equals("no-access-allowed", StringComparison.OrdinalIgnoreCase) Then
                     MsgBox("Error accessing server side script.", MsgBoxStyle.Critical, Me.Text)
-                ElseIf strHTTPResponse.stringCompare("error-no-message-found") Then
+                ElseIf strHTTPResponse.Equals("error-no-message-found", StringComparison.OrdinalIgnoreCase) Then
                     MsgBox("No message found. Please try again.", MsgBoxStyle.Critical, Me.Text)
-                ElseIf strHTTPResponse.stringCompare("file_attachment_failure") Then
+                ElseIf strHTTPResponse.Equals("file_attachment_failure", StringComparison.OrdinalIgnoreCase) Then
                     MsgBox("File attachment failure. Please try again.", MsgBoxStyle.Critical, Me.Text)
                 End If
 
                 btnSubmit.Enabled = True
             Else
+                closePleaseWaitPanel()
                 MsgBox("Error accessing server side script.", MsgBoxStyle.Critical, Me.Text)
             End If
         Catch ex As Exception
         Finally
+            closePleaseWaitPanel()
             enableFormElements()
         End Try
     End Sub
@@ -138,21 +139,29 @@ Public Class Official_Contact_Form
         disableFormElements()
 
         If listAttachedFiles.Items.Count <> 0 Then
-            Functions.wait.createPleaseWaitWindow("Compressing and Sending Data... Please Wait.", False, enums.howToCenterWindow.parent, False)
+            openPleaseWaitPanel("Compressing and Sending Data... Please Wait.")
         End If
 
         Threading.ThreadPool.QueueUserWorkItem(AddressOf dataSubmitThread)
-
-        If listAttachedFiles.Items.Count <> 0 Then
-            Functions.wait.openPleaseWaitWindow(Me)
-        End If
     End Sub
 
     Private Sub Official_Contact_Form_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        maxSize.ProgressBarColor = My.Settings.barColor
+
         If My.Settings.useSSL = True Then
             btnSubmit.Image = My.Resources.lock
             ToolTip.SetToolTip(btnSubmit, "Secured by SSL.")
         End If
+    End Sub
+
+    Private Sub addFileToList(strFileName As String)
+        Dim listViewItem As New myListViewItemTypes.contactFormFileListItem With {
+            .Text = strFileName,
+            .strFileName = strFileName,
+            .longFileSize = New IO.FileInfo(strFileName).Length
+        }
+        listViewItem.SubItems.Add(Functions.support.bytesToHumanSize(listViewItem.longFileSize))
+        listAttachedFiles.Items.Add(listViewItem)
     End Sub
 
     Private Sub btnBrowseForAttachment_Click(sender As Object, e As EventArgs) Handles btnBrowse.Click
@@ -163,11 +172,12 @@ Public Class Official_Contact_Form
         If OpenFileDialog1.ShowDialog() = DialogResult.OK Then
             Dim fileInfo As New IO.FileInfo(OpenFileDialog1.FileName)
 
-            If fileInfo.Extension.stringCompare(".png") Or fileInfo.Extension.stringCompare(".jpg") Or fileInfo.Extension.stringCompare(".jpeg") Or fileInfo.Extension.stringCompare(".txt") Or fileInfo.Extension.stringCompare(".log") Or fileInfo.Extension.stringCompare(".reslog") Then
+            If fileInfo.Extension.Equals(".png", StringComparison.OrdinalIgnoreCase) Or fileInfo.Extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase) Or fileInfo.Extension.Equals(".jpeg", StringComparison.OrdinalIgnoreCase) Or fileInfo.Extension.Equals(".txt", StringComparison.OrdinalIgnoreCase) Or fileInfo.Extension.Equals(".log", StringComparison.OrdinalIgnoreCase) Or fileInfo.Extension.Equals(".reslog", StringComparison.OrdinalIgnoreCase) Then
                 If doesFileExistInList(OpenFileDialog1.FileName.ToString) = True Then
                     MsgBox("A file by the name of " & Chr(34) & New IO.FileInfo(OpenFileDialog1.FileName.ToString).Name & Chr(34) & " already exists in the list of attached files.", MsgBoxStyle.Information, Me.Text)
                 Else
-                    listAttachedFiles.Items.Add(OpenFileDialog1.FileName.ToString)
+                    addFileToList(OpenFileDialog1.FileName.ToString)
+                    calculateTotalSize()
                 End If
             Else
                 MsgBox("Invalid file attachment.", MsgBoxStyle.Information, Me.Text)
@@ -176,15 +186,19 @@ Public Class Official_Contact_Form
     End Sub
 
     Private Sub btnDeleteAttachment_Click(sender As Object, e As EventArgs) Handles btnDeleteAttachment.Click
-        Dim strFileToBeRemoved As String = listAttachedFiles.Text
-        If listAttachedFiles.SelectedItems.Count <> 0 Then listAttachedFiles.Items.Remove(listAttachedFiles.SelectedItems(0))
-
-        If strFileToBeRemoved.EndsWith(".reslog", StringComparison.OrdinalIgnoreCase) = True Then
-            Try
-                IO.File.Delete(strFileToBeRemoved)
-            Catch ex As Exception
-            End Try
+        If listAttachedFiles.SelectedItems.Count > 0 Then
+            For Each item As myListViewItemTypes.contactFormFileListItem In listAttachedFiles.SelectedItems
+                If item.strFileName.EndsWith(".reslog", StringComparison.OrdinalIgnoreCase) Or item.strFileName.EndsWith(".reslogx", StringComparison.OrdinalIgnoreCase) Then
+                    Try
+                        IO.File.Delete(item.strFileName)
+                    Catch ex As Exception
+                    End Try
+                End If
+                item.Remove()
+            Next
         End If
+
+        calculateTotalSize()
     End Sub
 
     Function doesFileExistInList(strFileToCheckForExistanceOf As String) As Boolean
@@ -193,9 +207,8 @@ Public Class Official_Contact_Form
         Else
             strFileToCheckForExistanceOf = New IO.FileInfo(strFileToCheckForExistanceOf).Name
 
-            For Each item As String In listAttachedFiles.Items
-                item = New IO.FileInfo(item).Name
-                If item.stringCompare(strFileToCheckForExistanceOf) Then Return True
+            For Each item As myListViewItemTypes.contactFormFileListItem In listAttachedFiles.Items
+                If New IO.FileInfo(item.strFileName).Name.Equals(strFileToCheckForExistanceOf, StringComparison.OrdinalIgnoreCase) Then Return True
             Next
 
             Return False
@@ -204,19 +217,20 @@ Public Class Official_Contact_Form
 
     Private Sub btnClear_Click(sender As Object, e As EventArgs) Handles btnClear.Click
         listAttachedFiles.Items.Clear()
+        maxSize.Value = 0
     End Sub
 
     Private Sub btnAttachEventLogs_Click(sender As Object, e As EventArgs) Handles btnAttachEventLogs.Click
         Try
             Dim logCount As ULong = 0
-            Dim timeStamp As New Stopwatch
-            timeStamp.Start()
+            Dim timeStamp As Stopwatch = Stopwatch.StartNew()
 
             If Functions.eventLogFunctions.exportLogsToFile(strFileToHaveDataExportedTo, logCount) Then
                 timeStamp.Stop()
 
                 btnAttachEventLogs.Enabled = False
-                listAttachedFiles.Items.Add(strFileToHaveDataExportedTo)
+                addFileToList(strFileToHaveDataExportedTo)
+                calculateTotalSize()
 
                 MsgBox(String.Format("{0} log entries have been successfully exported and added to the list of attached files.{1}{1}Application Event Log exported in {2}ms ({3} seconds).", logCount, vbCrLf, timeStamp.ElapsedMilliseconds, Math.Round(timeStamp.Elapsed.TotalSeconds, 3)), MsgBoxStyle.Information, Me.Text)
             Else
@@ -238,4 +252,80 @@ Public Class Official_Contact_Form
             End Try
         End If
     End Sub
+
+    Sub calculateTotalSize()
+        btnSubmit.Enabled = True
+        Dim size As Integer
+
+        For Each item As myListViewItemTypes.contactFormFileListItem In listAttachedFiles.Items
+            size += item.longFileSize
+        Next
+
+        lblTotalFileSize.Text = String.Format("You have attached {0} of the maximum {1} allowed.", Functions.support.bytesToHumanSize(size), Functions.support.bytesToHumanSize(intMaxSize))
+        maxSize.Value = Math.Round((size / intMaxSize) * 100, 0)
+
+        If size > intMaxSize Then
+            btnSubmit.Enabled = False
+            MsgBox("You have exceeded the maximum amount of data that is allowed by this form, please reduce the amount of files you have attached." & vbCrLf & vbCrLf & "You are limited to 2 MBs of data.", MsgBoxStyle.Information, Me.Text)
+        End If
+    End Sub
+
+#Region "--== Please Wait Panel Code ==--"
+    Private strPleaseWaitLabelText As String
+
+    Private Sub centerPleaseWaitPanel()
+        pleaseWaitPanel.Location = New Point(
+            (Me.ClientSize.Width / 2) - (pleaseWaitPanel.Size.Width / 2),
+            (Me.ClientSize.Height / 2) - (pleaseWaitPanel.Size.Height / 2))
+        pleaseWaitPanel.Anchor = AnchorStyles.None
+    End Sub
+
+    Private Sub openPleaseWaitPanel(strInputPleaseWaitLabelText As String)
+        Functions.support.disableControlsOnForm(Me)
+
+        strPleaseWaitLabelText = strInputPleaseWaitLabelText
+        pleaseWaitProgressBar.ProgressBarColor = My.Settings.barColor
+        pleaseWaitlblLabel.Text = strInputPleaseWaitLabelText
+        centerPleaseWaitPanel()
+        pleaseWaitPanel.Visible = True
+        pleaseWaitProgressBar.Value = 0
+        pleaseWaitProgressBarChanger.Enabled = True
+        pleaseWaitMessageChanger.Enabled = True
+        pleaseWaitBorderText.BackColor = globalVariables.pleaseWaitPanelColor
+        pleaseWaitBorderText.ForeColor = globalVariables.pleaseWaitPanelFontColor
+    End Sub
+
+    Private Sub closePleaseWaitPanel()
+        Functions.support.enableControlsOnForm(Me)
+
+        pleaseWaitPanel.Visible = False
+        pleaseWaitProgressBarChanger.Enabled = False
+        pleaseWaitMessageChanger.Enabled = False
+        pleaseWaitProgressBar.Value = 0
+    End Sub
+
+    Private Sub pleaseWaitProgressBarChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitProgressBarChanger.Tick
+        If pleaseWaitProgressBar.Value < 100 Then
+            pleaseWaitProgressBar.Value += 1
+        Else
+            pleaseWaitProgressBar.Value = 0
+        End If
+    End Sub
+
+    Private Sub pleaseWaitMessageChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitMessageChanger.Tick
+        If pleaseWaitBorderText.Text = "Please Wait..." Then
+            pleaseWaitBorderText.Text = "Please Wait"
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText
+        ElseIf pleaseWaitBorderText.Text = "Please Wait" Then
+            pleaseWaitBorderText.Text = "Please Wait."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait." Then
+            pleaseWaitBorderText.Text = "Please Wait.."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & ".."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait.." Then
+            pleaseWaitBorderText.Text = "Please Wait..."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "..."
+        End If
+    End Sub
+#End Region
 End Class

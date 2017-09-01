@@ -83,8 +83,10 @@ Partial Class Form1
         Me.BackupToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RestoreToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripMenuItem5 = New System.Windows.Forms.ToolStripSeparator()
-        Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SetBarColorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.SetPleaseWaitBorderColorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.barBelowColorSettings = New System.Windows.Forms.ToolStripSeparator()
+        Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.toolStripClear = New System.Windows.Forms.ToolStripMenuItem()
         Me.toolStripMyComputer = New System.Windows.Forms.ToolStripMenuItem()
         Me.CreateRestorePointAtUserLogonToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -136,9 +138,16 @@ Partial Class Form1
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.importBackupDialog = New System.Windows.Forms.OpenFileDialog()
         Me.exportBackupDialog = New System.Windows.Forms.SaveFileDialog()
+        Me.pleaseWaitPanel = New System.Windows.Forms.Panel()
+        Me.pleaseWaitBorderText = New System.Windows.Forms.Label()
+        Me.pleaseWaitlblLabel = New System.Windows.Forms.Label()
+        Me.pleaseWaitProgressBar = New Tom.SmoothProgressBar()
+        Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
+        Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
         Me.restorePointListContextMenu.SuspendLayout()
         Me.buttonTableLayout.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
+        Me.pleaseWaitPanel.SuspendLayout()
         Me.SuspendLayout()
         '
         'Label1
@@ -487,7 +496,7 @@ Partial Class Form1
         '
         'OptionsToolStripMenuItem
         '
-        Me.OptionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveSafeModeBootOptionToolStripMenuItem, Me.InterfaceTooBigToolStripMenuItem, Me.AdditionalOptionsAndSettingsToolStripMenuItem, Me.ConfigurationBackupRestoreToolStripMenuItem, Me.ToolStripMenuItem5, Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem, Me.SetBarColorToolStripMenuItem, Me.toolStripClear, Me.toolStripMyComputer, Me.CreateRestorePointAtUserLogonToolStripMenuItem, Me.ConfigureProxyToolStripMenuItem, Me.SetWindowsActivePowerPlanSettingsForWakeTimersBackToDefaultToolStripMenuItem, Me.KeepXAmountOfRestorePointsToolStripMenuItem, Me.DefaultCustomRestorePointNameToolStripMenuItem, Me.ConfigureHTTPTimeoutToolStripMenuItem, Me.ToolStripMenuItem3, Me.SoftwareUpdateSettingsToolStripMenuItem, Me.NotificationOptionsToolStripMenuItem, Me.UseSSLToolStripMenuItem, Me.lineBeforeDebugMenuItem, Me.SwitchToDebugBuildToolStripMenuItem})
+        Me.OptionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveSafeModeBootOptionToolStripMenuItem, Me.InterfaceTooBigToolStripMenuItem, Me.AdditionalOptionsAndSettingsToolStripMenuItem, Me.ConfigurationBackupRestoreToolStripMenuItem, Me.ToolStripMenuItem5, Me.SetBarColorToolStripMenuItem, Me.SetPleaseWaitBorderColorToolStripMenuItem, Me.barBelowColorSettings, Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem, Me.toolStripClear, Me.toolStripMyComputer, Me.CreateRestorePointAtUserLogonToolStripMenuItem, Me.ConfigureProxyToolStripMenuItem, Me.SetWindowsActivePowerPlanSettingsForWakeTimersBackToDefaultToolStripMenuItem, Me.KeepXAmountOfRestorePointsToolStripMenuItem, Me.DefaultCustomRestorePointNameToolStripMenuItem, Me.ConfigureHTTPTimeoutToolStripMenuItem, Me.ToolStripMenuItem3, Me.SoftwareUpdateSettingsToolStripMenuItem, Me.NotificationOptionsToolStripMenuItem, Me.UseSSLToolStripMenuItem, Me.lineBeforeDebugMenuItem, Me.SwitchToDebugBuildToolStripMenuItem})
         Me.OptionsToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.settings
         Me.OptionsToolStripMenuItem.Name = "OptionsToolStripMenuItem"
         Me.OptionsToolStripMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.AsNeeded
@@ -624,19 +633,31 @@ Partial Class Form1
         Me.ToolStripMenuItem5.Name = "ToolStripMenuItem5"
         Me.ToolStripMenuItem5.Size = New System.Drawing.Size(428, 6)
         '
-        'RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem
-        '
-        Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.calculator
-        Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem.Name = "RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem"
-        Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem.Size = New System.Drawing.Size(431, 22)
-        Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem.Text = "Round the age of restore point in days to how many decimals?"
-        '
         'SetBarColorToolStripMenuItem
         '
         Me.SetBarColorToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.color_wheel
         Me.SetBarColorToolStripMenuItem.Name = "SetBarColorToolStripMenuItem"
         Me.SetBarColorToolStripMenuItem.Size = New System.Drawing.Size(431, 22)
         Me.SetBarColorToolStripMenuItem.Text = "Set Progress Bar Color"
+        '
+        'SetPleaseWaitBorderColorToolStripMenuItem
+        '
+        Me.SetPleaseWaitBorderColorToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.color_wheel
+        Me.SetPleaseWaitBorderColorToolStripMenuItem.Name = "SetPleaseWaitBorderColorToolStripMenuItem"
+        Me.SetPleaseWaitBorderColorToolStripMenuItem.Size = New System.Drawing.Size(431, 22)
+        Me.SetPleaseWaitBorderColorToolStripMenuItem.Text = "Set Please Wait Border Color"
+        '
+        'barBelowColorSettings
+        '
+        Me.barBelowColorSettings.Name = "barBelowColorSettings"
+        Me.barBelowColorSettings.Size = New System.Drawing.Size(428, 6)
+        '
+        'RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem
+        '
+        Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.calculator
+        Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem.Name = "RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem"
+        Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem.Size = New System.Drawing.Size(431, 22)
+        Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem.Text = "Round the age of restore point in days to how many decimals?"
         '
         'toolStripClear
         '
@@ -979,11 +1000,63 @@ Partial Class Form1
         '
         Me.importBackupDialog.FileName = "OpenFileDialog1"
         '
+        'pleaseWaitPanel
+        '
+        Me.pleaseWaitPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.pleaseWaitPanel.Controls.Add(Me.pleaseWaitBorderText)
+        Me.pleaseWaitPanel.Controls.Add(Me.pleaseWaitlblLabel)
+        Me.pleaseWaitPanel.Controls.Add(Me.pleaseWaitProgressBar)
+        Me.pleaseWaitPanel.Location = New System.Drawing.Point(216, 160)
+        Me.pleaseWaitPanel.Name = "pleaseWaitPanel"
+        Me.pleaseWaitPanel.Size = New System.Drawing.Size(293, 86)
+        Me.pleaseWaitPanel.TabIndex = 40
+        Me.pleaseWaitPanel.Visible = False
+        '
+        'pleaseWaitBorderText
+        '
+        Me.pleaseWaitBorderText.BackColor = System.Drawing.Color.SkyBlue
+        Me.pleaseWaitBorderText.Location = New System.Drawing.Point(0, 0)
+        Me.pleaseWaitBorderText.Name = "pleaseWaitBorderText"
+        Me.pleaseWaitBorderText.Padding = New System.Windows.Forms.Padding(3, 0, 0, 0)
+        Me.pleaseWaitBorderText.Size = New System.Drawing.Size(292, 23)
+        Me.pleaseWaitBorderText.TabIndex = 4
+        Me.pleaseWaitBorderText.Text = "Please Wait..."
+        Me.pleaseWaitBorderText.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'pleaseWaitlblLabel
+        '
+        Me.pleaseWaitlblLabel.AutoSize = True
+        Me.pleaseWaitlblLabel.Location = New System.Drawing.Point(3, 31)
+        Me.pleaseWaitlblLabel.Name = "pleaseWaitlblLabel"
+        Me.pleaseWaitlblLabel.Size = New System.Drawing.Size(39, 13)
+        Me.pleaseWaitlblLabel.TabIndex = 3
+        Me.pleaseWaitlblLabel.Text = "Label1"
+        '
+        'pleaseWaitProgressBar
+        '
+        Me.pleaseWaitProgressBar.Location = New System.Drawing.Point(6, 56)
+        Me.pleaseWaitProgressBar.Maximum = 100
+        Me.pleaseWaitProgressBar.Minimum = 0
+        Me.pleaseWaitProgressBar.Name = "pleaseWaitProgressBar"
+        Me.pleaseWaitProgressBar.ProgressBarColor = System.Drawing.Color.Blue
+        Me.pleaseWaitProgressBar.Size = New System.Drawing.Size(268, 19)
+        Me.pleaseWaitProgressBar.TabIndex = 2
+        Me.pleaseWaitProgressBar.Value = 0
+        '
+        'pleaseWaitProgressBarChanger
+        '
+        Me.pleaseWaitProgressBarChanger.Interval = 25
+        '
+        'pleaseWaitMessageChanger
+        '
+        Me.pleaseWaitMessageChanger.Interval = 250
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.ClientSize = New System.Drawing.Size(722, 423)
+        Me.Controls.Add(Me.pleaseWaitPanel)
         Me.Controls.Add(Me.btnCreateRestorePointNameWithDefaultName)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.Label2)
@@ -1005,6 +1078,8 @@ Partial Class Form1
         Me.buttonTableLayout.ResumeLayout(False)
         Me.MenuStrip1.ResumeLayout(False)
         Me.MenuStrip1.PerformLayout()
+        Me.pleaseWaitPanel.ResumeLayout(False)
+        Me.pleaseWaitPanel.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -1122,4 +1197,12 @@ Partial Class Form1
     Friend WithEvents ConfigureHTTPTimeoutToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ConfirmRestorePointDeletionsInBatchesToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ManuallyFixSystemRestoreToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents pleaseWaitPanel As Panel
+    Friend WithEvents pleaseWaitProgressBarChanger As Timer
+    Friend WithEvents pleaseWaitBorderText As Label
+    Friend WithEvents pleaseWaitlblLabel As Label
+    Friend WithEvents pleaseWaitProgressBar As Tom.SmoothProgressBar
+    Friend WithEvents pleaseWaitMessageChanger As Timer
+    Friend WithEvents SetPleaseWaitBorderColorToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents barBelowColorSettings As ToolStripSeparator
 End Class

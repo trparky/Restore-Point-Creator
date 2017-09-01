@@ -140,4 +140,28 @@
             End Set
         End Property
     End Class
+
+    ' This class extends the ListViewItem so that I can add more properties to it for my purposes.
+    Public Class contactFormFileListItem
+        Inherits ListViewItem
+        Private _strFileName As String, _longFileSize As Long
+
+        Public Property strFileName() As String
+            Get
+                Return _strFileName
+            End Get
+            Set(value As String)
+                _strFileName = value
+            End Set
+        End Property
+
+        Public Property longFileSize() As Long
+            Get
+                Return _longFileSize
+            End Get
+            Set(value As Long)
+                _longFileSize = value
+            End Set
+        End Property
+    End Class
 End Namespace

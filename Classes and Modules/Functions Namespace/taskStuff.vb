@@ -202,7 +202,7 @@ Namespace Functions.taskStuff
                 Dim strEvery As String = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Every", Nothing)
 
                 ' Checks to see if the value in the Registry existed, if it exists then it shouldn't equal "nothing".
-                If strEvery <> Nothing Then
+                If strEvery IsNot Nothing Then
                     ' Good, the Every setting existed in the Registry. So let's continue the work here.
 
                     Dim shortEvery As Short ' Creates a Short variable with a name of everyShort.
@@ -371,11 +371,7 @@ Namespace Functions.taskStuff
                         ' value from the Registry cannot be parsed, we give the boolNoTask variable a default value of False.
                         ' If the value is False, we use the Task Wrapper to launch the program. If the value is True, we prompt
                         ' the user for a UAC prompt instead.
-                        If Boolean.TryParse(registryKey.GetValue("No Task", "False"), boolNoTask) = False Then
-                            ' We weren't able to parse the value from the Registry so let's
-                            ' give the boolNoTask variable a default value of False.
-                            boolNoTask = False
-                        End If
+                        boolNoTask = registryStuff.getBooleanValueFromRegistry(registryKey, "No Task", False)
 
                         ' And let's close the Registry key.
                         registryKey.Close()
@@ -414,7 +410,7 @@ Namespace Functions.taskStuff
                                 Dim commandLineArgument As String = My.Application.CommandLineArgs(0).Trim
 
                                 ' Handles the creation of a restore point from the command line or shortcut.
-                                If commandLineArgument.stringCompare(globalVariables.commandLineSwitches.createRestorePoint) Then
+                                If commandLineArgument.Equals(globalVariables.commandLineSwitches.createRestorePoint, StringComparison.OrdinalIgnoreCase) Then
                                     ' Checks to see if the Task Wrapper task exists and returns both a Boolean value and a task object.
                                     If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Restore Point)", task) = True Then
                                         ' Yes, the Task Wrapper task exists so we are going to run that task.
@@ -423,7 +419,7 @@ Namespace Functions.taskStuff
                                         ' OK, we relaunch the process with full Administrator privileges with a UAC prompt.
                                         support.reRunWithAdminUserRights()
                                     End If
-                                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.createCustomRestorePoint) Then
+                                ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.createCustomRestorePoint, StringComparison.OrdinalIgnoreCase) Then
                                     ' Checks to see if the Task Wrapper task exists and returns both a Boolean value and a task object.
                                     If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Custom Restore Point)", task) = True Then
                                         ' Yes, the Task Wrapper task exists so we are going to run that task.
@@ -432,7 +428,7 @@ Namespace Functions.taskStuff
                                         ' OK, we relaunch the process with full Administrator privileges with a UAC prompt.
                                         support.reRunWithAdminUserRights()
                                     End If
-                                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.deleteOldRestorePoints) Then
+                                ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.deleteOldRestorePoints, StringComparison.OrdinalIgnoreCase) Then
                                     ' Checks to see if the Task Wrapper task exists and returns both a Boolean value and a task object.
                                     If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Delete old Restore Points)", task) = True Then
                                         ' Yes, the Task Wrapper task exists so we are going to run that task.
@@ -441,7 +437,7 @@ Namespace Functions.taskStuff
                                         ' OK, we relaunch the process with full Administrator privileges with a UAC prompt.
                                         support.reRunWithAdminUserRights()
                                     End If
-                                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints) Then
+                                ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints, StringComparison.OrdinalIgnoreCase) Then
                                     ' Checks to see if the Task Wrapper task exists and returns both a Boolean value and a task object.
                                     If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Keep X Number of Restore Points)", task) = True Then
                                         ' Yes, the Task Wrapper task exists so we are going to run that task.
@@ -450,7 +446,7 @@ Namespace Functions.taskStuff
                                         ' OK, we relaunch the process with full Administrator privileges with a UAC prompt.
                                         support.reRunWithAdminUserRights()
                                     End If
-                                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.forceUAC) And boolAreWeRunningAsAdministrator = False Then
+                                ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.forceUAC, StringComparison.OrdinalIgnoreCase) And boolAreWeRunningAsAdministrator = False Then
                                     ' OK, we relaunch the process with full Administrator privileges with a UAC prompt.
                                     support.reRunWithAdminUserRights()
                                 End If

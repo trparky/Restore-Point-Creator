@@ -28,7 +28,6 @@ Partial Class eventLogForm
         Me.ColumnHeader2 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ColumnHeader3 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ColumnHeader4 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
-        Me.ColumnHeader5 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.imageList = New System.Windows.Forms.ImageList(Me.components)
         Me.eventLogText = New System.Windows.Forms.TextBox()
         Me.btnRefreshEvents = New System.Windows.Forms.Button()
@@ -44,12 +43,19 @@ Partial Class eventLogForm
         Me.btnSearch = New System.Windows.Forms.Button()
         Me.chkAskMeToSubmitIfViewingAnExceptionEntry = New System.Windows.Forms.CheckBox()
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
+        Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
+        Me.pleaseWaitPanel = New System.Windows.Forms.Panel()
+        Me.pleaseWaitBorderText = New System.Windows.Forms.Label()
+        Me.pleaseWaitlblLabel = New System.Windows.Forms.Label()
+        Me.pleaseWaitProgressBar = New Tom.SmoothProgressBar()
+        Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
         Me.StatusStrip1.SuspendLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
+        Me.pleaseWaitPanel.SuspendLayout()
         Me.SuspendLayout()
         '
         'eventLogList
@@ -57,7 +63,7 @@ Partial Class eventLogForm
         Me.eventLogList.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.eventLogList.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader1, Me.ColumnHeader2, Me.ColumnHeader3, Me.ColumnHeader4, Me.ColumnHeader5})
+        Me.eventLogList.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader1, Me.ColumnHeader2, Me.ColumnHeader3, Me.ColumnHeader4})
         Me.eventLogList.FullRowSelect = True
         Me.eventLogList.Location = New System.Drawing.Point(3, 3)
         Me.eventLogList.MultiSelect = False
@@ -87,11 +93,6 @@ Partial Class eventLogForm
         '
         Me.ColumnHeader4.Text = "Log Source"
         Me.ColumnHeader4.Width = 95
-        '
-        'ColumnHeader5
-        '
-        Me.ColumnHeader5.Text = "*"
-        Me.ColumnHeader5.Width = 18
         '
         'imageList
         '
@@ -263,11 +264,63 @@ Partial Class eventLogForm
     "ins Exception data"
         Me.chkAskMeToSubmitIfViewingAnExceptionEntry.UseVisualStyleBackColor = True
         '
+        'pleaseWaitProgressBarChanger
+        '
+        Me.pleaseWaitProgressBarChanger.Interval = 25
+        '
+        'pleaseWaitPanel
+        '
+        Me.pleaseWaitPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.pleaseWaitPanel.Controls.Add(Me.pleaseWaitBorderText)
+        Me.pleaseWaitPanel.Controls.Add(Me.pleaseWaitlblLabel)
+        Me.pleaseWaitPanel.Controls.Add(Me.pleaseWaitProgressBar)
+        Me.pleaseWaitPanel.Location = New System.Drawing.Point(284, 123)
+        Me.pleaseWaitPanel.Name = "pleaseWaitPanel"
+        Me.pleaseWaitPanel.Size = New System.Drawing.Size(293, 86)
+        Me.pleaseWaitPanel.TabIndex = 41
+        Me.pleaseWaitPanel.Visible = False
+        '
+        'pleaseWaitBorderText
+        '
+        Me.pleaseWaitBorderText.BackColor = System.Drawing.Color.SkyBlue
+        Me.pleaseWaitBorderText.Location = New System.Drawing.Point(0, 0)
+        Me.pleaseWaitBorderText.Name = "pleaseWaitBorderText"
+        Me.pleaseWaitBorderText.Padding = New System.Windows.Forms.Padding(3, 0, 0, 0)
+        Me.pleaseWaitBorderText.Size = New System.Drawing.Size(292, 23)
+        Me.pleaseWaitBorderText.TabIndex = 4
+        Me.pleaseWaitBorderText.Text = "Please Wait..."
+        Me.pleaseWaitBorderText.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'pleaseWaitlblLabel
+        '
+        Me.pleaseWaitlblLabel.AutoSize = True
+        Me.pleaseWaitlblLabel.Location = New System.Drawing.Point(3, 31)
+        Me.pleaseWaitlblLabel.Name = "pleaseWaitlblLabel"
+        Me.pleaseWaitlblLabel.Size = New System.Drawing.Size(39, 13)
+        Me.pleaseWaitlblLabel.TabIndex = 3
+        Me.pleaseWaitlblLabel.Text = "Label1"
+        '
+        'pleaseWaitProgressBar
+        '
+        Me.pleaseWaitProgressBar.Location = New System.Drawing.Point(6, 56)
+        Me.pleaseWaitProgressBar.Maximum = 100
+        Me.pleaseWaitProgressBar.Minimum = 0
+        Me.pleaseWaitProgressBar.Name = "pleaseWaitProgressBar"
+        Me.pleaseWaitProgressBar.ProgressBarColor = System.Drawing.Color.Blue
+        Me.pleaseWaitProgressBar.Size = New System.Drawing.Size(268, 19)
+        Me.pleaseWaitProgressBar.TabIndex = 2
+        Me.pleaseWaitProgressBar.Value = 0
+        '
+        'pleaseWaitMessageChanger
+        '
+        Me.pleaseWaitMessageChanger.Interval = 250
+        '
         'eventLogForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.ClientSize = New System.Drawing.Size(860, 332)
+        Me.Controls.Add(Me.pleaseWaitPanel)
         Me.Controls.Add(Me.chkAskMeToSubmitIfViewingAnExceptionEntry)
         Me.Controls.Add(Me.SplitContainer1)
         Me.Controls.Add(Me.StatusStrip1)
@@ -284,6 +337,8 @@ Partial Class eventLogForm
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer1.ResumeLayout(False)
         Me.TableLayoutPanel2.ResumeLayout(False)
+        Me.pleaseWaitPanel.ResumeLayout(False)
+        Me.pleaseWaitPanel.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -306,7 +361,12 @@ Partial Class eventLogForm
     Friend WithEvents chkAskMeToSubmitIfViewingAnExceptionEntry As CheckBox
     Friend WithEvents btnSearch As Button
     Friend WithEvents btnClear As Button
-    Friend WithEvents ColumnHeader5 As ColumnHeader
     Friend WithEvents btnExportLogs As Button
     Friend WithEvents SaveFileDialog1 As SaveFileDialog
+    Friend WithEvents pleaseWaitProgressBarChanger As Timer
+    Friend WithEvents pleaseWaitPanel As Panel
+    Friend WithEvents pleaseWaitBorderText As Label
+    Friend WithEvents pleaseWaitlblLabel As Label
+    Friend WithEvents pleaseWaitProgressBar As Tom.SmoothProgressBar
+    Friend WithEvents pleaseWaitMessageChanger As Timer
 End Class

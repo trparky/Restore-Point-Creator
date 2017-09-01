@@ -224,18 +224,9 @@ Namespace Functions.startupFunctions
                 Dim dateDiffResults As Short
                 Dim numberOfOldRestorePointsDeleted As Short = 0
 
-                ' First we read it as a String and store it in memory as a String.
-                Dim boolValueFromRegistryAsString As String = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey).GetValue("Log Restore Point Deletions", "False")
-                boolValueFromRegistryAsString = boolValueFromRegistryAsString.Trim ' Then we trim it.
-                Dim boolLogDeletedRestorePoints As Boolean ' We now make a Boolean variable.
+                Dim boolLogDeletedRestorePoints As Boolean = registryStuff.getBooleanValueFromRegistry(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey), "Log Restore Point Deletions", True)
 
-                ' Check to see if the String is a valid Boolean String value.
-                If Boolean.TryParse(boolValueFromRegistryAsString.Trim, boolLogDeletedRestorePoints) = False Then
-                    ' Oops, we have invalid data so at this point we are going to ignore the setting in the Registry and just assume a True value.
-                    boolLogDeletedRestorePoints = True
-                End If
-
-                If boolLogDeletedRestorePoints = True Then
+                If boolLogDeletedRestorePoints Then
                     eventLogFunctions.writeToSystemEventLog("Began processing of old System Restore Points.", EventLogEntryType.Information)
                 End If
 
@@ -383,11 +374,7 @@ Namespace Functions.startupFunctions
 
                 Dim registryObject As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
                 If registryObject IsNot Nothing Then
-                    If Boolean.TryParse(registryObject.GetValue("Enable Extended Logging During Updating", "True"), boolExtendedLoggingForUpdating) = False Then
-                        ' This is in case we can't parse the value from the Registry.
-                        boolExtendedLoggingForUpdating = True
-                    End If
-
+                    boolExtendedLoggingForUpdating = registryStuff.getBooleanValueFromRegistry(registryObject, "Enable Extended Logging During Updating", True)
                     registryObject.Close()
                 End If
 
@@ -413,7 +400,7 @@ Namespace Functions.startupFunctions
 
                     Dim restorePointCreatorMainEXEName As String = currentProcessFileName.caseInsensitiveReplace(".new.exe", "")
 
-                    If commandLineArgument.stringCompare("-update") Then
+                    If commandLineArgument.Equals("-update", StringComparison.OrdinalIgnoreCase) Then
                         registryStuff.updateRestorePointCreatorUninstallationInfo()
 
                         If globalVariables.version.boolBeta = True Then

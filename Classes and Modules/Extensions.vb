@@ -11,7 +11,6 @@ Module DateExtensions
             inputDate = DateAdd(DateInterval.Hour, -1, inputDate)
         End If
 
-        'Return DateDiff(DateInterval.Second, #1/1/1970#, inputDate)
         Return DateDiff(DateInterval.Second, New DateTime(1970, 1, 1, 0, 0, 0, 0), inputDate)
     End Function
 End Module
@@ -51,15 +50,6 @@ Module StringExtensions
     Public Function caseInsensitiveContains(haystack As String, needle As String) As Boolean
         Dim index As Integer = haystack.IndexOf(needle, StringComparison.OrdinalIgnoreCase)
         Return (index >= 0)
-    End Function
-
-    <Extension()>
-    Public Function stringCompare(str1 As String, str2 As String, Optional boolCaseInsensitive As Boolean = True) As Boolean
-        If boolCaseInsensitive = True Then
-            Return str1.Trim.Equals(str2.Trim, StringComparison.OrdinalIgnoreCase)
-        Else
-            Return str1.Trim.Equals(str2.Trim, StringComparison.Ordinal)
-        End If
     End Function
 
     ''' <summary>This function performs RegEx search on a String. This function operates a lot like Contains().</summary>

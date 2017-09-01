@@ -140,7 +140,7 @@ Public Class frmCrash
 
         httpHelper.addPOSTData("crashdata", txtStackTrace.Text)
 
-        If txtDoing.Text.Trim <> Nothing Then
+        If txtDoing.Text.Trim IsNot Nothing Then
             httpHelper.addPOSTData("doing", txtDoing.Text)
         End If
 
@@ -175,64 +175,64 @@ Public Class frmCrash
             End If
 
             If boolHTTPResult = True Then
-                If boolDoWeHaveAttachments = True Then Functions.wait.closePleaseWaitWindow()
+                If boolDoWeHaveAttachments = True Then closePleaseWaitPanel()
                 deleteTempFiles()
 
-                If strHTTPResponse.stringCompare("ok") Then
+                If strHTTPResponse.Equals("ok", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = True
                     MsgBox("Crash data has been submitted. The program will now close.", MsgBoxStyle.Information, "Restore Point Creator Crash Reporter")
                     Me.Close()
-                ElseIf strHTTPResponse.stringCompare("error") Then
+                ElseIf strHTTPResponse.Equals("error", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
                     MsgBox("There was an error in submission. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
-                ElseIf strHTTPResponse.stringCompare("error-invalid-email") Then
+                ElseIf strHTTPResponse.Equals("error-invalid-email", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
                     MsgBox("Invalid email address. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
-                ElseIf strHTTPResponse.stringCompare("email-server-said-user-doesnt-exist") Then
+                ElseIf strHTTPResponse.Equals("email-server-said-user-doesnt-exist", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
                     MsgBox("The remote email server said that the email address doesn't exist. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
-                ElseIf strHTTPResponse.stringCompare("no-email-servers-contactable") Then
+                ElseIf strHTTPResponse.Equals("no-email-servers-contactable", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
                     MsgBox("No mail servers found, more than likely your email address is invalid. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
-                ElseIf strHTTPResponse.stringCompare("dns-error") Then
+                ElseIf strHTTPResponse.Equals("dns-error", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
                     MsgBox("The domain name doesn't exist. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
-                ElseIf strHTTPResponse.stringCompare("server-connect-error") Then
+                ElseIf strHTTPResponse.Equals("server-connect-error", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
                     MsgBox("Unable to contact mail server, more than likely your email address is invalid. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
-                ElseIf strHTTPResponse.stringCompare("error-no-crash-data-found") Then
+                ElseIf strHTTPResponse.Equals("error-no-crash-data-found", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
                     MsgBox("Something went wrong, no crash data found in submission data. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
-                ElseIf strHTTPResponse.stringCompare("error-no-program-code-found") Then
+                ElseIf strHTTPResponse.Equals("error-no-program-code-found", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
                     MsgBox("Something went wrong, no program code found in submission data. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
-                ElseIf strHTTPResponse.stringCompare("error-no-email-address-found") Then
+                ElseIf strHTTPResponse.Equals("error-no-email-address-found", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
                     MsgBox("Something went wrong, no email address found in submission data. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
-                ElseIf strHTTPResponse.stringCompare("error-no-name-found") Then
+                ElseIf strHTTPResponse.Equals("error-no-name-found", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
                     MsgBox("Something went wrong, no name found in submission data. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
-                ElseIf strHTTPResponse.stringCompare("invalid-email-syntax") Then
+                ElseIf strHTTPResponse.Equals("invalid-email-syntax", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
@@ -244,7 +244,7 @@ Public Class frmCrash
                     Debug.WriteLine("HTTP Response = " & strHTTPResponse)
                 End If
             Else
-                If boolDoWeHaveAttachments = True Then Functions.wait.closePleaseWaitWindow()
+                If boolDoWeHaveAttachments = True Then closePleaseWaitPanel()
                 deleteTempFiles()
 
                 boolSubmitted = False
@@ -253,14 +253,14 @@ Public Class frmCrash
                 MsgBox("Something went wrong while submitting data. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
             End If
         Catch ex As Exception
-            If boolDoWeHaveAttachments = True Then Functions.wait.closePleaseWaitWindow()
+            If boolDoWeHaveAttachments = True Then closePleaseWaitPanel()
             deleteTempFiles()
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
         End Try
     End Sub
 
     Private Sub btnSubmitData_Click(sender As Object, e As EventArgs) Handles btnSubmitData.Click
-        If txtEmail.Text.Trim = Nothing Then
+        If String.IsNullOrEmpty(txtEmail.Text.Trim) Then
             MsgBox("You must provide your email address.", MsgBoxStyle.Critical, Me.Text)
             Exit Sub
         End If
@@ -275,25 +275,80 @@ Public Class frmCrash
         End If
 
         If boolDoWeHaveAttachmentsInLine = True Then
-            Functions.wait.createPleaseWaitWindow("Compressing and Sending Data... Please Wait.", False, enums.howToCenterWindow.parent, False)
+            openPleaseWaitPanel("Compressing and Sending Data... Please Wait.")
         End If
 
         Threading.ThreadPool.QueueUserWorkItem(AddressOf dataSubmitThread)
-
-        If boolDoWeHaveAttachmentsInLine = True Then
-            Functions.wait.openPleaseWaitWindow(Me)
-        End If
     End Sub
 
     Private Sub btnClose_Click(sender As Object, e As EventArgs) Handles btnClose.Click
         If boolSubmitted = False Then
             If MsgBox("Are you sure you want to close this window? You have not submitted the crash data yet.", MsgBoxStyle.Question + MsgBoxStyle.YesNo, Me.Text) = MsgBoxResult.Yes Then
                 boolSubmitted = True
-	            Functions.support.deleteFileWithNoException(globalVariables.strDumpFilePath)
+                Functions.support.deleteFileWithNoException(globalVariables.strDumpFilePath)
                 Me.Close()
             End If
         End If
     End Sub
+
+#Region "--== Please Wait Panel Code ==--"
+    Private strPleaseWaitLabelText As String
+
+    Private Sub centerPleaseWaitPanel()
+        pleaseWaitPanel.Location = New Point(
+            (Me.ClientSize.Width / 2) - (pleaseWaitPanel.Size.Width / 2),
+            (Me.ClientSize.Height / 2) - (pleaseWaitPanel.Size.Height / 2))
+        pleaseWaitPanel.Anchor = AnchorStyles.None
+    End Sub
+
+    Private Sub openPleaseWaitPanel(strInputPleaseWaitLabelText As String)
+        Functions.support.disableControlsOnForm(Me)
+
+        strPleaseWaitLabelText = strInputPleaseWaitLabelText
+        pleaseWaitProgressBar.ProgressBarColor = My.Settings.barColor
+        pleaseWaitlblLabel.Text = strInputPleaseWaitLabelText
+        centerPleaseWaitPanel()
+        pleaseWaitPanel.Visible = True
+        pleaseWaitProgressBar.Value = 0
+        pleaseWaitProgressBarChanger.Enabled = True
+        pleaseWaitMessageChanger.Enabled = True
+        pleaseWaitBorderText.BackColor = globalVariables.pleaseWaitPanelColor
+        pleaseWaitBorderText.ForeColor = globalVariables.pleaseWaitPanelFontColor
+    End Sub
+
+    Private Sub closePleaseWaitPanel()
+        Functions.support.enableControlsOnForm(Me)
+
+        pleaseWaitPanel.Visible = False
+        pleaseWaitProgressBarChanger.Enabled = False
+        pleaseWaitMessageChanger.Enabled = False
+        pleaseWaitProgressBar.Value = 0
+    End Sub
+
+    Private Sub pleaseWaitProgressBarChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitProgressBarChanger.Tick
+        If pleaseWaitProgressBar.Value < 100 Then
+            pleaseWaitProgressBar.Value += 1
+        Else
+            pleaseWaitProgressBar.Value = 0
+        End If
+    End Sub
+
+    Private Sub pleaseWaitMessageChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitMessageChanger.Tick
+        If pleaseWaitBorderText.Text = "Please Wait..." Then
+            pleaseWaitBorderText.Text = "Please Wait"
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText
+        ElseIf pleaseWaitBorderText.Text = "Please Wait" Then
+            pleaseWaitBorderText.Text = "Please Wait."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait." Then
+            pleaseWaitBorderText.Text = "Please Wait.."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & ".."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait.." Then
+            pleaseWaitBorderText.Text = "Please Wait..."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "..."
+        End If
+    End Sub
+#End Region
 End Class
 
 Namespace exceptionHandler

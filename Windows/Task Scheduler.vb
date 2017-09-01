@@ -115,18 +115,13 @@ Public Class frmTaskScheduler
         Me.Location = Functions.support.verifyWindowLocation(My.Settings.TaskSchedulerWindowLocation)
         checkWindowsTaskScheduler()
 
-        Dim boolValueDeleteOldRestorePointsAsString As String = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Delete Old Restore Points", "False").Trim
-        Dim boolValueDeleteOldRestorePoints As Boolean
-
-        If Boolean.TryParse(boolValueDeleteOldRestorePointsAsString, boolValueDeleteOldRestorePoints) = True Then
-            chkDeleteOldRestorePoints.Checked = boolValueDeleteOldRestorePoints
-        End If
+        chkDeleteOldRestorePoints.Checked = Functions.registryStuff.getBooleanValueFromRegistry(Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False), "Delete Old Restore Points", False)
 
         txtDays.Text = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("MaxDays", 15).ToString
         txtDaysDelete.Text = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("MaxDays", 15).ToString
 
         ' Checks to see if the Registry Value exists.
-        If (Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).GetValue("Every", Nothing) = Nothing) = False Then
+        If (Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).GetValue("Every", Nothing) IsNot Nothing) Then
             txtEveryDay.Text = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).GetValue("Every")
 
             If Functions.support.isNumeric(txtEveryDay.Text) = False Then
@@ -295,7 +290,7 @@ Public Class frmTaskScheduler
         lblEvery.Visible = True
         txtEveryDay.Visible = True
 
-        If txtEveryDay.Text.Trim = Nothing Then
+        If String.IsNullOrEmpty(txtEveryDay.Text.Trim) Then
             txtEveryDay.Text = 2
         End If
     End Sub

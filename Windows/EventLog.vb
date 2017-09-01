@@ -1,16 +1,15 @@
 ﻿Public Class eventLogForm
     Private m_SortingColumn As ColumnHeader
-    Private eventLogLoadingThread As Threading.Thread
     Private boolDoneLoading As Boolean = False
     Private oldSplitterDifference As Integer
+    Private boolAreWeLoadingTheEventLogData As Boolean = False
 
     Private rawSearchTerms As String = Nothing
     Private previousSearchType As Search_Event_Log.searceType
 
     Private selectedIndex As Long
-    Private boolDidSortingChange As Boolean = False
-    Private boolDidWeDoASearch As Boolean = False
-    Private longEntriesFound As Long = 0
+    Private eventLogContents As New List(Of myListViewItemTypes.eventLogListEntry)
+    Private workingThread As Threading.Thread
 
     Sub loadEventLogData(ByVal strEventLog As String, ByRef itemsToPutInToList As List(Of myListViewItemTypes.eventLogListEntry))
         Dim itemAdd As myListViewItemTypes.eventLogListEntry
@@ -26,8 +25,7 @@
                 eventInstance = logReader.ReadEvent()
 
                 While eventInstance IsNot Nothing
-                    If eventInstance.ProviderName.stringCompare(globalVariables.eventLog.strSystemRestorePointCreator) Or eventInstance.ProviderName.caseInsensitiveContains(globalVariables.eventLog.strSystemRestorePointCreator) Then
-
+                    If eventInstance.ProviderName.Equals(globalVariables.eventLog.strSystemRestorePointCreator, StringComparison.OrdinalIgnoreCase) Or eventInstance.ProviderName.caseInsensitiveContains(globalVariables.eventLog.strSystemRestorePointCreator) Then
                         Try
                             itemAdd = New myListViewItemTypes.eventLogListEntry(eventInstance.LevelDisplayName)
                         Catch ex As Eventing.Reader.EventLogNotFoundException
@@ -71,6 +69,7 @@
                 logReader = Nothing
                 eventLogQuery = Nothing
             End If
+        Catch ex As Threading.ThreadAbortException
         Catch ex As Exception
             MsgBox(ex.Message)
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
@@ -78,48 +77,56 @@
     End Sub
 
     Sub loadEventLog()
-        Me.Cursor = Cursors.WaitCursor
-        Dim itemsToPutInToList As New List(Of myListViewItemTypes.eventLogListEntry)
+        Try
+            boolAreWeLoadingTheEventLogData = True
+            Invoke(Sub() Me.Cursor = Cursors.WaitCursor)
+            eventLogContents.Clear() ' Cleans our cached log entries in memory.
 
-        Dim timeStamp As New Stopwatch
-        timeStamp.Start()
+            Dim timeStamp As Stopwatch = Stopwatch.StartNew()
 
-        loadEventLogData(globalVariables.eventLog.strApplication, itemsToPutInToList)
-        loadEventLogData(globalVariables.eventLog.strSystemRestorePointCreator, itemsToPutInToList)
+            loadEventLogData(globalVariables.eventLog.strApplication, eventLogContents)
+            loadEventLogData(globalVariables.eventLog.strSystemRestorePointCreator, eventLogContents)
 
-        lblLogEntryCount.Text = "Entries in Event Log: " & itemsToPutInToList.Count.ToString("N0")
-        eventLogList.Items.Clear()
-        eventLogList.Items.AddRange(itemsToPutInToList.ToArray())
-        eventLogList.Sort()
+            If timeStamp.Elapsed.Milliseconds < 1000 Then Threading.Thread.Sleep(1000 - timeStamp.Elapsed.Milliseconds)
 
-        Me.Cursor = Cursors.Default
-        boolDoneLoading = True
-        eventLogLoadingThread = Nothing
+            Me.Invoke(Sub()
+                          lblLogEntryCount.Text = "Entries in Event Log: " & eventLogContents.Count.ToString("N0")
+                          loadEventLogContentsIntoList()
 
-        Functions.wait.closePleaseWaitWindow()
-        timeStamp.Stop()
-        lblProcessedIn.Text = String.Format("Event Log Loaded and Processed in {0}ms ({1} seconds).", timeStamp.ElapsedMilliseconds.ToString("N0"), Math.Round(timeStamp.Elapsed.TotalSeconds, 2))
+                          Me.Cursor = Cursors.Default
+                          boolDoneLoading = True
+                          boolAreWeLoadingTheEventLogData = False
+
+                          closePleaseWaitPanel()
+                          timeStamp.Stop()
+                          lblProcessedIn.Text = String.Format("Event Log Loaded and Processed in {0}ms ({1} seconds).", timeStamp.ElapsedMilliseconds.ToString("N0"), Math.Round(timeStamp.Elapsed.TotalSeconds, 2))
+                      End Sub)
+        Catch ex As Threading.ThreadAbortException
+        Finally
+            workingThread = Nothing
+        End Try
     End Sub
 
     Private Sub eventLogForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        If workingThread IsNot Nothing Then workingThread.Abort()
+
         My.Settings.eventLogFormWindowLocation = Me.Location
 
         If globalVariables.windows.eventLogForm IsNot Nothing Then
             globalVariables.windows.eventLogForm.Dispose()
             globalVariables.windows.eventLogForm = Nothing
         End If
-
-        If eventLogLoadingThread IsNot Nothing Then
-            eventLogLoadingThread.Abort()
-        End If
     End Sub
 
     Private Sub eventLogForm_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         If e.KeyCode = Keys.F5 Then
-            If eventLogLoadingThread Is Nothing Then
-                Functions.wait.createPleaseWaitWindow("Loading Event Log Data... Please Wait.", False, enums.howToCenterWindow.parent, False)
-                Threading.ThreadPool.QueueUserWorkItem(AddressOf loadEventLog)
-                Functions.wait.openPleaseWaitWindow()
+            If Not boolAreWeLoadingTheEventLogData Then
+                openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
+
+                workingThread = New Threading.Thread(AddressOf loadEventLog)
+                workingThread.Name = "Event Log Data Loading Thread"
+                workingThread.IsBackground = True
+                workingThread.Start()
             End If
         End If
     End Sub
@@ -179,7 +186,6 @@
     Private Sub eventLog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Location = Functions.support.verifyWindowLocation(My.Settings.eventLogFormWindowLocation)
         chkAskMeToSubmitIfViewingAnExceptionEntry.Checked = My.Settings.boolAskMeToSubmitIfViewingAnExceptionEntry
-        Control.CheckForIllegalCrossThreadCalls = False
         applySavedSorting()
     End Sub
 
@@ -232,8 +238,6 @@
 
     Private Sub eventLogList_ColumnWidthChanged(sender As Object, e As ColumnWidthChangedEventArgs) Handles eventLogList.ColumnWidthChanged
         If boolDoneLoading = True Then
-            If ColumnHeader5.Width <> 18 Then ColumnHeader5.Width = 18
-
             My.Settings.eventLogColumn1Size = ColumnHeader1.Width
             My.Settings.eventLogColumn2Size = ColumnHeader2.Width
             My.Settings.eventLogColumn3Size = ColumnHeader3.Width
@@ -243,10 +247,13 @@
     End Sub
 
     Private Sub btnRefreshEvents_Click(sender As Object, e As EventArgs) Handles btnRefreshEvents.Click
-        If eventLogLoadingThread Is Nothing Then
-            Functions.wait.createPleaseWaitWindow("Loading Event Log Data... Please Wait.", False, enums.howToCenterWindow.parent, False)
-            Threading.ThreadPool.QueueUserWorkItem(AddressOf loadEventLog)
-            Functions.wait.openPleaseWaitWindow()
+        If Not boolAreWeLoadingTheEventLogData Then
+            openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
+
+            workingThread = New Threading.Thread(AddressOf loadEventLog)
+            workingThread.Name = "Event Log Data Loading Thread"
+            workingThread.IsBackground = True
+            workingThread.Start()
         End If
     End Sub
 
@@ -298,9 +305,12 @@
 
         boolDoneLoading = True
 
-        Functions.wait.createPleaseWaitWindow("Loading Event Log Data... Please Wait.", False, enums.howToCenterWindow.parent, False)
-        Threading.ThreadPool.QueueUserWorkItem(AddressOf loadEventLog)
-        Functions.wait.openPleaseWaitWindow()
+        openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
+
+        workingThread = New Threading.Thread(AddressOf loadEventLog)
+        workingThread.Name = "Event Log Data Loading Thread"
+        workingThread.IsBackground = True
+        workingThread.Start()
     End Sub
 
     Private Sub chkAskMeToSubmitIfViewingAnExceptionEntry_Click(sender As Object, e As EventArgs) Handles chkAskMeToSubmitIfViewingAnExceptionEntry.Click
@@ -334,29 +344,7 @@
         End Try
     End Sub
 
-    Sub highlightItemInList(ByRef item As ListViewItem, ByRef longEntriesFound As Long)
-        item.SubItems(4).Text = "*"
-        item.BackColor = Color.LightBlue
-        longEntriesFound += 1
-    End Sub
-
     Private Sub btnSearch_Click(sender As Object, e As EventArgs) Handles btnSearch.Click
-        clearSearchResults()
-
-        If boolDidWeDoASearch Then
-            eventLogList.BeginUpdate()
-
-            For Each item As ListViewItem In eventLogList.Items
-                If item.SubItems(4).Text.Equals("*") Then
-                    item.SubItems(4).Text = ""
-                    item.BackColor = eventLogList.BackColor
-                End If
-            Next
-
-            eventLogList.EndUpdate()
-            boolDidWeDoASearch = False
-        End If
-
         Dim searchWindow As New Search_Event_Log
         searchWindow.StartPosition = FormStartPosition.CenterParent
         searchWindow.txtSearchTerms.Text = rawSearchTerms
@@ -381,54 +369,47 @@
             searchWindow.Dispose()
             searchWindow = Nothing
 
-            longEntriesFound = 0
-            boolDidWeDoASearch = True
+            eventLogList.Items.Clear()
 
-            For Each item As myListViewItemTypes.eventLogListEntry In eventLogList.Items
+            For Each item As myListViewItemTypes.eventLogListEntry In eventLogContents
                 With item
-                    If boolUseRegEx = True Then
+                    If boolUseRegEx Then
                         If searchType = Search_Event_Log.searceType.typeAny And .strEventLogText.regExSearch(searchTerms) Then
-                            highlightItemInList(item, longEntriesFound)
+                            eventLogList.Items.Add(item)
                         ElseIf searchType = Search_Event_Log.searceType.typeError And .shortLevelType = EventLogEntryType.Error And .strEventLogText.regExSearch(searchTerms) Then
-                            highlightItemInList(item, longEntriesFound)
+                            eventLogList.Items.Add(item)
                         ElseIf searchType = Search_Event_Log.searceType.typeInfo And .shortLevelType = EventLogEntryType.Information And .strEventLogText.regExSearch(searchTerms) Then
-                            highlightItemInList(item, longEntriesFound)
+                            eventLogList.Items.Add(item)
                         End If
-                    ElseIf boolCaseInsensitive = True Then
+                    ElseIf boolCaseInsensitive Then
                         If searchType = Search_Event_Log.searceType.typeAny And .strEventLogText.caseInsensitiveContains(searchTerms) Then
-                            highlightItemInList(item, longEntriesFound)
+                            eventLogList.Items.Add(item)
                         ElseIf searchType = Search_Event_Log.searceType.typeError And .shortLevelType = EventLogEntryType.Error And .strEventLogText.caseInsensitiveContains(searchTerms) Then
-                            highlightItemInList(item, longEntriesFound)
+                            eventLogList.Items.Add(item)
                         ElseIf searchType = Search_Event_Log.searceType.typeInfo And .shortLevelType = EventLogEntryType.Information And .strEventLogText.caseInsensitiveContains(searchTerms) Then
-                            highlightItemInList(item, longEntriesFound)
+                            eventLogList.Items.Add(item)
                         End If
                     Else
                         If searchType = Search_Event_Log.searceType.typeAny And .strEventLogText.Contains(searchTerms) Then
-                            highlightItemInList(item, longEntriesFound)
+                            eventLogList.Items.Add(item)
                         ElseIf searchType = Search_Event_Log.searceType.typeError And .shortLevelType = EventLogEntryType.Error And .strEventLogText.Contains(searchTerms) Then
-                            highlightItemInList(item, longEntriesFound)
+                            eventLogList.Items.Add(item)
                         ElseIf searchType = Search_Event_Log.searceType.typeInfo And .shortLevelType = EventLogEntryType.Information And .strEventLogText.Contains(searchTerms) Then
-                            highlightItemInList(item, longEntriesFound)
+                            eventLogList.Items.Add(item)
                         End If
                     End If
                 End With
-
             Next
 
-            If longEntriesFound <> 0 Then
-                eventLogList.ListViewItemSorter = New Functions.listViewSorter.ListViewComparer(4, SortOrder.Descending)
-                eventLogList.Sort()
-                eventLogList.EnsureVisible(0)
-                boolDidSortingChange = True
-
+            If eventLogList.Items.Count <> 0 Then
                 Dim strEntriesFound As String
-                If longEntriesFound = 1 Then
+                If eventLogList.Items.Count = 1 Then
                     strEntriesFound = "1 log entry was found."
                 Else
-                    strEntriesFound = longEntriesFound & " log entries were found."
+                    strEntriesFound = eventLogList.Items.Count.ToString & " log entries were found."
                 End If
 
-                MsgBox("Search complete. " & strEntriesFound & " The event log entries that contain your search terms have been highlighted in blue.", MsgBoxStyle.Information, Me.Text)
+                MsgBox("Search complete. " & strEntriesFound, MsgBoxStyle.Information, Me.Text)
             Else
                 MsgBox("Search complete. No results found.", MsgBoxStyle.Information, Me.Text)
             End If
@@ -465,22 +446,72 @@
     End Sub
 
     Private Sub btnClear_Click(sender As Object, e As EventArgs) Handles btnClear.Click
-        clearSearchResults()
+        loadEventLogContentsIntoList()
     End Sub
 
-    Sub clearSearchResults()
-        If boolDidSortingChange Then
-            rawSearchTerms = Nothing
+    Sub loadEventLogContentsIntoList()
+        rawSearchTerms = Nothing
+        eventLogList.Items.Clear()
+        eventLogList.Items.AddRange(eventLogContents.ToArray())
+        eventLogList.Sort()
+    End Sub
 
-            For Each item As ListViewItem In eventLogList.Items
-                item.SubItems(4).Text = ""
-                item.BackColor = eventLogList.BackColor
-            Next
+#Region "--== Please Wait Panel Code ==--"
+    Private strPleaseWaitLabelText As String
 
-            eventLogList.ListViewItemSorter = New Functions.listViewSorter.ListViewComparer(1, SortOrder.Descending)
-            eventLogList.Sort()
+    Private Sub centerPleaseWaitPanel()
+        pleaseWaitPanel.Location = New Point(
+            (Me.ClientSize.Width / 2) - (pleaseWaitPanel.Size.Width / 2),
+            (Me.ClientSize.Height / 2) - (pleaseWaitPanel.Size.Height / 2))
+        pleaseWaitPanel.Anchor = AnchorStyles.None
+    End Sub
 
-            boolDidSortingChange = False
+    Private Sub openPleaseWaitPanel(strInputPleaseWaitLabelText As String)
+        Functions.support.disableControlsOnForm(Me)
+
+        pleaseWaitProgressBar.ProgressBarColor = My.Settings.barColor
+        strPleaseWaitLabelText = strInputPleaseWaitLabelText
+        pleaseWaitlblLabel.Text = strInputPleaseWaitLabelText
+        centerPleaseWaitPanel()
+        pleaseWaitPanel.Visible = True
+        pleaseWaitProgressBar.Value = 0
+        pleaseWaitProgressBarChanger.Enabled = True
+        pleaseWaitMessageChanger.Enabled = True
+        pleaseWaitBorderText.BackColor = globalVariables.pleaseWaitPanelColor
+        pleaseWaitBorderText.ForeColor = globalVariables.pleaseWaitPanelFontColor
+    End Sub
+
+    Private Sub closePleaseWaitPanel()
+        Functions.support.enableControlsOnForm(Me)
+
+        pleaseWaitPanel.Visible = False
+        pleaseWaitProgressBarChanger.Enabled = False
+        pleaseWaitMessageChanger.Enabled = False
+        pleaseWaitProgressBar.Value = 0
+    End Sub
+
+    Private Sub pleaseWaitProgressBarChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitProgressBarChanger.Tick
+        If pleaseWaitProgressBar.Value < 100 Then
+            pleaseWaitProgressBar.Value += 1
+        Else
+            pleaseWaitProgressBar.Value = 0
         End If
     End Sub
+
+    Private Sub pleaseWaitMessageChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitMessageChanger.Tick
+        If pleaseWaitBorderText.Text = "Please Wait..." Then
+            pleaseWaitBorderText.Text = "Please Wait"
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText
+        ElseIf pleaseWaitBorderText.Text = "Please Wait" Then
+            pleaseWaitBorderText.Text = "Please Wait."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait." Then
+            pleaseWaitBorderText.Text = "Please Wait.."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & ".."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait.." Then
+            pleaseWaitBorderText.Text = "Please Wait..."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "..."
+        End If
+    End Sub
+#End Region
 End Class

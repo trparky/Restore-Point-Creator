@@ -46,7 +46,7 @@
     End Sub
 
     Private Sub txtSearchTerms_KeyUp(sender As Object, e As KeyEventArgs) Handles txtSearchTerms.KeyUp
-        If txtSearchTerms.Text.Trim <> Nothing And e.KeyCode = Keys.Enter Then
+        If txtSearchTerms.Text.Trim IsNot Nothing And e.KeyCode = Keys.Enter Then
             btnSearch.PerformClick()
         End If
     End Sub
@@ -56,7 +56,7 @@
     End Sub
 
     Private Sub txtSearchTerms_TextChanged(sender As Object, e As EventArgs) Handles txtSearchTerms.TextChanged
-        If txtSearchTerms.Text = Nothing Then
+        If String.IsNullOrEmpty(txtSearchTerms.Text) Then
             btnSearch.Enabled = False
             btnClear.Enabled = False
         Else

@@ -44,7 +44,7 @@
             MiniDumpWriteDump(thisProcess.Handle,
                               thisProcess.Id,
                               fsToDump.SafeFileHandle.DangerousGetHandle(),
-                              MINIDUMP_TYPE.MiniDumpNormal,
+                              MINIDUMP_TYPE.MiniDumpWithDataSegs,
                               IntPtr.Zero,
                               IntPtr.Zero,
                               IntPtr.Zero)

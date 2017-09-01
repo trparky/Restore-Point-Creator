@@ -4,6 +4,8 @@ Public Class Disk_Space_Usage
     Private pleaseWaitInstance As Please_Wait
     Private formLoadDiskDataAttempts As Short = 0
     Private boldFont As New Font("Microsoft Sans Serif", 8.25, FontStyle.Bold)
+    Private currentScreen As Screen = Screen.FromControl(Me)
+    Private workingThread As Threading.Thread
 
     Sub manualFixSub(Optional drive As String = "C:")
         If (globalVariables.windows.frmManageSystemRestoreStorageSpace Is Nothing) Then
@@ -86,6 +88,7 @@ Public Class Disk_Space_Usage
             Dim usedSpacePercentage, freeSpacePercentage, shadowStorageUsedPercentage, shadowStorageFreeSpacePercentage As Double
             Dim yPosition As Integer = 10
             Dim xPosition As Integer = 12
+            Dim stopWatch As Stopwatch = Stopwatch.StartNew()
 
             For Each currentDrive As IO.DriveInfo In My.Computer.FileSystem.Drives
                 xPosition = 12 ' Resets the X position back to the beginning of the line.
@@ -122,7 +125,7 @@ Public Class Disk_Space_Usage
                         ' Creates the Drive or Mount Point data label.
 
                         ' If the drive has no drive label, why display one?
-                        If currentDrive.VolumeLabel <> Nothing Then
+                        If currentDrive.VolumeLabel IsNot Nothing Then
                             ' Creates the "Drive Label:" header.
                             xPosition = createLabel("Drive Label:", xPosition + 10, yPosition, True)
 
@@ -237,15 +240,28 @@ Public Class Disk_Space_Usage
                 Catch ex As IO.IOException
 
                 End Try
+
+                Threading.Thread.Sleep(100)
             Next
+
+            stopWatch.Stop()
+            If stopWatch.Elapsed.Milliseconds < 1000 Then Threading.Thread.Sleep(1000 - stopWatch.Elapsed.Milliseconds)
+
+            btnRefresh.Invoke(Sub() btnRefresh.Enabled = True)
+            closePleaseWaitPanel()
+            doTheResizingOfTheBars()
+            GC.Collect()
+        Catch ex As Threading.ThreadAbortException
         Catch ex As Exception
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
-        Finally
+
             btnRefresh.Invoke(Sub() btnRefresh.Enabled = True)
-            Functions.wait.closePleaseWaitWindow()
+            closePleaseWaitPanel()
             doTheResizingOfTheBars()
             GC.Collect()
+        Finally
+            workingThread = Nothing
         End Try
     End Sub
 
@@ -257,6 +273,8 @@ Public Class Disk_Space_Usage
     End Sub
 
     Private Sub Disk_Space_Usage_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        If workingThread IsNot Nothing Then workingThread.Abort()
+
         My.Settings.DiskSpaceUsageWindowLocation = Me.Location
         globalVariables.windows.frmDiskSpaceUsageWindow.Dispose()
         globalVariables.windows.frmDiskSpaceUsageWindow = Nothing
@@ -272,9 +290,12 @@ Public Class Disk_Space_Usage
         Try
             If Me.IsHandleCreated = True Then
                 If GroupBox1.IsHandleCreated = True Then
-                    Functions.wait.createPleaseWaitWindow("Loading Disk Space Usage Information... Please Wait.", False, enums.howToCenterWindow.parent, False)
-                    Threading.ThreadPool.QueueUserWorkItem(AddressOf loadDiskSpaceUsageData)
-                    Functions.wait.openPleaseWaitWindow(Me)
+                    openPleaseWaitPanel("Loading Disk Space Usage Information... Please Wait.")
+
+                    workingThread = New Threading.Thread(AddressOf loadDiskSpaceUsageData)
+                    workingThread.Name = "Disk Space Usage Data Loading Thread"
+                    workingThread.IsBackground = True
+                    workingThread.Start()
                 End If
             Else
                 Threading.Thread.Sleep(100)
@@ -287,7 +308,6 @@ Public Class Disk_Space_Usage
                 formLoadDiskData()
             End If
         Catch ex As Exception
-
         End Try
     End Sub
 
@@ -297,9 +317,12 @@ Public Class Disk_Space_Usage
         Try
             GroupBox1.Controls.Clear()
 
-            Functions.wait.createPleaseWaitWindow("Loading Disk Space Usage Information... Please Wait.", False, enums.howToCenterWindow.parent, False)
-            Threading.ThreadPool.QueueUserWorkItem(AddressOf loadDiskSpaceUsageData)
-            Functions.wait.openPleaseWaitWindow(Me)
+            openPleaseWaitPanel("Loading Disk Space Usage Information... Please Wait.")
+
+            workingThread = New Threading.Thread(AddressOf loadDiskSpaceUsageData)
+            workingThread.Name = "Disk Space Usage Data Loading Thread"
+            workingThread.IsBackground = True
+            workingThread.Start()
         Catch ex As Exception
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
@@ -323,7 +346,6 @@ Public Class Disk_Space_Usage
     End Sub
 
     Private Sub Disk_Space_Usage_Resize(sender As Object, e As EventArgs) Handles Me.Resize
-        If Me.Width <> 859 Then Me.Width = 859
         doTheResizingOfTheBars()
     End Sub
 
@@ -343,29 +365,13 @@ Public Class Disk_Space_Usage
 
     Private Sub btnSetBarColor_Click(sender As Object, e As EventArgs) Handles btnSetBarColor.Click
         Try
-            If My.Settings.customColors2 IsNot Nothing Then
-                Dim integerArray As Integer()
-                ReDim integerArray(My.Settings.customColors2.Count - 1)
-
-                For i = 0 To My.Settings.customColors2.Count - 1
-                    integerArray(i) = Integer.Parse(My.Settings.customColors2(i))
-                Next
-
-                ColorDialog.CustomColors = integerArray
-                integerArray = Nothing
-            End If
+            ColorDialog.CustomColors = Functions.support.loadCustomColors()
 
             ColorDialog.Color = My.Settings.barColor
             ColorDialog.ShowDialog()
             My.Settings.barColor = ColorDialog.Color
 
-            Dim temp As New Specialized.StringCollection
-            For Each entry As String In ColorDialog.CustomColors
-                temp.Add(entry)
-            Next
-            My.Settings.customColors2 = temp
-            My.Settings.Save()
-            temp = Nothing
+            Functions.support.saveCustomColors(ColorDialog.CustomColors)
 
             Dim smoothProgressBarObject As SmoothProgressBar
 
@@ -392,11 +398,6 @@ Public Class Disk_Space_Usage
         Try
             Me.Size = My.Settings.diskUsageWindowSize
             chkShowFullDisksAsRed.Checked = My.Settings.ShowFullDisksAsRed
-
-            If Me.Size.Width <> 859 Then
-                Me.Size = New Size(859, Me.Size.Height)
-                My.Settings.diskUsageWindowSize = Me.Size
-            End If
         Catch ex As Exception
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
@@ -425,6 +426,80 @@ Public Class Disk_Space_Usage
     End Sub
 
     Private Sub Disk_Space_Usage_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.MaximumSize = New Size(859, Screen.FromControl(Me).Bounds.Height)
         Me.Location = Functions.support.verifyWindowLocation(My.Settings.DiskSpaceUsageWindowLocation)
+        currentScreen = Screen.FromControl(Me)
     End Sub
+
+    Private Sub Disk_Space_Usage_LocationChanged(sender As Object, e As EventArgs) Handles Me.LocationChanged
+        Try
+            If currentScreen IsNot Nothing Then
+                If Not currentScreen.Equals(Screen.FromControl(Me)) Then
+                    currentScreen = Screen.FromControl(Me)
+                    Me.MaximumSize = New Size(859, Screen.FromControl(Me).Bounds.Height)
+                End If
+            End If
+        Catch ex As Exception
+            ' Does nothing.
+        End Try
+    End Sub
+
+#Region "--== Please Wait Panel Code ==--"
+    Private strPleaseWaitLabelText As String
+
+    Private Sub centerPleaseWaitPanel()
+        pleaseWaitPanel.Location = New Point(
+            (Me.ClientSize.Width / 2) - (pleaseWaitPanel.Size.Width / 2),
+            (Me.ClientSize.Height / 2) - (pleaseWaitPanel.Size.Height / 2))
+        pleaseWaitPanel.Anchor = AnchorStyles.None
+    End Sub
+
+    Private Sub openPleaseWaitPanel(strInputPleaseWaitLabelText As String)
+        Functions.support.disableControlsOnForm(Me)
+
+        pleaseWaitProgressBar.ProgressBarColor = My.Settings.barColor
+        strPleaseWaitLabelText = strInputPleaseWaitLabelText
+        pleaseWaitlblLabel.Text = strInputPleaseWaitLabelText
+        centerPleaseWaitPanel()
+        pleaseWaitPanel.Visible = True
+        pleaseWaitProgressBar.Value = 0
+        pleaseWaitProgressBarChanger.Enabled = True
+        pleaseWaitMessageChanger.Enabled = True
+        pleaseWaitBorderText.BackColor = globalVariables.pleaseWaitPanelColor
+        pleaseWaitBorderText.ForeColor = globalVariables.pleaseWaitPanelFontColor
+    End Sub
+
+    Private Sub closePleaseWaitPanel()
+        Functions.support.enableControlsOnForm(Me)
+
+        pleaseWaitPanel.Visible = False
+        pleaseWaitProgressBarChanger.Enabled = False
+        pleaseWaitMessageChanger.Enabled = False
+        pleaseWaitProgressBar.Value = 0
+    End Sub
+
+    Private Sub pleaseWaitProgressBarChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitProgressBarChanger.Tick
+        If pleaseWaitProgressBar.Value < 100 Then
+            pleaseWaitProgressBar.Value += 1
+        Else
+            pleaseWaitProgressBar.Value = 0
+        End If
+    End Sub
+
+    Private Sub pleaseWaitMessageChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitMessageChanger.Tick
+        If pleaseWaitBorderText.Text = "Please Wait..." Then
+            pleaseWaitBorderText.Text = "Please Wait"
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText
+        ElseIf pleaseWaitBorderText.Text = "Please Wait" Then
+            pleaseWaitBorderText.Text = "Please Wait."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait." Then
+            pleaseWaitBorderText.Text = "Please Wait.."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & ".."
+        ElseIf pleaseWaitBorderText.Text = "Please Wait.." Then
+            pleaseWaitBorderText.Text = "Please Wait..."
+            pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "..."
+        End If
+    End Sub
+#End Region
 End Class

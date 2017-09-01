@@ -182,6 +182,8 @@ Namespace globalVariables
         Public KeepXAmountofRestorePointsValue As Short = -10
         Public boolLogLoadsAndExits As Boolean = False
         Public pleaseWaitWindowThread As Threading.Thread = Nothing
+        Public pleaseWaitPanelColor As Color = Functions.support.getDWMGlassColor()
+        Public pleaseWaitPanelFontColor As Color = Functions.support.getGoodTextColorBasedUponBackgroundColor(pleaseWaitPanelColor)
 
         Public boolLogToSystemLog As Boolean = True
 

@@ -12,6 +12,60 @@ Namespace Functions.support
     End Enum
 
     Module support
+        Public Sub enableControlsOnForm(ByRef formToWorkOn As Form)
+            For Each control As Control In formToWorkOn.Controls
+                If Not control.GetType.Equals(GetType(Timer)) And Not control.Name.caseInsensitiveContains("pleasewait") Then control.Enabled = True
+            Next
+        End Sub
+
+        Public Sub disableControlsOnForm(ByRef formToWorkOn As Form)
+            For Each control As Control In formToWorkOn.Controls
+                If Not control.GetType.Equals(GetType(Timer)) And Not control.Name.caseInsensitiveContains("pleasewait") Then control.Enabled = False
+            Next
+        End Sub
+
+        Public Function getDWMGlassColor() As Color
+            Try
+                ' This checks to see if we are running on Windows 8 or Windows 10 since the API we're accessing
+                ' here really only works correctly on those versions of Windows; not anything older than that.
+                If osVersionInfo.isThisWindows8x() Or osVersionInfo.isThisWindows10() Then
+                    ' Yep, we're on Windows 8 or Windows 10 so lets go ahead and use that special API.
+                    Dim color As UInteger, blend As Boolean
+                    NativeMethod.NativeMethod.DwmGetColorizationColor(color, blend)
+                    Dim strHexColor As String = color.ToString("x")
+                    Dim a As Integer = Convert.ToInt32(strHexColor.Substring(0, 2), 16)
+                    Dim r As Integer = Convert.ToInt32(strHexColor.Substring(2, 2), 16)
+                    Dim g As Integer = Convert.ToInt32(strHexColor.Substring(4, 2), 16)
+                    Dim b As Integer = Convert.ToInt32(strHexColor.Substring(6, 2), 16)
+                    Return Drawing.Color.FromArgb(a, r, g, b)
+                Else
+                    ' This is for Windows Vista and Windows 7 machines.
+                    Return My.Settings.pleaseWaitBorderColor
+                End If
+            Catch ex As Exception
+                ' This is if something goes wrong while trying to parse what Windows gave us as the window's border color.
+                eventLogFunctions.writeCrashToEventLog(ex)
+                Return My.Settings.pleaseWaitBorderColor
+            End Try
+        End Function
+
+        Public Function loadCustomColors() As Integer()
+            If Not String.IsNullOrEmpty(My.Settings.customColors3) Then
+                Return (New Web.Script.Serialization.JavaScriptSerializer).Deserialize(Of Integer())(My.Settings.customColors3)
+            Else
+                Return Nothing
+            End If
+        End Function
+
+        Public Sub saveCustomColors(input As Integer())
+            My.Settings.customColors3 = (New Web.Script.Serialization.JavaScriptSerializer).Serialize(input)
+        End Sub
+
+        Public Function getGoodTextColorBasedUponBackgroundColor(input As Color) As Color
+            Dim intCombinedTotal As Short = Integer.Parse(input.R.ToString) + Integer.Parse(input.G.ToString) + Integer.Parse(input.B.ToString)
+            Return If((intCombinedTotal / 3) < 128, Color.White, Color.Black)
+        End Function
+
         Public Function verifyWindowLocation(point As Point) As Point
             If point.X < 0 Or point.Y < 0 Then
                 Return New Point(0, 0)
@@ -118,7 +172,9 @@ Namespace Functions.support
 
         Public Function convertErrorCodeToHex(input As Long) As String
             Try
-                Return input.ToString("x").caseInsensitiveReplace("ffffffff", "0x").ToString.ToUpper
+                Dim strHexValue As String = input.ToString("x").caseInsensitiveReplace("ffffffff", "0x").ToString.ToUpper
+                If Not strHexValue.StartsWith("0x", StringComparison.OrdinalIgnoreCase) Then strHexValue = "0x" & strHexValue
+                Return strHexValue
             Catch ex As Exception
                 Return Nothing
             End Try
@@ -139,77 +195,86 @@ Namespace Functions.support
             Try
                 Dim exceptionType As Type = rawExceptionObject.GetType
 
-                If exceptionType.Equals(GetType(IO.FileNotFoundException)) Or
-                    exceptionType.Equals(GetType(IO.FileLoadException)) Or
-                    exceptionType.Equals(GetType(Runtime.InteropServices.COMException)) Or
-                    exceptionType.Equals(GetType(IO.IOException)) Or
-                    exceptionType.Equals(GetType(ArgumentOutOfRangeException)) Or
-                    exceptionType.Equals(GetType(FormatException)) Or
-                    exceptionType.Equals(GetType(ComponentModel.Win32Exception)) Or
-                    exceptionType.Equals(GetType(XPath.XPathException)) Or
-                    exceptionType.Equals(GetType(XmlException)) Or
-                    exceptionType.Equals(GetType(InvalidOperationException)) Or
-                    exceptionType.Equals(GetType(myExceptions.integerTryParseException)) Or
-                    exceptionType.Equals(GetType(IO.DirectoryNotFoundException)) Or
-                    exceptionType.Equals(GetType(ObjectDisposedException)) Then
+                Dim listExceptionTypes As New List(Of Type) From {
+                    GetType(IO.FileNotFoundException),
+                    GetType(IO.FileLoadException),
+                    GetType(Runtime.InteropServices.COMException),
+                    GetType(IO.IOException),
+                    GetType(ArgumentOutOfRangeException),
+                    GetType(FormatException),
+                    GetType(ComponentModel.Win32Exception),
+                    GetType(XPath.XPathException),
+                    GetType(XmlException),
+                    GetType(InvalidOperationException),
+                    GetType(myExceptions.integerTryParseException),
+                    GetType(IO.DirectoryNotFoundException),
+                    GetType(Management.ManagementException),
+                    GetType(ObjectDisposedException),
+                    GetType(StackOverflowException)
+                }
 
-                    stringBuilder.AppendLine()
-                    stringBuilder.AppendLine("Additional " & rawExceptionObject.GetType.ToString & " Data")
+                If listExceptionTypes.Contains(exceptionType) Then
+                        stringBuilder.AppendLine()
+                        stringBuilder.AppendLine("Additional " & rawExceptionObject.GetType.ToString & " Data")
 
-                    If exceptionType.Equals(GetType(IO.FileNotFoundException)) Then
-                        Dim FileNotFoundExceptionObject As IO.FileNotFoundException = DirectCast(rawExceptionObject, IO.FileNotFoundException)
-                        stringBuilder.AppendLine("Name of File: " & FileNotFoundExceptionObject.FileName)
+                        If exceptionType.Equals(GetType(IO.FileNotFoundException)) Then
+                            Dim FileNotFoundExceptionObject As IO.FileNotFoundException = DirectCast(rawExceptionObject, IO.FileNotFoundException)
+                            stringBuilder.AppendLine("Name of File: " & FileNotFoundExceptionObject.FileName)
 
-                        If Not String.IsNullOrEmpty(FileNotFoundExceptionObject.FusionLog) Then
-                            stringBuilder.AppendLine("Reason: " & FileNotFoundExceptionObject.FusionLog)
+                            If Not String.IsNullOrEmpty(FileNotFoundExceptionObject.FusionLog) Then
+                                stringBuilder.AppendLine("Reason: " & FileNotFoundExceptionObject.FusionLog)
+                            End If
+                        ElseIf exceptionType.Equals(GetType(IO.DirectoryNotFoundException)) Then
+                            Dim DirectoryNotFoundExceptionObject As IO.DirectoryNotFoundException = DirectCast(rawExceptionObject, IO.DirectoryNotFoundException)
+                            stringBuilder.AppendLine("Source: " & DirectoryNotFoundExceptionObject.Source)
+                            addJSONedExtendedExceptionDataPackage(DirectoryNotFoundExceptionObject, stringBuilder)
+                        ElseIf exceptionType.Equals(GetType(myExceptions.integerTryParseException)) Then
+                            stringBuilder.AppendLine("String that could not be parsed into an Integer: " & DirectCast(rawExceptionObject, myExceptions.integerTryParseException).strThatCouldNotBeParsedIntoAnInteger)
+                        ElseIf exceptionType.Equals(GetType(XmlException)) Then
+                            Dim XmlExceptionObject As XmlException = DirectCast(rawExceptionObject, XmlException)
+                            stringBuilder.AppendLine("Line Number: " & XmlExceptionObject.LineNumber)
+                            stringBuilder.AppendLine("Line Position: " & XmlExceptionObject.LinePosition)
+
+                            addJSONedExtendedExceptionDataPackage(XmlExceptionObject, stringBuilder)
+                        ElseIf exceptionType.Equals(GetType(XPath.XPathException)) Then
+                            Dim XPathExceptionExceptionObject As XPath.XPathException = DirectCast(rawExceptionObject, XPath.XPathException)
+                            addJSONedExtendedExceptionDataPackage(XPathExceptionExceptionObject, stringBuilder)
+                        ElseIf exceptionType.Equals(GetType(IO.FileLoadException)) Then
+                            Dim FileLoadExceptionObject As IO.FileLoadException = DirectCast(rawExceptionObject, IO.FileLoadException)
+                            stringBuilder.AppendLine("Unable to Load Assembly File: " & FileLoadExceptionObject.FileName)
+
+                            If Not String.IsNullOrEmpty(FileLoadExceptionObject.FusionLog) Then
+                                stringBuilder.AppendLine("Reason why assembly couldn't be loaded: " & FileLoadExceptionObject.FusionLog)
+                            End If
+                        ElseIf exceptionType.Equals(GetType(Runtime.InteropServices.COMException)) Then
+                            Dim COMExceptionObject As Runtime.InteropServices.COMException = DirectCast(rawExceptionObject, Runtime.InteropServices.COMException)
+                            stringBuilder.AppendLine("Source: " & COMExceptionObject.Source)
+                            stringBuilder.AppendLine("Error Code: " & COMExceptionObject.ErrorCode)
+                        ElseIf exceptionType.Equals(GetType(ObjectDisposedException)) Then
+                            Dim ObjectDisposedExceptionObject As ObjectDisposedException = DirectCast(rawExceptionObject, ObjectDisposedException)
+                            stringBuilder.AppendLine("Source: " & ObjectDisposedExceptionObject.Source)
+                            stringBuilder.AppendLine("Object Name: " & ObjectDisposedExceptionObject.ObjectName)
+                        ElseIf exceptionType.Equals(GetType(IO.IOException)) Then
+                            stringBuilder.AppendLine("Source: " & DirectCast(rawExceptionObject, IO.IOException).Source)
+                        ElseIf exceptionType.Equals(GetType(ArgumentOutOfRangeException)) Then
+                            Dim ArgumentOutOfRangeExceptionObject As ArgumentOutOfRangeException = DirectCast(rawExceptionObject, ArgumentOutOfRangeException)
+                            stringBuilder.AppendLine("Parameter Name: " & ArgumentOutOfRangeExceptionObject.ParamName)
+                            stringBuilder.AppendLine("Parameter Value: " & ArgumentOutOfRangeExceptionObject.ActualValue)
+                        ElseIf exceptionType.Equals(GetType(ArgumentException)) Then
+                            stringBuilder.AppendLine("Parameter Name: " & DirectCast(rawExceptionObject, ArgumentException).ParamName)
+                        ElseIf exceptionType.Equals(GetType(ComponentModel.Win32Exception)) Then
+                            Dim Win32ExceptionObject As ComponentModel.Win32Exception = DirectCast(rawExceptionObject, ComponentModel.Win32Exception)
+                            stringBuilder.AppendLine(String.Format("Error Code: {0} ({1})", Win32ExceptionObject.ErrorCode, convertErrorCodeToHex(Win32ExceptionObject.ErrorCode)))
+                            stringBuilder.AppendLine(String.Format("Native Error Code: {0} ({1})", Win32ExceptionObject.NativeErrorCode, convertErrorCodeToHex(Win32ExceptionObject.NativeErrorCode)))
+                        ElseIf exceptionType.Equals(GetType(StackOverflowException)) Then
+                            Dim StackOverflowExceptionObject As StackOverflowException = DirectCast(rawExceptionObject, StackOverflowException)
+                            stringBuilder.AppendLine(String.Format("Source: {0}", StackOverflowExceptionObject.Source))
+                            addJSONedExtendedExceptionDataPackage(StackOverflowExceptionObject, stringBuilder)
                         End If
-                    ElseIf exceptionType.Equals(GetType(IO.DirectoryNotFoundException)) Then
-                        Dim DirectoryNotFoundExceptionObject As IO.DirectoryNotFoundException = DirectCast(rawExceptionObject, IO.DirectoryNotFoundException)
-                        stringBuilder.AppendLine("Source: " & DirectoryNotFoundExceptionObject.Source)
-                        addJSONedExtendedExceptionDataPackage(DirectoryNotFoundExceptionObject, stringBuilder)
-                    ElseIf exceptionType.Equals(GetType(myExceptions.integerTryParseException)) Then
-                        stringBuilder.AppendLine("String that could not be parsed into an Integer: " & DirectCast(rawExceptionObject, myExceptions.integerTryParseException).strThatCouldNotBeParsedIntoAnInteger)
-                    ElseIf exceptionType.Equals(GetType(XmlException)) Then
-                        Dim XmlExceptionObject As XmlException = DirectCast(rawExceptionObject, XmlException)
-                        stringBuilder.AppendLine("Line Number: " & XmlExceptionObject.LineNumber)
-                        stringBuilder.AppendLine("Line Position: " & XmlExceptionObject.LinePosition)
 
-                        addJSONedExtendedExceptionDataPackage(XmlExceptionObject, stringBuilder)
-                    ElseIf exceptionType.Equals(GetType(XPath.XPathException)) Then
-                        Dim XPathExceptionExceptionObject As XPath.XPathException = DirectCast(rawExceptionObject, XPath.XPathException)
-                        addJSONedExtendedExceptionDataPackage(XPathExceptionExceptionObject, stringBuilder)
-                    ElseIf exceptionType.Equals(GetType(IO.FileLoadException)) Then
-                        Dim FileLoadExceptionObject As IO.FileLoadException = DirectCast(rawExceptionObject, IO.FileLoadException)
-                        stringBuilder.AppendLine("Unable to Load Assembly File: " & FileLoadExceptionObject.FileName)
-
-                        If Not String.IsNullOrEmpty(FileLoadExceptionObject.FusionLog) Then
-                            stringBuilder.AppendLine("Reason why assembly couldn't be loaded: " & FileLoadExceptionObject.FusionLog)
-                        End If
-                    ElseIf exceptionType.Equals(GetType(Runtime.InteropServices.COMException)) Then
-                        Dim COMExceptionObject As Runtime.InteropServices.COMException = DirectCast(rawExceptionObject, Runtime.InteropServices.COMException)
-                        stringBuilder.AppendLine("Source: " & COMExceptionObject.Source)
-                        stringBuilder.AppendLine("Error Code: " & COMExceptionObject.ErrorCode)
-                    ElseIf exceptionType.Equals(GetType(ObjectDisposedException)) Then
-                        Dim ObjectDisposedExceptionObject As ObjectDisposedException = DirectCast(rawExceptionObject, ObjectDisposedException)
-                        stringBuilder.AppendLine("Source: " & ObjectDisposedExceptionObject.Source)
-                        stringBuilder.AppendLine("Object Name: " & ObjectDisposedExceptionObject.ObjectName)
-                    ElseIf exceptionType.Equals(GetType(IO.IOException)) Then
-                        stringBuilder.AppendLine("Source: " & DirectCast(rawExceptionObject, IO.IOException).Source)
-                    ElseIf exceptionType.Equals(GetType(ArgumentOutOfRangeException)) Then
-                        Dim ArgumentOutOfRangeExceptionObject As ArgumentOutOfRangeException = DirectCast(rawExceptionObject, ArgumentOutOfRangeException)
-                        stringBuilder.AppendLine("Parameter Name: " & ArgumentOutOfRangeExceptionObject.ParamName)
-                        stringBuilder.AppendLine("Parameter Value: " & ArgumentOutOfRangeExceptionObject.ActualValue)
-                    ElseIf exceptionType.Equals(GetType(ArgumentException)) Then
-                        stringBuilder.AppendLine("Parameter Name: " & DirectCast(rawExceptionObject, ArgumentException).ParamName)
-                    ElseIf exceptionType.Equals(GetType(ComponentModel.Win32Exception)) Then
-                        Dim Win32ExceptionObject As ComponentModel.Win32Exception = DirectCast(rawExceptionObject, ComponentModel.Win32Exception)
-                        stringBuilder.AppendLine(String.Format("Error Code: {0} ({1})", Win32ExceptionObject.ErrorCode, convertErrorCodeToHex(Win32ExceptionObject.ErrorCode)))
-                        stringBuilder.AppendLine(String.Format("Native Error Code: {0} ({1})", Win32ExceptionObject.NativeErrorCode, convertErrorCodeToHex(Win32ExceptionObject.NativeErrorCode)))
+                        addJSONedExtendedExceptionDataPackage(rawExceptionObject, stringBuilder)
+                        stringBuilder.AppendLine()
                     End If
-
-                    addJSONedExtendedExceptionDataPackage(rawExceptionObject, stringBuilder)
-                    stringBuilder.AppendLine()
-                End If
             Catch ex As Exception
             End Try
         End Sub
@@ -250,7 +315,7 @@ Namespace Functions.support
             Dim processesOnSystem As New Dictionary(Of Integer, String)
             Dim exePath As String
 
-            For Each process As Process In Process.GetProcesses()
+            For Each process As Process In process.GetProcesses()
                 exePath = getProcessExecutablePath(process.Id)
                 If exePath IsNot Nothing Then processesOnSystem.Add(process.Id, exePath)
             Next
@@ -281,7 +346,7 @@ Namespace Functions.support
             Dim processExecutablePath As String
             Dim processExecutablePathFileInfo As IO.FileInfo
 
-            For Each process As Process In Process.GetProcesses()
+            For Each process As Process In process.GetProcesses()
                 processExecutablePath = getProcessExecutablePath(process.Id)
 
                 If processExecutablePath IsNot Nothing Then
@@ -289,11 +354,11 @@ Namespace Functions.support
                         processExecutablePathFileInfo = New IO.FileInfo(processExecutablePath)
 
                         If boolFullFilePathPassed = True Then
-                            If stringCompare(strFileName, processExecutablePathFileInfo.FullName) = True Then
+                            If strFileName.Equals(processExecutablePathFileInfo.FullName, StringComparison.OrdinalIgnoreCase) = True Then
                                 killProcess(process.Id, True)
                             End If
                         ElseIf boolFullFilePathPassed = False Then
-                            If stringCompare(strFileName, processExecutablePathFileInfo.Name) = True Then
+                            If strFileName.Equals(processExecutablePathFileInfo.Name, StringComparison.OrdinalIgnoreCase) = True Then
                                 killProcess(process.Id, True)
                             End If
                         End If
@@ -337,7 +402,7 @@ Namespace Functions.support
 
                         ' This checks to see if the programmer wants to delete the file if it exists in this function.
                         If boolDeleteTargetIfExists = True Then
-                            If stringCompare(extractionTargetFileInfo.Extension, ".exe") Then
+                            If extractionTargetFileInfo.Extension.Equals(".exe", StringComparison.OrdinalIgnoreCase) Then
                                 ' If the file is an EXE file, let's try and kill any parent processes first.
                                 If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                                     eventLogFunctions.writeToSystemEventLog(String.Format("Since this file is an EXE file we need to check for any processes that have this file as the parent executable file.{2}{2}Killing any possible processes that have a parent executable of {0}{1}{0}.", Chr(34), extractionTargetFileInfo.FullName, vbCrLf), EventLogEntryType.Information)
@@ -499,7 +564,7 @@ Namespace Functions.support
                 Dim processObject As New Process()
                 processObject.StartInfo.FileName = commandToExecute
 
-                If commandLineArgument <> Nothing Then
+                If commandLineArgument IsNot Nothing Then
                     processObject.StartInfo.Arguments = commandLineArgument
                 End If
 
@@ -574,7 +639,7 @@ Namespace Functions.support
                 Dim processStartInfo As New ProcessStartInfo() With {
                     .FileName = pathToExecutable,
                     .WindowStyle = ProcessWindowStyle.Hidden,
-                    .Arguments = arguments,
+                    .arguments = arguments,
                     .CreateNoWindow = True
                 }
 
@@ -603,7 +668,7 @@ Namespace Functions.support
                 Dim processStartInfo As New ProcessStartInfo() With {
                     .FileName = pathToExecutable,
                     .WindowStyle = ProcessWindowStyle.Hidden,
-                    .Arguments = arguments,
+                    .arguments = arguments,
                     .CreateNoWindow = True
                 }
 
@@ -664,7 +729,7 @@ Namespace Functions.support
                 With shortCut
                     .TargetPath = pathToExecutable
 
-                    If (arguments = Nothing) = False Then
+                    If Not String.IsNullOrEmpty(arguments) Then
                         .Arguments = arguments
                     End If
 

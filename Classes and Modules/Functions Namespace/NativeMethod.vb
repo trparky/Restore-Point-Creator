@@ -458,5 +458,9 @@ Namespace Functions.NativeMethod
         <DllImport("user32.dll", SetLastError:=True)>
         Public Shared Function SetWindowPos(ByVal hWnd As IntPtr, ByVal hWndInsertAfter As IntPtr, ByVal X As Integer, ByVal Y As Integer, ByVal cx As Integer, ByVal cy As Integer, ByVal uFlags As SetWindowPosFlags) As Boolean
         End Function
+
+        <DllImport("dwmapi.dll")>
+        Public Shared Sub DwmGetColorizationColor(ByRef ColorizationColor As UInteger, ByRef ColorizationOpaqueBlend As Boolean)
+        End Sub
     End Class
 End Namespace

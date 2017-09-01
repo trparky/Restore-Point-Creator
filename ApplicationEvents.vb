@@ -18,7 +18,20 @@ Namespace My
             Process.GetCurrentProcess.Kill()
         End Sub
 
+        Private Sub setProcessPriorities()
+            Try
+                Process.GetCurrentProcess.PriorityClass = ProcessPriorityClass.Normal
+            Catch ex As Exception
+            End Try
+
+            Try
+                Functions.IOPriority.SetIOPriority(Functions.IOPriority.IOPrioritySetting.Normal)
+            Catch ex As Exception
+            End Try
+        End Sub
+
         Private Sub MyApplication_Startup(sender As Object, e As ApplicationServices.StartupEventArgs) Handles Me.Startup
+            setProcessPriorities()
             exceptionHandler.loadExceptionHandler()
             Functions.startupFunctions.validateSettings()
 
@@ -97,17 +110,17 @@ Namespace My
             If My.Application.CommandLineArgs.Count >= 1 Then
                 commandLineArgument = My.Application.CommandLineArgs(0).Trim
 
-                If commandLineArgument.stringCompare(globalVariables.commandLineSwitches.viewChangeLog) Then
+                If commandLineArgument.Equals(globalVariables.commandLineSwitches.viewChangeLog, StringComparison.OrdinalIgnoreCase) Then
                     Dim changeLog As New Change_Log
                     changeLog.ShowDialog()
                     e.Cancel = True
                     Exit Sub
-                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.viewEventLog) Then
+                ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.viewEventLog, StringComparison.OrdinalIgnoreCase) Then
                     Dim eventLogForm As New eventLogForm
                     eventLogForm.ShowDialog()
                     e.Cancel = True
                     Exit Sub
-                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.createRestorePoint) Then
+                ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.createRestorePoint, StringComparison.OrdinalIgnoreCase) Then
                     If My.Application.CommandLineArgs.Count = 2 Then
                         If My.Application.CommandLineArgs(1).Trim.StartsWith("-name", StringComparison.OrdinalIgnoreCase) Then
                             My.Settings.savedRestorePointFromCommandLine = My.Application.CommandLineArgs(1).Trim.caseInsensitiveReplace("-name=", "")
@@ -116,7 +129,7 @@ Namespace My
                     End If
 
                     Functions.taskStuff.runProgramUsingTaskWrapper()
-                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.deleteOldRestorePoints) Then
+                ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.deleteOldRestorePoints, StringComparison.OrdinalIgnoreCase) Then
                     If Not Functions.privilegeChecks.areWeAnAdministrator() Then
                         If My.Application.CommandLineArgs.Count = 2 Then
                             ' OK, the user provided a second command line argument so let's check it out.
@@ -136,7 +149,7 @@ Namespace My
                         e.Cancel = True
                         Exit Sub
                     End If
-                ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints) And Not boolAreWeAnAdministrator Then
+                ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints, StringComparison.OrdinalIgnoreCase) And Not boolAreWeAnAdministrator Then
                     ' Let's put the setting back to the default value of 0.
                     My.Settings.deleteOldRestorePointCommandLineCount = 0
                     My.Settings.Save()
@@ -218,21 +231,16 @@ Namespace My
                 Exit Sub
             End If
 #End If
-            ' Reads a special Registry entry from the Registry that instructs the program to not run with the Task Wrapper.
-            If Boolean.TryParse(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey).GetValue("No Task", "False"), boolNoTask) Then
-                ' Checks to see if the Registry value was True and if we aren't an Admin.
-                If boolNoTask = True And boolAreWeAnAdministrator = False Then
-                    Functions.support.reRunWithAdminUserRights() ' OK, we relaunch the process with full Administrator privileges with a UAC prompt.
-                End If
-            Else
-                ' This is in case we couldn't parse what came from the Registry.
-                boolNoTask = False
+            boolNoTask = Functions.registryStuff.getBooleanValueFromRegistry(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey), "No Task", False)
+
+            If boolNoTask And Not boolAreWeAnAdministrator Then
+                Functions.support.reRunWithAdminUserRights() ' OK, we relaunch the process with full Administrator privileges with a UAC prompt.
             End If
 
             If Not boolAreWeInSafeMode And boolAreWeAnAdministrator And My.Application.CommandLineArgs.Count > 0 Then
                 commandLineArgument = My.Application.CommandLineArgs(0)
 
-                If commandLineArgument.stringCompare("-update") Or commandLineArgument.stringCompare("-updatewithoutuninstallinfoupdate") Then
+                If commandLineArgument.Equals("-update", StringComparison.OrdinalIgnoreCase) Or commandLineArgument.Equals("-updatewithoutuninstallinfoupdate", StringComparison.OrdinalIgnoreCase) Then
                     Functions.startupFunctions.performApplicationUpdate(commandLineArgument)
                     e.Cancel = True
                     Exit Sub
@@ -268,15 +276,15 @@ Namespace My
                     If boolAreWeAnAdministrator = True And My.Application.CommandLineArgs.Count = 1 Then
                         commandLineArgument = My.Application.CommandLineArgs(0)
 
-                        If commandLineArgument.stringCompare("-createtasks") Then
+                        If commandLineArgument.Equals("-createtasks", StringComparison.OrdinalIgnoreCase) Then
                             Functions.eventLogFunctions.writeToSystemEventLog("The program was called with an obsolete command line argument, specifically ""-createtasks"". The program has ignored the command and exited.", EventLogEntryType.Information)
                             Process.GetCurrentProcess.Kill()
-                        ElseIf commandLineArgument.stringCompare("-fixruntimetasks") Then
+                        ElseIf commandLineArgument.Equals("-fixruntimetasks", StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.repairRuntimeTasks()
 
                             e.Cancel = True
                             Exit Sub
-                        ElseIf commandLineArgument.stringCompare("-deletealltasks") Then
+                        ElseIf commandLineArgument.Equals("-deletealltasks", StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.deleteAllTasks()
                         End If
                     End If
@@ -296,19 +304,14 @@ Namespace My
                 registryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
 
                 If registryKey IsNot Nothing Then
-                    Boolean.TryParse(registryKey.GetValue("Keep X Amount of Restore Points", "False"), globalVariables.KeepXAmountOfRestorePoints)
+                    globalVariables.KeepXAmountOfRestorePoints = Functions.registryStuff.getBooleanValueFromRegistry(registryKey, "Keep X Amount of Restore Points", False)
 
                     If globalVariables.KeepXAmountOfRestorePoints = True Then
                         Short.TryParse(registryKey.GetValue("Keep X Amount of Restore Points Value", "-10"), globalVariables.KeepXAmountofRestorePointsValue)
                     End If
 
-                    If Boolean.TryParse(registryKey.GetValue("Enable System Logging", "True"), globalVariables.boolLogToSystemLog) = False Then
-                        globalVariables.boolLogToSystemLog = True
-                    End If
-
-                    If Boolean.TryParse(registryKey.GetValue("Log Program Loads and Exits to Event Log", "True"), globalVariables.boolLogLoadsAndExits) = False Then
-                        globalVariables.boolLogLoadsAndExits = True
-                    End If
+                    globalVariables.boolLogToSystemLog = Functions.registryStuff.getBooleanValueFromRegistry(registryKey, "Enable System Logging", True)
+                    globalVariables.boolLogLoadsAndExits = Functions.registryStuff.getBooleanValueFromRegistry(registryKey, "Log Program Loads and Exits to Event Log", True)
 
                     registryKey.Close()
                     registryKey.Dispose()
@@ -324,7 +327,7 @@ Namespace My
                     If My.Application.CommandLineArgs.Count >= 1 Then
                         commandLineArgument = My.Application.CommandLineArgs(0)
 
-                        If commandLineArgument.stringCompare(globalVariables.commandLineSwitches.createRestorePoint) Then
+                        If commandLineArgument.Equals(globalVariables.commandLineSwitches.createRestorePoint, StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.giveSafeModeErrorMessage(boolAreWeInSafeMode)
                             Functions.eventLogFunctions.writeToSystemEventLog("Activated JumpList Task.", EventLogEntryType.Information)
 
@@ -353,7 +356,7 @@ Namespace My
 
                             e.Cancel = True
                             Exit Sub
-                        ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.createCustomRestorePoint) Then
+                        ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.createCustomRestorePoint, StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.giveSafeModeErrorMessage(boolAreWeInSafeMode)
                             Functions.eventLogFunctions.writeToSystemEventLog("Activated JumpList Task.", EventLogEntryType.Information)
 
@@ -383,7 +386,7 @@ Namespace My
 
                             e.Cancel = True
                             Exit Sub
-                        ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.scheduledRestorePoint) Then
+                        ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.scheduledRestorePoint, StringComparison.OrdinalIgnoreCase) Then
                             Dim restorePointNameForScheduledTasks As String = globalVariables.strDefaultNameForScheduledTasks
                             Dim boolExtendedLoggingForScheduledTasks As Boolean = True
                             Dim oldNewestRestorePointID As Integer
@@ -393,11 +396,7 @@ Namespace My
                             If registryKey IsNot Nothing Then
                                 restorePointNameForScheduledTasks = registryKey.GetValue("Custom Name for Scheduled Restore Points", globalVariables.strDefaultNameForScheduledTasks)
 
-                                If Boolean.TryParse(registryKey.GetValue("Extended Logging For Scheduled Tasks", "True"), boolExtendedLoggingForScheduledTasks) Then
-                                    boolExtendedLoggingForScheduledTasks = boolExtendedLoggingForScheduledTasks
-                                Else
-                                    boolExtendedLoggingForScheduledTasks = True
-                                End If
+                                boolExtendedLoggingForScheduledTasks = Functions.registryStuff.getBooleanValueFromRegistry(registryKey, "Extended Logging For Scheduled Tasks", True)
 
                                 registryKey.Close()
                                 registryKey.Dispose()
@@ -426,15 +425,8 @@ Namespace My
 
                             If boolExtendedLoggingForScheduledTasks = True Then Functions.restorePointStuff.writeSystemRestorePointsToApplicationLogs()
 
-                            Dim boolValueFromRegistryAsString As String = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Delete Old Restore Points", "False").Trim
-                            Dim boolValueFromRegistry As Boolean
-
-                            ' This checks if we have valid data from the Registry value.  It attempts to parse it and passes the value of the parses data to boolValueFromRegistry.
-                            If Boolean.TryParse(boolValueFromRegistryAsString, boolValueFromRegistry) = True Then
-                                ' OK, we do have valid data, let's continue.
-                                If boolValueFromRegistryAsString = True Then
-                                    Functions.startupFunctions.deleteOldRestorePoints()
-                                End If
+                            If Functions.registryStuff.getBooleanValueFromRegistry(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False), "Delete Old Restore Points", False) Then
+                                Functions.startupFunctions.deleteOldRestorePoints()
                             End If
 
                             If globalVariables.KeepXAmountOfRestorePoints = True Then
@@ -445,7 +437,7 @@ Namespace My
 
                             e.Cancel = True
                             Exit Sub
-                        ElseIf commandLineArgument.stringCompare("-restoretopoint") Then
+                        ElseIf commandLineArgument.Equals("-restoretopoint", StringComparison.OrdinalIgnoreCase) Then
                             ' The first thing we do is disable Safe Mode boot so the user doesn't get trapped in Safe Mode.
                             Functions.support.removeSafeModeBoot()
 
@@ -489,11 +481,11 @@ Namespace My
 
                             e.Cancel = True
                             Exit Sub
-                        ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.deleteOldRestorePoints) Then
+                        ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.deleteOldRestorePoints, StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.deleteOldRestorePoints()
                             e.Cancel = True
                             Exit Sub
-                        ElseIf commandLineArgument.stringCompare(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints) Then
+                        ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints, StringComparison.OrdinalIgnoreCase) Then
                             Dim deleteOldRestorePointCommandLineCount As Short
 
                             ' This checks if the user provided a "-count" argument.
@@ -573,7 +565,7 @@ Namespace My
 
                             e.Cancel = True
                             Exit Sub
-                        ElseIf commandLineArgument.stringCompare("-prefscleanup") Then
+                        ElseIf commandLineArgument.Equals("-prefscleanup", StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.prefsCleanup()
                         End If
                     Else

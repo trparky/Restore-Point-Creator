@@ -3,29 +3,10 @@ Imports Microsoft.Win32
 
 Namespace Functions.registryStuff
     Module registryStuff
-        Private Function getFileTypeHandler(fileType As String) As String
-            Try
-                Dim registryKey As RegistryKey = Registry.ClassesRoot.OpenSubKey(fileType, False)
-
-                If registryKey IsNot Nothing Then
-                    Dim fileTypeNameInRegistry As String = registryKey.GetValue("")
-                    Dim registryKey2 As RegistryKey = Registry.ClassesRoot.OpenSubKey(fileTypeNameInRegistry & "\shell\open\command", False)
-
-                    If registryKey2 IsNot Nothing Then
-                        Return registryKey2.GetValue("").ToString.Replace("""", "").Replace("%1", "").Trim
-                    End If
-                End If
-
-                Return ""
-            Catch ex As Exception
-                Return ""
-            End Try
-        End Function
-
         Public Function getFileAssociation(ByVal fileExtension As String, ByRef associatedApplication As String) As Boolean
             Try
                 fileExtension = fileExtension.ToLower.Trim
-                If fileExtension.StartsWith(".") = False Then
+                If Not fileExtension.StartsWith(".") Then
                     fileExtension = "." & fileExtension
                 End If
 
@@ -50,7 +31,7 @@ Namespace Functions.registryStuff
                 If installerRegistryPath IsNot Nothing Then
                     displayName = installerRegistryPath.GetValue("DisplayName", "")
 
-                    If displayName.caseInsensitiveContains("restore point creator") = True Then
+                    If displayName.caseInsensitiveContains("restore point creator") Then
                         If globalVariables.version.boolBeta Then
                             installerRegistryPath.SetValue("DisplayName", String.Format("Restore Point Creator version {0} Public Beta {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion), RegistryValueKind.String)
                         ElseIf globalVariables.version.boolReleaseCandidate Then
@@ -144,7 +125,7 @@ Namespace Functions.registryStuff
         ''' <param name="registryKey">The Registry Object you want to act on.</param>
         ''' <param name="boolCloseAfterSettingValue">This is an optional Boolean value, this is normally set to False.</param>
         Public Sub setBooleanValueInRegistry(ByRef registryKey As RegistryKey, ByVal strValueNameToSetInRegistry As String, ByVal boolValueToSet As Boolean, Optional boolCloseAfterSettingValue As Boolean = False)
-            setValueInRegistry(registryKey, strValueNameToSetInRegistry, boolValueToSet, boolCloseAfterSettingValue)
+            setValueInRegistry(registryKey, strValueNameToSetInRegistry, boolValueToSet.ToString, boolCloseAfterSettingValue)
         End Sub
 
         ''' <summary>Gets a setting from the application's Registry key.</summary>
@@ -156,13 +137,13 @@ Namespace Functions.registryStuff
             Try
                 Dim boolTemp As Boolean, strDefaultValue As String
 
-                If boolDefaultValue = True Then
+                If boolDefaultValue Then
                     strDefaultValue = globalVariables.booleans.strTrue
                 Else
                     strDefaultValue = globalVariables.booleans.strFalse
                 End If
 
-                If Boolean.TryParse(registryObject.GetValue(valueToGetFromRegistry, strDefaultValue), boolTemp) = False Then
+                If Not Boolean.TryParse(registryObject.GetValue(valueToGetFromRegistry, strDefaultValue), boolTemp) Then
                     boolTemp = boolDefaultValue
                 End If
 

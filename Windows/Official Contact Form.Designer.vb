@@ -38,9 +38,20 @@ Partial Class Official_Contact_Form
         Me.Label4 = New System.Windows.Forms.Label()
         Me.btnClear = New System.Windows.Forms.Button()
         Me.btnDeleteAttachment = New System.Windows.Forms.Button()
-        Me.listAttachedFiles = New System.Windows.Forms.ListBox()
         Me.btnAttachEventLogs = New System.Windows.Forms.Button()
+        Me.maxSize = New Tom.SmoothProgressBar()
+        Me.lblTotalFileSize = New System.Windows.Forms.Label()
+        Me.listAttachedFiles = New System.Windows.Forms.ListView()
+        Me.ColumnHeader1 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
+        Me.ColumnHeader2 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
+        Me.pleaseWaitPanel = New System.Windows.Forms.Panel()
+        Me.pleaseWaitBorderText = New System.Windows.Forms.Label()
+        Me.pleaseWaitlblLabel = New System.Windows.Forms.Label()
+        Me.pleaseWaitProgressBar = New Tom.SmoothProgressBar()
+        Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
+        Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
         Me.TableLayoutPanel1.SuspendLayout()
+        Me.pleaseWaitPanel.SuspendLayout()
         Me.SuspendLayout()
         '
         'Label1
@@ -100,7 +111,7 @@ Partial Class Official_Contact_Form
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.btnClose, 0, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.btnSubmit, 0, 0)
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(10, 525)
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(10, 566)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 1
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
@@ -184,14 +195,6 @@ Partial Class Official_Contact_Form
         Me.btnDeleteAttachment.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.btnDeleteAttachment.UseVisualStyleBackColor = True
         '
-        'listAttachedFiles
-        '
-        Me.listAttachedFiles.FormattingEnabled = True
-        Me.listAttachedFiles.Location = New System.Drawing.Point(10, 346)
-        Me.listAttachedFiles.Name = "listAttachedFiles"
-        Me.listAttachedFiles.Size = New System.Drawing.Size(378, 173)
-        Me.listAttachedFiles.TabIndex = 13
-        '
         'btnAttachEventLogs
         '
         Me.btnAttachEventLogs.Image = Global.Restore_Point_Creator.My.Resources.Resources.textBlock
@@ -204,13 +207,108 @@ Partial Class Official_Contact_Form
         Me.btnAttachEventLogs.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.btnAttachEventLogs.UseVisualStyleBackColor = True
         '
+        'maxSize
+        '
+        Me.maxSize.Location = New System.Drawing.Point(10, 538)
+        Me.maxSize.Maximum = 100
+        Me.maxSize.Minimum = 0
+        Me.maxSize.Name = "maxSize"
+        Me.maxSize.ProgressBarColor = System.Drawing.Color.LightGreen
+        Me.maxSize.Size = New System.Drawing.Size(491, 22)
+        Me.maxSize.TabIndex = 15
+        Me.maxSize.Value = 0
+        '
+        'lblTotalFileSize
+        '
+        Me.lblTotalFileSize.AutoSize = True
+        Me.lblTotalFileSize.Location = New System.Drawing.Point(7, 522)
+        Me.lblTotalFileSize.Name = "lblTotalFileSize"
+        Me.lblTotalFileSize.Size = New System.Drawing.Size(275, 13)
+        Me.lblTotalFileSize.TabIndex = 16
+        Me.lblTotalFileSize.Text = "You have attached 0 KB of the maximum 6 MBs allowed."
+        '
+        'listAttachedFiles
+        '
+        Me.listAttachedFiles.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader1, Me.ColumnHeader2})
+        Me.listAttachedFiles.FullRowSelect = True
+        Me.listAttachedFiles.Location = New System.Drawing.Point(10, 346)
+        Me.listAttachedFiles.Name = "listAttachedFiles"
+        Me.listAttachedFiles.Size = New System.Drawing.Size(378, 171)
+        Me.listAttachedFiles.TabIndex = 17
+        Me.listAttachedFiles.UseCompatibleStateImageBehavior = False
+        Me.listAttachedFiles.View = System.Windows.Forms.View.Details
+        '
+        'ColumnHeader1
+        '
+        Me.ColumnHeader1.Text = "File Name"
+        Me.ColumnHeader1.Width = 269
+        '
+        'ColumnHeader2
+        '
+        Me.ColumnHeader2.Text = "Size"
+        Me.ColumnHeader2.Width = 69
+        '
+        'pleaseWaitPanel
+        '
+        Me.pleaseWaitPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.pleaseWaitPanel.Controls.Add(Me.pleaseWaitBorderText)
+        Me.pleaseWaitPanel.Controls.Add(Me.pleaseWaitlblLabel)
+        Me.pleaseWaitPanel.Controls.Add(Me.pleaseWaitProgressBar)
+        Me.pleaseWaitPanel.Location = New System.Drawing.Point(108, 258)
+        Me.pleaseWaitPanel.Name = "pleaseWaitPanel"
+        Me.pleaseWaitPanel.Size = New System.Drawing.Size(293, 86)
+        Me.pleaseWaitPanel.TabIndex = 49
+        Me.pleaseWaitPanel.Visible = False
+        '
+        'pleaseWaitBorderText
+        '
+        Me.pleaseWaitBorderText.BackColor = System.Drawing.Color.SkyBlue
+        Me.pleaseWaitBorderText.Location = New System.Drawing.Point(0, 0)
+        Me.pleaseWaitBorderText.Name = "pleaseWaitBorderText"
+        Me.pleaseWaitBorderText.Padding = New System.Windows.Forms.Padding(3, 0, 0, 0)
+        Me.pleaseWaitBorderText.Size = New System.Drawing.Size(292, 23)
+        Me.pleaseWaitBorderText.TabIndex = 4
+        Me.pleaseWaitBorderText.Text = "Please Wait..."
+        Me.pleaseWaitBorderText.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'pleaseWaitlblLabel
+        '
+        Me.pleaseWaitlblLabel.AutoSize = True
+        Me.pleaseWaitlblLabel.Location = New System.Drawing.Point(3, 31)
+        Me.pleaseWaitlblLabel.Name = "pleaseWaitlblLabel"
+        Me.pleaseWaitlblLabel.Size = New System.Drawing.Size(39, 13)
+        Me.pleaseWaitlblLabel.TabIndex = 3
+        Me.pleaseWaitlblLabel.Text = "Label1"
+        '
+        'pleaseWaitProgressBar
+        '
+        Me.pleaseWaitProgressBar.Location = New System.Drawing.Point(6, 56)
+        Me.pleaseWaitProgressBar.Maximum = 100
+        Me.pleaseWaitProgressBar.Minimum = 0
+        Me.pleaseWaitProgressBar.Name = "pleaseWaitProgressBar"
+        Me.pleaseWaitProgressBar.ProgressBarColor = System.Drawing.Color.Blue
+        Me.pleaseWaitProgressBar.Size = New System.Drawing.Size(268, 19)
+        Me.pleaseWaitProgressBar.TabIndex = 2
+        Me.pleaseWaitProgressBar.Value = 0
+        '
+        'pleaseWaitMessageChanger
+        '
+        Me.pleaseWaitMessageChanger.Interval = 250
+        '
+        'pleaseWaitProgressBarChanger
+        '
+        Me.pleaseWaitProgressBarChanger.Interval = 25
+        '
         'Official_Contact_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
-        Me.ClientSize = New System.Drawing.Size(509, 561)
-        Me.Controls.Add(Me.btnAttachEventLogs)
+        Me.ClientSize = New System.Drawing.Size(509, 603)
+        Me.Controls.Add(Me.pleaseWaitPanel)
         Me.Controls.Add(Me.listAttachedFiles)
+        Me.Controls.Add(Me.lblTotalFileSize)
+        Me.Controls.Add(Me.maxSize)
+        Me.Controls.Add(Me.btnAttachEventLogs)
         Me.Controls.Add(Me.btnDeleteAttachment)
         Me.Controls.Add(Me.btnClear)
         Me.Controls.Add(Me.Label4)
@@ -228,6 +326,8 @@ Partial Class Official_Contact_Form
         Me.Name = "Official_Contact_Form"
         Me.Text = "Official Contact Form"
         Me.TableLayoutPanel1.ResumeLayout(False)
+        Me.pleaseWaitPanel.ResumeLayout(False)
+        Me.pleaseWaitPanel.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -248,6 +348,16 @@ Partial Class Official_Contact_Form
     Friend WithEvents Label4 As Label
     Friend WithEvents btnClear As Button
     Friend WithEvents btnDeleteAttachment As Button
-    Friend WithEvents listAttachedFiles As ListBox
     Friend WithEvents btnAttachEventLogs As Button
+    Friend WithEvents maxSize As Tom.SmoothProgressBar
+    Friend WithEvents lblTotalFileSize As Label
+    Friend WithEvents listAttachedFiles As ListView
+    Friend WithEvents ColumnHeader1 As ColumnHeader
+    Friend WithEvents ColumnHeader2 As ColumnHeader
+    Friend WithEvents pleaseWaitPanel As Panel
+    Friend WithEvents pleaseWaitBorderText As Label
+    Friend WithEvents pleaseWaitlblLabel As Label
+    Friend WithEvents pleaseWaitProgressBar As Tom.SmoothProgressBar
+    Friend WithEvents pleaseWaitMessageChanger As Timer
+    Friend WithEvents pleaseWaitProgressBarChanger As Timer
 End Class

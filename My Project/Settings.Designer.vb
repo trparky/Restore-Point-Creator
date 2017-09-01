@@ -15,7 +15,7 @@ Option Explicit On
 Namespace My
     
     <Global.System.Runtime.CompilerServices.CompilerGeneratedAttribute(),  _
-     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.1.0.0"),  _
+     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.3.0.0"),  _
      Global.System.ComponentModel.EditorBrowsableAttribute(Global.System.ComponentModel.EditorBrowsableState.Advanced)>  _
     Partial Friend NotInheritable Class MySettings
         Inherits Global.System.Configuration.ApplicationSettingsBase
@@ -291,17 +291,6 @@ Namespace My
             End Get
             Set
                 Me("debug") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute()>  _
-        Public Property customColors2() As Global.System.Collections.Specialized.StringCollection
-            Get
-                Return CType(Me("customColors2"),Global.System.Collections.Specialized.StringCollection)
-            End Get
-            Set
-                Me("customColors2") = value
             End Set
         End Property
         
@@ -625,17 +614,6 @@ Namespace My
             End Get
             Set
                 Me("column5Size") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute()>  _
-        Public Property restorePointListColumnOrder() As Global.System.Collections.Specialized.StringCollection
-            Get
-                Return CType(Me("restorePointListColumnOrder"),Global.System.Collections.Specialized.StringCollection)
-            End Get
-            Set
-                Me("restorePointListColumnOrder") = value
             End Set
         End Property
         
@@ -972,6 +950,42 @@ Namespace My
             End Get
             Set
                 Me("maxDaysAtRelaunch") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property customColors3() As String
+            Get
+                Return CType(Me("customColors3"),String)
+            End Get
+            Set
+                Me("customColors3") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property restorePointListColumnOrder2() As String
+            Get
+                Return CType(Me("restorePointListColumnOrder2"),String)
+            End Get
+            Set
+                Me("restorePointListColumnOrder2") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("SkyBlue")>  _
+        Public Property pleaseWaitBorderColor() As Global.System.Drawing.Color
+            Get
+                Return CType(Me("pleaseWaitBorderColor"),Global.System.Drawing.Color)
+            End Get
+            Set
+                Me("pleaseWaitBorderColor") = value
             End Set
         End Property
     End Class
