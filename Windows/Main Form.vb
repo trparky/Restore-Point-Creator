@@ -662,7 +662,8 @@ Public Class Form1
             .versionUpdate = versionUpdateType,
             .remoteVersion = remoteVersion,
             .remoteBuild = remoteBuild,
-            .strRemoteBetaRCVersion = strRemoteBetaRCVersion
+            .strRemoteBetaRCVersion = strRemoteBetaRCVersion,
+            .TopMost = True
         }
 
         updateMessageDialog.ShowDialog()
