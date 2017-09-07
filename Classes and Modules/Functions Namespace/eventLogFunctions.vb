@@ -58,17 +58,6 @@ Namespace Functions.eventLogFunctions
                     Dim logName As String = "Application"
                     Dim host As String = "."
 
-                    With Registry.LocalMachine
-                        If .OpenSubKey(strRegistryApplicationPath & "\" & logSource) Is Nothing Then
-                            .OpenSubKey(strRegistryApplicationPath, True).CreateSubKey(logSource)
-                            .OpenSubKey(strRegistryApplicationPath & "\" & logSource, True).SetValue("EventMessageFile", IO.Path.Combine(RuntimeEnvironment.GetRuntimeDirectory(), "EventLogMessages.dll"), RegistryValueKind.String)
-                        Else
-                            If .OpenSubKey(strRegistryApplicationPath & "\" & logSource, False).GetValue("EventMessageFile", Nothing) Is Nothing Then
-                                .OpenSubKey(strRegistryApplicationPath & "\" & logSource, True).SetValue("EventMessageFile", IO.Path.Combine(RuntimeEnvironment.GetRuntimeDirectory(), "EventLogMessages.dll"), RegistryValueKind.String)
-                            End If
-                        End If
-                    End With
-
                     If Not EventLog.SourceExists(logSource, host) Then
                         EventLog.CreateEventSource(New EventSourceCreationData(logSource, logName))
                     End If
