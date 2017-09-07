@@ -8,7 +8,7 @@ Module ProcessExtensions
         Dim processIndexdName As String = Nothing
 
         For index As Integer = 0 To processesByName.Length - 1
-            processIndexdName = If(index = 0, processName, processName + "#" + index)
+            processIndexdName = If(index = 0, processName, processName & "#" & index)
 
             Using performanceCounterObject As New PerformanceCounter("Process", "ID Process", processIndexdName)
                 If CInt(performanceCounterObject.NextValue()).Equals(pid) Then Return processIndexdName
