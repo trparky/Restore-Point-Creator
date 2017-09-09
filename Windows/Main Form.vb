@@ -909,7 +909,7 @@ Public Class Form1
 
             If IO.File.Exists(strNewApplicationFileNameFullName) = True Then
                 Process.Start(New ProcessStartInfo With {.FileName = strNewApplicationFileNameFullName, .Arguments = "-updatewithoutuninstallinfoupdate", .Verb = "runas"})
-                Process.GetCurrentProcess.Kill()
+                Application.Exit()
             Else
                 MsgBox("Something went wrong during the download, update process aborted.", MsgBoxStyle.Critical, strMessageBoxTitle)
             End If
@@ -1443,7 +1443,7 @@ Public Class Form1
             End If
 
             Process.Start(New ProcessStartInfo With {.FileName = strNewApplicationFileNameFullName, .Arguments = "-update", .Verb = "runas"})
-            Process.GetCurrentProcess.Kill()
+            Application.Exit()
         Else
             Functions.eventLogFunctions.writeToSystemEventLog("New executable doesn't exists, update process aborted.", EventLogEntryType.Error)
             MsgBox("Something went wrong during the download, update process aborted.", MsgBoxStyle.Critical, strMessageBoxTitle)
@@ -2109,6 +2109,7 @@ Public Class Form1
     End Sub
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Throw New Exception()
         Control.CheckForIllegalCrossThreadCalls = False
 
         verifyUpdateChannel()
@@ -2211,7 +2212,7 @@ Public Class Form1
             Functions.eventLogFunctions.writeToSystemEventLog("Unable to open application settings file, it appears to be locked by another process.", EventLogEntryType.Error)
             MsgBox("Unable to open application settings file, it appears to be locked by another process." & vbCrLf & vbCrLf & "The program will now close.", MsgBoxStyle.Critical, "Restore Point Creator")
 
-            Process.GetCurrentProcess.Kill()
+            Application.Exit()
         End If
     End Sub
 

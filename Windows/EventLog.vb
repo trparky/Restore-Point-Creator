@@ -11,64 +11,80 @@
     Private eventLogContents As New List(Of myListViewItemTypes.eventLogListEntry)
     Private workingThread As Threading.Thread
 
-    Sub loadEventLogData(ByVal strEventLog As String, ByRef itemsToPutInToList As List(Of myListViewItemTypes.eventLogListEntry))
+    Private Function convertToEventLogType(input As Short) As EventLogEntryType
+        If input = EventLogEntryType.Error Then
+            Return EventLogEntryType.Error
+        ElseIf input = EventLogEntryType.FailureAudit Then
+            Return EventLogEntryType.FailureAudit
+        ElseIf input = EventLogEntryType.Information Then
+            Return EventLogEntryType.Information
+        ElseIf input = EventLogEntryType.SuccessAudit Then
+            Return EventLogEntryType.SuccessAudit
+        ElseIf input = EventLogEntryType.Warning Then
+            Return EventLogEntryType.Warning
+        Else
+            Return EventLogEntryType.Information
+        End If
+    End Function
+
+    Private Function UNIXTimestampToDate(ByVal strUnixTime As ULong) As Date
+        'Dim tmpDate As Date = DateAdd(DateInterval.Second, strUnixTime, #1/1/1970#)
+        Dim tmpDate As Date = DateAdd(DateInterval.Second, strUnixTime, New DateTime(1970, 1, 1, 0, 0, 0, 0))
+
+        If tmpDate.IsDaylightSavingTime Then
+            tmpDate = DateAdd(DateInterval.Hour, 1, tmpDate)
+        End If
+
+        Return tmpDate
+    End Function
+
+    Private Function convertLineFeeds(input As String) As String
+        ' Checks to see if the file is in Windows linefeed format or UNIX linefeed format.
+        If input.Contains(vbCrLf) Then
+            Return input ' It's in Windows linefeed format so we return the output as is.
+        Else
+            Return input.Replace(vbLf, vbCrLf) ' It's in UNIX linefeed format so we have to convert it to Windows before we return the output.
+        End If
+    End Function
+
+    Sub loadEventLogData(ByRef itemsToPutInToList As List(Of myListViewItemTypes.eventLogListEntry))
         Dim itemAdd As myListViewItemTypes.eventLogListEntry
-        Dim eventLogQuery As Eventing.Reader.EventLogQuery
-        Dim logReader As Eventing.Reader.EventLogReader
-        Dim eventInstance As Eventing.Reader.EventRecord
+        Dim eventLogType As EventLogEntryType
 
         Try
-            If EventLog.Exists(strEventLog) Then
-                eventLogQuery = New Eventing.Reader.EventLogQuery(strEventLog, Eventing.Reader.PathType.LogName)
-                logReader = New Eventing.Reader.EventLogReader(eventLogQuery)
+            Dim stopwatch As Stopwatch = Stopwatch.StartNew
+            Dim logEntries As List(Of restorePointCreatorExportedLog) = Functions.eventLogFunctions.getLogObject()
+            Debug.WriteLine("time needed to load log data in ms: " & stopwatch.ElapsedMilliseconds)
 
-                eventInstance = logReader.ReadEvent()
+            For Each logEntry As restorePointCreatorExportedLog In logEntries
+                eventLogType = convertToEventLogType(logEntry.logType)
+                itemAdd = New myListViewItemTypes.eventLogListEntry(eventLogType.ToString)
 
-                While eventInstance IsNot Nothing
-                    If eventInstance.ProviderName.Equals(globalVariables.eventLog.strSystemRestorePointCreator, StringComparison.OrdinalIgnoreCase) Or eventInstance.ProviderName.caseInsensitiveContains(globalVariables.eventLog.strSystemRestorePointCreator) Then
-                        Try
-                            itemAdd = New myListViewItemTypes.eventLogListEntry(eventInstance.LevelDisplayName)
-                        Catch ex As Eventing.Reader.EventLogNotFoundException
-                            itemAdd = New myListViewItemTypes.eventLogListEntry("Unknown")
-                        End Try
+                With itemAdd
+                    ' 0 = "Error"
+                    ' 1 = "Information"
+                    ' 2 = "Warning"
+                    Select Case eventLogType
+                        Case Eventing.Reader.StandardEventLevel.Error ' Error
+                            .ImageIndex = 0
+                        Case Eventing.Reader.StandardEventLevel.Informational ' Information
+                            .ImageIndex = 1
+                        Case Eventing.Reader.StandardEventLevel.Warning ' Warning
+                            .ImageIndex = 2
+                    End Select
 
-                        With itemAdd
-                            ' 0 = "Error"
-                            ' 1 = "Information"
-                            ' 2 = "Warning"
-                            Select Case eventInstance.Level
-                                Case Eventing.Reader.StandardEventLevel.Error ' Error
-                                    .ImageIndex = 0
-                                Case Eventing.Reader.StandardEventLevel.Informational ' Information
-                                    .ImageIndex = 1
-                                Case Eventing.Reader.StandardEventLevel.Warning ' Warning
-                                    .ImageIndex = 2
-                            End Select
+                    .SubItems.Add(UNIXTimestampToDate(logEntry.unixTime).ToLocalTime.ToString)
+                    .SubItems.Add(logEntry.logID.ToString("N0"))
 
-                            .SubItems.Add(eventInstance.TimeCreated.Value.ToLocalTime.ToString)
-                            .SubItems.Add(Long.Parse(eventInstance.RecordId).ToString("N0"))
-                            .SubItems.Add(strEventLog)
-                            .SubItems.Add("")
+                    .strEventLogText = Functions.support.removeSourceCodePathInfo(convertLineFeeds(logEntry.logData))
+                    .longEventLogEntryID = logEntry.logID
+                    .strEventLogSource = logEntry.logSource
+                    .shortLevelType = logEntry.logType
+                End With
 
-                            .strEventLogText = Functions.support.removeSourceCodePathInfo(eventInstance.FormatDescription)
-                            .longEventLogEntryID = Long.Parse(eventInstance.RecordId)
-                            .strEventLogSource = strEventLog
-                            .shortLevelType = Short.Parse(eventInstance.Level)
-                        End With
-
-                        itemsToPutInToList.Add(itemAdd)
-                        itemAdd = Nothing
-                    End If
-
-                    eventInstance.Dispose()
-                    eventInstance = Nothing
-                    eventInstance = logReader.ReadEvent()
-                End While
-
-                logReader.Dispose()
-                logReader = Nothing
-                eventLogQuery = Nothing
-            End If
+                itemsToPutInToList.Add(itemAdd)
+                itemAdd = Nothing
+            Next
         Catch ex As Threading.ThreadAbortException
         Catch ex As Exception
             MsgBox(ex.Message)
@@ -83,9 +99,10 @@
             eventLogContents.Clear() ' Cleans our cached log entries in memory.
 
             Dim timeStamp As Stopwatch = Stopwatch.StartNew()
+            loadEventLogData(eventLogContents)
 
-            loadEventLogData(globalVariables.eventLog.strApplication, eventLogContents)
-            loadEventLogData(globalVariables.eventLog.strSystemRestorePointCreator, eventLogContents)
+            Dim longElapsedMilisecond As Long = timeStamp.ElapsedMilliseconds
+            Dim dblElapsedSeconds As Double = timeStamp.Elapsed.TotalSeconds
 
             If timeStamp.Elapsed.Milliseconds < 1000 Then Threading.Thread.Sleep(1000 - timeStamp.Elapsed.Milliseconds)
 
@@ -99,7 +116,7 @@
 
                           closePleaseWaitPanel()
                           timeStamp.Stop()
-                          lblProcessedIn.Text = String.Format("Event Log Loaded and Processed in {0}ms ({1} seconds).", timeStamp.ElapsedMilliseconds.ToString("N0"), Math.Round(timeStamp.Elapsed.TotalSeconds, 2))
+                          lblProcessedIn.Text = String.Format("Event Log Loaded and Processed in {0}ms ({1} seconds).", longElapsedMilisecond.ToString("N0"), Math.Round(dblElapsedSeconds, 2))
                       End Sub)
         Catch ex As Threading.ThreadAbortException
         Finally
@@ -143,6 +160,7 @@
         ' Some data validation.
 
         ' Get the new sorting column.
+        If My.Settings.eventLogSortingColumn > 2 Then My.Settings.eventLogSortingColumn = 2
         Dim new_sorting_column As ColumnHeader = eventLogList.Columns(My.Settings.eventLogSortingColumn)
         Dim sort_order As SortOrder = My.Settings.eventLogSortingOrder
 
@@ -184,6 +202,7 @@
     End Sub
 
     Private Sub eventLog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(New IO.FileInfo(Functions.eventLogFunctions.strLogFile).Length)
         Me.Location = Functions.support.verifyWindowLocation(My.Settings.eventLogFormWindowLocation)
         chkAskMeToSubmitIfViewingAnExceptionEntry.Checked = My.Settings.boolAskMeToSubmitIfViewingAnExceptionEntry
         applySavedSorting()
@@ -241,7 +260,6 @@
             My.Settings.eventLogColumn1Size = ColumnHeader1.Width
             My.Settings.eventLogColumn2Size = ColumnHeader2.Width
             My.Settings.eventLogColumn3Size = ColumnHeader3.Width
-            My.Settings.eventLogColumn4Size = ColumnHeader4.Width
             My.Settings.Save()
         End If
     End Sub
@@ -259,10 +277,6 @@
 
     Private Sub eventLogForm_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
         My.Settings.eventLogWindowSize = Me.Size
-    End Sub
-
-    Private Sub btnOpenEventLog_Click(sender As Object, e As EventArgs) Handles btnOpenEventLog.Click
-        Process.Start("eventvwr")
     End Sub
 
     Private Sub SplitContainer1_SplitterMoved(sender As Object, e As SplitterEventArgs) Handles SplitContainer1.SplitterMoved
@@ -301,7 +315,6 @@
         ColumnHeader1.Width = My.Settings.eventLogColumn1Size
         ColumnHeader2.Width = My.Settings.eventLogColumn2Size
         ColumnHeader3.Width = My.Settings.eventLogColumn3Size
-        ColumnHeader4.Width = My.Settings.eventLogColumn4Size
 
         boolDoneLoading = True
 
@@ -512,6 +525,12 @@
             pleaseWaitBorderText.Text = "Please Wait..."
             pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "..."
         End If
+    End Sub
+
+    Private Sub btnCleanLogFile_Click(sender As Object, e As EventArgs) Handles btnCleanLogFile.Click
+        IO.File.Delete(Functions.eventLogFunctions.strLogFile)
+        Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Log file cleaned by user {0}.", Environment.UserName), EventLogEntryType.Information)
+        loadEventLog()
     End Sub
 #End Region
 End Class

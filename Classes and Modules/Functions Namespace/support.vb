@@ -770,11 +770,11 @@ Namespace Functions.support
                 If privilegeChecks.areWeAnAdministrator() = False Then startInfo.Verb = "runas"
 
                 Process.Start(startInfo)
-                Process.GetCurrentProcess.Kill()
+                Application.Exit()
             Catch ex As ComponentModel.Win32Exception
                 eventLogFunctions.writeCrashToEventLog(ex)
                 MsgBox("There was an error while attempting to elevate the process, please make sure that when the Windows UAC prompt appears asking you to run the program with elevated privileges that you say ""Yes"" to the UAC prompt." & vbCrLf & vbCrLf & "The program will now terminate.", MsgBoxStyle.Critical, globalVariables.programName)
-                Process.GetCurrentProcess.Kill()
+                Application.Exit()
             End Try
         End Sub
 
@@ -791,11 +791,11 @@ Namespace Functions.support
                 If privilegeChecks.areWeAnAdministrator() = False Then startInfo.Verb = "runas"
 
                 Process.Start(startInfo)
-                Process.GetCurrentProcess.Kill()
+                Application.Exit()
             Catch ex As ComponentModel.Win32Exception
                 eventLogFunctions.writeCrashToEventLog(ex)
                 MsgBox("There was an error while attempting to elevate the process, please make sure that when the Windows UAC prompt appears asking you to run the program with elevated privileges that you say ""Yes"" to the UAC prompt." & vbCrLf & vbCrLf & "The program will now terminate.", MsgBoxStyle.Critical + MsgBoxStyle.SystemModal, globalVariables.programName)
-                Process.GetCurrentProcess.Kill()
+                Application.Exit()
             End Try
         End Sub
 

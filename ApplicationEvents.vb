@@ -15,7 +15,7 @@ Namespace My
 
         Private Sub giveNoCountGivenError()
             Console.WriteLine("ERROR: You must include a ""-count=(0-9)"" to your invokation of this program with this command line argument. For instance... ""-count=9"".")
-            Process.GetCurrentProcess.Kill()
+            Windows.Forms.Application.Exit()
         End Sub
 
         Private Sub setProcessPriorities()
@@ -43,6 +43,7 @@ Namespace My
         End Function
 
         Private Sub MyApplication_Startup(sender As Object, e As ApplicationServices.StartupEventArgs) Handles Me.Startup
+            Functions.eventLogFunctions.getOldLogsFromWindowsEventLog()
             setProcessPriorities()
             exceptionHandler.loadExceptionHandler()
             Functions.startupFunctions.validateSettings()
@@ -57,7 +58,7 @@ Namespace My
 
             If Functions.osVersionInfo.isThisAServerOS() = True Then
                 MsgBox("You are running a Server edition of Microsoft Windows. System Restore Point Creator doesn't function on server operating systems." & vbCrLf & vbCrLf & "This application will now close.", MsgBoxStyle.Critical, "System Restore Point Creator -- Application Error")
-                Process.GetCurrentProcess.Kill()
+                Windows.Forms.Application.Exit()
             End If
 
             If IO.File.Exists("portable.mode") = True Or IO.File.Exists("portablemode.txt") = True Then
@@ -150,7 +151,7 @@ Namespace My
                                 If Not Short.TryParse(My.Application.CommandLineArgs(1).Trim.caseInsensitiveReplace("-maxdays=", "").Trim, My.Settings.maxDaysAtRelaunch) Then
                                     ' We tried to parse it and we failed so we give the user an error message.
                                     Console.WriteLine("ERROR: You have provided an invalid numeric input, please try again.")
-                                    Process.GetCurrentProcess.Kill()
+                                    Windows.Forms.Application.Exit()
                                 End If
 
                                 My.Settings.Save()
@@ -211,7 +212,7 @@ Namespace My
                                 My.Settings.Save()
                             Else
                                 Console.WriteLine("ERROR: You have provided an invalid numeric input, please try again.")
-                                Process.GetCurrentProcess.Kill()
+                                Windows.Forms.Application.Exit()
                             End If
                         Else
                             ' No, the second command line argument isn't a "-count" like we are expecting so give the user an error message.
@@ -290,10 +291,11 @@ Namespace My
 
                         If commandLineArgument.Equals("-createtasks", StringComparison.OrdinalIgnoreCase) Then
                             Functions.eventLogFunctions.writeToSystemEventLog("The program was called with an obsolete command line argument, specifically ""-createtasks"". The program has ignored the command and exited.", EventLogEntryType.Information)
-                            Process.GetCurrentProcess.Kill()
+                            Windows.Forms.Application.Exit()
                         ElseIf commandLineArgument.Equals("-fixruntimetasks", StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.repairRuntimeTasks()
 
+                            Functions.eventLogFunctions.saveLogFileToDisk()
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals("-deletealltasks", StringComparison.OrdinalIgnoreCase) Then
@@ -546,7 +548,7 @@ Namespace My
                                     If Not Short.TryParse(My.Application.CommandLineArgs(1).Trim.caseInsensitiveReplace("-count=", "").Trim, deleteOldRestorePointCommandLineCount) Then
                                         ' We tried to parse it and we failed so we give the user an error message.
                                         Console.WriteLine("ERROR: You have provided an invalid numeric input, please try again.")
-                                        Process.GetCurrentProcess.Kill()
+                                        Windows.Forms.Application.Exit()
                                     End If
                                 Else
                                     ' No, the second command line argument isn't a "-count" like we are expecting so give the user an error message.
@@ -614,6 +616,7 @@ Namespace My
 
         Private Sub MyApplication_Shutdown(sender As Object, e As EventArgs) Handles Me.Shutdown
             If IO.Directory.Exists(globalVariables.shadowCopyMountFolder) Then IO.Directory.Delete(globalVariables.shadowCopyMountFolder)
+            Functions.eventLogFunctions.saveLogFileToDisk()
         End Sub
     End Class
 End Namespace
