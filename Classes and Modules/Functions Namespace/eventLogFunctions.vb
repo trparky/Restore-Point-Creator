@@ -8,6 +8,7 @@ Namespace Functions.eventLogFunctions
 
         Private applicationLog As List(Of restorePointCreatorExportedLog) = getLogObject()
         Public strLogFile As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Restore Point Creator.log")
+        Private boolCachedCanIWriteThereResults As Boolean = privilegeChecks.canIWriteThere(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData))
 
         ''' <summary>Exports the application logs to a file.</summary>
         ''' <param name="strLogFile">The path to the file we will be exporting the data to.</param>
@@ -89,7 +90,7 @@ Namespace Functions.eventLogFunctions
         End Sub
 
         Public Sub saveLogFileToDisk()
-            If privilegeChecks.canIWriteThere(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) Then
+            If boolCachedCanIWriteThereResults Then
                 Using streamWriter As New IO.StreamWriter(strLogFile)
                     Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
                     xmlSerializerObject.Serialize(streamWriter, applicationLog)
