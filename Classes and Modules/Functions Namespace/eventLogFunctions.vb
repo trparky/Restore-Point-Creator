@@ -87,10 +87,12 @@ Namespace Functions.eventLogFunctions
         End Sub
 
         Public Sub saveLogFileToDisk()
-            Using streamWriter As New IO.StreamWriter(strLogFile)
-                Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
-                xmlSerializerObject.Serialize(streamWriter, applicationLog)
-            End Using
+            If privilegeChecks.canIWriteThere(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) Then
+                Using streamWriter As New IO.StreamWriter(strLogFile)
+                    Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
+                    xmlSerializerObject.Serialize(streamWriter, applicationLog)
+                End Using
+            End If
         End Sub
 
         ''' <summary>Writes a log entry to the System Event Log.</summary>
