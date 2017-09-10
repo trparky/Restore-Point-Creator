@@ -154,6 +154,7 @@ Namespace My
                                 End If
 
                                 My.Settings.Save()
+
                             End If
                         End If
 
@@ -293,11 +294,10 @@ Namespace My
                             Process.GetCurrentProcess.Kill()
                         ElseIf commandLineArgument.Equals("-fixruntimetasks", StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.repairRuntimeTasks()
-
-                            e.Cancel = True
-                            Exit Sub
+                            Process.GetCurrentProcess.Kill()
                         ElseIf commandLineArgument.Equals("-deletealltasks", StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.deleteAllTasks()
+                            Process.GetCurrentProcess.Kill()
                         End If
                     End If
 
