@@ -83,7 +83,7 @@ Namespace Functions.wmi
                 eventLogFunctions.writeCrashToEventLog(ex)
                 eventLogFunctions.writeToSystemEventLog("Unable to retrieve volumeID from WMI for system drive " & driveLetter & ".", EventLogEntryType.Error)
                 MsgBox("Unable to retrieve volumeID from WMI for system drive " & driveLetter & "." & vbCrLf & vbCrLf & "The program will now terminate.", MsgBoxStyle.Critical, "Restore Point Creator")
-                Application.Exit()
+                Process.GetCurrentProcess.Kill()
 
                 boolResult = False
                 Return Nothing
@@ -95,7 +95,7 @@ Namespace Functions.wmi
 
             support.launchURLInWebBrowser(globalVariables.webURLs.webPages.strCOMExceptionCrash, "An error occurred when trying to launch a URL. The URL has been copied to your Windows Clipboard for you to paste into the address bar in the browser of your choice.")
 
-            Application.Exit()
+            Process.GetCurrentProcess.Kill()
         End Sub
 
         Public Sub doDeletingOfXNumberOfRestorePoints(ByVal shortHowManyToKeep As Short)
@@ -256,7 +256,7 @@ Namespace Functions.wmi
             Catch ex2 As IO.FileLoadException
                 eventLogFunctions.writeCrashToEventLog(ex2)
                 MsgBox("Unable to load required system assemblies to perform system operation. Please refer to the Application Event Log for more details and to submit the crash event to me." & vbCrLf & vbCrLf & "This program will now close.", MsgBoxStyle.Critical, "Restore Point Creator FileLoadException Handler")
-                Application.Exit()
+                Process.GetCurrentProcess.Kill()
             Catch ex As Exception
                 Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
                 exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)

@@ -93,7 +93,7 @@ Namespace Functions.restorePointStuff
                 wmi.createRestorePoint(strRestorePointDescription, RestoreType.WindowsType, integerNewRestorePointID)
             Catch ex As Exception
                 eventLogFunctions.writeCrashToEventLog(ex)
-                Application.Exit()
+                Process.GetCurrentProcess.Kill()
             End Try
         End Sub
 

@@ -338,7 +338,7 @@ Namespace Functions.taskStuff
                 ' Yes, it's allowed so let's continue.
                 Try
                     task.Run() ' Runs the task.
-                    Application.Exit() ' We kill the current un-elevated process.
+                    Process.GetCurrentProcess.Kill() ' We kill the current un-elevated process.
                 Catch ex As Exception
                     ' OK, something went wrong so now let's just abandon the idea of running the task and just re-run the program with a UAC prompt instead.
                     support.reRunWithAdminUserRights() ' OK, we relaunch the process with full Administrator privileges with a UAC prompt.
@@ -346,7 +346,7 @@ Namespace Functions.taskStuff
             Else
                 ' OK, the task somehow got the demand start flag disabled; we need to repair this.
                 support.launchRuntimeTaskFixRoutine() ' This launches the program with a command line argument to tell the program to fix the runtime tasks.
-                Application.Exit() ' We now kill the current un-elevated process.
+                Process.GetCurrentProcess.Kill() ' We now kill the current un-elevated process.
             End If
         End Sub
 

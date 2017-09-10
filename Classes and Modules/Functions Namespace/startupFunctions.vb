@@ -17,7 +17,7 @@ Namespace Functions.startupFunctions
                     wait.closePleaseWaitWindow()
                     MsgBox("There was an error while downloading required files, please check the Event Log for more details.", MsgBoxStyle.Critical, "Restore Point Creator")
 
-                    Application.Exit()
+                    Process.GetCurrentProcess.Kill()
                 End If
 
                 If File.Exists("updater.exe") = True Then
@@ -25,7 +25,7 @@ Namespace Functions.startupFunctions
                         wait.closePleaseWaitWindow()
                         MsgBox("There was an error while downloading required files, please check the Event Log for more details.", MsgBoxStyle.Critical, "Restore Point Creator")
 
-                        Application.Exit()
+                        Process.GetCurrentProcess.Kill()
                     End If
                 End If
 
@@ -35,7 +35,7 @@ Namespace Functions.startupFunctions
                     wait.closePleaseWaitWindow()
                     MsgBox("There was an error while downloading required files, please check the Event Log for more details.", MsgBoxStyle.Critical, "Restore Point Creator")
 
-                    Application.Exit()
+                    Process.GetCurrentProcess.Kill()
                 End If
 
                 If File.Exists(fileInfo.Name & ".new") = True Then
@@ -43,7 +43,7 @@ Namespace Functions.startupFunctions
                         wait.closePleaseWaitWindow()
                         MsgBox("There was an error while downloading required files, please check the Event Log for more details.", MsgBoxStyle.Critical, "Restore Point Creator")
 
-                        Application.Exit()
+                        Process.GetCurrentProcess.Kill()
                     End If
                 End If
 
@@ -55,7 +55,7 @@ Namespace Functions.startupFunctions
                 Application.Exit()
             End If
 
-            Application.Exit()
+            Process.GetCurrentProcess.Kill()
         End Sub
 
         Public isMyRestoreThreadRunning As Boolean = False
@@ -159,7 +159,7 @@ Namespace Functions.startupFunctions
                 taskFolderObject = Nothing
                 taskServiceObject = Nothing
 
-                If boolKillProcessAfterRun = True Then windows.forms.application.exit()
+                If boolKillProcessAfterRun = True Then Process.GetCurrentProcess.Kill()
             Catch ex As Exception
                 eventLogFunctions.writeCrashToEventLog(ex)
             End Try
@@ -185,7 +185,7 @@ Namespace Functions.startupFunctions
             End If
 
             taskStuff.enableBuiltInRestorePointTask()
-            Application.Exit()
+            Process.GetCurrentProcess.Kill()
         End Sub
 
         Public Sub deleteOldRestorePoints()
@@ -213,7 +213,7 @@ Namespace Functions.startupFunctions
                         If Not Short.TryParse(My.Application.CommandLineArgs(1).Trim.caseInsensitiveReplace("-maxdays=", "").Trim, maxDays) Then
                             ' We tried to parse it and we failed so we give the user an error message.
                             Console.WriteLine("ERROR: You have provided an invalid numeric input, please try again.")
-                            Application.Exit()
+                            Process.GetCurrentProcess.Kill()
                         End If
                     End If
                 End If
@@ -293,7 +293,7 @@ Namespace Functions.startupFunctions
         Public Sub giveSafeModeErrorMessage(boolAreWeInSafeMode As Boolean)
             If boolAreWeInSafeMode = True Then
                 MsgBox("You are in Safe Mode, it's not recommended to make restore points in Safe Mode.", MsgBoxStyle.Information, "Restore Point Creator")
-                Application.Exit()
+                Process.GetCurrentProcess.Kill()
             End If
         End Sub
 
@@ -318,7 +318,7 @@ Namespace Functions.startupFunctions
             eventLogFunctions.writeCrashToEventLog(ex)
             eventLogFunctions.writeToSystemEventLog("Unable to open application settings file, it appears to be locked by another process.", EventLogEntryType.Error)
             MsgBox("Unable to open application settings file, it appears to be locked by another process." & vbCrLf & vbCrLf & "The program will now close.", MsgBoxStyle.Critical, "Restore Point Creator")
-            Application.Exit()
+            Process.GetCurrentProcess.Kill()
         End Sub
 
         Public Sub validateSettings()
@@ -496,7 +496,7 @@ Namespace Functions.startupFunctions
                             End If
 
                             support.rebootSystem()
-                            Application.Exit()
+                            Process.GetCurrentProcess.Kill()
                         Else
                             If boolExtendedLoggingForUpdating = True Then
                                 eventLogFunctions.writeToSystemEventLog("User chose not to reboot the system. Application updating is scheduled for the next system reboot.", EventLogEntryType.Information)
@@ -522,16 +522,16 @@ Namespace Functions.startupFunctions
                             Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe"), New FileInfo(Application.ExecutablePath).DirectoryName)
                         End If
 
-                        Application.Exit()
+                        Process.GetCurrentProcess.Kill()
                     End If
                 Else
                     MsgBox("The environment is not ready for an update. This process will now terminate.", MsgBoxStyle.Critical, "Restore Point Creator")
-                    Application.Exit()
+                    Process.GetCurrentProcess.Kill()
                 End If
             Catch ex As Exception
                 eventLogFunctions.writeCrashToEventLog(ex)
                 MsgBox("Something went wrong during the application update procedure, please see the Application Event Log for more details.", MsgBoxStyle.Critical, "Restore Point Creator -- Error")
-                Application.Exit()
+                Process.GetCurrentProcess.Kill()
             End Try
         End Sub
     End Module
