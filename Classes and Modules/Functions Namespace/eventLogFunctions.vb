@@ -64,9 +64,10 @@ Namespace Functions.eventLogFunctions
 
             If Not boolExportedOldLogs Then
                 Try
+                    writeToSystemEventLog("Starting log conversion process.", EventLogEntryType.Information)
+
                     Dim stopwatch As Stopwatch = Stopwatch.StartNew
                     Dim logCount As ULong = 0
-                    Dim applicationLog As New List(Of restorePointCreatorExportedLog)
                     exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strApplication, applicationLog, logCount)
                     exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strSystemRestorePointCreator, applicationLog, logCount)
 
@@ -75,6 +76,7 @@ Namespace Functions.eventLogFunctions
                         xmlSerializerObject.Serialize(streamWriter, applicationLog)
                     End Using
 
+                    writeToSystemEventLog("Log conversion process complete.", EventLogEntryType.Information)
                     writeToSystemEventLog(String.Format("Converted log data to new log file format in {0}ms.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information)
                 Catch ex As Exception
                 End Try
