@@ -448,7 +448,7 @@ Namespace exceptionHandler
                 crashWindow.rawExceptionObject = exceptionObject
                 crashWindow.ShowDialog()
 
-                wapplication.exit()
+                Application.Exit()
             End If
         End Sub
     End Module
