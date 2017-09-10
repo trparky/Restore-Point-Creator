@@ -6,9 +6,9 @@ Namespace Functions.eventLogFunctions
         Private Const strSystemRestorePointCreator As String = "System Restore Point Creator"
         Private Const strRegistryApplicationPath As String = "SYSTEM\CurrentControlSet\services\eventlog\Application"
 
-        Private applicationLog As List(Of restorePointCreatorExportedLog) = getLogObject()
         Public strLogFile As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Restore Point Creator.log")
         Private boolCachedCanIWriteThereResults As Boolean = privilegeChecks.canIWriteThere(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData))
+        Private applicationLog As List(Of restorePointCreatorExportedLog) = getLogObject()
 
         ''' <summary>Exports the application logs to a file.</summary>
         ''' <param name="strLogFile">The path to the file we will be exporting the data to.</param>
