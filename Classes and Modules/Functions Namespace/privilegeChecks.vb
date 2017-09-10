@@ -13,18 +13,16 @@ Namespace Functions.privilegeChecks
 
         Public Function canIWriteThere(folderPath As String) As Boolean
             ' We make sure we get valid folder path by taking off the leading slash.
-            If folderPath.EndsWith("\") Then
-                folderPath = folderPath.Substring(0, folderPath.Length - 1)
-            End If
+            If folderPath.EndsWith("\") Then folderPath = folderPath.Substring(0, folderPath.Length - 1)
+            If String.IsNullOrEmpty(folderPath) Or Not IO.Directory.Exists(folderPath) Then Return False
 
-            If String.IsNullOrEmpty(folderPath) = True Or IO.Directory.Exists(folderPath) = False Then
-                Return False
-            End If
-
-            If checkByFolderACLs(folderPath) = True Then
+            If checkByFolderACLs(folderPath) Then
                 Try
-                    IO.File.Create(IO.Path.Combine(folderPath, "test.txt"), 1, IO.FileOptions.DeleteOnClose).Close()
-                    If IO.File.Exists(IO.Path.Combine(folderPath, "test.txt")) Then IO.File.Delete(IO.Path.Combine(folderPath, "test.txt"))
+                    Dim strOurTestFileName As String = IO.Path.Combine(folderPath, "test" & support.randomStringGenerator(10) & ".txt")
+
+                    IO.File.Create(strOurTestFileName, 1, IO.FileOptions.DeleteOnClose).Close()
+                    If IO.File.Exists(strOurTestFileName) Then IO.File.Delete(strOurTestFileName)
+
                     Return True
                 Catch ex As Exception
                     Return False
