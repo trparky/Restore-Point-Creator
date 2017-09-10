@@ -36,11 +36,13 @@ Namespace Functions.privilegeChecks
             Try
                 Dim directoryACLs As DirectorySecurity = IO.Directory.GetAccessControl(folderPath)
                 Dim directoryUsers As String = WindowsIdentity.GetCurrent.User.Value
+                Dim userGroups As IdentityReferenceCollection = WindowsIdentity.GetCurrent.Groups
+                Dim authorizationRules As AuthorizationRuleCollection = directoryACLs.GetAccessRules(True, True, GetType(SecurityIdentifier))
                 Dim directoryAccessRights As FileSystemAccessRule
                 Dim fileSystemRights As FileSystemRights
 
-                For Each rule As AuthorizationRule In directoryACLs.GetAccessRules(True, True, GetType(SecurityIdentifier))
-                    If rule.IdentityReference.Value = directoryUsers Then
+                For Each rule As AuthorizationRule In authorizationRules
+                    If rule.IdentityReference.Value.Equals(directoryUsers, StringComparison.OrdinalIgnoreCase) Or userGroups.Contains(rule.IdentityReference) Then
                         directoryAccessRights = DirectCast(rule, FileSystemAccessRule)
 
                         If directoryAccessRights.AccessControlType = Security.AccessControl.AccessControlType.Allow Then
