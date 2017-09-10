@@ -8,7 +8,7 @@ Namespace Functions.eventLogFunctions
 
         Public strLogFile As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Restore Point Creator.log")
         Private boolCachedCanIWriteThereResults As Boolean = privilegeChecks.canIWriteThere(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData))
-        Private applicationLog As List(Of restorePointCreatorExportedLog) = getLogObject()
+        Public applicationLog As List(Of restorePointCreatorExportedLog) = getLogObject()
         Private boolHasTheLogChanged As Boolean = False
 
         ''' <summary>Exports the application logs to a file.</summary>

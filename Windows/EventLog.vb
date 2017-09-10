@@ -52,11 +52,7 @@
         Dim eventLogType As EventLogEntryType
 
         Try
-            Dim stopwatch As Stopwatch = Stopwatch.StartNew
-            Dim logEntries As List(Of restorePointCreatorExportedLog) = Functions.eventLogFunctions.getLogObject()
-            Debug.WriteLine("time needed to load log data in ms: " & stopwatch.ElapsedMilliseconds)
-
-            For Each logEntry As restorePointCreatorExportedLog In logEntries
+            For Each logEntry As restorePointCreatorExportedLog In Functions.eventLogFunctions.applicationLog
                 eventLogType = convertToEventLogType(logEntry.logType)
                 itemAdd = New myListViewItemTypes.eventLogListEntry(eventLogType.ToString)
 
