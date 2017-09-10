@@ -169,7 +169,14 @@ Namespace Functions.eventLogFunctions
 
                 stringBuilder.AppendLine(support.removeSourceCodePathInfo(exceptionObject.StackTrace.Trim))
 
-                writeToSystemEventLog(stringBuilder.ToString.Trim, errorType)
+                applicationLog.Add(New restorePointCreatorExportedLog With {
+                                   .logData = stringBuilder.ToString.Trim,
+                                   .logType = errorType,
+                                   .unixTime = Now.ToUniversalTime.toUNIXTimestamp,
+                                   .logSource = "Restore Point Creator",
+                                   .logID = applicationLog.Count
+                })
+
                 stringBuilder = Nothing
             Catch ex2 As Exception
                 ' Does nothing
