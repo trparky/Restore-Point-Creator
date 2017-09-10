@@ -8,8 +8,6 @@ Namespace Functions.eventLogFunctions
 
         Private applicationLog As List(Of restorePointCreatorExportedLog) = getLogObject()
         Public strLogFile As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Restore Point Creator.log")
-        Public boolLogChanged As Boolean = False
-        Private shortNumberOfLogEntriesAddedSinceLastLogFileSave As Short = 0
 
         ''' <summary>Exports the application logs to a file.</summary>
         ''' <param name="strLogFile">The path to the file we will be exporting the data to.</param>
@@ -89,15 +87,10 @@ Namespace Functions.eventLogFunctions
         End Sub
 
         Public Sub saveLogFileToDisk()
-            If boolLogChanged Then
-                Using streamWriter As New IO.StreamWriter(strLogFile)
-                    Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
-                    xmlSerializerObject.Serialize(streamWriter, applicationLog)
-                End Using
-
-                boolLogChanged = False
-                shortNumberOfLogEntriesAddedSinceLastLogFileSave = 0
-            End If
+            Using streamWriter As New IO.StreamWriter(strLogFile)
+                Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
+                xmlSerializerObject.Serialize(streamWriter, applicationLog)
+            End Using
         End Sub
 
         ''' <summary>Writes a log entry to the System Event Log.</summary>
@@ -107,11 +100,15 @@ Namespace Functions.eventLogFunctions
         Public Sub writeToSystemEventLog(logMessage As String, Optional logType As EventLogEntryType = EventLogEntryType.Information)
             If globalVariables.boolLogToSystemLog = True Then
                 Try
-                    applicationLog.Add(New restorePointCreatorExportedLog With {.logData = logMessage, .logType = logType, .unixTime = Now.ToUniversalTime.toUNIXTimestamp, .logSource = "Restore Point Creator", .logID = applicationLog.Count})
-                    boolLogChanged = True
-                    shortNumberOfLogEntriesAddedSinceLastLogFileSave += 1
+                    applicationLog.Add(New restorePointCreatorExportedLog With {
+                                       .logData = logMessage,
+                                       .logType = logType,
+                                       .unixTime = Now.ToUniversalTime.toUNIXTimestamp,
+                                       .logSource = "Restore Point Creator",
+                                       .logID = applicationLog.Count
+                    })
 
-                    If shortNumberOfLogEntriesAddedSinceLastLogFileSave >= 5 And boolLogChanged Then saveLogFileToDisk()
+                    saveLogFileToDisk()
                 Catch ex As Exception
                     ' Does nothing
                 End Try
@@ -176,6 +173,7 @@ Namespace Functions.eventLogFunctions
                                    .logSource = "Restore Point Creator",
                                    .logID = applicationLog.Count
                 })
+                saveLogFileToDisk()
 
                 stringBuilder = Nothing
             Catch ex2 As Exception
