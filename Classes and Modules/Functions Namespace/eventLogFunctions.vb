@@ -24,6 +24,7 @@ Namespace Functions.eventLogFunctions
                     .version = 4,
                     .logsEntries = getLogObject()
                 }
+                logCount = logObject.logsEntries.Count
 
                 If IO.File.Exists(strLogFile) Then IO.File.Delete(strLogFile)
 
