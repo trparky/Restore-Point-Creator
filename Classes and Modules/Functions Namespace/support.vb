@@ -24,6 +24,20 @@ Namespace Functions.support
             Next
         End Sub
 
+        Public Function randomStringGenerator(length As Integer)
+            Dim random As Random = New Random()
+            Dim builder As New Text.StringBuilder()
+            Dim ch As Char
+            Dim legalCharacters As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"
+
+            For cntr As Integer = 0 To length
+                ch = legalCharacters.Substring(random.Next(0, legalCharacters.Length), 1)
+                builder.Append(ch)
+            Next
+
+            Return builder.ToString()
+        End Function
+
         Public Function getDWMGlassColor() As Color
             Try
                 ' This checks to see if we are running on Windows 8 or Windows 10 since the API we're accessing
