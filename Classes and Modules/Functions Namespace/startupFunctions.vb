@@ -315,8 +315,8 @@ Namespace Functions.startupFunctions
         End Sub
 
         Private Sub handleLockedSettingsFile(ex As Exception)
-            eventLogFunctions.writeCrashToEventLog(ex)
             eventLogFunctions.writeToSystemEventLog("Unable to open application settings file, it appears to be locked by another process.", EventLogEntryType.Error)
+            eventLogFunctions.writeCrashToEventLog(ex)
             MsgBox("Unable to open application settings file, it appears to be locked by another process." & vbCrLf & vbCrLf & "The program will now close.", MsgBoxStyle.Critical, "Restore Point Creator")
             Process.GetCurrentProcess.Kill()
         End Sub
@@ -495,6 +495,7 @@ Namespace Functions.startupFunctions
                                 eventLogFunctions.writeToSystemEventLog("Rebooting system.", EventLogEntryType.Information)
                             End If
 
+                            eventLogFunctions.saveLogFileToDisk()
                             support.rebootSystem()
                             Process.GetCurrentProcess.Kill()
                         Else
@@ -522,6 +523,7 @@ Namespace Functions.startupFunctions
                             Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe"), New FileInfo(Application.ExecutablePath).DirectoryName)
                         End If
 
+                        eventLogFunctions.saveLogFileToDisk()
                         Process.GetCurrentProcess.Kill()
                     End If
                 Else

@@ -9,6 +9,7 @@ Namespace Functions.eventLogFunctions
         Public strLogFile As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Restore Point Creator.log")
         Private boolCachedCanIWriteThereResults As Boolean = privilegeChecks.canIWriteThere(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData))
         Private applicationLog As List(Of restorePointCreatorExportedLog) = getLogObject()
+        Private boolHasTheLogChanged As Boolean = False
 
         ''' <summary>Exports the application logs to a file.</summary>
         ''' <param name="strLogFile">The path to the file we will be exporting the data to.</param>
@@ -76,6 +77,7 @@ Namespace Functions.eventLogFunctions
                     Using streamWriter As New IO.StreamWriter(strLogFile)
                         Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
                         xmlSerializerObject.Serialize(streamWriter, applicationLog)
+                        boolHasTheLogChanged = False
                     End Using
 
                     writeToSystemEventLog("Log conversion process complete.", EventLogEntryType.Information)
@@ -90,11 +92,14 @@ Namespace Functions.eventLogFunctions
             registryKey.Dispose()
         End Sub
 
-        Public Sub saveLogFileToDisk()
-            If boolCachedCanIWriteThereResults Then
+        Public Sub saveLogFileToDisk(Optional boolForceWrite As Boolean = False)
+            If boolForceWrite Then boolHasTheLogChanged = True
+
+            If boolCachedCanIWriteThereResults And boolHasTheLogChanged Then
                 Using streamWriter As New IO.StreamWriter(strLogFile)
                     Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
                     xmlSerializerObject.Serialize(streamWriter, applicationLog)
+                    boolHasTheLogChanged = False
                 End Using
             End If
         End Sub
@@ -114,7 +119,7 @@ Namespace Functions.eventLogFunctions
                                        .logID = applicationLog.Count
                     })
 
-                    saveLogFileToDisk()
+                    boolHasTheLogChanged = True
                 Catch ex As Exception
                     ' Does nothing
                 End Try

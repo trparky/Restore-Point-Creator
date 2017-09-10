@@ -372,6 +372,8 @@ Namespace exceptionHandler
 
             Dim exceptionMessage As String = exceptionObject.Message
 
+            Functions.eventLogFunctions.saveLogFileToDisk()
+
             If exceptionType = GetType(IO.FileLoadException) And exceptionMessage.regExSearch("(?:restoreToSystemRestorePoint|createRestorePoint)") = True Then
                 MsgBox("There has been an error while loading a required system library for System Restore. Please reboot your computer and try again.", MsgBoxStyle.Critical, "System Restore Point Creator")
                 Process.GetCurrentProcess.Kill()
@@ -447,6 +449,8 @@ Namespace exceptionHandler
                 crashWindow.exceptionType = exceptionType.ToString
                 crashWindow.rawExceptionObject = exceptionObject
                 crashWindow.ShowDialog()
+
+                Functions.eventLogFunctions.saveLogFileToDisk()
 
                 Process.GetCurrentProcess.Kill()
             End If

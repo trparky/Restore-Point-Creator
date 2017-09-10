@@ -2208,8 +2208,8 @@ Public Class Form1
 
     Private Sub handleConfigFileAccessViolation(ex As IO.IOException)
         If ex.Message.caseInsensitiveContains("user.config") Then
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
             Functions.eventLogFunctions.writeToSystemEventLog("Unable to open application settings file, it appears to be locked by another process.", EventLogEntryType.Error)
+            Functions.eventLogFunctions.writeCrashToEventLog(ex)
             MsgBox("Unable to open application settings file, it appears to be locked by another process." & vbCrLf & vbCrLf & "The program will now close.", MsgBoxStyle.Critical, "Restore Point Creator")
 
             Process.GetCurrentProcess.Kill()

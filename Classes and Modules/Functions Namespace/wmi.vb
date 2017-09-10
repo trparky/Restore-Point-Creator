@@ -80,8 +80,8 @@ Namespace Functions.wmi
                     Return Nothing
                 End If
             Catch ex As Management.ManagementException
-                eventLogFunctions.writeCrashToEventLog(ex)
                 eventLogFunctions.writeToSystemEventLog("Unable to retrieve volumeID from WMI for system drive " & driveLetter & ".", EventLogEntryType.Error)
+                eventLogFunctions.writeCrashToEventLog(ex)
                 MsgBox("Unable to retrieve volumeID from WMI for system drive " & driveLetter & "." & vbCrLf & vbCrLf & "The program will now terminate.", MsgBoxStyle.Critical, "Restore Point Creator")
                 Process.GetCurrentProcess.Kill()
 

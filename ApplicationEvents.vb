@@ -291,12 +291,15 @@ Namespace My
 
                         If commandLineArgument.Equals("-createtasks", StringComparison.OrdinalIgnoreCase) Then
                             Functions.eventLogFunctions.writeToSystemEventLog("The program was called with an obsolete command line argument, specifically ""-createtasks"". The program has ignored the command and exited.", EventLogEntryType.Information)
+                            Functions.eventLogFunctions.saveLogFileToDisk()
                             Process.GetCurrentProcess.Kill()
                         ElseIf commandLineArgument.Equals("-fixruntimetasks", StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.repairRuntimeTasks()
+                            Functions.eventLogFunctions.saveLogFileToDisk()
                             Process.GetCurrentProcess.Kill()
                         ElseIf commandLineArgument.Equals("-deletealltasks", StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.deleteAllTasks()
+                            Functions.eventLogFunctions.saveLogFileToDisk()
                             Process.GetCurrentProcess.Kill()
                         End If
                     End If
@@ -614,6 +617,7 @@ Namespace My
 
         Private Sub MyApplication_Shutdown(sender As Object, e As EventArgs) Handles Me.Shutdown
             If IO.Directory.Exists(globalVariables.shadowCopyMountFolder) Then IO.Directory.Delete(globalVariables.shadowCopyMountFolder)
+            Functions.eventLogFunctions.saveLogFileToDisk(True)
         End Sub
     End Class
 End Namespace
