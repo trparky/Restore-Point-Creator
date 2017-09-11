@@ -188,22 +188,25 @@ Namespace Functions.wmi
                 Dim oOutParams As Management.ManagementBaseObject = managementClass.InvokeMethod("CreateRestorePoint", managementParameters, Nothing)
 
                 eventLogFunctions.writeToSystemEventLog("Created System Restore Point (" & restorePointName & ").", EventLogEntryType.Information)
+                eventLogFunctions.saveLogFileToDisk()
 
                 Return oOutParams("ReturnValue")
             Catch ex4 As UnauthorizedAccessException
                 eventLogFunctions.writeToSystemEventLog("Falling back to core Windows APIs to create restore point.", EventLogEntryType.Warning)
+                eventLogFunctions.saveLogFileToDisk()
 
                 Try
                     Return APIs.systemRestore.StartRestore(restorePointName, restorePointType, restorePointID)
                 Catch ex6 As Exception
-                    eventLogFunctions.writeCrashToEventLog(ex6)
                     eventLogFunctions.writeToSystemEventLog("Unable to create system restore point. System permissions seem to not allow it.", EventLogEntryType.Error)
+                    eventLogFunctions.writeCrashToEventLog(ex6)
                     MsgBox("Unable to create system restore point. System permissions seem to not allow it.", MsgBoxStyle.Critical, "Error Creating System Restore Point")
 
                     Return APIs.errorCodes.ERROR_ACCESS_DENIED
                 End Try
             Catch ex3 As Runtime.InteropServices.COMException
                 eventLogFunctions.writeToSystemEventLog("Falling back to core Windows APIs to create restore point.", EventLogEntryType.Warning)
+                Functions.eventLogFunctions.saveLogFileToDisk()
 
                 Try
                     Return APIs.systemRestore.StartRestore(restorePointName, restorePointType, restorePointID)
