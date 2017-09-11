@@ -403,6 +403,11 @@ Namespace My
                             Functions.eventLogFunctions.saveLogFileToDisk()
                             e.Cancel = True
                             Exit Sub
+                        ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.testlogwrite, StringComparison.OrdinalIgnoreCase) Then
+                            Functions.eventLogFunctions.writeToSystemEventLog("Written to application log file successfully.", EventLogEntryType.Information)
+                            Functions.eventLogFunctions.saveLogFileToDisk()
+                            e.Cancel = True
+                            Exit Sub
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.scheduledRestorePoint, StringComparison.OrdinalIgnoreCase) Then
                             Dim restorePointNameForScheduledTasks As String = globalVariables.strDefaultNameForScheduledTasks
                             Dim boolExtendedLoggingForScheduledTasks As Boolean = True
@@ -421,9 +426,9 @@ Namespace My
                             End If
 
                             If boolExtendedLoggingForScheduledTasks = True Then
-                                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Starting scheduled restore point job. Task running as user {0}. There are currently {1} system restore point(s) on this system.", Environment.UserName, Functions.wmi.getNumberOfRestorePoints()), EventLogEntryType.Information)
+                                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Starting scheduled restore point job. Task running as user {0}. There are currently {1} system restore point(s) On this system.", Environment.UserName, Functions.wmi.getNumberOfRestorePoints()), EventLogEntryType.Information)
                             Else
-                                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Starting scheduled restore point job. Task running as user {0}.", Environment.UserName), EventLogEntryType.Information)
+                                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Starting scheduled restore point job. Task running As user {0}.", Environment.UserName), EventLogEntryType.Information)
                             End If
 
                             Functions.startupFunctions.writeLastRunFile()
@@ -465,9 +470,9 @@ Namespace My
                             End If
 
                             ' We try and parse the value in the Registry.
-                            If Integer.TryParse(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Preselected Restore Point for Restore in Safe Mode", 0), Functions.startupFunctions.preSelectedRestorePointID) Then
+                            If Integer.TryParse(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Preselected Restore Point For Restore In Safe Mode", 0), Functions.startupFunctions.preSelectedRestorePointID) Then
                                 ' We need to remove the registry keys from the registry, we no longer need them.
-                                Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Preselected Restore Point for Restore in Safe Mode", False)
+                                Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Preselected Restore Point For Restore In Safe Mode", False)
                                 Registry.LocalMachine.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\RunOnce", True).DeleteValue("*Restore To Restore Point", False)
 
                                 ' OK, what we have is an Interger. Great. Let's do some work with it.

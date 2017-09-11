@@ -11,6 +11,7 @@ Namespace globalVariables
             Public Const forceUAC As String = "-forceuac"
             Public Const deleteOldRestorePoints As String = "-deleteoldrestorepoints"
             Public Const keepXNumberOfRestorePoints As String = "-keepxnumberofrestorepoints"
+            Public Const testlogwrite As String = "-testlogwrite"
         End Module
     End Namespace
 
