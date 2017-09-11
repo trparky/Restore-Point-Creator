@@ -36,10 +36,6 @@ Module DateExtensions
     ''' <returns>A 64-but Integer representing a standard UNIX timestamp.</returns>
     <Extension()>
     Public Function toUNIXTimestamp(ByVal inputDate As Date) As ULong
-        If inputDate.IsDaylightSavingTime = True Then
-            inputDate = DateAdd(DateInterval.Hour, -1, inputDate)
-        End If
-
         Return DateDiff(DateInterval.Second, New DateTime(1970, 1, 1, 0, 0, 0, 0), inputDate)
     End Function
 End Module

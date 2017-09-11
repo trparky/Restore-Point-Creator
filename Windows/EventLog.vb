@@ -28,14 +28,8 @@
     End Function
 
     Private Function UNIXTimestampToDate(ByVal strUnixTime As ULong) As Date
-        'Dim tmpDate As Date = DateAdd(DateInterval.Second, strUnixTime, #1/1/1970#)
-        Dim tmpDate As Date = DateAdd(DateInterval.Second, strUnixTime, New DateTime(1970, 1, 1, 0, 0, 0, 0))
-
-        If tmpDate.IsDaylightSavingTime Then
-            tmpDate = DateAdd(DateInterval.Hour, 1, tmpDate)
-        End If
-
-        Return tmpDate
+        Dim tmpDate As Date = DateAdd(DateInterval.Second, strUnixTime, New DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc))
+        Return tmpDate.ToLocalTime
     End Function
 
     Private Function convertLineFeeds(input As String) As String
