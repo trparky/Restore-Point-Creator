@@ -70,7 +70,7 @@ Namespace Functions.eventLogFunctions
                     writeToSystemEventLog("Starting log conversion process.", EventLogEntryType.Information)
 
                     Dim stopwatch As Stopwatch = Stopwatch.StartNew
-                    Dim logCount As ULong = 0
+                    Dim logCount As ULong = applicationLog.Count
                     exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strApplication, applicationLog, logCount)
                     exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strSystemRestorePointCreator, applicationLog, logCount)
 
