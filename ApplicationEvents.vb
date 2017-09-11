@@ -384,6 +384,7 @@ Namespace My
 
                             If Custom_Named_Restore_Point_Instance.createRestorePoint = False Then
                                 MsgBox("Restore Point not created.", MsgBoxStyle.Information, "Restore Point Creator") ' Gives the user some feedback.
+                                Functions.eventLogFunctions.saveLogFileToDisk()
                                 e.Cancel = True
                                 Exit Sub
                             Else
@@ -399,6 +400,7 @@ Namespace My
                             creatingThread.Name = "Restore Point Creating Thread"
                             creatingThread.Start()
 
+                            Functions.eventLogFunctions.saveLogFileToDisk()
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.scheduledRestorePoint, StringComparison.OrdinalIgnoreCase) Then
@@ -450,6 +452,7 @@ Namespace My
 
                             Functions.eventLogFunctions.writeToSystemEventLog("Scheduled restore point job complete.", EventLogEntryType.Information)
 
+                            Functions.eventLogFunctions.saveLogFileToDisk()
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals("-restoretopoint", StringComparison.OrdinalIgnoreCase) Then
@@ -494,10 +497,13 @@ Namespace My
                                 MsgBox("Something went wrong, we don't have a valid restore point to restore to. The program will execute as normal from now on.", MsgBoxStyle.Information, "Restore Point Creator")
                             End If
 
+                            Functions.eventLogFunctions.saveLogFileToDisk()
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.deleteOldRestorePoints, StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.deleteOldRestorePoints()
+
+                            Functions.eventLogFunctions.saveLogFileToDisk()
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints, StringComparison.OrdinalIgnoreCase) Then
@@ -578,6 +584,7 @@ Namespace My
                             My.Settings.deleteOldRestorePointCommandLineCount = 0
                             My.Settings.Save()
 
+                            Functions.eventLogFunctions.saveLogFileToDisk()
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals("-prefscleanup", StringComparison.OrdinalIgnoreCase) Then
