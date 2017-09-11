@@ -34,21 +34,19 @@ Namespace Functions.privilegeChecks
 
         Private Function checkByFolderACLs(folderPath As String) As Boolean
             Try
-                Dim directoryACLs As DirectorySecurity = IO.Directory.GetAccessControl(folderPath)
-                Dim directoryUsers As String = WindowsIdentity.GetCurrent.User.Value
-                Dim userGroups As IdentityReferenceCollection = WindowsIdentity.GetCurrent.Groups
-                Dim authorizationRules As AuthorizationRuleCollection = directoryACLs.GetAccessRules(True, True, GetType(SecurityIdentifier))
-                Dim directoryAccessRights As FileSystemAccessRule
-                Dim fileSystemRights As FileSystemRights
+                Dim dsDirectoryACLs As DirectorySecurity = IO.Directory.GetAccessControl(folderPath)
+                Dim strCurrentUserSDDL As String = WindowsIdentity.GetCurrent.User.Value
+                Dim ircCurrentUserGroups As IdentityReferenceCollection = WindowsIdentity.GetCurrent.Groups
 
-                For Each rule As AuthorizationRule In authorizationRules
-                    If rule.IdentityReference.Value.Equals(directoryUsers, StringComparison.OrdinalIgnoreCase) Or userGroups.Contains(rule.IdentityReference) Then
-                        directoryAccessRights = DirectCast(rule, FileSystemAccessRule)
+                Dim arcAuthorizationRules As AuthorizationRuleCollection = dsDirectoryACLs.GetAccessRules(True, True, GetType(SecurityIdentifier))
+                Dim fsarDirectoryAccessRights As FileSystemAccessRule
 
-                        If directoryAccessRights.AccessControlType = Security.AccessControl.AccessControlType.Allow Then
-                            fileSystemRights = directoryAccessRights.FileSystemRights
+                For Each arAccessRule As AuthorizationRule In arcAuthorizationRules
+                    If arAccessRule.IdentityReference.Value.Equals(strCurrentUserSDDL, StringComparison.OrdinalIgnoreCase) Or ircCurrentUserGroups.Contains(arAccessRule.IdentityReference) Then
+                        fsarDirectoryAccessRights = DirectCast(arAccessRule, FileSystemAccessRule)
 
-                            If fileSystemRights = (FileSystemRights.Read Or FileSystemRights.Modify Or FileSystemRights.Write Or FileSystemRights.FullControl) Then
+                        If fsarDirectoryAccessRights.AccessControlType = AccessControlType.Allow Then
+                            If fsarDirectoryAccessRights.FileSystemRights = (FileSystemRights.Modify Or FileSystemRights.WriteData Or FileSystemRights.FullControl) Then
                                 Return True
                             End If
                         End If
