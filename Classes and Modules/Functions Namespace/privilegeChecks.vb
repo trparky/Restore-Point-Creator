@@ -33,6 +33,8 @@ Namespace Functions.privilegeChecks
         End Function
 
         Private Function checkByFolderACLs(folderPath As String) As Boolean
+            If WindowsIdentity.GetCurrent().IsSystem Then Return True
+
             Try
                 Dim dsDirectoryACLs As DirectorySecurity = IO.Directory.GetAccessControl(folderPath)
                 Dim strCurrentUserSDDL As String = WindowsIdentity.GetCurrent.User.Value
