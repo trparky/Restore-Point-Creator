@@ -28,8 +28,7 @@
     End Function
 
     Private Function UNIXTimestampToDate(ByVal strUnixTime As ULong) As Date
-        Dim tmpDate As Date = DateAdd(DateInterval.Second, strUnixTime, New DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc))
-        Return tmpDate.ToLocalTime
+        Return DateAdd(DateInterval.Second, strUnixTime, New DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).ToLocalTime
     End Function
 
     Private Function convertLineFeeds(input As String) As String
@@ -63,7 +62,7 @@
                             .ImageIndex = 2
                     End Select
 
-                    .SubItems.Add(UNIXTimestampToDate(logEntry.unixTime).ToLocalTime.ToString)
+                    .SubItems.Add(UNIXTimestampToDate(logEntry.unixTime).ToString)
                     .SubItems.Add(logEntry.logID.ToString("N0"))
 
                     .strEventLogText = Functions.support.removeSourceCodePathInfo(convertLineFeeds(logEntry.logData))
