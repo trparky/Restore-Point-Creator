@@ -101,8 +101,6 @@ Namespace Functions.taskStuff
                 taskEXEPath = taskEXEPath.Trim
                 taskParameters = taskParameters.Trim
 
-                eventLogFunctions.writeToSystemEventLog("Creating task """ & taskName & """", EventLogEntryType.Information)
-
                 If IO.File.Exists(taskEXEPath) = False Then
                     MsgBox("Executable path not found.", MsgBoxStyle.Critical, "Restore Point Creator")
                     Exit Sub
@@ -148,7 +146,7 @@ Namespace Functions.taskStuff
                 End Try
 
                 Dim taskFolderObject As TaskScheduler.TaskFolder = getOurTaskFolder(taskService)
-                eventLogFunctions.writeToSystemEventLog(String.Format("Creating scheduled task ""{0}"" in ""{1}"".", taskName, taskFolderObject.Name))
+                eventLogFunctions.writeToSystemEventLog(String.Format("Creating task ""{0}"" in ""{1}"".", taskName, taskFolderObject.Name))
                 taskFolderObject.RegisterTaskDefinition(taskName, newTask)
 
                 taskFolderObject.Dispose()
