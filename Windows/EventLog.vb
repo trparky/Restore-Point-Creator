@@ -54,11 +54,11 @@
                     ' 1 = "Information"
                     ' 2 = "Warning"
                     Select Case eventLogType
-                        Case Eventing.Reader.StandardEventLevel.Error ' Error
+                        Case EventLogEntryType.Error ' Error
                             .ImageIndex = 0
-                        Case Eventing.Reader.StandardEventLevel.Informational ' Information
+                        Case EventLogEntryType.Information ' Information
                             .ImageIndex = 1
-                        Case Eventing.Reader.StandardEventLevel.Warning ' Warning
+                        Case EventLogEntryType.Warning ' Warning
                             .ImageIndex = 2
                     End Select
 
