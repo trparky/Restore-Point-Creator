@@ -2130,14 +2130,44 @@ Public Class Form1
 
         Threading.Thread.Sleep(750)
 
-        openPleaseWaitPanel("Loading Restore Points... Please Wait.")
-        Threading.ThreadPool.QueueUserWorkItem(AddressOf startSystemRestorePointListLoadThreadSub)
+        doOldLogFileConversionRoutineAndStartLoadingRestorePoints()
+    End Sub
+
+    Private Sub doOldLogFileConversionRoutineAndStartLoadingRestorePoints()
+        Dim boolExportedOldLogs As Boolean = False
+        Using registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+            Boolean.TryParse(registryKey.GetValue("Exported Old Logs", "False"), boolExportedOldLogs)
+        End Using
+
+        If boolExportedOldLogs Then
+            ' OK, so the log have already been converted so we just load the restore points.
+            openPleaseWaitPanel("Loading Restore Points... Please Wait.")
+            Threading.ThreadPool.QueueUserWorkItem(AddressOf startSystemRestorePointListLoadThreadSub)
+        Else
+            ' The log hasn't been converted yet so let's do it now.
+
+            ' Open a Please Wait panel to tell the user that we have to do some work.
+            openPleaseWaitPanel("Converting old application logs... Please wait.")
+
+            ' Start a background thread to do the work.
+            Threading.ThreadPool.QueueUserWorkItem(Sub()
+                                                       ' This calls the function that converts the logs.
+                                                       Functions.eventLogFunctions.getOldLogsFromWindowsEventLog()
+
+                                                       ' Now we need to do some work on the main thread.
+                                                       Me.Invoke(Sub()
+                                                                     closePleaseWaitPanel() ' First we close the Please Wait panel.
+                                                                     openPleaseWaitPanel("Loading Restore Points... Please Wait.") ' And open a new one.
+                                                                 End Sub)
+
+                                                       ' Now we load the restore points.
+                                                       startSystemRestorePointListLoadThreadSub()
+                                                   End Sub)
+        End If
     End Sub
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Control.CheckForIllegalCrossThreadCalls = False
-        Functions.eventLogFunctions.getOldLogsFromWindowsEventLog()
-
         verifyUpdateChannel()
 
         If IO.File.Exists("tom") Then

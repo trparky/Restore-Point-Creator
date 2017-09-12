@@ -61,35 +61,28 @@ Namespace Functions.eventLogFunctions
         End Function
 
         Public Sub getOldLogsFromWindowsEventLog()
-            Dim registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
-            Dim boolExportedOldLogs As Boolean = False
-            Boolean.TryParse(registryKey.GetValue("Exported Old Logs", "False"), boolExportedOldLogs)
+            Try
+                writeToSystemEventLog("Starting log conversion process.", EventLogEntryType.Information)
 
-            If Not boolExportedOldLogs Then
-                Try
-                    writeToSystemEventLog("Starting log conversion process.", EventLogEntryType.Information)
+                Dim stopwatch As Stopwatch = Stopwatch.StartNew
+                Dim logCount As ULong = applicationLog.Count
+                exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strApplication, applicationLog, logCount)
+                exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strSystemRestorePointCreator, applicationLog, logCount)
 
-                    Dim stopwatch As Stopwatch = Stopwatch.StartNew
-                    Dim logCount As ULong = applicationLog.Count
-                    exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strApplication, applicationLog, logCount)
-                    exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strSystemRestorePointCreator, applicationLog, logCount)
+                Using streamWriter As New IO.StreamWriter(strLogFile)
+                    Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
+                    xmlSerializerObject.Serialize(streamWriter, applicationLog)
+                    boolHasTheLogChanged = False
+                End Using
 
-                    Using streamWriter As New IO.StreamWriter(strLogFile)
-                        Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
-                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
-                        boolHasTheLogChanged = False
-                    End Using
+                writeToSystemEventLog("Log conversion process complete.", EventLogEntryType.Information)
+                writeToSystemEventLog(String.Format("Converted log data to new log file format in {0}ms.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information)
+            Catch ex As Exception
+            End Try
 
-                    writeToSystemEventLog("Log conversion process complete.", EventLogEntryType.Information)
-                    writeToSystemEventLog(String.Format("Converted log data to new log file format in {0}ms.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information)
-                Catch ex As Exception
-                End Try
-
+            Using registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
                 registryKey.SetValue("Exported Old Logs", "True", RegistryValueKind.String)
-            End If
-
-            registryKey.Close()
-            registryKey.Dispose()
+            End Using
         End Sub
 
         Public Sub saveLogFileToDisk(Optional boolForceWrite As Boolean = False)
