@@ -184,6 +184,8 @@ Namespace Functions.eventLogFunctions
                                    .logSource = "Restore Point Creator",
                                    .logID = applicationLog.Count
                 })
+
+                boolHasTheLogChanged = True
                 saveLogFileToDisk()
 
                 stringBuilder = Nothing
