@@ -306,7 +306,7 @@ Public Class Form1
 
             If String.IsNullOrEmpty(defaultCustomRestorePointName.Trim) = False And Functions.support.areWeInSafeMode() = False Then btnCreateRestorePointNameWithDefaultName.Visible = True
 
-            If My.Settings.updateChannel = globalVariables.updateChannels.stable Then
+            If My.Settings.updateChannel.Equals(globalVariables.updateChannels.stable, StringComparison.OrdinalIgnoreCase) Then
                 toolStripStableChannel.Checked = True
                 lineUnderRC.Visible = False
                 OnlyGiveMeReleaseCandidates.Visible = False
@@ -320,12 +320,12 @@ Public Class Form1
                         deleteAtReboot.dispose(True)
                     End Try
                 End If
-            ElseIf My.Settings.updateChannel = globalVariables.updateChannels.beta Then
+            ElseIf My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta, StringComparison.OrdinalIgnoreCase) Then
                 toolStripBetaChannel.Checked = True
                 lineUnderRC.Visible = True
                 OnlyGiveMeReleaseCandidates.Visible = True
                 OnlyGiveMeReleaseCandidates.Checked = My.Settings.onlyGiveMeRCs
-            ElseIf My.Settings.updateChannel = globalVariables.updateChannels.tom Then
+            ElseIf My.Settings.updateChannel.Equals(globalVariables.updateChannels.tom, StringComparison.OrdinalIgnoreCase) Then
                 ToolStripMenuItemPrivateForTom.Checked = True
                 lineUnderRC.Visible = True
                 OnlyGiveMeReleaseCandidates.Visible = True
@@ -2170,6 +2170,12 @@ Public Class Form1
     End Sub
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        ' This code checks to see if the current version is a beta or Release Candidate and if the user's update channel is already set to beta mode.
+        ' If the user's update channel isn't set to beta mode we then set it for the user here.
+        If (globalVariables.version.boolBeta Or globalVariables.version.boolReleaseCandidate) And Not My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta, StringComparison.OrdinalIgnoreCase) Then
+            My.Settings.updateChannel = globalVariables.updateChannels.beta ' Changes the update channel to beta.
+        End If
+
         Control.CheckForIllegalCrossThreadCalls = False
         verifyUpdateChannel()
 

@@ -227,7 +227,7 @@ Namespace My
 
             ' This code checks to see if the current version is a beta or Release Candidate and if the user's update channel is already set to beta mode.
             ' If the user's update channel isn't set to beta mode we then set it for the user here.
-            If (globalVariables.version.boolBeta = True Or globalVariables.version.boolReleaseCandidate = True) And My.Settings.updateChannel <> globalVariables.updateChannels.beta Then
+            If (globalVariables.version.boolBeta Or globalVariables.version.boolReleaseCandidate) And Not My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta, StringComparison.OrdinalIgnoreCase) Then
                 My.Settings.updateChannel = globalVariables.updateChannels.beta ' Changes the update channel to beta.
             End If
 
