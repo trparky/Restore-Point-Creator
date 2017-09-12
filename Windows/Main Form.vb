@@ -879,6 +879,19 @@ Public Class Form1
 
             Dim strNewApplicationFileNameFullName As String = New IO.FileInfo(Application.ExecutablePath).FullName & ".new.exe"
 
+            If IO.File.Exists(strNewApplicationFileNameFullName) Then
+                Try
+                    IO.File.Delete(strNewApplicationFileNameFullName)
+                Catch ex As Exception
+                    Me.Invoke(Sub() closePleaseWaitPanel())
+                    MsgBox("An existing new program executable file has been found, we tried to delete it but we couldn't. Please see the Application Event Log for more details.", MsgBoxStyle.Critical, strMessageBoxTitle)
+                    Functions.eventLogFunctions.writeToSystemEventLog("An existing new program executable file has been found, we tried to delete it but we couldn't.", EventLogEntryType.Error)
+                    Functions.eventLogFunctions.writeCrashToEventLog(ex)
+                    Functions.eventLogFunctions.saveLogFileToDisk()
+                    Exit Sub
+                End Try
+            End If
+
             memoryStream.Position = 0
             Dim zipFileObject As New ZipFile(memoryStream)
 
@@ -1371,6 +1384,19 @@ Public Class Form1
         End If
 
         Dim strNewApplicationFileNameFullName As String = New IO.FileInfo(Application.ExecutablePath).FullName & ".new.exe"
+
+        If IO.File.Exists(strNewApplicationFileNameFullName) Then
+            Try
+                IO.File.Delete(strNewApplicationFileNameFullName)
+            Catch ex As Exception
+                Me.Invoke(Sub() closePleaseWaitPanel())
+                MsgBox("An existing new program executable file has been found, we tried to delete it but we couldn't. Please see the Application Event Log for more details.", MsgBoxStyle.Critical, strMessageBoxTitle)
+                Functions.eventLogFunctions.writeToSystemEventLog("An existing new program executable file has been found, we tried to delete it but we couldn't.", EventLogEntryType.Error)
+                Functions.eventLogFunctions.writeCrashToEventLog(ex)
+                Functions.eventLogFunctions.saveLogFileToDisk()
+                Exit Sub
+            End Try
+        End If
 
         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
             Functions.eventLogFunctions.writeToSystemEventLog("Setting position for the IO.MemoryStream() back to the beginning of the stream to ready it for file extraction.", EventLogEntryType.Information)
