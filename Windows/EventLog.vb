@@ -195,6 +195,11 @@
         Me.Location = Functions.support.verifyWindowLocation(My.Settings.eventLogFormWindowLocation)
         chkAskMeToSubmitIfViewingAnExceptionEntry.Checked = My.Settings.boolAskMeToSubmitIfViewingAnExceptionEntry
         applySavedSorting()
+
+        If Not Functions.privilegeChecks.areWeAnAdministrator() Then
+            btnCleanLogFile.Enabled = False
+            btnCleanLogFile.Text &= " (Disabled)"
+        End If
     End Sub
 
     Private Sub eventLogList_ColumnClick(sender As Object, e As ColumnClickEventArgs) Handles eventLogList.ColumnClick
@@ -485,6 +490,8 @@
 
     Private Sub closePleaseWaitPanel()
         Functions.support.enableControlsOnForm(Me)
+
+        If Not Functions.privilegeChecks.areWeAnAdministrator() Then btnCleanLogFile.Enabled = False
 
         pleaseWaitPanel.Visible = False
         pleaseWaitProgressBarChanger.Enabled = False
