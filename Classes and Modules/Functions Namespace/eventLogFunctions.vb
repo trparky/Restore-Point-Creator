@@ -217,7 +217,7 @@ Namespace Functions.eventLogFunctions
                     While eventInstance IsNot Nothing
                         If eventInstance.ProviderName.Equals(strSystemRestorePointCreator, StringComparison.OrdinalIgnoreCase) Or eventInstance.ProviderName.caseInsensitiveContains(strSystemRestorePointCreator) = True Then
                             logClass = New restorePointCreatorExportedLog With {
-                                .logData = eventInstance.FormatDescription,
+                                .logData = "Imported Log" & vbCrLf & "============" & vbCrLf & eventInstance.FormatDescription,
                                 .unixTime = eventInstance.TimeCreated.Value.ToUniversalTime.toUNIXTimestamp(),
                                 .logType = eventInstance.Level,
                                 .logSource = strEventLog,
