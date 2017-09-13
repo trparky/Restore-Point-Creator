@@ -66,8 +66,12 @@ Namespace Functions.eventLogFunctions
 
                 Dim stopwatch As Stopwatch = Stopwatch.StartNew
                 Dim logCount As ULong = applicationLog.Count
+                Dim longOldLogCount As ULong = logCount
+
                 exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strApplication, applicationLog, logCount)
                 exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strSystemRestorePointCreator, applicationLog, logCount)
+
+                Dim longNumberOfImportedLogs As ULong = applicationLog.Count - longOldLogCount
 
                 Using streamWriter As New IO.StreamWriter(strLogFile)
                     Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
@@ -76,7 +80,14 @@ Namespace Functions.eventLogFunctions
                 End Using
 
                 writeToSystemEventLog("Log conversion process complete.", EventLogEntryType.Information)
-                writeToSystemEventLog(String.Format("Converted log data to new log file format in {0}ms.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information)
+
+                If longNumberOfImportedLogs = 1 Then
+                    writeToSystemEventLog(String.Format("Converted log data to new log file format in {0}ms. 1 log entry was imported.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information)
+                ElseIf longNumberOfImportedLogs > 1 Then
+                    writeToSystemEventLog(String.Format("Converted log data to new log file format in {0}ms. {1} log entries were imported.", stopwatch.ElapsedMilliseconds.ToString, longNumberOfImportedLogs.ToString("N0")), EventLogEntryType.Information)
+                Else
+                    writeToSystemEventLog(String.Format("Converted log data to new log file format in {0}ms. No old log entries were detected.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information)
+                End If
             Catch ex As Exception
             End Try
 
