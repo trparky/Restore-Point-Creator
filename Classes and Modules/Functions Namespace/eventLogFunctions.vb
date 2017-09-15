@@ -17,13 +17,15 @@ Namespace Functions.eventLogFunctions
         ''' <returns>Returns a Boolean value. If True the logs were successfully exported, if False then something went wrong.</returns>
         Public Function exportLogsToFile(ByVal strLogFile As String, ByRef logCount As ULong) As Boolean
             Try
+                saveLogFileToDisk()
+
                 Dim jsonEngine As New Web.Script.Serialization.JavaScriptSerializer
 
                 Dim logObject As New exportedLogFile With {
                     .operatingSystem = osVersionInfo.getFullOSVersionString,
                     .programVersion = globalVariables.version.strFullVersionString,
                     .version = 4,
-                    .logsEntries = getLogObject()
+                    .logsEntries = applicationLog
                 }
                 logCount = logObject.logsEntries.Count
 
