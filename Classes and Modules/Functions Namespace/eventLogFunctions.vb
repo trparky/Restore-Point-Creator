@@ -51,10 +51,10 @@ Namespace Functions.eventLogFunctions
 
         Public Function getLogObject() As List(Of restorePointCreatorExportedLog)
             Dim applicationLog As New List(Of restorePointCreatorExportedLog)
-            Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
 
             If IO.File.Exists(strLogFile) Then
                 Using streamReader As New IO.StreamReader(strLogFile)
+                    Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
                     applicationLog = xmlSerializerObject.Deserialize(streamReader)
                 End Using
             End If
