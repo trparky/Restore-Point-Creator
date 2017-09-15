@@ -191,7 +191,12 @@
     End Sub
 
     Private Sub eventLog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(New IO.FileInfo(Functions.eventLogFunctions.strLogFile).Length)
+        If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
+            lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(New IO.FileInfo(Functions.eventLogFunctions.strLogFile).Length)
+        Else
+            lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
+        End If
+
         Me.Location = Functions.support.verifyWindowLocation(My.Settings.eventLogFormWindowLocation)
         chkAskMeToSubmitIfViewingAnExceptionEntry.Checked = My.Settings.boolAskMeToSubmitIfViewingAnExceptionEntry
         applySavedSorting()
