@@ -48,6 +48,7 @@ Partial Class eventLogForm
         Me.pleaseWaitlblLabel = New System.Windows.Forms.Label()
         Me.pleaseWaitProgressBar = New Tom.SmoothProgressBar()
         Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
+        Me.logFileWatcher = New System.IO.FileSystemWatcher()
         Me.StatusStrip1.SuspendLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
@@ -55,6 +56,7 @@ Partial Class eventLogForm
         Me.SplitContainer1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
         Me.pleaseWaitPanel.SuspendLayout()
+        CType(Me.logFileWatcher, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'eventLogList
@@ -309,6 +311,11 @@ Partial Class eventLogForm
         '
         Me.pleaseWaitMessageChanger.Interval = 250
         '
+        'logFileWatcher
+        '
+        Me.logFileWatcher.EnableRaisingEvents = True
+        Me.logFileWatcher.SynchronizingObject = Me
+        '
         'eventLogForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
@@ -333,6 +340,7 @@ Partial Class eventLogForm
         Me.TableLayoutPanel2.ResumeLayout(False)
         Me.pleaseWaitPanel.ResumeLayout(False)
         Me.pleaseWaitPanel.PerformLayout()
+        CType(Me.logFileWatcher, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -362,4 +370,5 @@ Partial Class eventLogForm
     Friend WithEvents pleaseWaitProgressBar As Tom.SmoothProgressBar
     Friend WithEvents pleaseWaitMessageChanger As Timer
     Friend WithEvents lblLogFileSize As ToolStripStatusLabel
+    Friend WithEvents logFileWatcher As IO.FileSystemWatcher
 End Class

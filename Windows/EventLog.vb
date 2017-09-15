@@ -191,6 +191,11 @@
     End Sub
 
     Private Sub eventLog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Dim logFileInfo As New IO.FileInfo(Functions.eventLogFunctions.strLogFile)
+        logFileWatcher.Path = logFileInfo.DirectoryName
+        logFileWatcher.Filter = logFileInfo.Name
+        logFileInfo = Nothing
+
         If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
             lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(New IO.FileInfo(Functions.eventLogFunctions.strLogFile).Length)
         Else
@@ -468,6 +473,20 @@
         eventLogList.Sort()
     End Sub
 
+    Private Sub btnCleanLogFile_Click(sender As Object, e As EventArgs) Handles btnCleanLogFile.Click
+        IO.File.Delete(Functions.eventLogFunctions.strLogFile)
+        Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Log file cleaned by user {0}.", Environment.UserName), EventLogEntryType.Information)
+        loadEventLog()
+    End Sub
+
+    Private Sub logFileWatcher_Changed(sender As Object, e As IO.FileSystemEventArgs) Handles logFileWatcher.Changed
+        If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
+            lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(New IO.FileInfo(Functions.eventLogFunctions.strLogFile).Length)
+        Else
+            lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
+        End If
+    End Sub
+
 #Region "--== Please Wait Panel Code ==--"
     Private strPleaseWaitLabelText As String
 
@@ -526,12 +545,6 @@
             pleaseWaitBorderText.Text = "Please Wait..."
             pleaseWaitlblLabel.Text = strPleaseWaitLabelText & "..."
         End If
-    End Sub
-
-    Private Sub btnCleanLogFile_Click(sender As Object, e As EventArgs) Handles btnCleanLogFile.Click
-        IO.File.Delete(Functions.eventLogFunctions.strLogFile)
-        Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Log file cleaned by user {0}.", Environment.UserName), EventLogEntryType.Information)
-        loadEventLog()
     End Sub
 #End Region
 End Class
