@@ -50,16 +50,25 @@ Namespace Functions.eventLogFunctions
         End Function
 
         Public Function getLogObject() As List(Of restorePointCreatorExportedLog)
-            Dim applicationLog As New List(Of restorePointCreatorExportedLog)
+            Dim internalApplicationLog As New List(Of restorePointCreatorExportedLog)
 
             If IO.File.Exists(strLogFile) Then
                 Using streamReader As New IO.StreamReader(strLogFile)
-                    Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
-                    applicationLog = xmlSerializerObject.Deserialize(streamReader)
+                    Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(internalApplicationLog.GetType)
+                    internalApplicationLog = xmlSerializerObject.Deserialize(streamReader)
                 End Using
-            End If
 
-            Return applicationLog
+                Return internalApplicationLog
+            Else
+                ' Here we are working the application-wide object that holds the logs in memory.
+                ' If the Then file doesn't exist we have to create an object in memory.
+                applicationLog = New List(Of restorePointCreatorExportedLog)
+
+                writeToSystemEventLog("Initializing Application Log File.", EventLogEntryType.Information) ' Now we write something to the log.
+                saveLogFileToDisk(True) ' Force a write to disk.
+
+                Return applicationLog ' And now we return the log Object.
+            End If
         End Function
 
         Public Sub getOldLogsFromWindowsEventLog()
