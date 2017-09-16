@@ -2179,6 +2179,8 @@ Public Class Form1
         Control.CheckForIllegalCrossThreadCalls = False
         verifyUpdateChannel()
 
+        Functions.eventLogFunctions.createGlobalLogFileWatcher()
+
         If IO.File.Exists("tom") Then
             ToolStripMenuItemPrivateForTom.Visible = True
         End If

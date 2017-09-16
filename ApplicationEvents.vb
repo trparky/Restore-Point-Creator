@@ -631,6 +631,7 @@ Namespace My
         Private Sub MyApplication_Shutdown(sender As Object, e As EventArgs) Handles Me.Shutdown
             If IO.Directory.Exists(globalVariables.shadowCopyMountFolder) Then IO.Directory.Delete(globalVariables.shadowCopyMountFolder)
             Functions.eventLogFunctions.saveLogFileToDisk(True)
+            Functions.eventLogFunctions.destroyLogFileWatcher()
         End Sub
     End Class
 End Namespace
