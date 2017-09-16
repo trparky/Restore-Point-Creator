@@ -482,6 +482,13 @@
     Private Sub logFileWatcher_Changed(sender As Object, e As IO.FileSystemEventArgs) Handles logFileWatcher.Changed
         If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
             lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(New IO.FileInfo(Functions.eventLogFunctions.strLogFile).Length)
+
+            openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
+
+            workingThread = New Threading.Thread(AddressOf loadEventLog)
+            workingThread.Name = "Event Log Data Loading Thread"
+            workingThread.IsBackground = True
+            workingThread.Start()
         Else
             lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
         End If
