@@ -887,7 +887,6 @@ Public Class Form1
                     MsgBox("An existing new program executable file has been found, we tried to delete it but we couldn't. Please see the Application Event Log for more details.", MsgBoxStyle.Critical, strMessageBoxTitle)
                     Functions.eventLogFunctions.writeToSystemEventLog("An existing new program executable file has been found, we tried to delete it but we couldn't.", EventLogEntryType.Error)
                     Functions.eventLogFunctions.writeCrashToEventLog(ex)
-                    Functions.eventLogFunctions.saveLogFileToDisk()
                     Exit Sub
                 End Try
             End If
@@ -1393,7 +1392,6 @@ Public Class Form1
                 MsgBox("An existing new program executable file has been found, we tried to delete it but we couldn't. Please see the Application Event Log for more details.", MsgBoxStyle.Critical, strMessageBoxTitle)
                 Functions.eventLogFunctions.writeToSystemEventLog("An existing new program executable file has been found, we tried to delete it but we couldn't.", EventLogEntryType.Error)
                 Functions.eventLogFunctions.writeCrashToEventLog(ex)
-                Functions.eventLogFunctions.saveLogFileToDisk()
                 Exit Sub
             End Try
         End If
@@ -2178,8 +2176,6 @@ Public Class Form1
 
         Control.CheckForIllegalCrossThreadCalls = False
         verifyUpdateChannel()
-
-        Functions.eventLogFunctions.createGlobalLogFileWatcher()
 
         If IO.File.Exists("tom") Then
             ToolStripMenuItemPrivateForTom.Visible = True

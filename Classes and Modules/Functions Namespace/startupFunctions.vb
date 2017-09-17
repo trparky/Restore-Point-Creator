@@ -495,7 +495,6 @@ Namespace Functions.startupFunctions
                                 eventLogFunctions.writeToSystemEventLog("Rebooting system.", EventLogEntryType.Information)
                             End If
 
-                            eventLogFunctions.saveLogFileToDisk()
                             support.rebootSystem()
                             Process.GetCurrentProcess.Kill()
                         Else
@@ -523,7 +522,6 @@ Namespace Functions.startupFunctions
                             Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe"), New FileInfo(Application.ExecutablePath).DirectoryName)
                         End If
 
-                        eventLogFunctions.saveLogFileToDisk()
                         Process.GetCurrentProcess.Kill()
                     End If
                 Else

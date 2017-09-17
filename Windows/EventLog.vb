@@ -10,6 +10,7 @@
     Private selectedIndex As Long
     Private eventLogContents As New List(Of myListViewItemTypes.eventLogListEntry)
     Private workingThread As Threading.Thread
+    Private dateLastFileSystemWatcherEventRaised As Date
 
     Private Function convertToEventLogType(input As Short) As EventLogEntryType
         If input = EventLogEntryType.Error Then
@@ -45,7 +46,7 @@
         Dim eventLogType As EventLogEntryType
 
         Try
-            For Each logEntry As restorePointCreatorExportedLog In Functions.eventLogFunctions.applicationLog
+            For Each logEntry As restorePointCreatorExportedLog In Functions.eventLogFunctions.getLogObject()
                 eventLogType = convertToEventLogType(logEntry.logType)
                 itemAdd = New myListViewItemTypes.eventLogListEntry(eventLogType.ToString)
 
@@ -480,6 +481,13 @@
     End Sub
 
     Private Sub logFileWatcher_Changed(sender As Object, e As IO.FileSystemEventArgs) Handles logFileWatcher.Changed
+        ' This hack is required because of a bug in the File System Watcher that causes it to fire multiple events one after
+        ' another even though there was only one change to the file we are watching. ARG Microsoft! You stupid idiots!
+        If (Date.Now.Subtract(dateLastFileSystemWatcherEventRaised).TotalMilliseconds < 500) Then
+            Exit Sub ' Crap, multiple events have been fired... we need to exit this routine.
+        End If
+        dateLastFileSystemWatcherEventRaised = Date.Now
+
         If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
             lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(New IO.FileInfo(Functions.eventLogFunctions.strLogFile).Length)
 
