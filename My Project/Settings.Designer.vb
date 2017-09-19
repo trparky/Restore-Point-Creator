@@ -988,6 +988,18 @@ Namespace My
                 Me("pleaseWaitBorderColor") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("1")>  _
+        Public Property mountShadowCopySortingOrder() As Short
+            Get
+                Return CType(Me("mountShadowCopySortingOrder"),Short)
+            End Get
+            Set
+                Me("mountShadowCopySortingOrder") = value
+            End Set
+        End Property
     End Class
 End Namespace
 
