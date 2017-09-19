@@ -3,6 +3,7 @@
     Public Class volumeShadowCopyListItem
         Inherits ListViewItem
         Private strDeviceID As String
+        Private _dateCreated As Date
 
         Public Property deviceID() As String
             Get
@@ -10,6 +11,15 @@
             End Get
             Set(value As String)
                 strDeviceID = value
+            End Set
+        End Property
+
+        Public Property dateCreated() As Date
+            Get
+                Return _dateCreated
+            End Get
+            Set(value As Date)
+                _dateCreated = value
             End Set
         End Property
     End Class
