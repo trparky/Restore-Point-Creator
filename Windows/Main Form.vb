@@ -2174,6 +2174,11 @@ Public Class Form1
             My.Settings.updateChannel = globalVariables.updateChannels.beta ' Changes the update channel to beta.
         End If
 
+        If globalVariables.version.boolBeta Or globalVariables.version.boolReleaseCandidate Then
+            toolStripStableChannel.Enabled = False
+            toolStripStableChannel.Text &= " (Disabled)"
+        End If
+
         Control.CheckForIllegalCrossThreadCalls = False
         verifyUpdateChannel()
 
