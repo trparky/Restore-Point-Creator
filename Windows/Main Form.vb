@@ -2168,14 +2168,20 @@ Public Class Form1
     End Sub
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        verifyUpdateChannel()
+
         ' This code checks to see if the current version is a beta or Release Candidate and if the user's update channel is already set to beta mode.
         ' If the user's update channel isn't set to beta mode we then set it for the user here.
         If (globalVariables.version.boolBeta Or globalVariables.version.boolReleaseCandidate) And Not My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta, StringComparison.OrdinalIgnoreCase) Then
             My.Settings.updateChannel = globalVariables.updateChannels.beta ' Changes the update channel to beta.
         End If
 
+        If globalVariables.version.boolBeta Or globalVariables.version.boolReleaseCandidate Then
+            toolStripStableChannel.Enabled = False
+            toolStripStableChannel.Text &= " (Disabled)"
+        End If
+
         Control.CheckForIllegalCrossThreadCalls = False
-        verifyUpdateChannel()
 
         If IO.File.Exists("tom") Then
             ToolStripMenuItemPrivateForTom.Visible = True
