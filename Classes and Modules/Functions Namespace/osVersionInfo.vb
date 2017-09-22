@@ -2,12 +2,7 @@
     Module osVersionInfo
         Public Function isThisAServerOS() As Boolean
             Dim strOSProductType As String = Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\Control\ProductOptions", False).GetValue("ProductType", Nothing)
-
-            If strOSProductType.caseInsensitiveContains("ServerNT") Then
-                Return True
-            Else
-                Return False
-            End If
+            Return If(strOSProductType.caseInsensitiveContains("ServerNT"), True, False)
         End Function
 
         Public Function isThisWindowsXP() As Boolean
