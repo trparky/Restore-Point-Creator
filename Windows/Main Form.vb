@@ -2198,9 +2198,9 @@ Public Class Form1
             NotifyIcon1.Icon = My.Resources.RestorePoint_noBackground_2
 
             Try
-                ' Checks to see if the user is running Windows 7, Windows 8, Windows 8.1, or Windows 10 and then proceeds to add the Jumplist Tasks.
-                ' Earlier versions of Windows don't support this option so there's a check for what OS the user is running before adding them.
-                If Environment.OSVersion.ToString.Contains("10") Or Environment.OSVersion.ToString.Contains("6.4") Or Environment.OSVersion.ToString.Contains("6.3") Or Environment.OSVersion.ToString.Contains("6.2") Or Environment.OSVersion.ToString.Contains("6.1") Then
+                ' Checks to see if the user is running Windows 7, Windows 8.x, or Windows 10 and then proceeds to add the Jumplist Tasks. Earlier
+                ' versions of Windows don't support this option so there's a check for what OS the user is running before adding them.
+                If Functions.osVersionInfo.isThisWindows10() Or Functions.osVersionInfo.isThisWindows8x() Or Functions.osVersionInfo.isThisWindows7() Then
                     createJumpListTaskItems()
                 End If
             Catch ex As Exception
@@ -2213,12 +2213,12 @@ Public Class Form1
 
             deleteRPLifeIntervalValue()
 
-            If Functions.osVersionInfo.isThisWindows10 = True Or Functions.osVersionInfo.isThisWindows8x() = True Then
+            If Functions.osVersionInfo.isThisWindows10 Or Functions.osVersionInfo.isThisWindows8x() Then
                 addRPGlobalInterval()
                 addRPSessionInterval()
             End If
 
-            If (Environment.OSVersion.ToString.Contains("6.2") Or Environment.OSVersion.ToString.Contains("6.3") Or Environment.OSVersion.ToString.Contains("6.4") Or Environment.OSVersion.ToString.Contains("10")) Then ' This checks to see if we are running Windows 8, 8.1, or 10.
+            If Functions.osVersionInfo.isThisWindows10() Or Functions.osVersionInfo.isThisWindows8x() Then ' This checks to see if we are running Windows 8.x or Windows 10.
                 addSpecialRegistryKeysToWindows8ToFixWindows8SystemRestorePoint()
             End If
 
