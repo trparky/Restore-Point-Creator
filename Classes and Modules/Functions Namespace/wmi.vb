@@ -315,6 +315,7 @@ Namespace Functions.wmi
                             If systemRestoreIDs.Count = 0 Then
                                 newestSystemRestoreID = 0
                             Else
+                                systemRestoreIDs.Sort()
                                 newestSystemRestoreID = Integer.Parse(systemRestoreIDs.Item(systemRestoreIDs.Count - 1))
                             End If
                         Else
