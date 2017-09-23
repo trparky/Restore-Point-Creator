@@ -63,13 +63,8 @@ Namespace Functions.privilegeChecks
 
         Public Function areWeAnAdministrator() As Boolean
             Try
-                Dim principal As Security.Principal.WindowsPrincipal = New Security.Principal.WindowsPrincipal(Security.Principal.WindowsIdentity.GetCurrent())
-
-                If principal.IsInRole(Security.Principal.WindowsBuiltInRole.Administrator) = True Then
-                    Return True
-                Else
-                    Return False
-                End If
+                Dim principal As WindowsPrincipal = New WindowsPrincipal(WindowsIdentity.GetCurrent())
+                Return principal.IsInRole(WindowsBuiltInRole.Administrator)
             Catch ex As Exception
                 Return False
             End Try
@@ -142,9 +137,9 @@ Namespace Functions.privilegeChecks
                 End If
 
                 ' Check if the token to be checked contains admin SID.
-                Dim id As New Security.Principal.WindowsIdentity(hTokenToCheck.DangerousGetHandle)
-                Dim principal As New Security.Principal.WindowsPrincipal(id)
-                fInAdminGroup = principal.IsInRole(Security.Principal.WindowsBuiltInRole.Administrator)
+                Dim id As New WindowsIdentity(hTokenToCheck.DangerousGetHandle)
+                Dim principal As New WindowsPrincipal(id)
+                fInAdminGroup = principal.IsInRole(WindowsBuiltInRole.Administrator)
             Catch ex As Exception
                 ' Something went wrong here so we are going to assume that the user isn't part of the Administrator user group.
                 fInAdminGroup = False
