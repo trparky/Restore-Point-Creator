@@ -186,7 +186,7 @@ Namespace Functions.support
 
         Public Function convertErrorCodeToHex(input As Long) As String
             Try
-                Dim strHexValue As String = input.ToString("x").caseInsensitiveReplace("ffffffff", "0x").ToString.ToUpper
+                Dim strHexValue As String = input.ToString("x").ToUpper.caseInsensitiveReplace("ffffffff", "0x").ToString
                 If Not strHexValue.StartsWith("0x", StringComparison.OrdinalIgnoreCase) Then strHexValue = "0x" & strHexValue
                 Return strHexValue
             Catch ex As Exception
@@ -273,6 +273,7 @@ Namespace Functions.support
                     ElseIf exceptionType.Equals(GetType(IO.FileLoadException)) Then
                         Dim FileLoadExceptionObject As IO.FileLoadException = DirectCast(rawExceptionObject, IO.FileLoadException)
                         stringBuilder.AppendLine("Unable to Load Assembly File: " & FileLoadExceptionObject.FileName)
+                        stringBuilder.AppendLine("Error Code: " & convertErrorCodeToHex(Runtime.InteropServices.Marshal.GetExceptionCode()))
 
                         If Not String.IsNullOrEmpty(FileLoadExceptionObject.FusionLog) Then
                             stringBuilder.AppendLine("Reason why assembly couldn't be loaded: " & FileLoadExceptionObject.FusionLog)
@@ -280,7 +281,7 @@ Namespace Functions.support
                     ElseIf exceptionType.Equals(GetType(Runtime.InteropServices.COMException)) Then
                         Dim COMExceptionObject As Runtime.InteropServices.COMException = DirectCast(rawExceptionObject, Runtime.InteropServices.COMException)
                         stringBuilder.AppendLine("Source: " & COMExceptionObject.Source)
-                        stringBuilder.AppendLine("Error Code: " & COMExceptionObject.ErrorCode)
+                        stringBuilder.AppendLine("Error Code: " & convertErrorCodeToHex(COMExceptionObject.ErrorCode))
                     ElseIf exceptionType.Equals(GetType(ObjectDisposedException)) Then
                         Dim ObjectDisposedExceptionObject As ObjectDisposedException = DirectCast(rawExceptionObject, ObjectDisposedException)
                         stringBuilder.AppendLine("Source: " & ObjectDisposedExceptionObject.Source)
