@@ -1,4 +1,5 @@
 ﻿Imports System.Security.AccessControl
+Imports System.Security.Claims
 Imports System.Security.Principal
 
 Namespace Functions.privilegeChecks
@@ -71,12 +72,11 @@ Namespace Functions.privilegeChecks
         End Function
 
         Public Function IsUserInAdminGroup() As Boolean
-            Try
-                Return (WindowsIdentity.GetCurrent().Groups.Where(Function(identityReference As IdentityReference) identityReference.Value.Trim.Equals("S-1-5-32-544", StringComparison.OrdinalIgnoreCase)).Count > 0)
-            Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
-                Return False
-            End Try
+            Dim identity As WindowsIdentity = WindowsIdentity.GetCurrent()
+            Dim principal As New WindowsPrincipal(identity)
+
+            If principal.IsInRole(WindowsBuiltInRole.Administrator) Then Return True ' Elevated
+            Return identity.FindAll(ClaimTypes.DenyOnlySid).Any(Function(userClaimObject) userClaimObject.Value.Trim.Equals("S-1-5-114", StringComparison.OrdinalIgnoreCase))
         End Function
     End Module
 End Namespace
