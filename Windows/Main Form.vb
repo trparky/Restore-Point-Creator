@@ -4,7 +4,6 @@ Imports System.Text.RegularExpressions
 Imports System.Text
 Imports System.Runtime.InteropServices
 Imports System.Management
-Imports ICSharpCode.SharpZipLib.Zip
 #End Region
 
 Public Class Form1
@@ -892,12 +891,12 @@ Public Class Form1
             End If
 
             memoryStream.Position = 0
-            Dim zipFileObject As New ZipFile(memoryStream)
+            Dim zipFileObject As New IO.Compression.ZipArchive(memoryStream, IO.Compression.ZipArchiveMode.Read)
 
             If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.programFileNameInZIP, strNewApplicationFileNameFullName) = False Then
                 MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, strMessageBoxTitle)
 
-                zipFileObject.Close()
+                zipFileObject.Dispose()
                 memoryStream.Close()
                 memoryStream.Dispose()
                 memoryStream = Nothing
@@ -907,14 +906,14 @@ Public Class Form1
             If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.pdbFileNameInZIP, globalVariables.pdbFileNameInZIP & ".new") = False Then
                 MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, strMessageBoxTitle)
 
-                zipFileObject.Close()
+                zipFileObject.Dispose()
                 memoryStream.Close()
                 memoryStream.Dispose()
                 memoryStream = Nothing
                 Exit Sub
             End If
 
-            zipFileObject.Close()
+            zipFileObject.Dispose()
             memoryStream.Close()
             memoryStream.Dispose()
             memoryStream = Nothing
@@ -1406,7 +1405,7 @@ Public Class Form1
             Functions.eventLogFunctions.writeToSystemEventLog("Opening ZIP file package in system RAM for file extractions.", EventLogEntryType.Information)
         End If
 
-        Dim zipFileObject As New ZipFile(memoryStream) ' Create a new ZIPFile Object.
+        Dim zipFileObject As New IO.Compression.ZipArchive(memoryStream, IO.Compression.ZipArchiveMode.Read) ' Create a new ZIPFile Object.
 
         If extractPDB = True Then
             If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.pdbFileNameInZIP, globalVariables.pdbFileNameInZIP & ".new") = False Then
@@ -1418,7 +1417,7 @@ Public Class Form1
                     Functions.eventLogFunctions.writeToSystemEventLog("Closing out ZIP File Object and freeing up memory.", EventLogEntryType.Information)
                 End If
 
-                zipFileObject.Close() ' This closes our ZIPFile Object.
+                zipFileObject.Dispose() ' This closes our ZIPFile Object.
                 memoryStream.Close()
                 memoryStream.Dispose()
                 memoryStream = Nothing
@@ -1438,7 +1437,7 @@ Public Class Form1
                 Functions.eventLogFunctions.writeToSystemEventLog("Closing out ZIP File Object and freeing up memory.", EventLogEntryType.Information)
             End If
 
-            zipFileObject.Close() ' This closes our ZIPFile Object.
+            zipFileObject.Dispose() ' This closes our ZIPFile Object.
             memoryStream.Close()
             memoryStream.Dispose()
             memoryStream = Nothing
@@ -1452,7 +1451,7 @@ Public Class Form1
             Functions.eventLogFunctions.writeToSystemEventLog("Closing out ZIP File Object and freeing up memory.", EventLogEntryType.Information)
         End If
 
-        zipFileObject.Close() ' This closes our ZIPFile Object.
+        zipFileObject.Dispose() ' This closes our ZIPFile Object.
         memoryStream.Close()
         memoryStream.Dispose()
         memoryStream = Nothing

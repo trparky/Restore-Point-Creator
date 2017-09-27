@@ -1,5 +1,4 @@
 ﻿Imports System.ComponentModel
-Imports ICSharpCode.SharpZipLib.Zip
 
 Public Class Official_Contact_Form
     Protected Const apiAccessCode As String = "YWiIMIyGVVFEunRpDF5PNIF2yzcADdBxneRmWDlLpMTCoVFEunRWiIMIyRmWnRpDF"
@@ -30,15 +29,20 @@ Public Class Official_Contact_Form
 
         If boolDoWeHaveAttachments = True Then
             Try
-                Dim zipFileObject As ZipFile = ZipFile.Create(zipFilePath) ' Creates a new ZIP file.
-                zipFileObject.BeginUpdate() ' We need to open the ZIP file for writing.
+                Dim newZipFileEntryObject As IO.Compression.ZipArchiveEntry
+                Dim zipArchiveMode As IO.Compression.ZipArchiveMode = If(IO.File.Exists(zipFilePath), IO.Compression.ZipArchiveMode.Update, IO.Compression.ZipArchiveMode.Create)
 
-                For Each item As myListViewItemTypes.contactFormFileListItem In listAttachedFiles.Items
-                    zipFileObject.Add(item.strFileName, New IO.FileInfo(item.strFileName).Name) ' Adds the file to the ZIP file.
-                Next
+                Using zipFileObject As IO.Compression.ZipArchive = IO.Compression.ZipFile.Open(zipFilePath, zipArchiveMode)
+                    For Each item As myListViewItemTypes.contactFormFileListItem In listAttachedFiles.Items
+                        newZipFileEntryObject = zipFileObject.CreateEntry(New IO.FileInfo(item.strFileName).Name, IO.Compression.CompressionLevel.Optimal)
 
-                zipFileObject.CommitUpdate() ' Commits the added file(s) to the ZIP file.
-                zipFileObject.Close() ' Closes the ZIPFile Object.
+                        Using localFileStreamReader As New IO.FileStream(item.strFileName, IO.FileMode.Open)
+                            Using zipFileEntryIOStream As IO.Stream = newZipFileEntryObject.Open()
+                                localFileStreamReader.CopyTo(zipFileEntryIOStream)
+                            End Using
+                        End Using
+                    Next
+                End Using
             Catch ex As Exception
                 enableFormElements()
                 Functions.eventLogFunctions.writeCrashToEventLog(ex)

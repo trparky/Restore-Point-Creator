@@ -1,5 +1,4 @@
 ﻿Imports System.Text.RegularExpressions
-Imports ICSharpCode.SharpZipLib.Zip
 Imports System.Xml
 
 Namespace Functions.support
@@ -409,7 +408,7 @@ Namespace Functions.support
         ''' <param name="fileToExtract">The name of the file you want to extract from the ZIP file.</param>
         ''' <param name="extractionTarget">The path to which you want to extract the file to.</param>
         ''' <returns>A Boolean Value. If the function was able to sucessfully extract the requested file from the ZIP file, it will return a True value. However, if for whatever reason something goes wrong anywhere in this function, it will return a False value.</returns>
-        Public Function extractUpdatedFileFromZIPPackage(ByRef zipFileObject As ZipFile, ByVal fileToExtract As String, ByVal extractionTarget As String, Optional boolDeleteTargetIfExists As Boolean = True) As Boolean
+        Public Function extractUpdatedFileFromZIPPackage(ByRef zipFileObject As IO.Compression.ZipArchive, ByVal fileToExtract As String, ByVal extractionTarget As String, Optional boolDeleteTargetIfExists As Boolean = True) As Boolean
             Try
                 Dim extractionTargetFileInfo As New IO.FileInfo(extractionTarget)
 
@@ -418,7 +417,7 @@ Namespace Functions.support
                 End If
 
                 ' This gets the ZipEntry Object for the file we are trying to extract from the ZIP file.
-                Dim zipFileEntryObject As ZipEntry = zipFileObject.GetEntry(fileToExtract)
+                Dim zipFileEntryObject As IO.Compression.ZipArchiveEntry = zipFileObject.GetEntry(fileToExtract)
 
                 ' This checks to see if the file that we're trying to extract from the ZIP file exists in the ZIP file.
                 If zipFileEntryObject Is Nothing Then
@@ -476,7 +475,7 @@ Namespace Functions.support
                     End If
 
                     ' This copies the data out of the ZIP File Data Stream to our FileStream Object that was created above.
-                    zipFileObject.GetInputStream(zipFileEntryObject).CopyTo(fileStream)
+                    zipFileEntryObject.Open().CopyTo(fileStream)
 
                     If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                         eventLogFunctions.writeToSystemEventLog("File write operation complete. Closing out file and disposing of the IO.FileStream.", EventLogEntryType.Information)
@@ -518,21 +517,18 @@ Namespace Functions.support
         ''' <returns>Returns a Boolean value.</returns>
         Public Function addFileToZipFile(pathToZIPFile As String, fileToAddToZIPFile As String) As Boolean
             Try
-                Dim zipFileObject As ZipFile ' Creates a ZIPFile Object.
+                Dim newZipFileEntryObject As IO.Compression.ZipArchiveEntry
+                Dim zipArchiveMode As IO.Compression.ZipArchiveMode = If(IO.File.Exists(pathToZIPFile), IO.Compression.ZipArchiveMode.Update, IO.Compression.ZipArchiveMode.Create)
 
-                ' This checks to see if the ZIP file we want to work with already exists.
-                If IO.File.Exists(pathToZIPFile) = True Then
-                    ' OK, the ZIP file already exists so we create a new ZIPFile Object by opening the existing ZIP file.
-                    zipFileObject = New ZipFile(pathToZIPFile)
-                Else
-                    ' No, the ZIP file doesn't exist so we tells the ZIPFile Library to create a new ZIPFile Object with no previous file.
-                    zipFileObject = ZipFile.Create(pathToZIPFile)
-                End If
+                Using zipFileObject As IO.Compression.ZipArchive = IO.Compression.ZipFile.Open(pathToZIPFile, zipArchiveMode)
+                    newZipFileEntryObject = zipFileObject.CreateEntry(New IO.FileInfo(fileToAddToZIPFile).Name, IO.Compression.CompressionLevel.Optimal)
 
-                zipFileObject.BeginUpdate() ' We need to open the ZIP file for writing.
-                zipFileObject.Add(fileToAddToZIPFile, New IO.FileInfo(fileToAddToZIPFile).Name) ' Adds the file to the ZIP file.
-                zipFileObject.CommitUpdate() ' Commits the added file to the ZIP file.
-                zipFileObject.Close() ' Closes the ZIPFile Object.
+                    Using localFileStreamReader As New IO.FileStream(fileToAddToZIPFile, IO.FileMode.Open)
+                        Using zipFileEntryIOStream As IO.Stream = newZipFileEntryObject.Open()
+                            localFileStreamReader.CopyTo(zipFileEntryIOStream)
+                        End Using
+                    End Using
+                End Using
 
                 Return True
             Catch ex As Exception
