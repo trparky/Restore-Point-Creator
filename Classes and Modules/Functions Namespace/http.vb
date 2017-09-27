@@ -16,28 +16,6 @@
             End If
         End Function
 
-        Public Function downloadFile(ByVal urlToDownloadFrom As String, ByRef memStream As IO.MemoryStream) As Boolean
-            Try
-                Dim httpHelper As httpHelper = createNewHTTPHelperObject()
-                Dim downloadResult As Boolean = httpHelper.downloadFile(urlToDownloadFrom, memStream, False)
-                If Not downloadResult Then eventLogFunctions.writeCrashToEventLog(httpHelper.getLastException)
-                Return downloadResult
-            Catch ex As Exception
-                Return False
-            End Try
-        End Function
-
-        Public Function downloadFile(urlToDownloadFrom As String, localFileName As String) As Boolean
-            Try
-                Dim httpHelper As httpHelper = createNewHTTPHelperObject()
-                Dim downloadResult As Boolean = httpHelper.downloadFile(urlToDownloadFrom, localFileName, False)
-                If Not downloadResult Then eventLogFunctions.writeCrashToEventLog(httpHelper.getLastException)
-                Return downloadResult
-            Catch ex As Exception
-                Return False
-            End Try
-        End Function
-
         Private Sub customHTTPHelperErrorHandler(ex As Exception, classInstance As httpHelper)
             eventLogFunctions.writeCrashToEventLog(ex, EventLogEntryType.Warning)
             Dim lastAccessedURL As String = classInstance.getLastAccessedURL()

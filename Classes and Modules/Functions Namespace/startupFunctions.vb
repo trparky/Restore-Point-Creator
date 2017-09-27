@@ -6,58 +6,6 @@ Imports System.Configuration
 
 Namespace Functions.startupFunctions
     Module startupFunctions
-        Public Sub downloadWindowsXPVersion()
-            Dim windowsXPVersionEXEURL As String = "http://www.toms-world.org/download/Restore Point Creator (Windows XP).exe"
-            Dim windowsXPVersionSHA1URL As String = "http://www.toms-world.org/download/Restore Point Creator (Windows XP).exe.sha1"
-
-            If MsgBox("This version of System Restore Point Creator is NOT compatible with Windows XP and will NOT run on Windows XP." & vbCrLf & vbCrLf & "Would you like to go back to the last version that supported Windows XP?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "System Restore Point Creator Windows XP Support") = MsgBoxResult.Yes Then
-                wait.createPleaseWaitWindow("Downloading File... Please Wait.", True, enums.howToCenterWindow.screen, True)
-
-                If http.downloadFile("http://www.toms-world.org/download/updater.exe", "updater.exe") = False Then
-                    wait.closePleaseWaitWindow()
-                    MsgBox("There was an error while downloading required files, please check the Event Log for more details.", MsgBoxStyle.Critical, "Restore Point Creator")
-
-                    Process.GetCurrentProcess.Kill()
-                End If
-
-                If File.Exists("updater.exe") = True Then
-                    If checksum.verifyChecksum("http://www.toms-world.org/download/updater.exe.sha1", "updater.exe", True) = False Then
-                        wait.closePleaseWaitWindow()
-                        MsgBox("There was an error while downloading required files, please check the Event Log for more details.", MsgBoxStyle.Critical, "Restore Point Creator")
-
-                        Process.GetCurrentProcess.Kill()
-                    End If
-                End If
-
-                Dim fileInfo As New FileInfo(Application.ExecutablePath)
-
-                If http.downloadFile(windowsXPVersionEXEURL, fileInfo.Name & ".New") = False Then
-                    wait.closePleaseWaitWindow()
-                    MsgBox("There was an error while downloading required files, please check the Event Log for more details.", MsgBoxStyle.Critical, "Restore Point Creator")
-
-                    Process.GetCurrentProcess.Kill()
-                End If
-
-                If File.Exists(fileInfo.Name & ".new") = True Then
-                    If checksum.verifyChecksum(windowsXPVersionSHA1URL, fileInfo.Name & ".new", True) = False Then
-                        wait.closePleaseWaitWindow()
-                        MsgBox("There was an error while downloading required files, please check the Event Log for more details.", MsgBoxStyle.Critical, "Restore Point Creator")
-
-                        Process.GetCurrentProcess.Kill()
-                    End If
-                End If
-
-                fileInfo = Nothing
-
-                Process.Start(globalVariables.updaterFileName, String.Format("--file={0}{1}{0}", Chr(34), Application.ExecutablePath))
-
-                wait.closePleaseWaitWindow()
-                Application.Exit()
-            End If
-
-            Process.GetCurrentProcess.Kill()
-        End Sub
-
         Public isMyRestoreThreadRunning As Boolean = False
         Public preSelectedRestorePointID As Integer
 

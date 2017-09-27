@@ -52,10 +52,6 @@ Namespace My
             Dim registryKey As RegistryKey
             Dim boolNoTask As Boolean = False ' Create a Boolean data type variable.
 
-            If Environment.OSVersion.ToString.Contains("5.1") = True Or Environment.OSVersion.ToString.Contains("5.2") = True Then
-                Functions.startupFunctions.downloadWindowsXPVersion()
-            End If
-
             If Functions.osVersionInfo.isThisAServerOS() = True Then
                 MsgBox("You are running a Server edition of Microsoft Windows. System Restore Point Creator doesn't function on server operating systems." & vbCrLf & vbCrLf & "This application will now close.", MsgBoxStyle.Critical, "System Restore Point Creator -- Application Error")
                 Process.GetCurrentProcess.Kill()
