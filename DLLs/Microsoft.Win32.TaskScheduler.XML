@@ -1990,6 +1990,14 @@
             Gets the highest version of Task Scheduler that a computer supports.
             </summary>
         </member>
+        <member name="P:Microsoft.Win32.TaskScheduler.TaskService.Instance">
+            <summary>
+            Gets a local instance of the <see cref="T:Microsoft.Win32.TaskScheduler.TaskService"/> using the current user's credentials.
+            </summary>
+            <value>
+            Local user <see cref="T:Microsoft.Win32.TaskScheduler.TaskService"/> instance.
+            </value>
+        </member>
         <member name="P:Microsoft.Win32.TaskScheduler.TaskService.LibraryVersion">
             <summary>
             Gets the library version. This is the highest version supported by the local library. Tasks cannot be created using any compatibility level higher than this version.
@@ -2013,14 +2021,6 @@
             Gets or sets the user account domain to be used when connecting to the <see cref="P:Microsoft.Win32.TaskScheduler.TaskService.TargetServer"/>.
             </summary>
             <value>The user account domain.</value>
-        </member>
-        <member name="P:Microsoft.Win32.TaskScheduler.TaskService.Instance">
-            <summary>
-            Gets a local instance of the <see cref="T:Microsoft.Win32.TaskScheduler.TaskService"/> using the current user's credentials.
-            </summary>
-            <value>
-            Local user <see cref="T:Microsoft.Win32.TaskScheduler.TaskService"/> instance.
-            </value>
         </member>
         <member name="P:Microsoft.Win32.TaskScheduler.TaskService.UserName">
             <summary>
@@ -3219,6 +3219,9 @@
         </member>
         <member name="F:Microsoft.Win32.TaskScheduler.TaskCompatibility.V2_2">
             <summary>The task is compatible with Task Scheduler 2.2 (Windows® 8.x, Windows Server™ 2012).</summary>
+        </member>
+        <member name="F:Microsoft.Win32.TaskScheduler.TaskCompatibility.V2_3">
+            <summary>The task is compatible with Task Scheduler 2.3 (Windows® 10, Windows Server™ 2016).</summary>
         </member>
         <member name="T:Microsoft.Win32.TaskScheduler.TaskCreation">
             <summary>Defines how the Task Scheduler service creates, updates, or disables the task.</summary>
@@ -6552,25 +6555,6 @@
             <param name="ptr">The <see cref="T:System.IntPtr"/> pointing to the native array.</param>
             <param name="count">The number of items in the native array.</param>
             <returns>An array of type <typeparamref name="T"/> containing the elements of the native array.</returns>
-        </member>
-        <member name="T:System.Collections.Generic.IReadOnlyCollection`1">
-            <summary>Represents a strongly-typed, read-only collection of elements.</summary>
-            <typeparam name="T">The type of the elements.</typeparam>
-            <seealso cref="T:System.Collections.Generic.IEnumerable`1"/>
-        </member>
-        <member name="P:System.Collections.Generic.IReadOnlyCollection`1.Count">
-            <summary>Gets the number of elements in the collection.</summary>
-            <value>The number of elements in the collection.</value>
-        </member>
-        <member name="T:System.Collections.Generic.IReadOnlyList`1">
-            <summary>Represents a read-only collection of elements that can be accessed by index.</summary>
-            <typeparam name="T">The type of elements in the read-only list.</typeparam>
-            <seealso cref="T:System.Collections.Generic.IReadOnlyCollection`1"/>
-        </member>
-        <member name="P:System.Collections.Generic.IReadOnlyList`1.Item(System.Int32)">
-            <summary>Gets the element at the specified index in the read-only list.</summary>
-            <value>The element at the specified index in the read-only list.</value>
-            <param name="index">The zero-based index of the element to get.</param>
         </member>
         <member name="M:System.EnumUtil.TryParse``1(System.String,System.Boolean,``0)">
             <summary>
