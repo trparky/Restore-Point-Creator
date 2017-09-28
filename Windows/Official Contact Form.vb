@@ -20,6 +20,18 @@ Public Class Official_Contact_Form
         End If
     End Sub
 
+    Private Sub addFileToZip(ByRef zipFileObject As IO.Compression.ZipArchive, strFileToBeAdded As String)
+        If IO.File.Exists(strFileToBeAdded) Then
+            Dim newZipFileEntryObject As IO.Compression.ZipArchiveEntry = zipFileObject.CreateEntry(New IO.FileInfo(strFileToBeAdded).Name, IO.Compression.CompressionLevel.Optimal)
+
+            Using localFileStreamReader As New IO.FileStream(strFileToBeAdded, IO.FileMode.Open)
+                Using zipFileEntryIOStream As IO.Stream = newZipFileEntryObject.Open()
+                    localFileStreamReader.CopyTo(zipFileEntryIOStream)
+                End Using
+            End Using
+        End If
+    End Sub
+
     Sub dataSubmitThread()
         Dim zipFilePath As String = IO.Path.Combine(IO.Path.GetTempPath(), "attachments.zip")
         If IO.File.Exists(zipFilePath) Then IO.File.Delete(zipFilePath)
@@ -29,18 +41,11 @@ Public Class Official_Contact_Form
 
         If boolDoWeHaveAttachments = True Then
             Try
-                Dim newZipFileEntryObject As IO.Compression.ZipArchiveEntry
                 Dim zipArchiveMode As IO.Compression.ZipArchiveMode = If(IO.File.Exists(zipFilePath), IO.Compression.ZipArchiveMode.Update, IO.Compression.ZipArchiveMode.Create)
 
                 Using zipFileObject As IO.Compression.ZipArchive = IO.Compression.ZipFile.Open(zipFilePath, zipArchiveMode)
                     For Each item As myListViewItemTypes.contactFormFileListItem In listAttachedFiles.Items
-                        newZipFileEntryObject = zipFileObject.CreateEntry(New IO.FileInfo(item.strFileName).Name, IO.Compression.CompressionLevel.Optimal)
-
-                        Using localFileStreamReader As New IO.FileStream(item.strFileName, IO.FileMode.Open)
-                            Using zipFileEntryIOStream As IO.Stream = newZipFileEntryObject.Open()
-                                localFileStreamReader.CopyTo(zipFileEntryIOStream)
-                            End Using
-                        End Using
+                        addFileToZip(zipFileObject, item.strFileName)
                     Next
                 End Using
             Catch ex As Exception
