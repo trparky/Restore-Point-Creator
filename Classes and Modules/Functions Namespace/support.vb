@@ -472,10 +472,21 @@ Namespace Functions.support
 
                     If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                         eventLogFunctions.writeToSystemEventLog(String.Format("IO.FileStream created successfully. Commencing the process of writing file {0}{1}{0} as {0}{2}{0} to disk.", Chr(34), fileToExtract, extractionTargetFileInfo.Name), EventLogEntryType.Information)
+                        eventLogFunctions.writeToSystemEventLog("Opening IO.Stream from ZIP File Object.", EventLogEntryType.Information)
                     End If
 
                     ' This copies the data out of the ZIP File Data Stream to our FileStream Object that was created above.
-                    zipFileEntryObject.Open().CopyTo(fileStream)
+                    Using zipFileEntryObjectIOStream As IO.Stream = zipFileEntryObject.Open()
+                        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                            eventLogFunctions.writeToSystemEventLog("ZIP File Object IO.Stream opened. Copying data from ZIP File Object IO.Stream to IO.FileStream.", EventLogEntryType.Information)
+                        End If
+
+                        zipFileEntryObjectIOStream.CopyTo(fileStream)
+
+                        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                            eventLogFunctions.writeToSystemEventLog("Data copying complete. Closing out ZIP File Object IO.Stream.", EventLogEntryType.Information)
+                        End If
+                    End Using
 
                     If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                         eventLogFunctions.writeToSystemEventLog("File write operation complete. Closing out file and disposing of the IO.FileStream.", EventLogEntryType.Information)
