@@ -522,27 +522,44 @@ Namespace Functions.support
             End Try
         End Sub
 
-        ''' <summary>ZIPs the exported log file.</summary>
-        ''' <param name="pathToZIPFile">The path the ZIP file we will be working with.</param>
-        ''' <param name="fileToAddToZIPFile">The path to the file we will be adding to the ZIP file.</param>
+        ''' <summary>Adds a file to the chosen ZIP file.</summary>
+        ''' <param name="zipFileObject">A IO.Compression.ZipArchive Object.</param>
+        ''' <param name="strFileToBeAdded">The path to the file we will be adding to the ZIP file.</param>
         ''' <returns>Returns a Boolean value.</returns>
-        Public Function addFileToZipFile(pathToZIPFile As String, fileToAddToZIPFile As String) As Boolean
+        Public Function addFileToZipFile(ByRef zipFileObject As IO.Compression.ZipArchive, strFileToBeAdded As String) As Boolean
             Try
-                Dim newZipFileEntryObject As IO.Compression.ZipArchiveEntry
-                Dim zipArchiveMode As IO.Compression.ZipArchiveMode = If(IO.File.Exists(pathToZIPFile), IO.Compression.ZipArchiveMode.Update, IO.Compression.ZipArchiveMode.Create)
+                If IO.File.Exists(strFileToBeAdded) Then
+                    Dim newZipFileEntryObject As IO.Compression.ZipArchiveEntry = zipFileObject.CreateEntry(New IO.FileInfo(strFileToBeAdded).Name, IO.Compression.CompressionLevel.Optimal)
 
-                Using zipFileObject As IO.Compression.ZipArchive = IO.Compression.ZipFile.Open(pathToZIPFile, zipArchiveMode)
-                    newZipFileEntryObject = zipFileObject.CreateEntry(New IO.FileInfo(fileToAddToZIPFile).Name, IO.Compression.CompressionLevel.Optimal)
-
-                    Using localFileStreamReader As New IO.FileStream(fileToAddToZIPFile, IO.FileMode.Open)
+                    Using localFileStreamReader As New IO.FileStream(strFileToBeAdded, IO.FileMode.Open)
                         Using zipFileEntryIOStream As IO.Stream = newZipFileEntryObject.Open()
                             localFileStreamReader.CopyTo(zipFileEntryIOStream)
                         End Using
                     End Using
+                End If
+
+                Return True
+            Catch ex As Exception
+                eventLogFunctions.writeCrashToEventLog(ex)
+                Return False
+            End Try
+        End Function
+
+        ''' <summary>Adds a file to the chosen ZIP file.</summary>
+        ''' <param name="pathToZIPFile">The path the ZIP file we will be working with.</param>
+        ''' <param name="strFileToBeAdded">The path to the file we will be adding to the ZIP file.</param>
+        ''' <returns>Returns a Boolean value.</returns>
+        Public Function addFileToZipFile(pathToZIPFile As String, strFileToBeAdded As String) As Boolean
+            Try
+                Dim zipArchiveMode As IO.Compression.ZipArchiveMode = If(IO.File.Exists(pathToZIPFile), IO.Compression.ZipArchiveMode.Update, IO.Compression.ZipArchiveMode.Create)
+
+                Using zipFileObject As IO.Compression.ZipArchive = IO.Compression.ZipFile.Open(pathToZIPFile, zipArchiveMode)
+                    addFileToZipFile(zipFileObject, strFileToBeAdded)
                 End Using
 
                 Return True
             Catch ex As Exception
+                eventLogFunctions.writeCrashToEventLog(ex)
                 Return False
             End Try
         End Function

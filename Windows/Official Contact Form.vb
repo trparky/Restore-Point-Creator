@@ -20,18 +20,6 @@ Public Class Official_Contact_Form
         End If
     End Sub
 
-    Private Sub addFileToZip(ByRef zipFileObject As IO.Compression.ZipArchive, strFileToBeAdded As String)
-        If IO.File.Exists(strFileToBeAdded) Then
-            Dim newZipFileEntryObject As IO.Compression.ZipArchiveEntry = zipFileObject.CreateEntry(New IO.FileInfo(strFileToBeAdded).Name, IO.Compression.CompressionLevel.Optimal)
-
-            Using localFileStreamReader As New IO.FileStream(strFileToBeAdded, IO.FileMode.Open)
-                Using zipFileEntryIOStream As IO.Stream = newZipFileEntryObject.Open()
-                    localFileStreamReader.CopyTo(zipFileEntryIOStream)
-                End Using
-            End Using
-        End If
-    End Sub
-
     Sub dataSubmitThread()
         Dim zipFilePath As String = IO.Path.Combine(IO.Path.GetTempPath(), "attachments.zip")
         If IO.File.Exists(zipFilePath) Then IO.File.Delete(zipFilePath)
@@ -41,12 +29,18 @@ Public Class Official_Contact_Form
 
         If boolDoWeHaveAttachments = True Then
             Try
-                Dim zipArchiveMode As IO.Compression.ZipArchiveMode = If(IO.File.Exists(zipFilePath), IO.Compression.ZipArchiveMode.Update, IO.Compression.ZipArchiveMode.Create)
-
-                Using zipFileObject As IO.Compression.ZipArchive = IO.Compression.ZipFile.Open(zipFilePath, zipArchiveMode)
-                    For Each item As myListViewItemTypes.contactFormFileListItem In listAttachedFiles.Items
-                        addFileToZip(zipFileObject, item.strFileName)
-                    Next
+                Using zipFileObject As IO.Compression.ZipArchive = IO.Compression.ZipFile.Open(zipFilePath, IO.Compression.ZipArchiveMode.Create)
+                    If zipFileObject Is Nothing Then
+                        MsgBox("There was an error while creating the ZIP file to contain your attached files, submission process aborted.", MsgBoxStyle.Critical, Me.Text)
+                        Exit Sub
+                    Else
+                        For Each item As myListViewItemTypes.contactFormFileListItem In listAttachedFiles.Items
+                            If Not Functions.support.addFileToZipFile(zipFileObject, item.strFileName) Then
+                                MsgBox("There was an error while writing the attached files to the ZIP file, submission process aborted.", MsgBoxStyle.Critical, Me.Text)
+                                Exit Sub
+                            End If
+                        Next
+                    End If
                 End Using
             Catch ex As Exception
                 enableFormElements()
