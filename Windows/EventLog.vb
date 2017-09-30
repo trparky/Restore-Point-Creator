@@ -41,7 +41,7 @@
         End If
     End Function
 
-    Sub loadEventLogData(ByRef itemsToPutInToList As List(Of myListViewItemTypes.eventLogListEntry))
+    Sub loadEventLogData()
         Dim itemAdd As myListViewItemTypes.eventLogListEntry
         Dim eventLogType As EventLogEntryType
 
@@ -72,7 +72,7 @@
                     .shortLevelType = logEntry.logType
                 End With
 
-                itemsToPutInToList.Add(itemAdd)
+                eventLogContents.Add(itemAdd)
                 itemAdd = Nothing
             Next
         Catch ex As Threading.ThreadAbortException
@@ -94,7 +94,7 @@
             eventLogContents.Clear() ' Cleans our cached log entries in memory.
 
             Dim timeStamp As Stopwatch = Stopwatch.StartNew()
-            loadEventLogData(eventLogContents)
+            loadEventLogData()
 
             Dim longElapsedMilisecond As Long = timeStamp.ElapsedMilliseconds
             Dim dblElapsedSeconds As Double = timeStamp.Elapsed.TotalSeconds
@@ -510,14 +510,16 @@
         dateLastFileSystemWatcherEventRaised = Date.Now
 
         If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
-            lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(New IO.FileInfo(Functions.eventLogFunctions.strLogFile).Length)
+            If Not boolAreWeLoadingTheEventLogData Then
+                lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(New IO.FileInfo(Functions.eventLogFunctions.strLogFile).Length)
 
-            openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
+                openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
 
-            workingThread = New Threading.Thread(AddressOf loadEventLog)
-            workingThread.Name = "Event Log Data Loading Thread"
-            workingThread.IsBackground = True
-            workingThread.Start()
+                workingThread = New Threading.Thread(AddressOf loadEventLog)
+                workingThread.Name = "Event Log Data Loading Thread"
+                workingThread.IsBackground = True
+                workingThread.Start()
+            End If
         Else
             lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
         End If
