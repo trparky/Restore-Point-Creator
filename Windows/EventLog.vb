@@ -84,6 +84,11 @@
 
     Sub loadEventLog()
         Try
+            If Not Me.IsHandleCreated Then
+                closePleaseWaitPanel()
+                Exit Sub
+            End If
+
             boolAreWeLoadingTheEventLogData = True
             Invoke(Sub() Me.Cursor = Cursors.WaitCursor)
             eventLogContents.Clear() ' Cleans our cached log entries in memory.
@@ -126,14 +131,19 @@
     End Sub
 
     Private Sub eventLogForm_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
-        If e.KeyCode = Keys.F5 Then
-            If Not boolAreWeLoadingTheEventLogData Then
+        If e.KeyCode = Keys.F5 And Not boolAreWeLoadingTheEventLogData Then
+            If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
+                lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(New IO.FileInfo(Functions.eventLogFunctions.strLogFile).Length)
                 openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
 
                 workingThread = New Threading.Thread(AddressOf loadEventLog)
                 workingThread.Name = "Event Log Data Loading Thread"
                 workingThread.IsBackground = True
                 workingThread.Start()
+            Else
+                lblLogEntryCount.Text = "Entries in Event Log: 0"
+                lblProcessedIn.Text = "Processed in 0ms"
+                lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
             End If
         End If
     End Sub
@@ -200,6 +210,8 @@
         If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
             lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(New IO.FileInfo(Functions.eventLogFunctions.strLogFile).Length)
         Else
+            lblLogEntryCount.Text = "Entries in Event Log: 0"
+            lblProcessedIn.Text = "Processed in 0ms"
             lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
         End If
 
@@ -271,12 +283,20 @@
 
     Private Sub btnRefreshEvents_Click(sender As Object, e As EventArgs) Handles btnRefreshEvents.Click
         If Not boolAreWeLoadingTheEventLogData Then
-            openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
+            If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
+                lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(New IO.FileInfo(Functions.eventLogFunctions.strLogFile).Length)
+                openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
 
-            workingThread = New Threading.Thread(AddressOf loadEventLog)
-            workingThread.Name = "Event Log Data Loading Thread"
-            workingThread.IsBackground = True
-            workingThread.Start()
+                workingThread = New Threading.Thread(AddressOf loadEventLog)
+                workingThread.Name = "Event Log Data Loading Thread"
+                workingThread.IsBackground = True
+                workingThread.Start()
+            Else
+                eventLogList.Items.Clear()
+                lblLogEntryCount.Text = "Entries in Event Log: 0"
+                lblProcessedIn.Text = "Processed in 0ms"
+                lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
+            End If
         End If
     End Sub
 
@@ -323,12 +343,14 @@
 
         boolDoneLoading = True
 
-        openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
+        If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
+            openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
 
-        workingThread = New Threading.Thread(AddressOf loadEventLog)
-        workingThread.Name = "Event Log Data Loading Thread"
-        workingThread.IsBackground = True
-        workingThread.Start()
+            workingThread = New Threading.Thread(AddressOf loadEventLog)
+            workingThread.Name = "Event Log Data Loading Thread"
+            workingThread.IsBackground = True
+            workingThread.Start()
+        End If
     End Sub
 
     Private Sub chkAskMeToSubmitIfViewingAnExceptionEntry_Click(sender As Object, e As EventArgs) Handles chkAskMeToSubmitIfViewingAnExceptionEntry.Click
