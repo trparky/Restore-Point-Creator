@@ -145,6 +145,8 @@
                 lblProcessedIn.Text = ""
                 lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
             End If
+        ElseIf e.KeyCode = Keys.Delete And eventLogList.SelectedItems.Count > 0 Then
+            btnDeleteIndividualLogEntry.PerformClick()
         End If
     End Sub
 
@@ -223,6 +225,8 @@
             btnCleanLogFile.Enabled = False
             btnCleanLogFile.Text &= " (Disabled)"
         End If
+
+        chkMultiSelectMode.Checked = eventLogList.MultiSelect
     End Sub
 
     Private Sub eventLogList_ColumnClick(sender As Object, e As ColumnClickEventArgs) Handles eventLogList.ColumnClick
@@ -360,6 +364,7 @@
     Private Sub eventLogList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles eventLogList.SelectedIndexChanged
         Try
             If eventLogList.SelectedItems.Count <> 0 Then
+                btnDeleteIndividualLogEntry.Enabled = True
                 eventLogText.Text = DirectCast(eventLogList.SelectedItems(0), myListViewItemTypes.eventLogListEntry).strEventLogText
 
                 If eventLogText.Text.caseInsensitiveContains("exception") And chkAskMeToSubmitIfViewingAnExceptionEntry.Checked And selectedIndex <> eventLogList.SelectedIndices(0) Then
@@ -379,6 +384,8 @@
                 End If
 
                 selectedIndex = eventLogList.SelectedIndices(0)
+            Else
+                btnDeleteIndividualLogEntry.Enabled = False
             End If
         Catch ex As Exception
         End Try
@@ -523,6 +530,35 @@
         Else
             lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
         End If
+    End Sub
+
+    Private Sub btnDeleteIndividualLogEntry_Click(sender As Object, e As EventArgs) Handles btnDeleteIndividualLogEntry.Click
+        If eventLogList.SelectedItems.Count = 1 Then
+            Functions.eventLogFunctions.deleteEntryFromLog(DirectCast(eventLogList.SelectedItems(0), myListViewItemTypes.eventLogListEntry).longEventLogEntryID)
+        Else
+            logFileWatcher.EnableRaisingEvents = False
+
+            Dim logsToBeDeleted As New List(Of Long)
+            For Each item As myListViewItemTypes.eventLogListEntry In eventLogList.SelectedItems
+                logsToBeDeleted.Add(item.longEventLogEntryID)
+            Next
+            Functions.eventLogFunctions.deleteEntryFromLog(logsToBeDeleted)
+            logsToBeDeleted = Nothing
+
+            logFileWatcher.EnableRaisingEvents = True
+
+            lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(New IO.FileInfo(Functions.eventLogFunctions.strLogFile).Length)
+            openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
+
+            workingThread = New Threading.Thread(AddressOf loadEventLog)
+            workingThread.Name = "Event Log Data Loading Thread"
+            workingThread.IsBackground = True
+            workingThread.Start()
+        End If
+    End Sub
+
+    Private Sub chkMultiSelectMode_Click(sender As Object, e As EventArgs) Handles chkMultiSelectMode.Click
+        eventLogList.MultiSelect = chkMultiSelectMode.Checked
     End Sub
 
 #Region "--== Please Wait Panel Code ==--"

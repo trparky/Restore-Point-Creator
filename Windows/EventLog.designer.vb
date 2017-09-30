@@ -36,10 +36,12 @@ Partial Class eventLogForm
         Me.lblLogFileSize = New System.Windows.Forms.ToolStripStatusLabel()
         Me.btnCleanLogFile = New System.Windows.Forms.Button()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
+        Me.chkMultiSelectMode = New System.Windows.Forms.CheckBox()
         Me.TableLayoutPanel2 = New System.Windows.Forms.TableLayoutPanel()
         Me.btnExportLogs = New System.Windows.Forms.Button()
         Me.btnClear = New System.Windows.Forms.Button()
         Me.btnSearch = New System.Windows.Forms.Button()
+        Me.btnDeleteIndividualLogEntry = New System.Windows.Forms.Button()
         Me.chkAskMeToSubmitIfViewingAnExceptionEntry = New System.Windows.Forms.CheckBox()
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
         Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
@@ -69,7 +71,7 @@ Partial Class eventLogForm
         Me.eventLogList.Location = New System.Drawing.Point(3, 3)
         Me.eventLogList.MultiSelect = False
         Me.eventLogList.Name = "eventLogList"
-        Me.eventLogList.Size = New System.Drawing.Size(410, 172)
+        Me.eventLogList.Size = New System.Drawing.Size(410, 153)
         Me.eventLogList.SmallImageList = Me.imageList
         Me.eventLogList.TabIndex = 0
         Me.eventLogList.UseCompatibleStateImageBehavior = False
@@ -174,6 +176,7 @@ Partial Class eventLogForm
         '
         'SplitContainer1.Panel1
         '
+        Me.SplitContainer1.Panel1.Controls.Add(Me.chkMultiSelectMode)
         Me.SplitContainer1.Panel1.Controls.Add(Me.TableLayoutPanel2)
         Me.SplitContainer1.Panel1.Controls.Add(Me.eventLogList)
         '
@@ -184,6 +187,17 @@ Partial Class eventLogForm
         Me.SplitContainer1.SplitterDistance = 418
         Me.SplitContainer1.TabIndex = 5
         '
+        'chkMultiSelectMode
+        '
+        Me.chkMultiSelectMode.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.chkMultiSelectMode.AutoSize = True
+        Me.chkMultiSelectMode.Location = New System.Drawing.Point(4, 158)
+        Me.chkMultiSelectMode.Name = "chkMultiSelectMode"
+        Me.chkMultiSelectMode.Size = New System.Drawing.Size(289, 17)
+        Me.chkMultiSelectMode.TabIndex = 2
+        Me.chkMultiSelectMode.Text = "Multi-Select Mode (Used for deleting multiple log entries)"
+        Me.chkMultiSelectMode.UseVisualStyleBackColor = True
+        '
         'TableLayoutPanel2
         '
         Me.TableLayoutPanel2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
@@ -192,10 +206,11 @@ Partial Class eventLogForm
         Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel2.Controls.Add(Me.btnExportLogs, 0, 2)
-        Me.TableLayoutPanel2.Controls.Add(Me.btnClear, 0, 1)
         Me.TableLayoutPanel2.Controls.Add(Me.btnCleanLogFile, 1, 0)
         Me.TableLayoutPanel2.Controls.Add(Me.btnRefreshEvents, 0, 0)
         Me.TableLayoutPanel2.Controls.Add(Me.btnSearch, 0, 1)
+        Me.TableLayoutPanel2.Controls.Add(Me.btnDeleteIndividualLogEntry, 1, 1)
+        Me.TableLayoutPanel2.Controls.Add(Me.btnClear, 1, 2)
         Me.TableLayoutPanel2.Location = New System.Drawing.Point(0, 178)
         Me.TableLayoutPanel2.Name = "TableLayoutPanel2"
         Me.TableLayoutPanel2.RowCount = 3
@@ -210,14 +225,13 @@ Partial Class eventLogForm
         Me.btnExportLogs.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.TableLayoutPanel2.SetColumnSpan(Me.btnExportLogs, 2)
         Me.btnExportLogs.Image = Global.Restore_Point_Creator.My.Resources.Resources.save
         Me.btnExportLogs.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnExportLogs.Location = New System.Drawing.Point(3, 61)
         Me.btnExportLogs.Name = "btnExportLogs"
-        Me.btnExportLogs.Size = New System.Drawing.Size(413, 26)
+        Me.btnExportLogs.Size = New System.Drawing.Size(203, 26)
         Me.btnExportLogs.TabIndex = 9
-        Me.btnExportLogs.Text = "Export Application Event Logs to File"
+        Me.btnExportLogs.Text = "Export Application Event Logs"
         Me.btnExportLogs.UseVisualStyleBackColor = True
         '
         'btnClear
@@ -227,9 +241,9 @@ Partial Class eventLogForm
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnClear.Image = Global.Restore_Point_Creator.My.Resources.Resources.edit_clear
         Me.btnClear.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.btnClear.Location = New System.Drawing.Point(212, 32)
+        Me.btnClear.Location = New System.Drawing.Point(212, 61)
         Me.btnClear.Name = "btnClear"
-        Me.btnClear.Size = New System.Drawing.Size(204, 23)
+        Me.btnClear.Size = New System.Drawing.Size(204, 26)
         Me.btnClear.TabIndex = 8
         Me.btnClear.Text = "Clear Search Results"
         Me.btnClear.UseVisualStyleBackColor = True
@@ -247,6 +261,21 @@ Partial Class eventLogForm
         Me.btnSearch.TabIndex = 7
         Me.btnSearch.Text = "Search Event Log"
         Me.btnSearch.UseVisualStyleBackColor = True
+        '
+        'btnDeleteIndividualLogEntry
+        '
+        Me.btnDeleteIndividualLogEntry.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnDeleteIndividualLogEntry.Enabled = False
+        Me.btnDeleteIndividualLogEntry.Image = Global.Restore_Point_Creator.My.Resources.Resources.delete
+        Me.btnDeleteIndividualLogEntry.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnDeleteIndividualLogEntry.Location = New System.Drawing.Point(212, 32)
+        Me.btnDeleteIndividualLogEntry.Name = "btnDeleteIndividualLogEntry"
+        Me.btnDeleteIndividualLogEntry.Size = New System.Drawing.Size(204, 23)
+        Me.btnDeleteIndividualLogEntry.TabIndex = 10
+        Me.btnDeleteIndividualLogEntry.Text = "Delete Individual Log Entry"
+        Me.btnDeleteIndividualLogEntry.UseVisualStyleBackColor = True
         '
         'chkAskMeToSubmitIfViewingAnExceptionEntry
         '
@@ -333,6 +362,7 @@ Partial Class eventLogForm
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()
         Me.SplitContainer1.Panel1.ResumeLayout(False)
+        Me.SplitContainer1.Panel1.PerformLayout()
         Me.SplitContainer1.Panel2.ResumeLayout(False)
         Me.SplitContainer1.Panel2.PerformLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
@@ -371,4 +401,6 @@ Partial Class eventLogForm
     Friend WithEvents pleaseWaitMessageChanger As Timer
     Friend WithEvents lblLogFileSize As ToolStripStatusLabel
     Friend WithEvents logFileWatcher As IO.FileSystemWatcher
+    Friend WithEvents btnDeleteIndividualLogEntry As Button
+    Friend WithEvents chkMultiSelectMode As CheckBox
 End Class

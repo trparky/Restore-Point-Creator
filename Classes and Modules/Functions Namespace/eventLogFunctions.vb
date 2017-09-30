@@ -141,6 +141,72 @@ Namespace Functions.eventLogFunctions
             End Try
         End Sub
 
+        ''' <summary>Deletes a list of individual log entries from the log.</summary>
+        Public Sub deleteEntryFromLog(idsOfLogsToBeDeleted As List(Of Long))
+            If globalVariables.boolLogToSystemLog = True Then
+                Try
+                    Dim applicationLog As New List(Of restorePointCreatorExportedLog)
+                    Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
+
+                    If Not IO.File.Exists(strLogFile) Then createLogFile()
+
+                    shortNumberOfRecalledGetFileStreamFunction = 0
+                    Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.ReadWrite)
+                        Dim streamReader As New IO.StreamReader(fileStream)
+                        applicationLog = xmlSerializerObject.Deserialize(streamReader)
+
+                        For Each longIDToBeDeleted As Long In idsOfLogsToBeDeleted
+                            For Each item As restorePointCreatorExportedLog In applicationLog.Where(Function(logObject As restorePointCreatorExportedLog) (logObject.logID = longIDToBeDeleted)).ToList()
+                                applicationLog.Remove(item)
+                            Next
+                        Next
+
+                        fileStream.Position = 0
+                        fileStream.SetLength(0)
+
+                        Dim streamWriter As New IO.StreamWriter(fileStream)
+                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
+
+                        streamReader.Dispose()
+                    End Using
+                Catch ex As Exception
+                    ' Does nothing
+                End Try
+            End If
+        End Sub
+
+        ''' <summary>Deletes an individual log entry from the log.</summary>
+        Public Sub deleteEntryFromLog(longIDToBeDeleted As Long)
+            If globalVariables.boolLogToSystemLog = True Then
+                Try
+                    Dim applicationLog As New List(Of restorePointCreatorExportedLog)
+                    Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
+
+                    If Not IO.File.Exists(strLogFile) Then createLogFile()
+
+                    shortNumberOfRecalledGetFileStreamFunction = 0
+                    Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.ReadWrite)
+                        Dim streamReader As New IO.StreamReader(fileStream)
+                        applicationLog = xmlSerializerObject.Deserialize(streamReader)
+
+                        For Each item As restorePointCreatorExportedLog In applicationLog.Where(Function(logObject As restorePointCreatorExportedLog) (logObject.logID = longIDToBeDeleted)).ToList()
+                            applicationLog.Remove(item)
+                        Next
+
+                        fileStream.Position = 0
+                        fileStream.SetLength(0)
+
+                        Dim streamWriter As New IO.StreamWriter(fileStream)
+                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
+
+                        streamReader.Dispose()
+                    End Using
+                Catch ex As Exception
+                    ' Does nothing
+                End Try
+            End If
+        End Sub
+
         ''' <summary>Writes a log entry to the System Event Log.</summary>
         ''' <param name="logMessage">The text you want to have in your new System Event Log entry.</param>
         ''' <param name="logType">The type of log that you want your entry to be. The three major options are Error, Information, and Warning.</param>
