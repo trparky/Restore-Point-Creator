@@ -477,7 +477,6 @@
     Private Sub btnCleanLogFile_Click(sender As Object, e As EventArgs) Handles btnCleanLogFile.Click
         IO.File.Delete(Functions.eventLogFunctions.strLogFile)
         Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Log file cleaned by user {0}.", Environment.UserName), EventLogEntryType.Information)
-        loadEventLog()
     End Sub
 
     Private Sub logFileWatcher_Changed(sender As Object, e As IO.FileSystemEventArgs) Handles logFileWatcher.Changed
