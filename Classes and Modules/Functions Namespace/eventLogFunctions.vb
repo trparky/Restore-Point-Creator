@@ -10,9 +10,9 @@ Namespace Functions.eventLogFunctions
         Private boolCachedCanIWriteThereResults As Boolean = privilegeChecks.canIWriteThere(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData))
         Private shortNumberOfRecalledGetFileStreamFunction As Short = 0
 
-        Private Function getFileStreamWithWaiting(strFileToOpen As String, accessMethod As IO.FileAccess) As IO.FileStream
+        Private Function getFileStreamWithWaiting(strFileToOpen As String, accessMethod As IO.FileAccess, Optional fileMode As IO.FileMode = IO.FileMode.Open) As IO.FileStream
             Try
-                Return New IO.FileStream(strFileToOpen, IO.FileMode.Open, accessMethod, IO.FileShare.None)
+                Return New IO.FileStream(strFileToOpen, fileMode, accessMethod, IO.FileShare.None)
             Catch ex As IO.IOException
                 If shortNumberOfRecalledGetFileStreamFunction.Equals(20) Then
                     MsgBox("Unable to get file lock, we have exceeded our retry attempts.", MsgBoxStyle.Critical, "File Access Violation")
@@ -117,6 +117,30 @@ Namespace Functions.eventLogFunctions
             End Using
         End Sub
 
+        Private Sub createLogFile()
+            Try
+                Dim applicationLog As New List(Of restorePointCreatorExportedLog)
+                Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
+
+                applicationLog.Add(New restorePointCreatorExportedLog With {
+                    .logData = "Log file initialized.",
+                    .logType = EventLogEntryType.Information,
+                    .unixTime = Now.ToUniversalTime.toUNIXTimestamp,
+                    .logSource = "Restore Point Creator",
+                    .logID = applicationLog.Count
+                })
+
+                shortNumberOfRecalledGetFileStreamFunction = 0
+                Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.Write, IO.FileMode.Create)
+                    Using streamWriter As New IO.StreamWriter(fileStream)
+                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
+                    End Using
+                End Using
+            Catch ex As Exception
+                MsgBox(ex.Message)
+            End Try
+        End Sub
+
         ''' <summary>Writes a log entry to the System Event Log.</summary>
         ''' <param name="logMessage">The text you want to have in your new System Event Log entry.</param>
         ''' <param name="logType">The type of log that you want your entry to be. The three major options are Error, Information, and Warning.</param>
@@ -126,6 +150,8 @@ Namespace Functions.eventLogFunctions
                 Try
                     Dim applicationLog As New List(Of restorePointCreatorExportedLog)
                     Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
+
+                    If Not IO.File.Exists(strLogFile) Then createLogFile()
 
                     shortNumberOfRecalledGetFileStreamFunction = 0
                     Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.ReadWrite)
