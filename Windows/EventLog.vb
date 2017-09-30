@@ -142,7 +142,7 @@
                 workingThread.Start()
             Else
                 lblLogEntryCount.Text = "Entries in Event Log: 0"
-                lblProcessedIn.Text = "Processed in 0ms"
+                lblProcessedIn.Text = ""
                 lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
             End If
         End If
@@ -211,7 +211,7 @@
             lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(New IO.FileInfo(Functions.eventLogFunctions.strLogFile).Length)
         Else
             lblLogEntryCount.Text = "Entries in Event Log: 0"
-            lblProcessedIn.Text = "Processed in 0ms"
+            lblProcessedIn.Text = ""
             lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
         End If
 
@@ -294,7 +294,7 @@
             Else
                 eventLogList.Items.Clear()
                 lblLogEntryCount.Text = "Entries in Event Log: 0"
-                lblProcessedIn.Text = "Processed in 0ms"
+                lblProcessedIn.Text = ""
                 lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
             End If
         End If
