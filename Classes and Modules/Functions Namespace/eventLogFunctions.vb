@@ -92,6 +92,8 @@ Namespace Functions.eventLogFunctions
 
                 Dim longNumberOfImportedLogs As ULong = applicationLog.Count - longOldLogCount
 
+                If Not IO.File.Exists(strLogFile) Then createLogFile()
+
                 shortNumberOfRecalledGetFileStreamFunction = 0
                 Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.Write)
                     Using streamWriter As New IO.StreamWriter(fileStream)
@@ -110,11 +112,9 @@ Namespace Functions.eventLogFunctions
                     writeToSystemEventLog(String.Format("Converted log data to new log file format in {0}ms. No old log entries were detected.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information)
                 End If
             Catch ex As Exception
+            Finally
+                registryStuff.setBooleanValueInRegistry("Exported Old Logs", True)
             End Try
-
-            Using registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
-                registryKey.SetValue("Exported Old Logs", "True", RegistryValueKind.String)
-            End Using
         End Sub
 
         Private Sub createLogFile()

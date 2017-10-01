@@ -2131,11 +2131,11 @@ Public Class Form1
     End Sub
 
     Private Sub doOldLogFileConversionRoutineAndStartLoadingRestorePoints()
-        ' This code here checks to see if the log conversion has already taken place.
         Dim boolExportedOldLogs As Boolean = False
         Using registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
-            ' And this parses the value from the Registry into a Boolean value.
-            Boolean.TryParse(registryKey.GetValue("Exported Old Logs", "False"), boolExportedOldLogs)
+            If registryKey IsNot Nothing Then
+                boolExportedOldLogs = Functions.registryStuff.getBooleanValueFromRegistry(registryKey, "Exported Old Logs", False)
+            End If
         End Using
 
         ' This checks to see if we have converted the logs by checking the Boolean value we parsed above.
