@@ -107,6 +107,7 @@
             If timeStamp.Elapsed.Milliseconds < 1000 Then Threading.Thread.Sleep(1000 - timeStamp.Elapsed.Milliseconds)
 
             Me.Invoke(Sub()
+                          btnDeleteIndividualLogEntry.Enabled = False
                           lblLogEntryCount.Text = "Entries in Event Log: " & eventLogContents.Count.ToString("N0")
                           loadEventLogContentsIntoList()
 
@@ -453,6 +454,8 @@
                 End With
             Next
 
+            btnClear.Enabled = True
+
             If eventLogList.Items.Count <> 0 Then
                 Dim strEntriesFound As String
                 If eventLogList.Items.Count = 1 Then
@@ -476,11 +479,8 @@
             SaveFileDialog1.OverwritePrompt = True
 
             If SaveFileDialog1.ShowDialog = DialogResult.OK Then
-                Dim jsonEngine As New Web.Script.Serialization.JavaScriptSerializer
-
                 Dim logCount As ULong = 0
-                Dim timeStamp As New Stopwatch
-                timeStamp.Start()
+                Dim timeStamp As Stopwatch = Stopwatch.StartNew()
 
                 Functions.eventLogFunctions.exportLogsToFile(SaveFileDialog1.FileName, logCount)
 
@@ -498,6 +498,7 @@
     End Sub
 
     Private Sub btnClear_Click(sender As Object, e As EventArgs) Handles btnClear.Click
+        btnClear.Enabled = False
         loadEventLogContentsIntoList()
     End Sub
 

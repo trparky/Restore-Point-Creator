@@ -268,6 +268,7 @@ Partial Class eventLogForm
         Me.btnClear.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnClear.Enabled = False
         Me.btnClear.Image = Global.Restore_Point_Creator.My.Resources.Resources.edit_clear
         Me.btnClear.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnClear.Location = New System.Drawing.Point(212, 61)
