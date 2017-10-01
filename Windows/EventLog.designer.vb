@@ -39,9 +39,9 @@ Partial Class eventLogForm
         Me.chkMultiSelectMode = New System.Windows.Forms.CheckBox()
         Me.TableLayoutPanel2 = New System.Windows.Forms.TableLayoutPanel()
         Me.btnExportLogs = New System.Windows.Forms.Button()
-        Me.btnClear = New System.Windows.Forms.Button()
         Me.btnSearch = New System.Windows.Forms.Button()
         Me.btnDeleteIndividualLogEntry = New System.Windows.Forms.Button()
+        Me.btnClear = New System.Windows.Forms.Button()
         Me.chkAskMeToSubmitIfViewingAnExceptionEntry = New System.Windows.Forms.CheckBox()
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
         Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
@@ -205,12 +205,12 @@ Partial Class eventLogForm
         Me.TableLayoutPanel2.ColumnCount = 2
         Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel2.Controls.Add(Me.btnExportLogs, 0, 2)
+        Me.TableLayoutPanel2.Controls.Add(Me.btnExportLogs, 0, 1)
         Me.TableLayoutPanel2.Controls.Add(Me.btnCleanLogFile, 1, 0)
         Me.TableLayoutPanel2.Controls.Add(Me.btnRefreshEvents, 0, 0)
-        Me.TableLayoutPanel2.Controls.Add(Me.btnSearch, 0, 1)
         Me.TableLayoutPanel2.Controls.Add(Me.btnDeleteIndividualLogEntry, 1, 1)
         Me.TableLayoutPanel2.Controls.Add(Me.btnClear, 1, 2)
+        Me.TableLayoutPanel2.Controls.Add(Me.btnSearch, 0, 2)
         Me.TableLayoutPanel2.Location = New System.Drawing.Point(0, 178)
         Me.TableLayoutPanel2.Name = "TableLayoutPanel2"
         Me.TableLayoutPanel2.RowCount = 3
@@ -227,26 +227,12 @@ Partial Class eventLogForm
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnExportLogs.Image = Global.Restore_Point_Creator.My.Resources.Resources.save
         Me.btnExportLogs.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.btnExportLogs.Location = New System.Drawing.Point(3, 61)
+        Me.btnExportLogs.Location = New System.Drawing.Point(3, 32)
         Me.btnExportLogs.Name = "btnExportLogs"
-        Me.btnExportLogs.Size = New System.Drawing.Size(203, 26)
+        Me.btnExportLogs.Size = New System.Drawing.Size(203, 23)
         Me.btnExportLogs.TabIndex = 9
         Me.btnExportLogs.Text = "Export Application Event Logs"
         Me.btnExportLogs.UseVisualStyleBackColor = True
-        '
-        'btnClear
-        '
-        Me.btnClear.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnClear.Image = Global.Restore_Point_Creator.My.Resources.Resources.edit_clear
-        Me.btnClear.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.btnClear.Location = New System.Drawing.Point(212, 61)
-        Me.btnClear.Name = "btnClear"
-        Me.btnClear.Size = New System.Drawing.Size(204, 26)
-        Me.btnClear.TabIndex = 8
-        Me.btnClear.Text = "Clear Search Results"
-        Me.btnClear.UseVisualStyleBackColor = True
         '
         'btnSearch
         '
@@ -255,9 +241,9 @@ Partial Class eventLogForm
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnSearch.Image = Global.Restore_Point_Creator.My.Resources.Resources.view
         Me.btnSearch.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.btnSearch.Location = New System.Drawing.Point(3, 32)
+        Me.btnSearch.Location = New System.Drawing.Point(3, 61)
         Me.btnSearch.Name = "btnSearch"
-        Me.btnSearch.Size = New System.Drawing.Size(203, 23)
+        Me.btnSearch.Size = New System.Drawing.Size(203, 26)
         Me.btnSearch.TabIndex = 7
         Me.btnSearch.Text = "Search Event Log"
         Me.btnSearch.UseVisualStyleBackColor = True
@@ -276,6 +262,20 @@ Partial Class eventLogForm
         Me.btnDeleteIndividualLogEntry.TabIndex = 10
         Me.btnDeleteIndividualLogEntry.Text = "Delete Individual Log Entry"
         Me.btnDeleteIndividualLogEntry.UseVisualStyleBackColor = True
+        '
+        'btnClear
+        '
+        Me.btnClear.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnClear.Image = Global.Restore_Point_Creator.My.Resources.Resources.edit_clear
+        Me.btnClear.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnClear.Location = New System.Drawing.Point(212, 61)
+        Me.btnClear.Name = "btnClear"
+        Me.btnClear.Size = New System.Drawing.Size(204, 26)
+        Me.btnClear.TabIndex = 8
+        Me.btnClear.Text = "Clear Search Results"
+        Me.btnClear.UseVisualStyleBackColor = True
         '
         'chkAskMeToSubmitIfViewingAnExceptionEntry
         '
