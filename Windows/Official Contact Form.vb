@@ -1,5 +1,4 @@
 ﻿Imports System.ComponentModel
-Imports ICSharpCode.SharpZipLib.Zip
 
 Public Class Official_Contact_Form
     Protected Const apiAccessCode As String = "YWiIMIyGVVFEunRpDF5PNIF2yzcADdBxneRmWDlLpMTCoVFEunRWiIMIyRmWnRpDF"
@@ -30,15 +29,19 @@ Public Class Official_Contact_Form
 
         If boolDoWeHaveAttachments = True Then
             Try
-                Dim zipFileObject As ZipFile = ZipFile.Create(zipFilePath) ' Creates a new ZIP file.
-                zipFileObject.BeginUpdate() ' We need to open the ZIP file for writing.
-
-                For Each item As myListViewItemTypes.contactFormFileListItem In listAttachedFiles.Items
-                    zipFileObject.Add(item.strFileName, New IO.FileInfo(item.strFileName).Name) ' Adds the file to the ZIP file.
-                Next
-
-                zipFileObject.CommitUpdate() ' Commits the added file(s) to the ZIP file.
-                zipFileObject.Close() ' Closes the ZIPFile Object.
+                Using zipFileObject As IO.Compression.ZipArchive = IO.Compression.ZipFile.Open(zipFilePath, IO.Compression.ZipArchiveMode.Create)
+                    If zipFileObject Is Nothing Then
+                        MsgBox("There was an error while creating the ZIP file to contain your attached files, submission process aborted.", MsgBoxStyle.Critical, Me.Text)
+                        Exit Sub
+                    Else
+                        For Each item As myListViewItemTypes.contactFormFileListItem In listAttachedFiles.Items
+                            If Not Functions.support.addFileToZipFile(zipFileObject, item.strFileName) Then
+                                MsgBox("There was an error while writing the attached files to the ZIP file, submission process aborted.", MsgBoxStyle.Critical, Me.Text)
+                                Exit Sub
+                            End If
+                        Next
+                    End If
+                End Using
             Catch ex As Exception
                 enableFormElements()
                 Functions.eventLogFunctions.writeCrashToEventLog(ex)

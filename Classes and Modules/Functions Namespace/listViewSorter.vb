@@ -23,6 +23,8 @@ Namespace Functions.listViewSorter
             Dim strFirstString, strSecondString As String
             Dim lvFirstListView As ListViewItem = lvInputFirstListView
             Dim lvSecondListView As ListViewItem = lvInputSecondListView
+            Dim lvFirstListViewType As Type = lvFirstListView.GetType
+            Dim lvSecondListViewType As Type = lvSecondListView.GetType
 
             ' Get the sub-item values.
             If lvFirstListView.SubItems.Count <= intColumnNumber Then
@@ -46,24 +48,38 @@ Namespace Functions.listViewSorter
 
             ' Compare them.
             If soSortOrder = SortOrder.Ascending Then
-                If Double.TryParse(strFirstString, dbl1) And Double.TryParse(strSecondString, dbl2) Then
-                    Return dbl1.CompareTo(dbl2)
-                ElseIf Date.TryParse(strFirstString, date1) And Date.TryParse(strSecondString, date2) Then
-                    Return date1.CompareTo(date2)
-                ElseIf Long.TryParse(strFirstString, long1) And Long.TryParse(strSecondString, long2) Then
-                    Return long1.CompareTo(long2)
+                If lvFirstListViewType.Equals(GetType(myListViewItemTypes.volumeShadowCopyListItem)) And lvSecondListViewType.Equals(GetType(myListViewItemTypes.volumeShadowCopyListItem)) Then
+                    Dim vol1 As myListViewItemTypes.volumeShadowCopyListItem = DirectCast(lvFirstListView, myListViewItemTypes.volumeShadowCopyListItem)
+                    Dim vol2 As myListViewItemTypes.volumeShadowCopyListItem = DirectCast(lvSecondListView, myListViewItemTypes.volumeShadowCopyListItem)
+
+                    Return vol1.dateCreated.CompareTo(vol2.dateCreated)
                 Else
-                    Return String.Compare(strFirstString, strSecondString)
+                    If Double.TryParse(strFirstString, dbl1) And Double.TryParse(strSecondString, dbl2) Then
+                        Return dbl1.CompareTo(dbl2)
+                    ElseIf Date.TryParse(strFirstString, date1) And Date.TryParse(strSecondString, date2) Then
+                        Return date1.CompareTo(date2)
+                    ElseIf Long.TryParse(strFirstString, long1) And Long.TryParse(strSecondString, long2) Then
+                        Return long1.CompareTo(long2)
+                    Else
+                        Return String.Compare(strFirstString, strSecondString)
+                    End If
                 End If
             Else
-                If Double.TryParse(strFirstString, dbl1) And Double.TryParse(strSecondString, dbl2) Then
-                    Return dbl2.CompareTo(dbl1)
-                ElseIf Date.TryParse(strFirstString, date1) And Date.TryParse(strSecondString, date2) Then
-                    Return date2.CompareTo(date1)
-                ElseIf Long.TryParse(strFirstString, long1) And Long.TryParse(strSecondString, long2) Then
-                    Return long2.CompareTo(long1)
+                If lvFirstListViewType.Equals(GetType(myListViewItemTypes.volumeShadowCopyListItem)) And lvSecondListViewType.Equals(GetType(myListViewItemTypes.volumeShadowCopyListItem)) Then
+                    Dim vol1 As myListViewItemTypes.volumeShadowCopyListItem = DirectCast(lvFirstListView, myListViewItemTypes.volumeShadowCopyListItem)
+                    Dim vol2 As myListViewItemTypes.volumeShadowCopyListItem = DirectCast(lvSecondListView, myListViewItemTypes.volumeShadowCopyListItem)
+
+                    Return vol2.dateCreated.CompareTo(vol1.dateCreated)
                 Else
-                    Return String.Compare(strSecondString, strFirstString)
+                    If Double.TryParse(strFirstString, dbl1) And Double.TryParse(strSecondString, dbl2) Then
+                        Return dbl2.CompareTo(dbl1)
+                    ElseIf Date.TryParse(strFirstString, date1) And Date.TryParse(strSecondString, date2) Then
+                        Return date2.CompareTo(date1)
+                    ElseIf Long.TryParse(strFirstString, long1) And Long.TryParse(strSecondString, long2) Then
+                        Return long2.CompareTo(long1)
+                    Else
+                        Return String.Compare(strSecondString, strFirstString)
+                    End If
                 End If
             End If
         End Function

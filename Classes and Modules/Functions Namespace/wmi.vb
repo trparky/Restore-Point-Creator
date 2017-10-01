@@ -80,8 +80,8 @@ Namespace Functions.wmi
                     Return Nothing
                 End If
             Catch ex As Management.ManagementException
-                eventLogFunctions.writeCrashToEventLog(ex)
                 eventLogFunctions.writeToSystemEventLog("Unable to retrieve volumeID from WMI for system drive " & driveLetter & ".", EventLogEntryType.Error)
+                eventLogFunctions.writeCrashToEventLog(ex)
                 MsgBox("Unable to retrieve volumeID from WMI for system drive " & driveLetter & "." & vbCrLf & vbCrLf & "The program will now terminate.", MsgBoxStyle.Critical, "Restore Point Creator")
                 Process.GetCurrentProcess.Kill()
 
@@ -196,8 +196,8 @@ Namespace Functions.wmi
                 Try
                     Return APIs.systemRestore.StartRestore(restorePointName, restorePointType, restorePointID)
                 Catch ex6 As Exception
-                    eventLogFunctions.writeCrashToEventLog(ex6)
                     eventLogFunctions.writeToSystemEventLog("Unable to create system restore point. System permissions seem to not allow it.", EventLogEntryType.Error)
+                    eventLogFunctions.writeCrashToEventLog(ex6)
                     MsgBox("Unable to create system restore point. System permissions seem to not allow it.", MsgBoxStyle.Critical, "Error Creating System Restore Point")
 
                     Return APIs.errorCodes.ERROR_ACCESS_DENIED
@@ -265,19 +265,19 @@ Namespace Functions.wmi
 
         Private Function getRestorePointName(id As Long, ByRef boolResult As Boolean) As String
             Try
-                Dim managementObjectSearcher As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
+                Dim managementObjectSearcher As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore WHERE SequenceNumber = " & id.ToString)
 
                 If managementObjectSearcher IsNot Nothing Then
                     Dim managementObjectCollection As Management.ManagementObjectCollection = managementObjectSearcher.Get()
 
                     If managementObjectCollection IsNot Nothing Then
                         If managementObjectCollection.Count <> 0 Then
-                            For Each managementObject As Management.ManagementObject In managementObjectCollection
-                                If Long.Parse(managementObject("SequenceNumber").ToString) = id Then
-                                    boolResult = True
-                                    Return managementObject("Description").ToString.ToString
-                                End If
-                            Next
+                            boolResult = True
+                            Return managementObjectCollection(0)("Description").ToString
+                        Else
+                            eventLogFunctions.writeToSystemEventLog("Unable to find description for restore point ID " & id & ".", EventLogEntryType.Error)
+                            boolResult = False
+                            Return "ERROR_NO_DESCRIPTION"
                         End If
                     End If
                 End If
@@ -315,6 +315,7 @@ Namespace Functions.wmi
                             If systemRestoreIDs.Count = 0 Then
                                 newestSystemRestoreID = 0
                             Else
+                                systemRestoreIDs.Sort()
                                 newestSystemRestoreID = Integer.Parse(systemRestoreIDs.Item(systemRestoreIDs.Count - 1))
                             End If
                         Else

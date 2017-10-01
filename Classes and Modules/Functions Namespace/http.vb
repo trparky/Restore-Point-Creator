@@ -1,19 +1,15 @@
 ﻿Namespace Functions.http
     Module http
         Public Function checkForInternetConnection() As Boolean
-            If My.Computer.Network.IsAvailable = True Then
-                Return True
-            Else
-                Return False
-            End If
+            Return My.Computer.Network.IsAvailable
         End Function
 
         ''' <summary>Creates a User Agent String for this program to be used in HTTP requests.</summary>
         ''' <returns>String type.</returns>
         Private Function createHTTPUserAgentHeaderString() As String
-            If globalVariables.version.boolBeta = True Then
+            If globalVariables.version.boolBeta Then
                 Return String.Format("{0} version {1} Public Beta {2} on {3}", globalVariables.programName, globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion, osVersionInfo.getFullOSVersionString())
-            ElseIf globalVariables.version.boolReleaseCandidate = True Then
+            ElseIf globalVariables.version.boolReleaseCandidate Then
                 Return String.Format("{0} version {1} Release Candidate {2} on {3}", globalVariables.programName, globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion, osVersionInfo.getFullOSVersionString())
             Else
                 Return String.Format("{0} version {1} on {2}", globalVariables.programName, globalVariables.version.strFullVersionString, osVersionInfo.getFullOSVersionString())
@@ -24,17 +20,6 @@
             Try
                 Dim httpHelper As httpHelper = createNewHTTPHelperObject()
                 Dim downloadResult As Boolean = httpHelper.downloadFile(urlToDownloadFrom, memStream, False)
-                If Not downloadResult Then eventLogFunctions.writeCrashToEventLog(httpHelper.getLastException)
-                Return downloadResult
-            Catch ex As Exception
-                Return False
-            End Try
-        End Function
-
-        Public Function downloadFile(urlToDownloadFrom As String, localFileName As String) As Boolean
-            Try
-                Dim httpHelper As httpHelper = createNewHTTPHelperObject()
-                Dim downloadResult As Boolean = httpHelper.downloadFile(urlToDownloadFrom, localFileName, False)
                 If Not downloadResult Then eventLogFunctions.writeCrashToEventLog(httpHelper.getLastException)
                 Return downloadResult
             Catch ex As Exception

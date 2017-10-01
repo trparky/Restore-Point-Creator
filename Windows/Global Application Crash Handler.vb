@@ -140,7 +140,7 @@ Public Class frmCrash
 
         httpHelper.addPOSTData("crashdata", txtStackTrace.Text)
 
-        If txtDoing.Text.Trim IsNot Nothing Then
+        If Not String.IsNullOrEmpty(txtDoing.Text.Trim) Then
             httpHelper.addPOSTData("doing", txtDoing.Text)
         End If
 

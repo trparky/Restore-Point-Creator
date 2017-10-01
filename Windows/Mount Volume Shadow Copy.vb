@@ -1,6 +1,8 @@
 ﻿Imports System.Management
 
 Public Class Mount_Volume_Shadow_Copy
+    Private m_SortingColumn As ColumnHeader
+
     Private Sub Mount_Volume_Shadow_Copy_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         My.Settings.mountVolumeShadowCopyWindowPosition = Me.Location
         If IO.Directory.Exists(globalVariables.shadowCopyMountFolder) Then IO.Directory.Delete(globalVariables.shadowCopyMountFolder)
@@ -19,7 +21,11 @@ Public Class Mount_Volume_Shadow_Copy
         For Each queryObj As ManagementObject In searcher.Get()
             timeCreated = Functions.restorePointStuff.parseSystemRestorePointCreationDate(queryObj("InstallDate").ToString).ToUniversalTime
 
-            listShadowCopyIDs.Items.Add(New myListViewItemTypes.volumeShadowCopyListItem() With {.Text = (timeCreated.ToLongDateString & " at " & timeCreated.ToLongTimeString).Trim, .deviceID = queryObj("DeviceObject").ToString})
+            listShadowCopyIDs.Items.Add(New myListViewItemTypes.volumeShadowCopyListItem() With {
+                                            .Text = (timeCreated.ToLongDateString & " at " & timeCreated.ToLongTimeString).Trim,
+                                            .deviceID = queryObj("DeviceObject").ToString,
+                                            .dateCreated = timeCreated
+                                        })
 
             timeCreated = Nothing
         Next
@@ -32,6 +38,7 @@ Public Class Mount_Volume_Shadow_Copy
         Me.Location = Functions.support.verifyWindowLocation(My.Settings.mountVolumeShadowCopyWindowPosition)
         lblMainLabel.Text = String.Format(lblMainLabel.Text, Environment.GetFolderPath(Environment.SpecialFolder.Windows).Substring(0, 3).ToUpper)
         loadSnapshots()
+        applySavedSorting()
     End Sub
 
     Private Sub listShadowCopyIDs_SelectedIndexChanged(sender As Object, e As EventArgs) Handles listShadowCopyIDs.SelectedIndexChanged
@@ -80,5 +87,99 @@ Public Class Mount_Volume_Shadow_Copy
 
     Private Sub btnRefreshList_Click(sender As Object, e As EventArgs) Handles btnRefreshList.Click
         loadSnapshots()
+    End Sub
+
+    Private Sub listShadowCopyIDs_ColumnClick(sender As Object, e As ColumnClickEventArgs) Handles listShadowCopyIDs.ColumnClick
+        ' Get the new sorting column.
+        Dim new_sorting_column As ColumnHeader = listShadowCopyIDs.Columns(e.Column)
+
+        ' Figure out the new sorting order.
+        Dim sort_order As SortOrder
+        If (m_SortingColumn Is Nothing) Then
+            ' New column. Sort ascending.
+            sort_order = SortOrder.Ascending
+            My.Settings.mountShadowCopySortingOrder = SortOrder.Ascending
+        Else
+            ' See if this is the same column.
+            If new_sorting_column.Equals(m_SortingColumn) Then
+                ' Same column. Switch the sort order.
+                If m_SortingColumn.Text.StartsWith("> ") Then
+                    sort_order = SortOrder.Descending
+                    My.Settings.mountShadowCopySortingOrder = SortOrder.Descending
+                Else
+                    sort_order = SortOrder.Ascending
+                    My.Settings.mountShadowCopySortingOrder = SortOrder.Ascending
+                End If
+            Else
+                ' New column. Sort ascending.
+                sort_order = SortOrder.Ascending
+                My.Settings.mountShadowCopySortingOrder = SortOrder.Ascending
+            End If
+
+            ' Remove the old sort indicator.
+            m_SortingColumn.Text = m_SortingColumn.Text.Substring(2)
+        End If
+
+        ' Display the new sort order.
+        m_SortingColumn = new_sorting_column
+        If sort_order = SortOrder.Ascending Then
+            m_SortingColumn.Text = "> " & m_SortingColumn.Text
+        Else
+            m_SortingColumn.Text = "< " & m_SortingColumn.Text
+        End If
+
+        ' Create a comparer.
+        listShadowCopyIDs.ListViewItemSorter = New Functions.listViewSorter.ListViewComparer(e.Column, sort_order)
+
+        ' Sort.
+        listShadowCopyIDs.Sort()
+    End Sub
+
+    Sub applySavedSorting()
+        ' Some data validation.
+        If My.Settings.mountShadowCopySortingOrder <> 1 And My.Settings.mountShadowCopySortingOrder <> 2 Then
+            My.Settings.mountShadowCopySortingOrder = 2
+        End If
+        ' Some data validation.
+
+        ' Get the new sorting column.
+        Dim new_sorting_column As ColumnHeader = listShadowCopyIDs.Columns(0)
+        Dim sort_order As SortOrder = My.Settings.mountShadowCopySortingOrder
+
+        ' Figure out the new sorting order.
+        If (m_SortingColumn IsNot Nothing) Then
+            ' See if this is the same column.
+            If new_sorting_column.Equals(m_SortingColumn) Then
+                ' Same column. Switch the sort order.
+                If m_SortingColumn.Text.StartsWith("> ") Then
+                    sort_order = SortOrder.Descending
+                    My.Settings.mountShadowCopySortingOrder = SortOrder.Descending
+                Else
+                    sort_order = SortOrder.Ascending
+                    My.Settings.mountShadowCopySortingOrder = SortOrder.Ascending
+                End If
+            Else
+                ' New column. Sort ascending.
+                sort_order = SortOrder.Ascending
+                My.Settings.mountShadowCopySortingOrder = SortOrder.Ascending
+            End If
+
+            ' Remove the old sort indicator.
+            m_SortingColumn.Text = m_SortingColumn.Text.Substring(2)
+        End If
+
+        ' Display the new sort order.
+        m_SortingColumn = new_sorting_column
+        If sort_order = SortOrder.Ascending Then
+            m_SortingColumn.Text = "> " & m_SortingColumn.Text
+        Else
+            m_SortingColumn.Text = "< " & m_SortingColumn.Text
+        End If
+
+        ' Create a comparer.
+        listShadowCopyIDs.ListViewItemSorter = New Functions.listViewSorter.ListViewComparer(My.Settings.mountShadowCopySortingOrder, sort_order)
+
+        ' Sort.
+        listShadowCopyIDs.Sort()
     End Sub
 End Class

@@ -4,7 +4,6 @@ Imports System.Text.RegularExpressions
 Imports System.Text
 Imports System.Runtime.InteropServices
 Imports System.Management
-Imports ICSharpCode.SharpZipLib.Zip
 #End Region
 
 Public Class Form1
@@ -306,7 +305,7 @@ Public Class Form1
 
             If String.IsNullOrEmpty(defaultCustomRestorePointName.Trim) = False And Functions.support.areWeInSafeMode() = False Then btnCreateRestorePointNameWithDefaultName.Visible = True
 
-            If My.Settings.updateChannel = globalVariables.updateChannels.stable Then
+            If My.Settings.updateChannel.Equals(globalVariables.updateChannels.stable, StringComparison.OrdinalIgnoreCase) Then
                 toolStripStableChannel.Checked = True
                 lineUnderRC.Visible = False
                 OnlyGiveMeReleaseCandidates.Visible = False
@@ -320,12 +319,12 @@ Public Class Form1
                         deleteAtReboot.dispose(True)
                     End Try
                 End If
-            ElseIf My.Settings.updateChannel = globalVariables.updateChannels.beta Then
+            ElseIf My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta, StringComparison.OrdinalIgnoreCase) Then
                 toolStripBetaChannel.Checked = True
                 lineUnderRC.Visible = True
                 OnlyGiveMeReleaseCandidates.Visible = True
                 OnlyGiveMeReleaseCandidates.Checked = My.Settings.onlyGiveMeRCs
-            ElseIf My.Settings.updateChannel = globalVariables.updateChannels.tom Then
+            ElseIf My.Settings.updateChannel.Equals(globalVariables.updateChannels.tom, StringComparison.OrdinalIgnoreCase) Then
                 ToolStripMenuItemPrivateForTom.Checked = True
                 lineUnderRC.Visible = True
                 OnlyGiveMeReleaseCandidates.Visible = True
@@ -662,7 +661,8 @@ Public Class Form1
             .versionUpdate = versionUpdateType,
             .remoteVersion = remoteVersion,
             .remoteBuild = remoteBuild,
-            .strRemoteBetaRCVersion = strRemoteBetaRCVersion
+            .strRemoteBetaRCVersion = strRemoteBetaRCVersion,
+            .TopMost = True
         }
 
         updateMessageDialog.ShowDialog()
@@ -878,13 +878,25 @@ Public Class Form1
 
             Dim strNewApplicationFileNameFullName As String = New IO.FileInfo(Application.ExecutablePath).FullName & ".new.exe"
 
+            If IO.File.Exists(strNewApplicationFileNameFullName) Then
+                Try
+                    IO.File.Delete(strNewApplicationFileNameFullName)
+                Catch ex As Exception
+                    Me.Invoke(Sub() closePleaseWaitPanel())
+                    MsgBox("An existing new program executable file has been found, we tried to delete it but we couldn't. Please see the Application Event Log for more details.", MsgBoxStyle.Critical, strMessageBoxTitle)
+                    Functions.eventLogFunctions.writeToSystemEventLog("An existing new program executable file has been found, we tried to delete it but we couldn't.", EventLogEntryType.Error)
+                    Functions.eventLogFunctions.writeCrashToEventLog(ex)
+                    Exit Sub
+                End Try
+            End If
+
             memoryStream.Position = 0
-            Dim zipFileObject As New ZipFile(memoryStream)
+            Dim zipFileObject As New IO.Compression.ZipArchive(memoryStream, IO.Compression.ZipArchiveMode.Read)
 
             If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.programFileNameInZIP, strNewApplicationFileNameFullName) = False Then
                 MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, strMessageBoxTitle)
 
-                zipFileObject.Close()
+                zipFileObject.Dispose()
                 memoryStream.Close()
                 memoryStream.Dispose()
                 memoryStream = Nothing
@@ -894,14 +906,14 @@ Public Class Form1
             If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.pdbFileNameInZIP, globalVariables.pdbFileNameInZIP & ".new") = False Then
                 MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, strMessageBoxTitle)
 
-                zipFileObject.Close()
+                zipFileObject.Dispose()
                 memoryStream.Close()
                 memoryStream.Dispose()
                 memoryStream = Nothing
                 Exit Sub
             End If
 
-            zipFileObject.Close()
+            zipFileObject.Dispose()
             memoryStream.Close()
             memoryStream.Dispose()
             memoryStream = Nothing
@@ -1371,6 +1383,18 @@ Public Class Form1
 
         Dim strNewApplicationFileNameFullName As String = New IO.FileInfo(Application.ExecutablePath).FullName & ".new.exe"
 
+        If IO.File.Exists(strNewApplicationFileNameFullName) Then
+            Try
+                IO.File.Delete(strNewApplicationFileNameFullName)
+            Catch ex As Exception
+                Me.Invoke(Sub() closePleaseWaitPanel())
+                MsgBox("An existing new program executable file has been found, we tried to delete it but we couldn't. Please see the Application Event Log for more details.", MsgBoxStyle.Critical, strMessageBoxTitle)
+                Functions.eventLogFunctions.writeToSystemEventLog("An existing new program executable file has been found, we tried to delete it but we couldn't.", EventLogEntryType.Error)
+                Functions.eventLogFunctions.writeCrashToEventLog(ex)
+                Exit Sub
+            End Try
+        End If
+
         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
             Functions.eventLogFunctions.writeToSystemEventLog("Setting position for the IO.MemoryStream() back to the beginning of the stream to ready it for file extraction.", EventLogEntryType.Information)
         End If
@@ -1381,7 +1405,7 @@ Public Class Form1
             Functions.eventLogFunctions.writeToSystemEventLog("Opening ZIP file package in system RAM for file extractions.", EventLogEntryType.Information)
         End If
 
-        Dim zipFileObject As New ZipFile(memoryStream) ' Create a new ZIPFile Object.
+        Dim zipFileObject As New IO.Compression.ZipArchive(memoryStream, IO.Compression.ZipArchiveMode.Read) ' Create a new ZIPFile Object.
 
         If extractPDB = True Then
             If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.pdbFileNameInZIP, globalVariables.pdbFileNameInZIP & ".new") = False Then
@@ -1393,7 +1417,7 @@ Public Class Form1
                     Functions.eventLogFunctions.writeToSystemEventLog("Closing out ZIP File Object and freeing up memory.", EventLogEntryType.Information)
                 End If
 
-                zipFileObject.Close() ' This closes our ZIPFile Object.
+                zipFileObject.Dispose() ' This closes our ZIPFile Object.
                 memoryStream.Close()
                 memoryStream.Dispose()
                 memoryStream = Nothing
@@ -1413,7 +1437,7 @@ Public Class Form1
                 Functions.eventLogFunctions.writeToSystemEventLog("Closing out ZIP File Object and freeing up memory.", EventLogEntryType.Information)
             End If
 
-            zipFileObject.Close() ' This closes our ZIPFile Object.
+            zipFileObject.Dispose() ' This closes our ZIPFile Object.
             memoryStream.Close()
             memoryStream.Dispose()
             memoryStream = Nothing
@@ -1427,7 +1451,7 @@ Public Class Form1
             Functions.eventLogFunctions.writeToSystemEventLog("Closing out ZIP File Object and freeing up memory.", EventLogEntryType.Information)
         End If
 
-        zipFileObject.Close() ' This closes our ZIPFile Object.
+        zipFileObject.Dispose() ' This closes our ZIPFile Object.
         memoryStream.Close()
         memoryStream.Dispose()
         memoryStream = Nothing
@@ -2103,14 +2127,60 @@ Public Class Form1
 
         Threading.Thread.Sleep(750)
 
-        openPleaseWaitPanel("Loading Restore Points... Please Wait.")
-        Threading.ThreadPool.QueueUserWorkItem(AddressOf startSystemRestorePointListLoadThreadSub)
+        doOldLogFileConversionRoutineAndStartLoadingRestorePoints()
+    End Sub
+
+    Private Sub doOldLogFileConversionRoutineAndStartLoadingRestorePoints()
+        ' This code here checks to see if the log conversion has already taken place.
+        Dim boolExportedOldLogs As Boolean = False
+        Using registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+            ' And this parses the value from the Registry into a Boolean value.
+            Boolean.TryParse(registryKey.GetValue("Exported Old Logs", "False"), boolExportedOldLogs)
+        End Using
+
+        ' This checks to see if we have converted the logs by checking the Boolean value we parsed above.
+        If boolExportedOldLogs Then
+            ' OK, so the log have already been converted so we just load the restore points.
+            openPleaseWaitPanel("Loading Restore Points... Please Wait.")
+            Threading.ThreadPool.QueueUserWorkItem(AddressOf startSystemRestorePointListLoadThreadSub)
+        Else
+            ' The log hasn't been converted yet so let's do it now.
+
+            ' Open a Please Wait panel to tell the user that we have to do some work.
+            openPleaseWaitPanel("Converting old application logs... Please wait.")
+
+            ' Start a background thread to do the work.
+            Threading.ThreadPool.QueueUserWorkItem(Sub()
+                                                       ' This calls the function that converts the logs.
+                                                       Functions.eventLogFunctions.getOldLogsFromWindowsEventLog()
+
+                                                       ' Now we need to do some work on the main thread.
+                                                       Me.Invoke(Sub()
+                                                                     closePleaseWaitPanel() ' First we close the Please Wait panel.
+                                                                     openPleaseWaitPanel("Loading Restore Points... Please Wait.") ' And open a new one.
+                                                                 End Sub)
+
+                                                       ' Now we load the restore points.
+                                                       startSystemRestorePointListLoadThreadSub()
+                                                   End Sub)
+        End If
     End Sub
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Control.CheckForIllegalCrossThreadCalls = False
-
         verifyUpdateChannel()
+
+        ' This code checks to see if the current version is a beta or Release Candidate and if the user's update channel is already set to beta mode.
+        ' If the user's update channel isn't set to beta mode we then set it for the user here.
+        If (globalVariables.version.boolBeta Or globalVariables.version.boolReleaseCandidate) And Not My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta, StringComparison.OrdinalIgnoreCase) Then
+            My.Settings.updateChannel = globalVariables.updateChannels.beta ' Changes the update channel to beta.
+        End If
+
+        If globalVariables.version.boolBeta Or globalVariables.version.boolReleaseCandidate Then
+            toolStripStableChannel.Enabled = False
+            toolStripStableChannel.Text &= " (Disabled)"
+        End If
+
+        Control.CheckForIllegalCrossThreadCalls = False
 
         If IO.File.Exists("tom") Then
             ToolStripMenuItemPrivateForTom.Visible = True
@@ -2127,9 +2197,9 @@ Public Class Form1
             NotifyIcon1.Icon = My.Resources.RestorePoint_noBackground_2
 
             Try
-                ' Checks to see if the user is running Windows 7, Windows 8, Windows 8.1, or Windows 10 and then proceeds to add the Jumplist Tasks.
-                ' Earlier versions of Windows don't support this option so there's a check for what OS the user is running before adding them.
-                If Environment.OSVersion.ToString.Contains("10") Or Environment.OSVersion.ToString.Contains("6.4") Or Environment.OSVersion.ToString.Contains("6.3") Or Environment.OSVersion.ToString.Contains("6.2") Or Environment.OSVersion.ToString.Contains("6.1") Then
+                ' Checks to see if the user is running Windows 7, Windows 8.x, or Windows 10 and then proceeds to add the Jumplist Tasks. Earlier
+                ' versions of Windows don't support this option so there's a check for what OS the user is running before adding them.
+                If Functions.osVersionInfo.isThisWindows10() Or Functions.osVersionInfo.isThisWindows8x() Or Functions.osVersionInfo.isThisWindows7() Then
                     createJumpListTaskItems()
                 End If
             Catch ex As Exception
@@ -2142,12 +2212,12 @@ Public Class Form1
 
             deleteRPLifeIntervalValue()
 
-            If Functions.osVersionInfo.isThisWindows10 = True Or Functions.osVersionInfo.isThisWindows8x() = True Then
+            If Functions.osVersionInfo.isThisWindows10 Or Functions.osVersionInfo.isThisWindows8x() Then
                 addRPGlobalInterval()
                 addRPSessionInterval()
             End If
 
-            If (Environment.OSVersion.ToString.Contains("6.2") Or Environment.OSVersion.ToString.Contains("6.3") Or Environment.OSVersion.ToString.Contains("6.4") Or Environment.OSVersion.ToString.Contains("10")) Then ' This checks to see if we are running Windows 8, 8.1, or 10.
+            If Functions.osVersionInfo.isThisWindows10() Or Functions.osVersionInfo.isThisWindows8x() Then ' This checks to see if we are running Windows 8.x or Windows 10.
                 addSpecialRegistryKeysToWindows8ToFixWindows8SystemRestorePoint()
             End If
 
@@ -2206,8 +2276,8 @@ Public Class Form1
 
     Private Sub handleConfigFileAccessViolation(ex As IO.IOException)
         If ex.Message.caseInsensitiveContains("user.config") Then
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
             Functions.eventLogFunctions.writeToSystemEventLog("Unable to open application settings file, it appears to be locked by another process.", EventLogEntryType.Error)
+            Functions.eventLogFunctions.writeCrashToEventLog(ex)
             MsgBox("Unable to open application settings file, it appears to be locked by another process." & vbCrLf & vbCrLf & "The program will now close.", MsgBoxStyle.Critical, "Restore Point Creator")
 
             Process.GetCurrentProcess.Kill()

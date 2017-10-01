@@ -58,7 +58,7 @@ Namespace Functions.restorePointStuff
                 hour = Integer.Parse(.Groups("hour").Value)
             End With
 
-            If boolFullDateParsing = True Then
+            If boolFullDateParsing Then
                 Return New DateTime(year, month, day, hour, minute, second, DateTimeKind.Utc).ToLocalTime
             Else
                 Return New Date(year, month, day)
@@ -75,10 +75,10 @@ Namespace Functions.restorePointStuff
                 ' Get all System Restore Points from the Windows Management System and puts then in the systemRestorePoints variable.
                 Dim systemRestorePoints As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore WHERE SequenceNumber = " & restorePointID)
 
-                If systemRestorePoints.Get().Count <> 0 Then
-                    Return parseSystemRestorePointCreationDate(systemRestorePoints.Get(0)("CreationTime").ToString, True)
-                Else
+                If systemRestorePoints.Get().Count = 0 Then
                     Return Nothing
+                Else
+                    Return parseSystemRestorePointCreationDate(systemRestorePoints.Get(0)("CreationTime").ToString, True)
                 End If
             Catch ex As Exception
                 Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
@@ -106,7 +106,7 @@ Namespace Functions.restorePointStuff
                 Dim restorePointsOnSystemManagementObjectCollection As Management.ManagementObjectCollection = systemRestorePointsManagementObjectSearcher.Get()
 
                 If restorePointsOnSystemManagementObjectCollection IsNot Nothing Then
-                    If (restorePointsOnSystemManagementObjectCollection.Count = 0) = False Then
+                    If restorePointsOnSystemManagementObjectCollection.Count <> 0 Then
                         restorePoints.AppendLine("Number of Restore Points: " & restorePointsOnSystemManagementObjectCollection.Count)
                         restorePoints.AppendLine("=========================")
                         For Each restorePointDetails As Management.ManagementObject In restorePointsOnSystemManagementObjectCollection

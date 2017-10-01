@@ -1,5 +1,4 @@
 ﻿Imports System.Text.RegularExpressions
-Imports ICSharpCode.SharpZipLib.Zip
 Imports System.Xml
 
 Namespace Functions.support
@@ -23,6 +22,20 @@ Namespace Functions.support
                 If Not control.GetType.Equals(GetType(Timer)) And Not control.Name.caseInsensitiveContains("pleasewait") Then control.Enabled = False
             Next
         End Sub
+
+        Public Function randomStringGenerator(length As Integer)
+            Dim random As Random = New Random()
+            Dim builder As New Text.StringBuilder()
+            Dim ch As Char
+            Dim legalCharacters As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"
+
+            For cntr As Integer = 0 To length
+                ch = legalCharacters.Substring(random.Next(0, legalCharacters.Length), 1)
+                builder.Append(ch)
+            Next
+
+            Return builder.ToString()
+        End Function
 
         Public Function getDWMGlassColor() As Color
             Try
@@ -172,7 +185,7 @@ Namespace Functions.support
 
         Public Function convertErrorCodeToHex(input As Long) As String
             Try
-                Dim strHexValue As String = input.ToString("x").caseInsensitiveReplace("ffffffff", "0x").ToString.ToUpper
+                Dim strHexValue As String = input.ToString("x").ToUpper.caseInsensitiveReplace("ffffffff", "0x").ToString
                 If Not strHexValue.StartsWith("0x", StringComparison.OrdinalIgnoreCase) Then strHexValue = "0x" & strHexValue
                 Return strHexValue
             Catch ex As Exception
@@ -210,71 +223,89 @@ Namespace Functions.support
                     GetType(IO.DirectoryNotFoundException),
                     GetType(Management.ManagementException),
                     GetType(ObjectDisposedException),
-                    GetType(StackOverflowException)
+                    GetType(StackOverflowException),
+                    GetType(PlatformNotSupportedException),
+                    GetType(NotSupportedException)
                 }
 
                 If listExceptionTypes.Contains(exceptionType) Then
-                        stringBuilder.AppendLine()
-                        stringBuilder.AppendLine("Additional " & rawExceptionObject.GetType.ToString & " Data")
+                    stringBuilder.AppendLine()
+                    stringBuilder.AppendLine("Additional " & rawExceptionObject.GetType.ToString & " Data")
 
-                        If exceptionType.Equals(GetType(IO.FileNotFoundException)) Then
-                            Dim FileNotFoundExceptionObject As IO.FileNotFoundException = DirectCast(rawExceptionObject, IO.FileNotFoundException)
-                            stringBuilder.AppendLine("Name of File: " & FileNotFoundExceptionObject.FileName)
+                    If exceptionType.Equals(GetType(IO.FileNotFoundException)) Then
+                        Dim FileNotFoundExceptionObject As IO.FileNotFoundException = DirectCast(rawExceptionObject, IO.FileNotFoundException)
+                        stringBuilder.AppendLine("Name of File: " & FileNotFoundExceptionObject.FileName)
 
-                            If Not String.IsNullOrEmpty(FileNotFoundExceptionObject.FusionLog) Then
-                                stringBuilder.AppendLine("Reason: " & FileNotFoundExceptionObject.FusionLog)
-                            End If
-                        ElseIf exceptionType.Equals(GetType(IO.DirectoryNotFoundException)) Then
-                            Dim DirectoryNotFoundExceptionObject As IO.DirectoryNotFoundException = DirectCast(rawExceptionObject, IO.DirectoryNotFoundException)
-                            stringBuilder.AppendLine("Source: " & DirectoryNotFoundExceptionObject.Source)
-                            addJSONedExtendedExceptionDataPackage(DirectoryNotFoundExceptionObject, stringBuilder)
-                        ElseIf exceptionType.Equals(GetType(myExceptions.integerTryParseException)) Then
-                            stringBuilder.AppendLine("String that could not be parsed into an Integer: " & DirectCast(rawExceptionObject, myExceptions.integerTryParseException).strThatCouldNotBeParsedIntoAnInteger)
-                        ElseIf exceptionType.Equals(GetType(XmlException)) Then
-                            Dim XmlExceptionObject As XmlException = DirectCast(rawExceptionObject, XmlException)
-                            stringBuilder.AppendLine("Line Number: " & XmlExceptionObject.LineNumber)
-                            stringBuilder.AppendLine("Line Position: " & XmlExceptionObject.LinePosition)
-
-                            addJSONedExtendedExceptionDataPackage(XmlExceptionObject, stringBuilder)
-                        ElseIf exceptionType.Equals(GetType(XPath.XPathException)) Then
-                            Dim XPathExceptionExceptionObject As XPath.XPathException = DirectCast(rawExceptionObject, XPath.XPathException)
-                            addJSONedExtendedExceptionDataPackage(XPathExceptionExceptionObject, stringBuilder)
-                        ElseIf exceptionType.Equals(GetType(IO.FileLoadException)) Then
-                            Dim FileLoadExceptionObject As IO.FileLoadException = DirectCast(rawExceptionObject, IO.FileLoadException)
-                            stringBuilder.AppendLine("Unable to Load Assembly File: " & FileLoadExceptionObject.FileName)
-
-                            If Not String.IsNullOrEmpty(FileLoadExceptionObject.FusionLog) Then
-                                stringBuilder.AppendLine("Reason why assembly couldn't be loaded: " & FileLoadExceptionObject.FusionLog)
-                            End If
-                        ElseIf exceptionType.Equals(GetType(Runtime.InteropServices.COMException)) Then
-                            Dim COMExceptionObject As Runtime.InteropServices.COMException = DirectCast(rawExceptionObject, Runtime.InteropServices.COMException)
-                            stringBuilder.AppendLine("Source: " & COMExceptionObject.Source)
-                            stringBuilder.AppendLine("Error Code: " & COMExceptionObject.ErrorCode)
-                        ElseIf exceptionType.Equals(GetType(ObjectDisposedException)) Then
-                            Dim ObjectDisposedExceptionObject As ObjectDisposedException = DirectCast(rawExceptionObject, ObjectDisposedException)
-                            stringBuilder.AppendLine("Source: " & ObjectDisposedExceptionObject.Source)
-                            stringBuilder.AppendLine("Object Name: " & ObjectDisposedExceptionObject.ObjectName)
-                        ElseIf exceptionType.Equals(GetType(IO.IOException)) Then
-                            stringBuilder.AppendLine("Source: " & DirectCast(rawExceptionObject, IO.IOException).Source)
-                        ElseIf exceptionType.Equals(GetType(ArgumentOutOfRangeException)) Then
-                            Dim ArgumentOutOfRangeExceptionObject As ArgumentOutOfRangeException = DirectCast(rawExceptionObject, ArgumentOutOfRangeException)
-                            stringBuilder.AppendLine("Parameter Name: " & ArgumentOutOfRangeExceptionObject.ParamName)
-                            stringBuilder.AppendLine("Parameter Value: " & ArgumentOutOfRangeExceptionObject.ActualValue)
-                        ElseIf exceptionType.Equals(GetType(ArgumentException)) Then
-                            stringBuilder.AppendLine("Parameter Name: " & DirectCast(rawExceptionObject, ArgumentException).ParamName)
-                        ElseIf exceptionType.Equals(GetType(ComponentModel.Win32Exception)) Then
-                            Dim Win32ExceptionObject As ComponentModel.Win32Exception = DirectCast(rawExceptionObject, ComponentModel.Win32Exception)
-                            stringBuilder.AppendLine(String.Format("Error Code: {0} ({1})", Win32ExceptionObject.ErrorCode, convertErrorCodeToHex(Win32ExceptionObject.ErrorCode)))
-                            stringBuilder.AppendLine(String.Format("Native Error Code: {0} ({1})", Win32ExceptionObject.NativeErrorCode, convertErrorCodeToHex(Win32ExceptionObject.NativeErrorCode)))
-                        ElseIf exceptionType.Equals(GetType(StackOverflowException)) Then
-                            Dim StackOverflowExceptionObject As StackOverflowException = DirectCast(rawExceptionObject, StackOverflowException)
-                            stringBuilder.AppendLine(String.Format("Source: {0}", StackOverflowExceptionObject.Source))
-                            addJSONedExtendedExceptionDataPackage(StackOverflowExceptionObject, stringBuilder)
+                        If Not String.IsNullOrEmpty(FileNotFoundExceptionObject.FusionLog) Then
+                            stringBuilder.AppendLine("Reason: " & FileNotFoundExceptionObject.FusionLog)
                         End If
+                    ElseIf exceptionType.Equals(GetType(PlatformNotSupportedException)) Then
+                        stringBuilder.AppendLine("Source: " & DirectCast(rawExceptionObject, PlatformNotSupportedException).Source)
+                    ElseIf exceptionType.Equals(GetType(NotSupportedException)) Then
+                        stringBuilder.AppendLine("Source: " & DirectCast(rawExceptionObject, NotSupportedException).Source)
+                    ElseIf exceptionType.Equals(GetType(Management.ManagementException)) Then
+                        Dim ManagementExceptionObject As Management.ManagementException = DirectCast(rawExceptionObject, Management.ManagementException)
+                        stringBuilder.AppendLine("Source: " & ManagementExceptionObject.Source)
 
-                        addJSONedExtendedExceptionDataPackage(rawExceptionObject, stringBuilder)
-                        stringBuilder.AppendLine()
+                        Try
+                            Dim intErrorCode As Integer = ManagementExceptionObject.ErrorCode
+                            stringBuilder.AppendLine(String.Format("Error Code: {0} (0x{1})", intErrorCode.ToString(), intErrorCode.ToString("X")))
+                        Catch ex As Exception
+                        End Try
+
+                        addJSONedExtendedExceptionDataPackage(ManagementExceptionObject, stringBuilder)
+                    ElseIf exceptionType.Equals(GetType(IO.DirectoryNotFoundException)) Then
+                        Dim DirectoryNotFoundExceptionObject As IO.DirectoryNotFoundException = DirectCast(rawExceptionObject, IO.DirectoryNotFoundException)
+                        stringBuilder.AppendLine("Source: " & DirectoryNotFoundExceptionObject.Source)
+                        addJSONedExtendedExceptionDataPackage(DirectoryNotFoundExceptionObject, stringBuilder)
+                    ElseIf exceptionType.Equals(GetType(myExceptions.integerTryParseException)) Then
+                        stringBuilder.AppendLine("String that could not be parsed into an Integer: " & DirectCast(rawExceptionObject, myExceptions.integerTryParseException).strThatCouldNotBeParsedIntoAnInteger)
+                    ElseIf exceptionType.Equals(GetType(XmlException)) Then
+                        Dim XmlExceptionObject As XmlException = DirectCast(rawExceptionObject, XmlException)
+                        stringBuilder.AppendLine("Line Number: " & XmlExceptionObject.LineNumber)
+                        stringBuilder.AppendLine("Line Position: " & XmlExceptionObject.LinePosition)
+
+                        addJSONedExtendedExceptionDataPackage(XmlExceptionObject, stringBuilder)
+                    ElseIf exceptionType.Equals(GetType(XPath.XPathException)) Then
+                        Dim XPathExceptionExceptionObject As XPath.XPathException = DirectCast(rawExceptionObject, XPath.XPathException)
+                        addJSONedExtendedExceptionDataPackage(XPathExceptionExceptionObject, stringBuilder)
+                    ElseIf exceptionType.Equals(GetType(IO.FileLoadException)) Then
+                        Dim FileLoadExceptionObject As IO.FileLoadException = DirectCast(rawExceptionObject, IO.FileLoadException)
+                        stringBuilder.AppendLine("Unable to Load Assembly File: " & FileLoadExceptionObject.FileName)
+                        stringBuilder.AppendLine("Error Code: " & convertErrorCodeToHex(Runtime.InteropServices.Marshal.GetExceptionCode()))
+
+                        If Not String.IsNullOrEmpty(FileLoadExceptionObject.FusionLog) Then
+                            stringBuilder.AppendLine("Reason why assembly couldn't be loaded: " & FileLoadExceptionObject.FusionLog)
+                        End If
+                    ElseIf exceptionType.Equals(GetType(Runtime.InteropServices.COMException)) Then
+                        Dim COMExceptionObject As Runtime.InteropServices.COMException = DirectCast(rawExceptionObject, Runtime.InteropServices.COMException)
+                        stringBuilder.AppendLine("Source: " & COMExceptionObject.Source)
+                        stringBuilder.AppendLine("Error Code: " & convertErrorCodeToHex(COMExceptionObject.ErrorCode))
+                    ElseIf exceptionType.Equals(GetType(ObjectDisposedException)) Then
+                        Dim ObjectDisposedExceptionObject As ObjectDisposedException = DirectCast(rawExceptionObject, ObjectDisposedException)
+                        stringBuilder.AppendLine("Source: " & ObjectDisposedExceptionObject.Source)
+                        stringBuilder.AppendLine("Object Name: " & ObjectDisposedExceptionObject.ObjectName)
+                    ElseIf exceptionType.Equals(GetType(IO.IOException)) Then
+                        stringBuilder.AppendLine("Source: " & DirectCast(rawExceptionObject, IO.IOException).Source)
+                    ElseIf exceptionType.Equals(GetType(ArgumentOutOfRangeException)) Then
+                        Dim ArgumentOutOfRangeExceptionObject As ArgumentOutOfRangeException = DirectCast(rawExceptionObject, ArgumentOutOfRangeException)
+                        stringBuilder.AppendLine("Parameter Name: " & ArgumentOutOfRangeExceptionObject.ParamName)
+                        stringBuilder.AppendLine("Parameter Value: " & ArgumentOutOfRangeExceptionObject.ActualValue)
+                    ElseIf exceptionType.Equals(GetType(ArgumentException)) Then
+                        stringBuilder.AppendLine("Parameter Name: " & DirectCast(rawExceptionObject, ArgumentException).ParamName)
+                    ElseIf exceptionType.Equals(GetType(ComponentModel.Win32Exception)) Then
+                        Dim Win32ExceptionObject As ComponentModel.Win32Exception = DirectCast(rawExceptionObject, ComponentModel.Win32Exception)
+                        stringBuilder.AppendLine(String.Format("Error Code: {0} ({1})", Win32ExceptionObject.ErrorCode, convertErrorCodeToHex(Win32ExceptionObject.ErrorCode)))
+                        stringBuilder.AppendLine(String.Format("Native Error Code: {0} ({1})", Win32ExceptionObject.NativeErrorCode, convertErrorCodeToHex(Win32ExceptionObject.NativeErrorCode)))
+                    ElseIf exceptionType.Equals(GetType(StackOverflowException)) Then
+                        Dim StackOverflowExceptionObject As StackOverflowException = DirectCast(rawExceptionObject, StackOverflowException)
+                        stringBuilder.AppendLine(String.Format("Source: {0}", StackOverflowExceptionObject.Source))
+                        addJSONedExtendedExceptionDataPackage(StackOverflowExceptionObject, stringBuilder)
                     End If
+
+                    addJSONedExtendedExceptionDataPackage(rawExceptionObject, stringBuilder)
+                    stringBuilder.AppendLine()
+                End If
             Catch ex As Exception
             End Try
         End Sub
@@ -377,7 +408,7 @@ Namespace Functions.support
         ''' <param name="fileToExtract">The name of the file you want to extract from the ZIP file.</param>
         ''' <param name="extractionTarget">The path to which you want to extract the file to.</param>
         ''' <returns>A Boolean Value. If the function was able to sucessfully extract the requested file from the ZIP file, it will return a True value. However, if for whatever reason something goes wrong anywhere in this function, it will return a False value.</returns>
-        Public Function extractUpdatedFileFromZIPPackage(ByRef zipFileObject As ZipFile, ByVal fileToExtract As String, ByVal extractionTarget As String, Optional boolDeleteTargetIfExists As Boolean = True) As Boolean
+        Public Function extractUpdatedFileFromZIPPackage(ByRef zipFileObject As IO.Compression.ZipArchive, ByVal fileToExtract As String, ByVal extractionTarget As String, Optional boolDeleteTargetIfExists As Boolean = True) As Boolean
             Try
                 Dim extractionTargetFileInfo As New IO.FileInfo(extractionTarget)
 
@@ -386,7 +417,7 @@ Namespace Functions.support
                 End If
 
                 ' This gets the ZipEntry Object for the file we are trying to extract from the ZIP file.
-                Dim zipFileEntryObject As ZipEntry = zipFileObject.GetEntry(fileToExtract)
+                Dim zipFileEntryObject As IO.Compression.ZipArchiveEntry = zipFileObject.GetEntry(fileToExtract)
 
                 ' This checks to see if the file that we're trying to extract from the ZIP file exists in the ZIP file.
                 If zipFileEntryObject Is Nothing Then
@@ -441,10 +472,21 @@ Namespace Functions.support
 
                     If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                         eventLogFunctions.writeToSystemEventLog(String.Format("IO.FileStream created successfully. Commencing the process of writing file {0}{1}{0} as {0}{2}{0} to disk.", Chr(34), fileToExtract, extractionTargetFileInfo.Name), EventLogEntryType.Information)
+                        eventLogFunctions.writeToSystemEventLog("Opening IO.Stream from ZIP File Object.", EventLogEntryType.Information)
                     End If
 
                     ' This copies the data out of the ZIP File Data Stream to our FileStream Object that was created above.
-                    zipFileObject.GetInputStream(zipFileEntryObject).CopyTo(fileStream)
+                    Using zipFileEntryObjectIOStream As IO.Stream = zipFileEntryObject.Open()
+                        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                            eventLogFunctions.writeToSystemEventLog("ZIP File Object IO.Stream opened. Copying data from ZIP File Object IO.Stream to IO.FileStream.", EventLogEntryType.Information)
+                        End If
+
+                        zipFileEntryObjectIOStream.CopyTo(fileStream)
+
+                        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                            eventLogFunctions.writeToSystemEventLog("Data copying complete. Closing out ZIP File Object IO.Stream.", EventLogEntryType.Information)
+                        End If
+                    End Using
 
                     If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                         eventLogFunctions.writeToSystemEventLog("File write operation complete. Closing out file and disposing of the IO.FileStream.", EventLogEntryType.Information)
@@ -480,30 +522,44 @@ Namespace Functions.support
             End Try
         End Sub
 
-        ''' <summary>ZIPs the exported log file.</summary>
-        ''' <param name="pathToZIPFile">The path the ZIP file we will be working with.</param>
-        ''' <param name="fileToAddToZIPFile">The path to the file we will be adding to the ZIP file.</param>
+        ''' <summary>Adds a file to the chosen ZIP file.</summary>
+        ''' <param name="zipFileObject">A IO.Compression.ZipArchive Object.</param>
+        ''' <param name="strFileToBeAdded">The path to the file we will be adding to the ZIP file.</param>
         ''' <returns>Returns a Boolean value.</returns>
-        Public Function addFileToZipFile(pathToZIPFile As String, fileToAddToZIPFile As String) As Boolean
+        Public Function addFileToZipFile(ByRef zipFileObject As IO.Compression.ZipArchive, strFileToBeAdded As String) As Boolean
             Try
-                Dim zipFileObject As ZipFile ' Creates a ZIPFile Object.
+                If IO.File.Exists(strFileToBeAdded) Then
+                    Dim newZipFileEntryObject As IO.Compression.ZipArchiveEntry = zipFileObject.CreateEntry(New IO.FileInfo(strFileToBeAdded).Name, IO.Compression.CompressionLevel.Optimal)
 
-                ' This checks to see if the ZIP file we want to work with already exists.
-                If IO.File.Exists(pathToZIPFile) = True Then
-                    ' OK, the ZIP file already exists so we create a new ZIPFile Object by opening the existing ZIP file.
-                    zipFileObject = New ZipFile(pathToZIPFile)
-                Else
-                    ' No, the ZIP file doesn't exist so we tells the ZIPFile Library to create a new ZIPFile Object with no previous file.
-                    zipFileObject = ZipFile.Create(pathToZIPFile)
+                    Using localFileStreamReader As New IO.FileStream(strFileToBeAdded, IO.FileMode.Open)
+                        Using zipFileEntryIOStream As IO.Stream = newZipFileEntryObject.Open()
+                            localFileStreamReader.CopyTo(zipFileEntryIOStream)
+                        End Using
+                    End Using
                 End If
-
-                zipFileObject.BeginUpdate() ' We need to open the ZIP file for writing.
-                zipFileObject.Add(fileToAddToZIPFile, New IO.FileInfo(fileToAddToZIPFile).Name) ' Adds the file to the ZIP file.
-                zipFileObject.CommitUpdate() ' Commits the added file to the ZIP file.
-                zipFileObject.Close() ' Closes the ZIPFile Object.
 
                 Return True
             Catch ex As Exception
+                eventLogFunctions.writeCrashToEventLog(ex)
+                Return False
+            End Try
+        End Function
+
+        ''' <summary>Adds a file to the chosen ZIP file.</summary>
+        ''' <param name="pathToZIPFile">The path the ZIP file we will be working with.</param>
+        ''' <param name="strFileToBeAdded">The path to the file we will be adding to the ZIP file.</param>
+        ''' <returns>Returns a Boolean value.</returns>
+        Public Function addFileToZipFile(pathToZIPFile As String, strFileToBeAdded As String) As Boolean
+            Try
+                Dim zipArchiveMode As IO.Compression.ZipArchiveMode = If(IO.File.Exists(pathToZIPFile), IO.Compression.ZipArchiveMode.Update, IO.Compression.ZipArchiveMode.Create)
+
+                Using zipFileObject As IO.Compression.ZipArchive = IO.Compression.ZipFile.Open(pathToZIPFile, zipArchiveMode)
+                    addFileToZipFile(zipFileObject, strFileToBeAdded)
+                End Using
+
+                Return True
+            Catch ex As Exception
+                eventLogFunctions.writeCrashToEventLog(ex)
                 Return False
             End Try
         End Function

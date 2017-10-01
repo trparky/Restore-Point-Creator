@@ -187,7 +187,7 @@ Namespace Functions.importExportSettings
                 Dim exportedSettingsFile As New exportedSettingsFile()
                 With exportedSettingsFile
                     .xmlPayload = support.convertToBase64(strXMLData)
-                    .randomString = randomStringGenerator((New Random).Next(100, 300))
+                    .randomString = support.randomStringGenerator((New Random).Next(100, 300))
                     .checksum = calculateConfigBackupDataPayloadChecksum(.xmlPayload, .randomString)
                 End With
 
@@ -291,20 +291,6 @@ Namespace Functions.importExportSettings
             Dim inputAsByteArray As Byte() = Text.Encoding.ASCII.GetBytes(input)
             Dim hashedByteArray As Byte() = SHA1Engine.ComputeHash(inputAsByteArray)
             Return BitConverter.ToString(hashedByteArray).ToLower().Replace("-", "").Trim
-        End Function
-
-        Private Function randomStringGenerator(length As Integer)
-            Dim random As Random = New Random()
-            Dim builder As New Text.StringBuilder()
-            Dim ch As Char
-            Dim legalCharacters As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"
-
-            For cntr As Integer = 0 To length
-                ch = legalCharacters.Substring(random.Next(0, legalCharacters.Length), 1)
-                builder.Append(ch)
-            Next
-
-            Return builder.ToString()
         End Function
     End Module
 End Namespace

@@ -6,34 +6,49 @@ Namespace Functions.eventLogFunctions
         Private Const strSystemRestorePointCreator As String = "System Restore Point Creator"
         Private Const strRegistryApplicationPath As String = "SYSTEM\CurrentControlSet\services\eventlog\Application"
 
+        Public strLogFile As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Restore Point Creator.log")
+        Private boolCachedCanIWriteThereResults As Boolean = privilegeChecks.canIWriteThere(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData))
+        Private shortNumberOfRecalledGetFileStreamFunction As Short = 0
+
+        Private Function getFileStreamWithWaiting(strFileToOpen As String, accessMethod As IO.FileAccess, Optional fileMode As IO.FileMode = IO.FileMode.Open) As IO.FileStream
+            Try
+                Return New IO.FileStream(strFileToOpen, fileMode, accessMethod, IO.FileShare.None)
+            Catch ex As IO.IOException
+                If shortNumberOfRecalledGetFileStreamFunction.Equals(20) Then
+                    MsgBox("Unable to get file lock, we have exceeded our retry attempts.", MsgBoxStyle.Critical, "File Access Violation")
+                    Process.GetCurrentProcess.Kill()
+                End If
+
+                Debug.WriteLine("File is locked, waiting 100ms to get a lock on the file.")
+                Threading.Thread.Sleep(100)
+                shortNumberOfRecalledGetFileStreamFunction += 1
+                Return getFileStreamWithWaiting(strFileToOpen, accessMethod)
+            End Try
+        End Function
+
         ''' <summary>Exports the application logs to a file.</summary>
-        ''' <param name="strLogFile">The path to the file we will be exporting the data to.</param>
+        ''' <param name="strFileToBeExportedTo">The path to the file we will be exporting the data to.</param>
         ''' <param name="logCount">This is a ByRef argument which passes back the number of logs that this function exported.</param>
         ''' <returns>Returns a Boolean value. If True the logs were successfully exported, if False then something went wrong.</returns>
-        Public Function exportLogsToFile(ByVal strLogFile As String, ByRef logCount As ULong) As Boolean
+        Public Function exportLogsToFile(ByVal strFileToBeExportedTo As String, ByRef logCount As ULong) As Boolean
             Try
                 Dim jsonEngine As New Web.Script.Serialization.JavaScriptSerializer
 
                 Dim logObject As New exportedLogFile With {
                     .operatingSystem = osVersionInfo.getFullOSVersionString,
                     .programVersion = globalVariables.version.strFullVersionString,
-                    .version = 4
+                    .version = 5,
+                    .logsEntries = getLogObject()
                 }
+                logCount = logObject.logsEntries.Count
 
-                Dim logsEntries As New List(Of restorePointCreatorExportedLog)()
-
-                If IO.File.Exists(strLogFile) Then IO.File.Delete(strLogFile)
-
-                exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strApplication, logsEntries, logCount)
-                exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strSystemRestorePointCreator, logsEntries, logCount)
-
-                logObject.logsEntries = logsEntries
+                If IO.File.Exists(strFileToBeExportedTo) Then IO.File.Delete(strFileToBeExportedTo)
 
                 Try
-                    Dim streamWriter As New IO.StreamWriter(strLogFile)
-                    Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(logObject.GetType)
-                    xmlSerializerObject.Serialize(streamWriter, logObject)
-                    streamWriter.Close()
+                    Using streamWriter As New IO.StreamWriter(strFileToBeExportedTo)
+                        Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(logObject.GetType)
+                        xmlSerializerObject.Serialize(streamWriter, logObject)
+                    End Using
                 Catch ex As Exception
                     writeCrashToEventLog(ex)
                 End Try
@@ -47,6 +62,175 @@ Namespace Functions.eventLogFunctions
             End Try
         End Function
 
+        Public Function getLogObject() As List(Of restorePointCreatorExportedLog)
+            Dim internalApplicationLog As New List(Of restorePointCreatorExportedLog)
+
+            If IO.File.Exists(strLogFile) Then
+                shortNumberOfRecalledGetFileStreamFunction = 0
+                Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.Read)
+                    Using streamReader As New IO.StreamReader(fileStream)
+                        Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(internalApplicationLog.GetType)
+                        internalApplicationLog = xmlSerializerObject.Deserialize(streamReader)
+                    End Using
+                End Using
+            End If
+
+            Return internalApplicationLog
+        End Function
+
+        Public Sub getOldLogsFromWindowsEventLog()
+            Try
+                writeToSystemEventLog("Starting log conversion process.", EventLogEntryType.Information)
+
+                Dim stopwatch As Stopwatch = Stopwatch.StartNew
+                Dim applicationLog As List(Of restorePointCreatorExportedLog) = getLogObject()
+                Dim logCount As ULong = applicationLog.Count
+                Dim longOldLogCount As ULong = logCount
+
+                exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strApplication, applicationLog, logCount)
+                exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strSystemRestorePointCreator, applicationLog, logCount)
+
+                Dim longNumberOfImportedLogs As ULong = applicationLog.Count - longOldLogCount
+
+                shortNumberOfRecalledGetFileStreamFunction = 0
+                Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.Write)
+                    Using streamWriter As New IO.StreamWriter(fileStream)
+                        Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
+                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
+                    End Using
+                End Using
+
+                writeToSystemEventLog("Log conversion process complete.", EventLogEntryType.Information)
+
+                If longNumberOfImportedLogs = 1 Then
+                    writeToSystemEventLog(String.Format("Converted log data to new log file format in {0}ms. 1 log entry was imported.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information)
+                ElseIf longNumberOfImportedLogs > 1 Then
+                    writeToSystemEventLog(String.Format("Converted log data to new log file format in {0}ms. {1} log entries were imported.", stopwatch.ElapsedMilliseconds.ToString, longNumberOfImportedLogs.ToString("N0")), EventLogEntryType.Information)
+                Else
+                    writeToSystemEventLog(String.Format("Converted log data to new log file format in {0}ms. No old log entries were detected.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information)
+                End If
+            Catch ex As Exception
+            End Try
+
+            Using registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
+                registryKey.SetValue("Exported Old Logs", "True", RegistryValueKind.String)
+            End Using
+        End Sub
+
+        Private Sub createLogFile()
+            Try
+                Dim applicationLog As New List(Of restorePointCreatorExportedLog)
+                Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
+
+                applicationLog.Add(New restorePointCreatorExportedLog With {
+                    .logData = "Log file initialized.",
+                    .logType = EventLogEntryType.Information,
+                    .unixTime = 0,
+                    .logSource = "Restore Point Creator",
+                    .logID = applicationLog.Count,
+                    .dateObject = Now.ToUniversalTime
+                })
+
+                shortNumberOfRecalledGetFileStreamFunction = 0
+                Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.Write, IO.FileMode.Create)
+                    Using streamWriter As New IO.StreamWriter(fileStream)
+                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
+                    End Using
+                End Using
+            Catch ex As Exception
+                MsgBox(ex.Message)
+            End Try
+        End Sub
+
+        ''' <summary>A function that re-IDs all of the log entries.</summary>
+        ''' <param name="oldLogEntryList">A List of restorePointCreatorExportedLog Objects.</param>
+        ''' <returns>A List of restorePointCreatorExportedLog Objects.</returns>
+        Private Function reIDTheLogEntries(oldLogEntryList As List(Of restorePointCreatorExportedLog)) As List(Of restorePointCreatorExportedLog)
+            ' We sort the List of log entries first.
+            oldLogEntryList = oldLogEntryList.OrderBy(Function(logEntry As restorePointCreatorExportedLog) logEntry.logID).ToList()
+
+            Dim newLogID As Long = 0
+            Dim newLogEntryList As New List(Of restorePointCreatorExportedLog)
+
+            For Each logEntry As restorePointCreatorExportedLog In oldLogEntryList
+                logEntry.logID = newLogID
+                newLogEntryList.Add(logEntry)
+                newLogID += 1
+            Next
+
+            Return newLogEntryList
+        End Function
+
+        ''' <summary>Deletes a list of individual log entries from the log.</summary>
+        Public Sub deleteEntryFromLog(idsOfLogsToBeDeleted As List(Of Long))
+            If globalVariables.boolLogToSystemLog = True Then
+                Try
+                    Dim applicationLog As New List(Of restorePointCreatorExportedLog)
+                    Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
+
+                    If Not IO.File.Exists(strLogFile) Then createLogFile()
+
+                    shortNumberOfRecalledGetFileStreamFunction = 0
+                    Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.ReadWrite)
+                        Dim streamReader As New IO.StreamReader(fileStream)
+                        applicationLog = xmlSerializerObject.Deserialize(streamReader)
+
+                        For Each longIDToBeDeleted As Long In idsOfLogsToBeDeleted
+                            For Each item As restorePointCreatorExportedLog In applicationLog.Where(Function(logObject As restorePointCreatorExportedLog) (logObject.logID = longIDToBeDeleted)).ToList()
+                                applicationLog.Remove(item)
+                            Next
+                        Next
+
+                        applicationLog = reIDTheLogEntries(applicationLog)
+
+                        fileStream.Position = 0
+                        fileStream.SetLength(0)
+
+                        Dim streamWriter As New IO.StreamWriter(fileStream)
+                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
+
+                        streamReader.Dispose()
+                    End Using
+                Catch ex As Exception
+                    ' Does nothing
+                End Try
+            End If
+        End Sub
+
+        ''' <summary>Deletes an individual log entry from the log.</summary>
+        Public Sub deleteEntryFromLog(longIDToBeDeleted As Long)
+            If globalVariables.boolLogToSystemLog = True Then
+                Try
+                    Dim applicationLog As New List(Of restorePointCreatorExportedLog)
+                    Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
+
+                    If Not IO.File.Exists(strLogFile) Then createLogFile()
+
+                    shortNumberOfRecalledGetFileStreamFunction = 0
+                    Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.ReadWrite)
+                        Dim streamReader As New IO.StreamReader(fileStream)
+                        applicationLog = xmlSerializerObject.Deserialize(streamReader)
+
+                        For Each item As restorePointCreatorExportedLog In applicationLog.Where(Function(logObject As restorePointCreatorExportedLog) (logObject.logID = longIDToBeDeleted)).ToList()
+                            applicationLog.Remove(item)
+                        Next
+
+                        applicationLog = reIDTheLogEntries(applicationLog)
+
+                        fileStream.Position = 0
+                        fileStream.SetLength(0)
+
+                        Dim streamWriter As New IO.StreamWriter(fileStream)
+                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
+
+                        streamReader.Dispose()
+                    End Using
+                Catch ex As Exception
+                    ' Does nothing
+                End Try
+            End If
+        End Sub
+
         ''' <summary>Writes a log entry to the System Event Log.</summary>
         ''' <param name="logMessage">The text you want to have in your new System Event Log entry.</param>
         ''' <param name="logType">The type of log that you want your entry to be. The three major options are Error, Information, and Warning.</param>
@@ -54,30 +238,33 @@ Namespace Functions.eventLogFunctions
         Public Sub writeToSystemEventLog(logMessage As String, Optional logType As EventLogEntryType = EventLogEntryType.Information)
             If globalVariables.boolLogToSystemLog = True Then
                 Try
-                    Dim logSource As String = "System Restore Point Creator"
-                    Dim logName As String = "Application"
-                    Dim host As String = "."
+                    Dim applicationLog As New List(Of restorePointCreatorExportedLog)
+                    Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
 
-                    With Registry.LocalMachine
-                        If .OpenSubKey(strRegistryApplicationPath & "\" & logSource) Is Nothing Then
-                            .OpenSubKey(strRegistryApplicationPath, True).CreateSubKey(logSource)
-                            .OpenSubKey(strRegistryApplicationPath & "\" & logSource, True).SetValue("EventMessageFile", IO.Path.Combine(RuntimeEnvironment.GetRuntimeDirectory(), "EventLogMessages.dll"), RegistryValueKind.String)
-                        Else
-                            If .OpenSubKey(strRegistryApplicationPath & "\" & logSource, False).GetValue("EventMessageFile", Nothing) Is Nothing Then
-                                .OpenSubKey(strRegistryApplicationPath & "\" & logSource, True).SetValue("EventMessageFile", IO.Path.Combine(RuntimeEnvironment.GetRuntimeDirectory(), "EventLogMessages.dll"), RegistryValueKind.String)
-                            End If
-                        End If
-                    End With
+                    If Not IO.File.Exists(strLogFile) Then createLogFile()
 
-                    If Not EventLog.SourceExists(logSource, host) Then
-                        EventLog.CreateEventSource(New EventSourceCreationData(logSource, logName))
-                    End If
+                    shortNumberOfRecalledGetFileStreamFunction = 0
+                    Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.ReadWrite)
+                        Dim streamReader As New IO.StreamReader(fileStream)
+                        applicationLog = xmlSerializerObject.Deserialize(streamReader)
 
-                    Dim eventLogObject As New EventLog(logName, host, logSource)
-                    eventLogObject.WriteEntry(logMessage, logType, 234, CType(3, Short))
+                        applicationLog.Add(New restorePointCreatorExportedLog With {
+                            .logData = logMessage,
+                            .logType = logType,
+                            .unixTime = 0,
+                            .logSource = "Restore Point Creator",
+                            .logID = applicationLog.Count,
+                            .dateObject = Now.ToUniversalTime
+                        })
 
-                    eventLogObject.Dispose()
-                    eventLogObject = Nothing
+                        fileStream.Position = 0
+                        fileStream.SetLength(0)
+
+                        Dim streamWriter As New IO.StreamWriter(fileStream)
+                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
+
+                        streamReader.Dispose()
+                    End Using
                 Catch ex As Exception
                     ' Does nothing
                 End Try
@@ -136,6 +323,7 @@ Namespace Functions.eventLogFunctions
                 stringBuilder.AppendLine(support.removeSourceCodePathInfo(exceptionObject.StackTrace.Trim))
 
                 writeToSystemEventLog(stringBuilder.ToString.Trim, errorType)
+
                 stringBuilder = Nothing
             Catch ex2 As Exception
                 ' Does nothing
@@ -161,11 +349,12 @@ Namespace Functions.eventLogFunctions
                     While eventInstance IsNot Nothing
                         If eventInstance.ProviderName.Equals(strSystemRestorePointCreator, StringComparison.OrdinalIgnoreCase) Or eventInstance.ProviderName.caseInsensitiveContains(strSystemRestorePointCreator) = True Then
                             logClass = New restorePointCreatorExportedLog With {
-                                .logData = eventInstance.FormatDescription,
-                                .unixTime = eventInstance.TimeCreated.Value.ToUniversalTime.toUNIXTimestamp(),
+                                .logData = "--== Imported Log ==--" & vbCrLf & vbCrLf & eventInstance.FormatDescription,
+                                .unixTime = 0,
                                 .logType = eventInstance.Level,
                                 .logSource = strEventLog,
-                                .logID = eventInstance.RecordId
+                                .logID = logCount,
+                                .dateObject = eventInstance.TimeCreated.Value.ToUniversalTime
                             }
 
                             logCount += 1

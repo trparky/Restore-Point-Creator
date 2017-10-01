@@ -19,18 +19,36 @@ Namespace My
         End Sub
 
         Private Sub setProcessPriorities()
-            Try
-                Process.GetCurrentProcess.PriorityClass = ProcessPriorityClass.Normal
-            Catch ex As Exception
-            End Try
+            If Functions.privilegeChecks.areWeAnAdministrator() Then
+                If areWeRunningAsATask() Then
+                    Try
+                        Process.GetCurrentProcess.PriorityClass = ProcessPriorityClass.Normal
+                    Catch ex As Exception
+                    End Try
 
-            Try
-                Functions.IOPriority.SetIOPriority(Functions.IOPriority.IOPrioritySetting.Normal)
-            Catch ex As Exception
-            End Try
+                    Try
+                        Functions.IOPriority.SetIOPriority(Functions.IOPriority.IOPrioritySetting.Normal)
+                    Catch ex As Exception
+                    End Try
+                End If
+            End If
         End Sub
 
+        Private Function areWeRunningAsATask() As Boolean
+            Try
+                Dim strParentProcess As String = Process.GetCurrentProcess.Parent.ProcessName
+                Return strParentProcess.caseInsensitiveContains("svchost") Or strParentProcess.caseInsensitiveContains("taskeng")
+            Catch ex As Exception
+                Return False
+            End Try
+        End Function
+
         Private Sub MyApplication_Startup(sender As Object, e As ApplicationServices.StartupEventArgs) Handles Me.Startup
+            If Functions.osVersionInfo.isThisWindowsXP() Then
+                MsgBox("System Restore Point Creator does not support Windows XP. This program will now terminate.", MsgBoxStyle.Critical, "System Restore Point Creator")
+                Process.GetCurrentProcess.Kill()
+            End If
+
             setProcessPriorities()
             exceptionHandler.loadExceptionHandler()
             Functions.startupFunctions.validateSettings()
@@ -38,10 +56,6 @@ Namespace My
             Dim commandLineArgument As String
             Dim registryKey As RegistryKey
             Dim boolNoTask As Boolean = False ' Create a Boolean data type variable.
-
-            If Environment.OSVersion.ToString.Contains("5.1") = True Or Environment.OSVersion.ToString.Contains("5.2") = True Then
-                Functions.startupFunctions.downloadWindowsXPVersion()
-            End If
 
             If Functions.osVersionInfo.isThisAServerOS() = True Then
                 MsgBox("You are running a Server edition of Microsoft Windows. System Restore Point Creator doesn't function on server operating systems." & vbCrLf & vbCrLf & "This application will now close.", MsgBoxStyle.Critical, "System Restore Point Creator -- Application Error")
@@ -142,6 +156,7 @@ Namespace My
                                 End If
 
                                 My.Settings.Save()
+
                             End If
                         End If
 
@@ -213,7 +228,7 @@ Namespace My
 
             ' This code checks to see if the current version is a beta or Release Candidate and if the user's update channel is already set to beta mode.
             ' If the user's update channel isn't set to beta mode we then set it for the user here.
-            If (globalVariables.version.boolBeta = True Or globalVariables.version.boolReleaseCandidate = True) And My.Settings.updateChannel <> globalVariables.updateChannels.beta Then
+            If (globalVariables.version.boolBeta Or globalVariables.version.boolReleaseCandidate) And Not My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta, StringComparison.OrdinalIgnoreCase) Then
                 My.Settings.updateChannel = globalVariables.updateChannels.beta ' Changes the update channel to beta.
             End If
 
@@ -281,11 +296,10 @@ Namespace My
                             Process.GetCurrentProcess.Kill()
                         ElseIf commandLineArgument.Equals("-fixruntimetasks", StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.repairRuntimeTasks()
-
-                            e.Cancel = True
-                            Exit Sub
+                            Process.GetCurrentProcess.Kill()
                         ElseIf commandLineArgument.Equals("-deletealltasks", StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.deleteAllTasks()
+                            Process.GetCurrentProcess.Kill()
                         End If
                     End If
 
@@ -386,6 +400,10 @@ Namespace My
 
                             e.Cancel = True
                             Exit Sub
+                        ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.testlogwrite, StringComparison.OrdinalIgnoreCase) Then
+                            Functions.eventLogFunctions.writeToSystemEventLog("Written to application log file successfully.", EventLogEntryType.Information)
+                            e.Cancel = True
+                            Exit Sub
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.scheduledRestorePoint, StringComparison.OrdinalIgnoreCase) Then
                             Dim restorePointNameForScheduledTasks As String = globalVariables.strDefaultNameForScheduledTasks
                             Dim boolExtendedLoggingForScheduledTasks As Boolean = True
@@ -404,9 +422,9 @@ Namespace My
                             End If
 
                             If boolExtendedLoggingForScheduledTasks = True Then
-                                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Starting scheduled restore point job. Task running as user {0}. There are currently {1} system restore point(s) on this system.", Environment.UserName, Functions.wmi.getNumberOfRestorePoints()), EventLogEntryType.Information)
+                                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Starting scheduled restore point job. Task running as user {0}. There are currently {1} system restore point(s) On this system.", Environment.UserName, Functions.wmi.getNumberOfRestorePoints()), EventLogEntryType.Information)
                             Else
-                                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Starting scheduled restore point job. Task running as user {0}.", Environment.UserName), EventLogEntryType.Information)
+                                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Starting scheduled restore point job. Task running As user {0}.", Environment.UserName), EventLogEntryType.Information)
                             End If
 
                             Functions.startupFunctions.writeLastRunFile()
@@ -447,9 +465,9 @@ Namespace My
                             End If
 
                             ' We try and parse the value in the Registry.
-                            If Integer.TryParse(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Preselected Restore Point for Restore in Safe Mode", 0), Functions.startupFunctions.preSelectedRestorePointID) Then
+                            If Integer.TryParse(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Preselected Restore Point For Restore In Safe Mode", 0), Functions.startupFunctions.preSelectedRestorePointID) Then
                                 ' We need to remove the registry keys from the registry, we no longer need them.
-                                Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Preselected Restore Point for Restore in Safe Mode", False)
+                                Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Preselected Restore Point For Restore In Safe Mode", False)
                                 Registry.LocalMachine.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\RunOnce", True).DeleteValue("*Restore To Restore Point", False)
 
                                 ' OK, what we have is an Interger. Great. Let's do some work with it.
@@ -483,6 +501,7 @@ Namespace My
                             Exit Sub
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.deleteOldRestorePoints, StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.deleteOldRestorePoints()
+
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints, StringComparison.OrdinalIgnoreCase) Then

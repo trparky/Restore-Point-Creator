@@ -73,7 +73,7 @@
 
         httpHelper.addPOSTData("crashdata", crashData)
 
-        If txtDoing.Text.Trim IsNot Nothing Then
+        If Not String.IsNullOrEmpty(txtDoing.Text.Trim) Then
             httpHelper.addPOSTData("doing", txtDoing.Text)
         End If
 

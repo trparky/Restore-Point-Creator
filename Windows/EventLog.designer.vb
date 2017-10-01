@@ -27,20 +27,21 @@ Partial Class eventLogForm
         Me.ColumnHeader1 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ColumnHeader2 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ColumnHeader3 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
-        Me.ColumnHeader4 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.imageList = New System.Windows.Forms.ImageList(Me.components)
         Me.eventLogText = New System.Windows.Forms.TextBox()
         Me.btnRefreshEvents = New System.Windows.Forms.Button()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.lblLogEntryCount = New System.Windows.Forms.ToolStripStatusLabel()
         Me.lblProcessedIn = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.progressBar = New System.Windows.Forms.ToolStripProgressBar()
-        Me.btnOpenEventLog = New System.Windows.Forms.Button()
+        Me.lblLogFileSize = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.btnCleanLogFile = New System.Windows.Forms.Button()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
+        Me.chkMultiSelectMode = New System.Windows.Forms.CheckBox()
         Me.TableLayoutPanel2 = New System.Windows.Forms.TableLayoutPanel()
         Me.btnExportLogs = New System.Windows.Forms.Button()
-        Me.btnClear = New System.Windows.Forms.Button()
         Me.btnSearch = New System.Windows.Forms.Button()
+        Me.btnDeleteIndividualLogEntry = New System.Windows.Forms.Button()
+        Me.btnClear = New System.Windows.Forms.Button()
         Me.chkAskMeToSubmitIfViewingAnExceptionEntry = New System.Windows.Forms.CheckBox()
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
         Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
@@ -49,6 +50,7 @@ Partial Class eventLogForm
         Me.pleaseWaitlblLabel = New System.Windows.Forms.Label()
         Me.pleaseWaitProgressBar = New Tom.SmoothProgressBar()
         Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
+        Me.logFileWatcher = New System.IO.FileSystemWatcher()
         Me.StatusStrip1.SuspendLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
@@ -56,6 +58,7 @@ Partial Class eventLogForm
         Me.SplitContainer1.SuspendLayout()
         Me.TableLayoutPanel2.SuspendLayout()
         Me.pleaseWaitPanel.SuspendLayout()
+        CType(Me.logFileWatcher, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'eventLogList
@@ -63,12 +66,12 @@ Partial Class eventLogForm
         Me.eventLogList.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.eventLogList.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader1, Me.ColumnHeader2, Me.ColumnHeader3, Me.ColumnHeader4})
+        Me.eventLogList.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader1, Me.ColumnHeader2, Me.ColumnHeader3})
         Me.eventLogList.FullRowSelect = True
         Me.eventLogList.Location = New System.Drawing.Point(3, 3)
         Me.eventLogList.MultiSelect = False
         Me.eventLogList.Name = "eventLogList"
-        Me.eventLogList.Size = New System.Drawing.Size(410, 172)
+        Me.eventLogList.Size = New System.Drawing.Size(410, 153)
         Me.eventLogList.SmallImageList = Me.imageList
         Me.eventLogList.TabIndex = 0
         Me.eventLogList.UseCompatibleStateImageBehavior = False
@@ -88,11 +91,6 @@ Partial Class eventLogForm
         '
         Me.ColumnHeader3.Text = "Event ID"
         Me.ColumnHeader3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'ColumnHeader4
-        '
-        Me.ColumnHeader4.Text = "Log Source"
-        Me.ColumnHeader4.Width = 95
         '
         'imageList
         '
@@ -129,7 +127,7 @@ Partial Class eventLogForm
         '
         'StatusStrip1
         '
-        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.lblLogEntryCount, Me.lblProcessedIn, Me.progressBar})
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.lblLogEntryCount, Me.lblProcessedIn, Me.lblLogFileSize})
         Me.StatusStrip1.Location = New System.Drawing.Point(0, 310)
         Me.StatusStrip1.Name = "StatusStrip1"
         Me.StatusStrip1.Size = New System.Drawing.Size(860, 22)
@@ -149,24 +147,24 @@ Partial Class eventLogForm
         Me.lblProcessedIn.Size = New System.Drawing.Size(112, 17)
         Me.lblProcessedIn.Text = "Processed in..."
         '
-        'progressBar
+        'lblLogFileSize
         '
-        Me.progressBar.Name = "progressBar"
-        Me.progressBar.Size = New System.Drawing.Size(200, 16)
-        Me.progressBar.Visible = False
+        Me.lblLogFileSize.Name = "lblLogFileSize"
+        Me.lblLogFileSize.Size = New System.Drawing.Size(100, 17)
+        Me.lblLogFileSize.Text = "Log File Size: 0 KB"
         '
-        'btnOpenEventLog
+        'btnCleanLogFile
         '
-        Me.btnOpenEventLog.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+        Me.btnCleanLogFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnOpenEventLog.Image = Global.Restore_Point_Creator.My.Resources.Resources.textBlock
-        Me.btnOpenEventLog.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.btnOpenEventLog.Location = New System.Drawing.Point(212, 3)
-        Me.btnOpenEventLog.Name = "btnOpenEventLog"
-        Me.btnOpenEventLog.Size = New System.Drawing.Size(204, 23)
-        Me.btnOpenEventLog.TabIndex = 3
-        Me.btnOpenEventLog.Text = "Open System Event Log"
-        Me.btnOpenEventLog.UseVisualStyleBackColor = True
+        Me.btnCleanLogFile.Image = Global.Restore_Point_Creator.My.Resources.Resources.textBlock
+        Me.btnCleanLogFile.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnCleanLogFile.Location = New System.Drawing.Point(212, 3)
+        Me.btnCleanLogFile.Name = "btnCleanLogFile"
+        Me.btnCleanLogFile.Size = New System.Drawing.Size(204, 23)
+        Me.btnCleanLogFile.TabIndex = 3
+        Me.btnCleanLogFile.Text = "Clean Application Log"
+        Me.btnCleanLogFile.UseVisualStyleBackColor = True
         '
         'SplitContainer1
         '
@@ -178,6 +176,7 @@ Partial Class eventLogForm
         '
         'SplitContainer1.Panel1
         '
+        Me.SplitContainer1.Panel1.Controls.Add(Me.chkMultiSelectMode)
         Me.SplitContainer1.Panel1.Controls.Add(Me.TableLayoutPanel2)
         Me.SplitContainer1.Panel1.Controls.Add(Me.eventLogList)
         '
@@ -188,6 +187,17 @@ Partial Class eventLogForm
         Me.SplitContainer1.SplitterDistance = 418
         Me.SplitContainer1.TabIndex = 5
         '
+        'chkMultiSelectMode
+        '
+        Me.chkMultiSelectMode.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.chkMultiSelectMode.AutoSize = True
+        Me.chkMultiSelectMode.Location = New System.Drawing.Point(4, 158)
+        Me.chkMultiSelectMode.Name = "chkMultiSelectMode"
+        Me.chkMultiSelectMode.Size = New System.Drawing.Size(289, 17)
+        Me.chkMultiSelectMode.TabIndex = 2
+        Me.chkMultiSelectMode.Text = "Multi-Select Mode (Used for deleting multiple log entries)"
+        Me.chkMultiSelectMode.UseVisualStyleBackColor = True
+        '
         'TableLayoutPanel2
         '
         Me.TableLayoutPanel2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
@@ -195,11 +205,12 @@ Partial Class eventLogForm
         Me.TableLayoutPanel2.ColumnCount = 2
         Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel2.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel2.Controls.Add(Me.btnExportLogs, 0, 2)
-        Me.TableLayoutPanel2.Controls.Add(Me.btnClear, 0, 1)
-        Me.TableLayoutPanel2.Controls.Add(Me.btnOpenEventLog, 1, 0)
+        Me.TableLayoutPanel2.Controls.Add(Me.btnExportLogs, 0, 1)
+        Me.TableLayoutPanel2.Controls.Add(Me.btnCleanLogFile, 1, 0)
         Me.TableLayoutPanel2.Controls.Add(Me.btnRefreshEvents, 0, 0)
-        Me.TableLayoutPanel2.Controls.Add(Me.btnSearch, 0, 1)
+        Me.TableLayoutPanel2.Controls.Add(Me.btnDeleteIndividualLogEntry, 1, 1)
+        Me.TableLayoutPanel2.Controls.Add(Me.btnClear, 1, 2)
+        Me.TableLayoutPanel2.Controls.Add(Me.btnSearch, 0, 2)
         Me.TableLayoutPanel2.Location = New System.Drawing.Point(0, 178)
         Me.TableLayoutPanel2.Name = "TableLayoutPanel2"
         Me.TableLayoutPanel2.RowCount = 3
@@ -214,29 +225,14 @@ Partial Class eventLogForm
         Me.btnExportLogs.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.TableLayoutPanel2.SetColumnSpan(Me.btnExportLogs, 2)
         Me.btnExportLogs.Image = Global.Restore_Point_Creator.My.Resources.Resources.save
         Me.btnExportLogs.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.btnExportLogs.Location = New System.Drawing.Point(3, 61)
+        Me.btnExportLogs.Location = New System.Drawing.Point(3, 32)
         Me.btnExportLogs.Name = "btnExportLogs"
-        Me.btnExportLogs.Size = New System.Drawing.Size(413, 26)
+        Me.btnExportLogs.Size = New System.Drawing.Size(203, 23)
         Me.btnExportLogs.TabIndex = 9
-        Me.btnExportLogs.Text = "Export Application Event Logs to File"
+        Me.btnExportLogs.Text = "Export Application Event Logs"
         Me.btnExportLogs.UseVisualStyleBackColor = True
-        '
-        'btnClear
-        '
-        Me.btnClear.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnClear.Image = Global.Restore_Point_Creator.My.Resources.Resources.edit_clear
-        Me.btnClear.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.btnClear.Location = New System.Drawing.Point(212, 32)
-        Me.btnClear.Name = "btnClear"
-        Me.btnClear.Size = New System.Drawing.Size(204, 23)
-        Me.btnClear.TabIndex = 8
-        Me.btnClear.Text = "Clear Search Results"
-        Me.btnClear.UseVisualStyleBackColor = True
         '
         'btnSearch
         '
@@ -245,12 +241,42 @@ Partial Class eventLogForm
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.btnSearch.Image = Global.Restore_Point_Creator.My.Resources.Resources.view
         Me.btnSearch.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.btnSearch.Location = New System.Drawing.Point(3, 32)
+        Me.btnSearch.Location = New System.Drawing.Point(3, 61)
         Me.btnSearch.Name = "btnSearch"
-        Me.btnSearch.Size = New System.Drawing.Size(203, 23)
+        Me.btnSearch.Size = New System.Drawing.Size(203, 26)
         Me.btnSearch.TabIndex = 7
         Me.btnSearch.Text = "Search Event Log"
         Me.btnSearch.UseVisualStyleBackColor = True
+        '
+        'btnDeleteIndividualLogEntry
+        '
+        Me.btnDeleteIndividualLogEntry.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnDeleteIndividualLogEntry.Enabled = False
+        Me.btnDeleteIndividualLogEntry.Image = Global.Restore_Point_Creator.My.Resources.Resources.delete
+        Me.btnDeleteIndividualLogEntry.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnDeleteIndividualLogEntry.Location = New System.Drawing.Point(212, 32)
+        Me.btnDeleteIndividualLogEntry.Name = "btnDeleteIndividualLogEntry"
+        Me.btnDeleteIndividualLogEntry.Size = New System.Drawing.Size(204, 23)
+        Me.btnDeleteIndividualLogEntry.TabIndex = 10
+        Me.btnDeleteIndividualLogEntry.Text = "Delete Individual Log Entry"
+        Me.btnDeleteIndividualLogEntry.UseVisualStyleBackColor = True
+        '
+        'btnClear
+        '
+        Me.btnClear.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnClear.Enabled = False
+        Me.btnClear.Image = Global.Restore_Point_Creator.My.Resources.Resources.edit_clear
+        Me.btnClear.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnClear.Location = New System.Drawing.Point(212, 61)
+        Me.btnClear.Name = "btnClear"
+        Me.btnClear.Size = New System.Drawing.Size(204, 26)
+        Me.btnClear.TabIndex = 8
+        Me.btnClear.Text = "Clear Search Results"
+        Me.btnClear.UseVisualStyleBackColor = True
         '
         'chkAskMeToSubmitIfViewingAnExceptionEntry
         '
@@ -315,6 +341,11 @@ Partial Class eventLogForm
         '
         Me.pleaseWaitMessageChanger.Interval = 250
         '
+        'logFileWatcher
+        '
+        Me.logFileWatcher.EnableRaisingEvents = True
+        Me.logFileWatcher.SynchronizingObject = Me
+        '
         'eventLogForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
@@ -332,6 +363,7 @@ Partial Class eventLogForm
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()
         Me.SplitContainer1.Panel1.ResumeLayout(False)
+        Me.SplitContainer1.Panel1.PerformLayout()
         Me.SplitContainer1.Panel2.ResumeLayout(False)
         Me.SplitContainer1.Panel2.PerformLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).EndInit()
@@ -339,6 +371,7 @@ Partial Class eventLogForm
         Me.TableLayoutPanel2.ResumeLayout(False)
         Me.pleaseWaitPanel.ResumeLayout(False)
         Me.pleaseWaitPanel.PerformLayout()
+        CType(Me.logFileWatcher, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -352,12 +385,10 @@ Partial Class eventLogForm
     Friend WithEvents StatusStrip1 As System.Windows.Forms.StatusStrip
     Friend WithEvents imageList As System.Windows.Forms.ImageList
     Friend WithEvents lblLogEntryCount As System.Windows.Forms.ToolStripStatusLabel
-    Friend WithEvents ColumnHeader4 As System.Windows.Forms.ColumnHeader
     Friend WithEvents lblProcessedIn As System.Windows.Forms.ToolStripStatusLabel
-    Friend WithEvents btnOpenEventLog As System.Windows.Forms.Button
+    Friend WithEvents btnCleanLogFile As System.Windows.Forms.Button
     Friend WithEvents SplitContainer1 As SplitContainer
     Friend WithEvents TableLayoutPanel2 As TableLayoutPanel
-    Friend WithEvents progressBar As ToolStripProgressBar
     Friend WithEvents chkAskMeToSubmitIfViewingAnExceptionEntry As CheckBox
     Friend WithEvents btnSearch As Button
     Friend WithEvents btnClear As Button
@@ -369,4 +400,8 @@ Partial Class eventLogForm
     Friend WithEvents pleaseWaitlblLabel As Label
     Friend WithEvents pleaseWaitProgressBar As Tom.SmoothProgressBar
     Friend WithEvents pleaseWaitMessageChanger As Timer
+    Friend WithEvents lblLogFileSize As ToolStripStatusLabel
+    Friend WithEvents logFileWatcher As IO.FileSystemWatcher
+    Friend WithEvents btnDeleteIndividualLogEntry As Button
+    Friend WithEvents chkMultiSelectMode As CheckBox
 End Class

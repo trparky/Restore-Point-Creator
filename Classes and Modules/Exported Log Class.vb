@@ -3,6 +3,7 @@
     Public logID As Long
     Public unixTime As ULong
     Public logData, logSource As String
+    Public dateObject As Date
 End Class
 
 Public Class exportedLogFile
