@@ -141,6 +141,25 @@ Namespace Functions.eventLogFunctions
             End Try
         End Sub
 
+        ''' <summary>A function that re-IDs all of the log entries.</summary>
+        ''' <param name="oldLogEntryList">A List of restorePointCreatorExportedLog Objects.</param>
+        ''' <returns>A List of restorePointCreatorExportedLog Objects.</returns>
+        Private Function reIDTheLogEntries(oldLogEntryList As List(Of restorePointCreatorExportedLog)) As List(Of restorePointCreatorExportedLog)
+            ' We sort the List of log entries first.
+            oldLogEntryList = oldLogEntryList.OrderBy(Function(logEntry As restorePointCreatorExportedLog) logEntry.logID).ToList()
+
+            Dim newLogID As Long = 0
+            Dim newLogEntryList As New List(Of restorePointCreatorExportedLog)
+
+            For Each logEntry As restorePointCreatorExportedLog In oldLogEntryList
+                logEntry.logID = newLogID
+                newLogEntryList.Add(logEntry)
+                newLogID += 1
+            Next
+
+            Return newLogEntryList
+        End Function
+
         ''' <summary>Deletes a list of individual log entries from the log.</summary>
         Public Sub deleteEntryFromLog(idsOfLogsToBeDeleted As List(Of Long))
             If globalVariables.boolLogToSystemLog = True Then
@@ -160,6 +179,8 @@ Namespace Functions.eventLogFunctions
                                 applicationLog.Remove(item)
                             Next
                         Next
+
+                        applicationLog = reIDTheLogEntries(applicationLog)
 
                         fileStream.Position = 0
                         fileStream.SetLength(0)
@@ -192,6 +213,8 @@ Namespace Functions.eventLogFunctions
                         For Each item As restorePointCreatorExportedLog In applicationLog.Where(Function(logObject As restorePointCreatorExportedLog) (logObject.logID = longIDToBeDeleted)).ToList()
                             applicationLog.Remove(item)
                         Next
+
+                        applicationLog = reIDTheLogEntries(applicationLog)
 
                         fileStream.Position = 0
                         fileStream.SetLength(0)
