@@ -63,7 +63,12 @@
                             .ImageIndex = 2
                     End Select
 
-                    .SubItems.Add(UNIXTimestampToDate(logEntry.unixTime).ToString)
+                    If logEntry.unixTime = 0 Then
+                        .SubItems.Add(logEntry.dateObject.ToLocalTime.ToString)
+                    Else
+                        .SubItems.Add(UNIXTimestampToDate(logEntry.unixTime).ToString)
+                    End If
+
                     .SubItems.Add(logEntry.logID.ToString("N0"))
 
                     .strEventLogText = Functions.support.removeSourceCodePathInfo(convertLineFeeds(logEntry.logData))
@@ -501,6 +506,7 @@
         eventLogList.Items.Clear()
         eventLogList.Items.AddRange(eventLogContents.ToArray())
         eventLogList.Sort()
+        eventLogText.Text = Nothing
     End Sub
 
     Private Sub btnCleanLogFile_Click(sender As Object, e As EventArgs) Handles btnCleanLogFile.Click

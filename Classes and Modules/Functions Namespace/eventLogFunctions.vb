@@ -37,7 +37,7 @@ Namespace Functions.eventLogFunctions
                 Dim logObject As New exportedLogFile With {
                     .operatingSystem = osVersionInfo.getFullOSVersionString,
                     .programVersion = globalVariables.version.strFullVersionString,
-                    .version = 4,
+                    .version = 5,
                     .logsEntries = getLogObject()
                 }
                 logCount = logObject.logsEntries.Count
@@ -125,9 +125,10 @@ Namespace Functions.eventLogFunctions
                 applicationLog.Add(New restorePointCreatorExportedLog With {
                     .logData = "Log file initialized.",
                     .logType = EventLogEntryType.Information,
-                    .unixTime = Now.ToUniversalTime.toUNIXTimestamp,
+                    .unixTime = 0,
                     .logSource = "Restore Point Creator",
-                    .logID = applicationLog.Count
+                    .logID = applicationLog.Count,
+                    .dateObject = Now.ToUniversalTime
                 })
 
                 shortNumberOfRecalledGetFileStreamFunction = 0
@@ -250,9 +251,10 @@ Namespace Functions.eventLogFunctions
                         applicationLog.Add(New restorePointCreatorExportedLog With {
                             .logData = logMessage,
                             .logType = logType,
-                            .unixTime = Now.ToUniversalTime.toUNIXTimestamp,
+                            .unixTime = 0,
                             .logSource = "Restore Point Creator",
-                            .logID = applicationLog.Count
+                            .logID = applicationLog.Count,
+                            .dateObject = Now.ToUniversalTime
                         })
 
                         fileStream.Position = 0
@@ -348,10 +350,11 @@ Namespace Functions.eventLogFunctions
                         If eventInstance.ProviderName.Equals(strSystemRestorePointCreator, StringComparison.OrdinalIgnoreCase) Or eventInstance.ProviderName.caseInsensitiveContains(strSystemRestorePointCreator) = True Then
                             logClass = New restorePointCreatorExportedLog With {
                                 .logData = "--== Imported Log ==--" & vbCrLf & vbCrLf & eventInstance.FormatDescription,
-                                .unixTime = eventInstance.TimeCreated.Value.ToUniversalTime.toUNIXTimestamp(),
+                                .unixTime = 0,
                                 .logType = eventInstance.Level,
                                 .logSource = strEventLog,
-                                .logID = logCount
+                                .logID = logCount,
+                                .dateObject = eventInstance.TimeCreated.Value.ToUniversalTime
                             }
 
                             logCount += 1

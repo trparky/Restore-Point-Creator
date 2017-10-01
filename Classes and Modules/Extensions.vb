@@ -30,16 +30,6 @@ Module ProcessExtensions
     End Function
 End Module
 
-Module DateExtensions
-    ''' <summary>Converts .NET Date Objects to a standard 64-bit Integer-based UNIX Timestamp.</summary>
-    ''' <param name="inputDate">A .NET Date Object.</param>
-    ''' <returns>A 64-but Integer representing a standard UNIX timestamp.</returns>
-    <Extension()>
-    Public Function toUNIXTimestamp(ByVal inputDate As Date) As ULong
-        Return DateDiff(DateInterval.Second, New DateTime(1970, 1, 1, 0, 0, 0, 0), inputDate)
-    End Function
-End Module
-
 Module StringExtensions
     ''' <summary>This function operates a lot like Replace() but is case-InSeNsItIvE.</summary>
     ''' <param name="source">The source String, aka the String where the data will be replaced in.</param>
