@@ -6,7 +6,7 @@
         End Function
 
         Public Function isThisWindowsXP() As Boolean
-            Return If(Environment.OSVersion.Version.Major = 5 And (Environment.OSVersion.Version.Minor = 1 Or 2), True, False)
+            Return If(Environment.OSVersion.Version.Major = 5 And (Environment.OSVersion.Version.Minor = 1 Or Environment.OSVersion.Version.Minor = 2), True, False)
         End Function
 
         Public Function isThisWindows7() As Boolean
@@ -18,7 +18,7 @@
         End Function
 
         Public Function isThisWindows8x() As Boolean
-            Return If(Environment.OSVersion.Version.Major = 6 And (Environment.OSVersion.Version.Minor = 2 Or 3), True, False)
+            Return If(Environment.OSVersion.Version.Major = 6 And (Environment.OSVersion.Version.Minor = 2 Or Environment.OSVersion.Version.Minor = 3), True, False)
         End Function
 
         Public Function isThisWindows10() As Boolean
