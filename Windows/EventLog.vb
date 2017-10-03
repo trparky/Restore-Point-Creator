@@ -569,6 +569,17 @@
         eventLogList.MultiSelect = chkMultiSelectMode.Checked
     End Sub
 
+    Private Sub eventLogList_KeyUp(sender As Object, e As KeyEventArgs) Handles eventLogList.KeyUp
+        If e.KeyCode = Keys.A And e.Modifiers = Keys.Control Then
+            chkMultiSelectMode.Checked = True
+            eventLogList.MultiSelect = True
+
+            For Each item As ListViewItem In eventLogList.Items
+                item.Selected = True
+            Next
+        End If
+    End Sub
+
 #Region "--== Please Wait Panel Code ==--"
     Private strPleaseWaitLabelText As String
 
