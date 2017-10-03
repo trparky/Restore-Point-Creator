@@ -412,6 +412,9 @@ Namespace exceptionHandler
 
                 Functions.support.launchURLInWebBrowser(globalVariables.webURLs.webPages.strCOMExceptionCrash)
                 Process.GetCurrentProcess.Kill()
+            ElseIf exceptionType = GetType(TypeInitializationException) And exceptionObject.Message.caseInsensitiveContains("Microsoft.Win32.TaskScheduler.TaskService") Then
+                ' Fixes an issue that causes the Crash Handling Window to appear during updates on systems with Avast antivirus installed on them.
+                Return False
             End If
 
             Return True ' This function returns a TRUE statement by default which will cause the program to show the crash window.
