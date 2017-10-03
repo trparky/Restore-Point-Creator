@@ -553,6 +553,7 @@
             logsToBeDeleted = Nothing
 
             logFileWatcher.EnableRaisingEvents = True
+            btnClear.Enabled = False
 
             lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(New IO.FileInfo(Functions.eventLogFunctions.strLogFile).Length)
             openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
