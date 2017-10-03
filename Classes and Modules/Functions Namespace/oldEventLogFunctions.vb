@@ -1,5 +1,7 @@
 ﻿Namespace Functions.oldEventLogFunctions
     Module oldEventLogFunctions
+        Public boolShowErrorMessage As Boolean = False
+
         ''' <summary>Writes a log entry to the System Event Log.</summary>
         ''' <param name="logMessage">The text you want to have in your new System Event Log entry.</param>
         ''' <param name="logType">The type of log that you want your entry to be. The three major options are Error, Information, and Warning.</param>
@@ -17,6 +19,8 @@
 
                     Dim eventLogObject As New EventLog(logName, host, logSource)
                     eventLogObject.WriteEntry(logMessage, logType, 234, CType(3, Short))
+
+                    If boolShowErrorMessage Then MsgBox("The program was unable to write the regular application log file, the event data was written to the Windows Event Log as a backup. Better to have it written somewhere then to have the data go nowhere." & vbCrLf & vbCrLf & "Please see the Windows Event Log for more details.", MsgBoxStyle.Critical, "Restore Point Creator -- Unable to write to log file")
 
                     eventLogObject.Dispose()
                     eventLogObject = Nothing

@@ -82,6 +82,7 @@ Namespace Functions.eventLogFunctions
                         End Using
                     End Using
                 Catch ex As myExceptions.unableToGetLockOnLogFile
+                    oldEventLogFunctions.boolShowErrorMessage = True
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
                 End Try
             End If
@@ -120,6 +121,7 @@ Namespace Functions.eventLogFunctions
                         streamReader.Dispose()
                     End Using
                 Catch ex As myExceptions.unableToGetLockOnLogFile
+                    oldEventLogFunctions.boolShowErrorMessage = True
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
                     Exit Sub
                 End Try
@@ -163,6 +165,7 @@ Namespace Functions.eventLogFunctions
                         End Using
                     End Using
                 Catch ex As myExceptions.unableToGetLockOnLogFile
+                    oldEventLogFunctions.boolShowErrorMessage = True
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
                 End Try
             Catch ex As Exception
@@ -220,6 +223,7 @@ Namespace Functions.eventLogFunctions
                         streamReader.Dispose()
                     End Using
                 Catch ex As myExceptions.unableToGetLockOnLogFile
+                    oldEventLogFunctions.boolShowErrorMessage = True
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
                 Catch ex As Exception
                     ' Does nothing
@@ -256,6 +260,7 @@ Namespace Functions.eventLogFunctions
                         streamReader.Dispose()
                     End Using
                 Catch ex As myExceptions.unableToGetLockOnLogFile
+                    oldEventLogFunctions.boolShowErrorMessage = True
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
                 Catch ex As Exception
                     ' Does nothing
@@ -299,6 +304,7 @@ Namespace Functions.eventLogFunctions
                     End Using
                 Catch ex As myExceptions.unableToGetLockOnLogFile
                     oldEventLogFunctions.writeToSystemEventLog(logMessage, logType)
+                    oldEventLogFunctions.boolShowErrorMessage = True
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
                 Catch ex As Exception
                     ' Does nothing
