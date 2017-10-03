@@ -298,6 +298,7 @@ Namespace Functions.eventLogFunctions
                         streamReader.Dispose()
                     End Using
                 Catch ex As myExceptions.unableToGetLockOnLogFile
+                    oldEventLogFunctions.writeToSystemEventLog(logMessage, logType)
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
                 Catch ex As Exception
                     ' Does nothing
