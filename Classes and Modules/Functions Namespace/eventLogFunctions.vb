@@ -91,31 +91,40 @@ Namespace Functions.eventLogFunctions
 
         Public Sub getOldLogsFromWindowsEventLog()
             Try
+                If Not IO.File.Exists(strLogFile) Then createLogFile()
                 writeToSystemEventLog("Starting log conversion process.", EventLogEntryType.Information)
 
+                Dim applicationLog As New List(Of restorePointCreatorExportedLog)
+                Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
+                Dim logCount, longOldLogCount As ULong
                 Dim stopwatch As Stopwatch = Stopwatch.StartNew
-                Dim applicationLog As List(Of restorePointCreatorExportedLog) = getLogObject()
-                Dim logCount As ULong = applicationLog.Count
-                Dim longOldLogCount As ULong = logCount
-
-                exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strApplication, applicationLog, logCount)
-                exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strSystemRestorePointCreator, applicationLog, logCount)
-
-                Dim longNumberOfImportedLogs As ULong = applicationLog.Count - longOldLogCount
-
-                If Not IO.File.Exists(strLogFile) Then createLogFile()
 
                 Try
                     shortNumberOfRecalledGetFileStreamFunction = 0
-                    Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.Write)
-                        Using streamWriter As New IO.StreamWriter(fileStream)
-                            Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
-                            xmlSerializerObject.Serialize(streamWriter, applicationLog)
-                        End Using
+                    Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.ReadWrite)
+                        Dim streamReader As New IO.StreamReader(fileStream)
+                        applicationLog = xmlSerializerObject.Deserialize(streamReader)
+
+                        logCount = applicationLog.Count
+                        longOldLogCount = logCount
+
+                        exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strApplication, applicationLog, logCount)
+                        exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strSystemRestorePointCreator, applicationLog, logCount)
+
+                        fileStream.Position = 0
+                        fileStream.SetLength(0)
+
+                        Dim streamWriter As New IO.StreamWriter(fileStream)
+                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
+
+                        streamReader.Dispose()
                     End Using
                 Catch ex As myExceptions.unableToGetLockOnLogFile
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
+                    Exit Sub
                 End Try
+
+                Dim longNumberOfImportedLogs As ULong = applicationLog.Count - longOldLogCount
 
                 writeToSystemEventLog("Log conversion process complete.", EventLogEntryType.Information)
 
