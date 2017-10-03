@@ -10,13 +10,20 @@ Namespace Functions.eventLogFunctions
         Private boolCachedCanIWriteThereResults As Boolean = privilegeChecks.canIWriteThere(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData))
         Private shortNumberOfRecalledGetFileStreamFunction As Short = 0
 
+        ''' <summary>Opens and returns a IO.FileStream.</summary>
+        ''' <param name="strFileToOpen">Path to the file you want to open.</param>
+        ''' <param name="accessMethod">The way you want to access the file.</param>
+        ''' <param name="fileMode">The way you want to access the file.</param>
+        ''' <returns>A IO.FileStream Object.</returns>
+        ''' <exception cref="myExceptions.unableToGetLockOnLogFile"></exception>
         Private Function getFileStreamWithWaiting(strFileToOpen As String, accessMethod As IO.FileAccess, Optional fileMode As IO.FileMode = IO.FileMode.Open) As IO.FileStream
             Try
                 Return New IO.FileStream(strFileToOpen, fileMode, accessMethod, IO.FileShare.None)
+            Catch ex As StackOverflowException
+                Throw New myExceptions.unableToGetLockOnLogFile() With {.innerIOException = ex}
             Catch ex As IO.IOException
                 If shortNumberOfRecalledGetFileStreamFunction.Equals(20) Then
-                    MsgBox("Unable to get file lock, we have exceeded our retry attempts.", MsgBoxStyle.Critical, "File Access Violation")
-                    Process.GetCurrentProcess.Kill()
+                    Throw New myExceptions.unableToGetLockOnLogFile() With {.innerIOException = ex}
                 End If
 
                 Debug.WriteLine("File is locked, waiting 100ms to get a lock on the file.")
@@ -66,13 +73,17 @@ Namespace Functions.eventLogFunctions
             Dim internalApplicationLog As New List(Of restorePointCreatorExportedLog)
 
             If IO.File.Exists(strLogFile) Then
-                shortNumberOfRecalledGetFileStreamFunction = 0
-                Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.Read)
-                    Using streamReader As New IO.StreamReader(fileStream)
-                        Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(internalApplicationLog.GetType)
-                        internalApplicationLog = xmlSerializerObject.Deserialize(streamReader)
+                Try
+                    shortNumberOfRecalledGetFileStreamFunction = 0
+                    Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.Read)
+                        Using streamReader As New IO.StreamReader(fileStream)
+                            Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(internalApplicationLog.GetType)
+                            internalApplicationLog = xmlSerializerObject.Deserialize(streamReader)
+                        End Using
                     End Using
-                End Using
+                Catch ex As myExceptions.unableToGetLockOnLogFile
+                    oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
+                End Try
             End If
 
             Return internalApplicationLog
@@ -94,13 +105,17 @@ Namespace Functions.eventLogFunctions
 
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
 
-                shortNumberOfRecalledGetFileStreamFunction = 0
-                Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.Write)
-                    Using streamWriter As New IO.StreamWriter(fileStream)
-                        Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
-                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
+                Try
+                    shortNumberOfRecalledGetFileStreamFunction = 0
+                    Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.Write)
+                        Using streamWriter As New IO.StreamWriter(fileStream)
+                            Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
+                            xmlSerializerObject.Serialize(streamWriter, applicationLog)
+                        End Using
                     End Using
-                End Using
+                Catch ex As myExceptions.unableToGetLockOnLogFile
+                    oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
+                End Try
 
                 writeToSystemEventLog("Log conversion process complete.", EventLogEntryType.Information)
 
@@ -131,12 +146,16 @@ Namespace Functions.eventLogFunctions
                     .dateObject = Now.ToUniversalTime
                 })
 
-                shortNumberOfRecalledGetFileStreamFunction = 0
-                Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.Write, IO.FileMode.Create)
-                    Using streamWriter As New IO.StreamWriter(fileStream)
-                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
+                Try
+                    shortNumberOfRecalledGetFileStreamFunction = 0
+                    Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.Write, IO.FileMode.Create)
+                        Using streamWriter As New IO.StreamWriter(fileStream)
+                            xmlSerializerObject.Serialize(streamWriter, applicationLog)
+                        End Using
                     End Using
-                End Using
+                Catch ex As myExceptions.unableToGetLockOnLogFile
+                    oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
+                End Try
             Catch ex As Exception
                 MsgBox(ex.Message)
             End Try
@@ -191,6 +210,8 @@ Namespace Functions.eventLogFunctions
 
                         streamReader.Dispose()
                     End Using
+                Catch ex As myExceptions.unableToGetLockOnLogFile
+                    oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
                 Catch ex As Exception
                     ' Does nothing
                 End Try
@@ -225,6 +246,8 @@ Namespace Functions.eventLogFunctions
 
                         streamReader.Dispose()
                     End Using
+                Catch ex As myExceptions.unableToGetLockOnLogFile
+                    oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
                 Catch ex As Exception
                     ' Does nothing
                 End Try
@@ -265,6 +288,8 @@ Namespace Functions.eventLogFunctions
 
                         streamReader.Dispose()
                     End Using
+                Catch ex As myExceptions.unableToGetLockOnLogFile
+                    oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
                 Catch ex As Exception
                     ' Does nothing
                 End Try

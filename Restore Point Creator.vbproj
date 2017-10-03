@@ -144,6 +144,7 @@
     <Compile Include="Classes and Modules\Functions Namespace\importExportSettings.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\IOPriority.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\myExceptions.vb" />
+    <Compile Include="Classes and Modules\Functions Namespace\oldEventLogFunctions.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\osVersionInfo.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\privilegeChecks.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\registryStuff.vb" />
