@@ -312,6 +312,22 @@ Namespace Functions.eventLogFunctions
             End If
         End Sub
 
+        Public Function convertLogTypeToText(errorType As EventLogEntryType) As String
+            If errorType = EventLogEntryType.Error Then
+                Return "Error"
+            ElseIf errorType = EventLogEntryType.Information Then
+                Return "Information"
+            ElseIf errorType = EventLogEntryType.Warning Then
+                Return "Warning"
+            ElseIf errorType = EventLogEntryType.FailureAudit Then
+                Return "FailureAudit"
+            ElseIf errorType = EventLogEntryType.SuccessAudit Then
+                Return "SuccessAudit"
+            Else
+                Return "Information"
+            End If
+        End Function
+
         ''' <summary>Writes the exception event to the System Log File. This is a universal exception logging function that's built to handle various forms of exceptions and not not any particular type.</summary>
         ''' <param name="exceptionObject">The exception object.</param>
         ''' <param name="errorType">The type of Event Log you want the Exception Event to be recorded to the Application Event Log as.</param>
@@ -353,6 +369,7 @@ Namespace Functions.eventLogFunctions
 
                 support.addExtendedCrashData(stringBuilder, exceptionObject)
 
+                stringBuilder.AppendLine("Log Type: " & convertLogTypeToText(errorType))
                 stringBuilder.AppendLine("Running As: " & Environment.UserName)
                 stringBuilder.AppendLine("Exception Type: " & exceptionObject.GetType.ToString)
                 stringBuilder.AppendLine("Message: " & support.removeSourceCodePathInfo(exceptionObject.Message))

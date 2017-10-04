@@ -59,6 +59,7 @@
 
                 support.addExtendedCrashData(stringBuilder, exceptionObject)
 
+                stringBuilder.AppendLine("Log Type: " & eventLogFunctions.convertLogTypeToText(errorType))
                 stringBuilder.AppendLine("Running As: " & Environment.UserName)
                 stringBuilder.AppendLine("Exception Type: " & exceptionObject.GetType.ToString)
                 stringBuilder.AppendLine("Message: " & support.removeSourceCodePathInfo(exceptionObject.Message))
