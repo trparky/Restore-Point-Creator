@@ -573,10 +573,7 @@
         If e.KeyCode = Keys.A And e.Modifiers = Keys.Control Then
             chkMultiSelectMode.Checked = True
             eventLogList.MultiSelect = True
-
-            For Each item As ListViewItem In eventLogList.Items
-                item.Selected = True
-            Next
+            eventLogList.Items.Cast(Of ListViewItem).ToList.ForEach(Sub(item As ListViewItem) item.Selected = True)
         End If
     End Sub
 
