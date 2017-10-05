@@ -407,6 +407,7 @@ Namespace My
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.scheduledRestorePoint, StringComparison.OrdinalIgnoreCase) Then
                             Dim restorePointNameForScheduledTasks As String = globalVariables.strDefaultNameForScheduledTasks
                             Dim boolExtendedLoggingForScheduledTasks As Boolean = True
+                            Dim boolWriteRestorePointListToLog As Boolean = True
                             Dim oldNewestRestorePointID As Integer
 
                             registryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
@@ -415,6 +416,7 @@ Namespace My
                                 restorePointNameForScheduledTasks = registryKey.GetValue("Custom Name for Scheduled Restore Points", globalVariables.strDefaultNameForScheduledTasks)
 
                                 boolExtendedLoggingForScheduledTasks = Functions.registryStuff.getBooleanValueFromRegistry(registryKey, "Extended Logging For Scheduled Tasks", True)
+                                boolWriteRestorePointListToLog = Functions.registryStuff.getBooleanValueFromRegistry(registryKey, globalVariables.strWriteRestorePointListToApplicationLogRegistryValue, True)
 
                                 registryKey.Close()
                                 registryKey.Dispose()
@@ -441,7 +443,7 @@ Namespace My
                                 End While
                             End If
 
-                            If boolExtendedLoggingForScheduledTasks = True Then Functions.restorePointStuff.writeSystemRestorePointsToApplicationLogs()
+                            If boolExtendedLoggingForScheduledTasks And boolWriteRestorePointListToLog Then Functions.restorePointStuff.writeSystemRestorePointsToApplicationLogs()
 
                             If Functions.registryStuff.getBooleanValueFromRegistry(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False), "Delete Old Restore Points", False) Then
                                 Functions.startupFunctions.deleteOldRestorePoints()

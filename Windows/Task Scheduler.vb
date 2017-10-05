@@ -117,6 +117,7 @@ Public Class frmTaskScheduler
 
         Using regKey As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
             chkDeleteOldRestorePoints.Checked = Functions.registryStuff.getBooleanValueFromRegistry(regKey, "Delete Old Restore Points", False)
+            chkWriteRestorePointListToLog.Checked = Functions.registryStuff.getBooleanValueFromRegistry(regKey, globalVariables.strWriteRestorePointListToApplicationLogRegistryValue, True)
         End Using
 
         txtDays.Text = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("MaxDays", 15).ToString
@@ -782,5 +783,9 @@ Public Class frmTaskScheduler
 
     Sub tellTheProgramThingsChanged()
         If boolDoneLoading = True Then boolThingsChanged = True
+    End Sub
+
+    Private Sub chkWriteRestorePointListToLog_Click(sender As Object, e As EventArgs) Handles chkWriteRestorePointListToLog.Click
+        Functions.registryStuff.setBooleanValueInRegistry(globalVariables.strWriteRestorePointListToApplicationLogRegistryValue, chkWriteRestorePointListToLog.Checked)
     End Sub
 End Class

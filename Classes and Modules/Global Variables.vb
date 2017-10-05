@@ -158,6 +158,7 @@ Namespace globalVariables
     End Namespace
 
     Module globalVariables
+        Public Const strWriteRestorePointListToApplicationLogRegistryValue As String = "Write Restore Point List to Application Log"
         Public Const programFileNameInZIP As String = "Restore Point Creator.exe"
         Public Const pdbFileNameInZIP As String = "Restore Point Creator.pdb"
 

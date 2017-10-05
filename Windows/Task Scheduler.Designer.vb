@@ -75,6 +75,7 @@ Partial Class frmTaskScheduler
         Me.btnSetCustomName = New System.Windows.Forms.Button()
         Me.chkWake = New System.Windows.Forms.CheckBox()
         Me.lblRunTimes = New System.Windows.Forms.Label()
+        Me.chkWriteRestorePointListToLog = New System.Windows.Forms.CheckBox()
         Me.grpDaysOfTheWeek.SuspendLayout()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
@@ -191,7 +192,7 @@ Partial Class frmTaskScheduler
         '
         Me.btnSaveTask.Image = Global.Restore_Point_Creator.My.Resources.Resources.save
         Me.btnSaveTask.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.btnSaveTask.Location = New System.Drawing.Point(15, 272)
+        Me.btnSaveTask.Location = New System.Drawing.Point(15, 288)
         Me.btnSaveTask.Name = "btnSaveTask"
         Me.btnSaveTask.Size = New System.Drawing.Size(230, 23)
         Me.btnSaveTask.TabIndex = 14
@@ -255,7 +256,7 @@ Partial Class frmTaskScheduler
         Me.btnDeleteTask.Enabled = False
         Me.btnDeleteTask.Image = Global.Restore_Point_Creator.My.Resources.Resources.delete
         Me.btnDeleteTask.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.btnDeleteTask.Location = New System.Drawing.Point(249, 272)
+        Me.btnDeleteTask.Location = New System.Drawing.Point(249, 288)
         Me.btnDeleteTask.Name = "btnDeleteTask"
         Me.btnDeleteTask.Size = New System.Drawing.Size(230, 23)
         Me.btnDeleteTask.TabIndex = 16
@@ -266,7 +267,7 @@ Partial Class frmTaskScheduler
         '
         Me.btnSet.Image = Global.Restore_Point_Creator.My.Resources.Resources.save
         Me.btnSet.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.btnSet.Location = New System.Drawing.Point(229, 211)
+        Me.btnSet.Location = New System.Drawing.Point(229, 227)
         Me.btnSet.Name = "btnSet"
         Me.btnSet.Size = New System.Drawing.Size(105, 23)
         Me.btnSet.TabIndex = 20
@@ -276,7 +277,7 @@ Partial Class frmTaskScheduler
         '
         'txtDays
         '
-        Me.txtDays.Location = New System.Drawing.Point(188, 213)
+        Me.txtDays.Location = New System.Drawing.Point(188, 229)
         Me.txtDays.Name = "txtDays"
         Me.txtDays.Size = New System.Drawing.Size(35, 20)
         Me.txtDays.TabIndex = 19
@@ -284,7 +285,7 @@ Partial Class frmTaskScheduler
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(11, 216)
+        Me.Label3.Location = New System.Drawing.Point(11, 232)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(174, 13)
         Me.Label3.TabIndex = 18
@@ -542,7 +543,7 @@ Partial Class frmTaskScheduler
         Me.deleteOldRestorePointsTaskSettings.Controls.Add(Me.grpDaysOfTheWeekDelete)
         Me.deleteOldRestorePointsTaskSettings.Controls.Add(Me.btnSaveTaskDelete)
         Me.deleteOldRestorePointsTaskSettings.Controls.Add(Me.Panel2)
-        Me.deleteOldRestorePointsTaskSettings.Location = New System.Drawing.Point(12, 301)
+        Me.deleteOldRestorePointsTaskSettings.Location = New System.Drawing.Point(12, 316)
         Me.deleteOldRestorePointsTaskSettings.Name = "deleteOldRestorePointsTaskSettings"
         Me.deleteOldRestorePointsTaskSettings.Size = New System.Drawing.Size(475, 268)
         Me.deleteOldRestorePointsTaskSettings.TabIndex = 35
@@ -600,7 +601,7 @@ Partial Class frmTaskScheduler
         '
         'btnSetCustomName
         '
-        Me.btnSetCustomName.Location = New System.Drawing.Point(16, 243)
+        Me.btnSetCustomName.Location = New System.Drawing.Point(16, 259)
         Me.btnSetCustomName.Name = "btnSetCustomName"
         Me.btnSetCustomName.Size = New System.Drawing.Size(463, 23)
         Me.btnSetCustomName.TabIndex = 37
@@ -627,11 +628,22 @@ Partial Class frmTaskScheduler
         Me.lblRunTimes.TabIndex = 39
         Me.lblRunTimes.Text = "Last Run Time:" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Next Run Time:"
         '
+        'chkWriteRestorePointListToLog
+        '
+        Me.chkWriteRestorePointListToLog.AutoSize = True
+        Me.chkWriteRestorePointListToLog.Location = New System.Drawing.Point(15, 207)
+        Me.chkWriteRestorePointListToLog.Name = "chkWriteRestorePointListToLog"
+        Me.chkWriteRestorePointListToLog.Size = New System.Drawing.Size(225, 17)
+        Me.chkWriteRestorePointListToLog.TabIndex = 40
+        Me.chkWriteRestorePointListToLog.Text = "Write Restore Point List to Application Log"
+        Me.chkWriteRestorePointListToLog.UseVisualStyleBackColor = True
+        '
         'frmTaskScheduler
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
-        Me.ClientSize = New System.Drawing.Size(492, 575)
+        Me.ClientSize = New System.Drawing.Size(492, 588)
+        Me.Controls.Add(Me.chkWriteRestorePointListToLog)
         Me.Controls.Add(Me.lblRunTimes)
         Me.Controls.Add(Me.chkWake)
         Me.Controls.Add(Me.btnSetCustomName)
@@ -725,4 +737,5 @@ Partial Class frmTaskScheduler
     Friend WithEvents chkWake As CheckBox
     Friend WithEvents lblRunTimes As Label
     Friend WithEvents lblRunTimesDelete As Label
+    Friend WithEvents chkWriteRestorePointListToLog As CheckBox
 End Class
