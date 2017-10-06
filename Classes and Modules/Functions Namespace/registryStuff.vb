@@ -152,5 +152,19 @@ Namespace Functions.registryStuff
                 Return boolDefaultValue
             End Try
         End Function
+
+        ''' <summary>Gets a setting from the application's Registry key.</summary>
+        ''' <param name="valueToGetFromRegistry">The name of the Registry Value we will be pulling from.</param>
+        ''' <param name="boolDefaultValue">If the Registry Value isn't found or the value is malformed, this will be the Boolean value that this function will return.</param>
+        ''' <returns>A Boolean value.</returns>
+        Public Function getBooleanValueFromRegistry(ByVal valueToGetFromRegistry As String, ByVal boolDefaultValue As Boolean) As Boolean
+            Using registryObject As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+                If registryObject Is Nothing Then
+                    Return boolDefaultValue
+                Else
+                    Return getBooleanValueFromRegistry(registryObject, valueToGetFromRegistry, boolDefaultValue)
+                End If
+            End Using
+        End Function
     End Module
 End Namespace
