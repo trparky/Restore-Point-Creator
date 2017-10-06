@@ -1644,7 +1644,6 @@ Public Class Form1
 
     Private Sub loadRestorePointsFromSystemIntoList() 'Adds all Restore Points to a ListView
         ' Declares some variables.
-        Dim systemRestoreIDs As New ArrayList ' Creates an ArrayList for us to put our System Restore IDs into for later checking for the newest System Restore Point ID.
         Dim systemRestorePointsManagementObjectSearcher As ManagementObjectSearcher
         Dim listViewItem As myListViewItemTypes.restorePointEntryItem
         Dim listOfRestorePoints As New List(Of myListViewItemTypes.restorePointEntryItem)
@@ -1682,9 +1681,6 @@ Public Class Form1
                                 If Not Integer.TryParse(listViewItem.strRestorePointID, listViewItem.intRestorePointID) Then
                                     Throw New Functions.myExceptions.integerTryParseException() With {.strThatCouldNotBeParsedIntoAnInteger = listViewItem.strRestorePointID}
                                 End If
-
-                                ' Adds the System Restore Point ID to our list of System Restore Point IDs to calculate the newest System Restore Point.
-                                systemRestoreIDs.Add(Integer.Parse(restorePointDetails("SequenceNumber")))
 
                                 listViewItem.SubItems.Add(restorePointDetails("Description").ToString)
                                 listViewItem.strRestorePointName = restorePointDetails("Description").ToString
@@ -1746,11 +1742,7 @@ Public Class Form1
                             ' Does some sorting on the System Restore Points list on the GUI.
                             systemRestorePointsList.Sort()
 
-                            If systemRestoreIDs.Count <> 0 Then
-                                ' First, we convert the ArrayList into an Integer then calculate the Max value of all of the Integers in the Integer Array.
-                                ' This gets the latest System Restore Point ID for later checking to see if the user is deleting the newest System Restore Point.
-                                newestSystemRestoreID = DirectCast(systemRestoreIDs.ToArray(GetType(Integer)), Integer()).Max
-                            End If
+                            newestSystemRestoreID = systemRestorePointsList.Items.Cast(Of myListViewItemTypes.restorePointEntryItem).Max(Function(item As myListViewItemTypes.restorePointEntryItem) item.intRestorePointID)
 
                             For Each itemInList As myListViewItemTypes.restorePointEntryItem In systemRestorePointsList.Items
                                 If itemInList.intRestorePointID = newestSystemRestoreID Then
