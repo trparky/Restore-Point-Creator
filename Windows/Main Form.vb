@@ -919,7 +919,11 @@ Public Class Form1
             memoryStream = Nothing
 
             If IO.File.Exists(strNewApplicationFileNameFullName) = True Then
-                Process.Start(New ProcessStartInfo With {.FileName = strNewApplicationFileNameFullName, .Arguments = "-updatewithoutuninstallinfoupdate", .Verb = "runas"})
+                Process.Start(New ProcessStartInfo With {
+                    .FileName = strNewApplicationFileNameFullName,
+                    .Arguments = "-updatewithoutuninstallinfoupdate",
+                    .Verb = "runas"
+                })
                 Process.GetCurrentProcess.Kill()
             Else
                 MsgBox("Something went wrong during the download, update process aborted.", MsgBoxStyle.Critical, strMessageBoxTitle)
@@ -1465,7 +1469,11 @@ Public Class Form1
                 Functions.eventLogFunctions.writeToSystemEventLog("New executable exists, executing it in update mode.", EventLogEntryType.Information)
             End If
 
-            Process.Start(New ProcessStartInfo With {.FileName = strNewApplicationFileNameFullName, .Arguments = "-update", .Verb = "runas"})
+            Process.Start(New ProcessStartInfo With {
+                .FileName = strNewApplicationFileNameFullName,
+                .Arguments = "-update",
+                .Verb = "runas"
+            })
             Process.GetCurrentProcess.Kill()
         Else
             Functions.eventLogFunctions.writeToSystemEventLog("New executable doesn't exists, update process aborted.", EventLogEntryType.Error)
@@ -1679,7 +1687,9 @@ Public Class Form1
                                 }
 
                                 If Not Integer.TryParse(listViewItem.strRestorePointID, listViewItem.intRestorePointID) Then
-                                    Throw New Functions.myExceptions.integerTryParseException() With {.strThatCouldNotBeParsedIntoAnInteger = listViewItem.strRestorePointID}
+                                    Throw New Functions.myExceptions.integerTryParseException() With {
+                                        .strThatCouldNotBeParsedIntoAnInteger = listViewItem.strRestorePointID
+                                    }
                                 End If
 
                                 listViewItem.SubItems.Add(restorePointDetails("Description").ToString)
@@ -3354,7 +3364,12 @@ Public Class Form1
             ' This fixes a bug that was reported by "George".
             If Not restorePointIDsToBeDeleted.ContainsKey(strRestorePointID) Then
                 If boolConfirmDeletions And My.Settings.multiConfirmRestorePointDeletions And systemRestorePointsList.SelectedItems.Count > 1 Then
-                    restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
+                    restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {
+                                                        .strName = strRestorePointName,
+                                                        .strCreatedDate = strRestorePointDate,
+                                                        .strRestorePointType = strRestorePointType,
+                                                        .dateCreated = dateRestorePointCreated
+                                                   })
                 ElseIf boolConfirmDeletions And (Not My.Settings.multiConfirmRestorePointDeletions Or systemRestorePointsList.SelectedItems.Count = 1) Then
                     deletionConfirmationWindow = New frmConfirmDelete
 
@@ -3381,9 +3396,19 @@ Public Class Form1
                     deletionConfirmationWindow.Dispose()
                     deletionConfirmationWindow = Nothing
 
-                    If boolUserWantsToDeleteTheRestorePoint Then restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
+                    If boolUserWantsToDeleteTheRestorePoint Then restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {
+                                                                                                        .strName = strRestorePointName,
+                                                                                                        .strCreatedDate = strRestorePointDate,
+                                                                                                        .strRestorePointType = strRestorePointType,
+                                                                                                        .dateCreated = dateRestorePointCreated
+                                                                                                })
                 Else
-                    restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {.strName = strRestorePointName, .strCreatedDate = strRestorePointDate, .strRestorePointType = strRestorePointType, .dateCreated = dateRestorePointCreated})
+                    restorePointIDsToBeDeleted.Add(strRestorePointID, New restorePointInfo With {
+                                                        .strName = strRestorePointName,
+                                                        .strCreatedDate = strRestorePointDate,
+                                                        .strRestorePointType = strRestorePointType,
+                                                        .dateCreated = dateRestorePointCreated
+                                                   })
                 End If
             End If
 
