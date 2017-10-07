@@ -1743,12 +1743,7 @@ Public Class Form1
                             systemRestorePointsList.Sort()
 
                             newestSystemRestoreID = systemRestorePointsList.Items.Cast(Of myListViewItemTypes.restorePointEntryItem).Max(Function(item As myListViewItemTypes.restorePointEntryItem) item.intRestorePointID)
-
-                            For Each itemInList As myListViewItemTypes.restorePointEntryItem In systemRestorePointsList.Items
-                                If itemInList.intRestorePointID = newestSystemRestoreID Then
-                                    itemInList.Font = New Font(btnCreate.Font.FontFamily, btnCreate.Font.SizeInPoints, FontStyle.Bold)
-                                End If
-                            Next
+                            systemRestorePointsList.Items.Cast(Of myListViewItemTypes.restorePointEntryItem).First(Function(item As myListViewItemTypes.restorePointEntryItem) item.intRestorePointID = newestSystemRestoreID).Font = New Font(btnCreate.Font.FontFamily, btnCreate.Font.SizeInPoints, FontStyle.Bold)
                         End If
                     Else
                         newestSystemRestoreID = 0
