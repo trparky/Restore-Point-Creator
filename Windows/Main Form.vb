@@ -2071,14 +2071,11 @@ Public Class Form1
         End If
 
         If AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked = False Then
-            For Each iteminlist As myListViewItemTypes.restorePointEntryItem In systemRestorePointsList.SelectedItems
-                If iteminlist.intRestorePointID = newestSystemRestoreID Then
-                    btnDeleteRestorePoint.Enabled = False
-                    stripDelete.Enabled = False
-                    ToolTip.SetToolTip(btnDeleteRestorePoint, "Disabled because you have the latest System Restore Point selected as part of the group of selected System Restore Points.")
-                    Exit Sub
-                End If
-            Next
+            If systemRestorePointsList.SelectedItems.Cast(Of myListViewItemTypes.restorePointEntryItem).ToList().FirstOrDefault(Function(item As myListViewItemTypes.restorePointEntryItem) item.intRestorePointID = newestSystemRestoreID) IsNot Nothing Then
+                btnDeleteRestorePoint.Enabled = False
+                stripDelete.Enabled = False
+                ToolTip.SetToolTip(btnDeleteRestorePoint, "Disabled because you have the latest System Restore Point selected as part of the group of selected System Restore Points.")
+            End If
         End If
     End Sub
 
