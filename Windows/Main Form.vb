@@ -1170,6 +1170,8 @@ Public Class Form1
 
             result = Functions.wmi.createRestorePoint(stringRestorePointName, Functions.restorePointStuff.RestoreType.WindowsType, sequenceNumber)
 
+            If My.Settings.debug Then Functions.eventLogFunctions.writeToSystemEventLog(String.Format("EXTENDED DEBUG MESSAGE{0}The error code returned from System Restore API was {1} ({2}).", vbCrLf, result.ToString(), Functions.support.convertErrorCodeToHex(result)), EventLogEntryType.Information)
+
             If result = Functions.APIs.errorCodes.ERROR_SERVICE_DISABLED Then
                 Dim reservedSpaceSize As ULong = Functions.vss.getMaxSize(globalVariables.systemDriveLetter)
 
@@ -1235,15 +1237,21 @@ Public Class Form1
                 Exit Sub
             End If
 
+            If My.Settings.debug Then Functions.eventLogFunctions.writeToSystemEventLog("EXTENDED DEBUG MESSAGE" & vbCrLf & "System Restore Point Created, waiting for system to update System Restore to catch up.", EventLogEntryType.Information)
+
             ' We wait here with this loop until the system's has the restore point created.
             While oldNewestRestorePointID = Functions.wmi.getNewestSystemRestorePointID()
                 ' Does nothing, just loops and sleeps for half a second.
                 Threading.Thread.Sleep(500)
             End While
 
+            If My.Settings.debug Then Functions.eventLogFunctions.writeToSystemEventLog("EXTENDED DEBUG MESSAGE" & vbCrLf & "System Restore has caught up.", EventLogEntryType.Information)
+
             If globalVariables.KeepXAmountOfRestorePoints = True Then
                 Functions.wmi.doDeletingOfXNumberOfRestorePoints(globalVariables.KeepXAmountofRestorePointsValue)
             End If
+
+            If My.Settings.debug Then Functions.eventLogFunctions.writeToSystemEventLog("EXTENDED DEBUG MESSAGE" & vbCrLf & "Finishing up restore point creation routine And closing Please Wait panel.", EventLogEntryType.Information)
 
             enableFormElements()
 
@@ -1255,7 +1263,10 @@ Public Class Form1
             txtRestorePointDescription.Text = Nothing
             doTheGrayingOfTheRestorePointNameTextBox()
 
-            If toolStripCloseAfterRestorePointIsCreated.Checked Then Me.Close()
+            If toolStripCloseAfterRestorePointIsCreated.Checked Then
+                If My.Settings.debug Then Functions.eventLogFunctions.writeToSystemEventLog("EXTENDED DEBUG MESSAGE" & vbCrLf & "System Restore Point Created, user has instructed the program to close after creation of restore points.", EventLogEntryType.Information)
+                Me.Close()
+            End If
         Catch ex2 As Exception
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex2, ex2.Message, ex2.StackTrace, ex2.GetType)
@@ -2245,6 +2256,8 @@ Public Class Form1
             End If
 
             chkShowVersionInTitleBarToolStripMenuItem.Checked = My.Settings.boolShowVersionInWindowTitle
+            ExtendedDebugToolStripMenuItem.Visible = globalVariables.version.boolDebugBuild
+            ExtendedDebugToolStripMenuItem.Checked = My.Settings.debug
 
             If My.Settings.boolShowVersionInWindowTitle = True Then
                 If globalVariables.version.boolBeta Then
@@ -2344,6 +2357,10 @@ Public Class Form1
 #End Region
 
 #Region "--== ToolStrip Click Events ==--"
+    Private Sub ExtendedDebugToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExtendedDebugToolStripMenuItem.Click
+        My.Settings.debug = ExtendedDebugToolStripMenuItem.Checked
+    End Sub
+
     Private Sub ManuallyFixSystemRestoreToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ManuallyFixSystemRestoreToolStripMenuItem.Click
         If MsgBox("You are about to forcefully fix System Restore on your system by enabling System Restore on the system drive. Use this tool only if you have received errors from the program such as Error 1058." & vbCrLf & vbCrLf & "WARNING! This tool may have unintended consequences such as lost restore points. By using this tool you agree that the developer of System Restore Point Creator is not liable for any lost restore points." & vbCrLf & vbCrLf & "Are you sure you want to do this?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, strMessageBoxTitle) = MsgBoxResult.Yes Then
             Functions.eventLogFunctions.writeToSystemEventLog("The Manual System Restore Fix Tool has been engaged.", EventLogEntryType.Information)

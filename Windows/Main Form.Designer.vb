@@ -144,6 +144,7 @@ Partial Class Form1
         Me.pleaseWaitProgressBar = New Tom.SmoothProgressBar()
         Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
         Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
+        Me.ExtendedDebugToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.restorePointListContextMenu.SuspendLayout()
         Me.buttonTableLayout.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
@@ -496,7 +497,7 @@ Partial Class Form1
         '
         'OptionsToolStripMenuItem
         '
-        Me.OptionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveSafeModeBootOptionToolStripMenuItem, Me.InterfaceTooBigToolStripMenuItem, Me.AdditionalOptionsAndSettingsToolStripMenuItem, Me.ConfigurationBackupRestoreToolStripMenuItem, Me.ToolStripMenuItem5, Me.SetBarColorToolStripMenuItem, Me.SetPleaseWaitBorderColorToolStripMenuItem, Me.barBelowColorSettings, Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem, Me.toolStripClear, Me.toolStripMyComputer, Me.CreateRestorePointAtUserLogonToolStripMenuItem, Me.ConfigureProxyToolStripMenuItem, Me.SetWindowsActivePowerPlanSettingsForWakeTimersBackToDefaultToolStripMenuItem, Me.KeepXAmountOfRestorePointsToolStripMenuItem, Me.DefaultCustomRestorePointNameToolStripMenuItem, Me.ConfigureHTTPTimeoutToolStripMenuItem, Me.ToolStripMenuItem3, Me.SoftwareUpdateSettingsToolStripMenuItem, Me.NotificationOptionsToolStripMenuItem, Me.UseSSLToolStripMenuItem, Me.lineBeforeDebugMenuItem, Me.SwitchToDebugBuildToolStripMenuItem})
+        Me.OptionsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RemoveSafeModeBootOptionToolStripMenuItem, Me.InterfaceTooBigToolStripMenuItem, Me.AdditionalOptionsAndSettingsToolStripMenuItem, Me.ConfigurationBackupRestoreToolStripMenuItem, Me.ToolStripMenuItem5, Me.SetBarColorToolStripMenuItem, Me.SetPleaseWaitBorderColorToolStripMenuItem, Me.barBelowColorSettings, Me.ExtendedDebugToolStripMenuItem, Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem, Me.toolStripClear, Me.toolStripMyComputer, Me.CreateRestorePointAtUserLogonToolStripMenuItem, Me.ConfigureProxyToolStripMenuItem, Me.SetWindowsActivePowerPlanSettingsForWakeTimersBackToDefaultToolStripMenuItem, Me.KeepXAmountOfRestorePointsToolStripMenuItem, Me.DefaultCustomRestorePointNameToolStripMenuItem, Me.ConfigureHTTPTimeoutToolStripMenuItem, Me.ToolStripMenuItem3, Me.SoftwareUpdateSettingsToolStripMenuItem, Me.NotificationOptionsToolStripMenuItem, Me.UseSSLToolStripMenuItem, Me.lineBeforeDebugMenuItem, Me.SwitchToDebugBuildToolStripMenuItem})
         Me.OptionsToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.settings
         Me.OptionsToolStripMenuItem.Name = "OptionsToolStripMenuItem"
         Me.OptionsToolStripMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.AsNeeded
@@ -1051,6 +1052,13 @@ Partial Class Form1
         '
         Me.pleaseWaitMessageChanger.Interval = 250
         '
+        'ExtendedDebugToolStripMenuItem
+        '
+        Me.ExtendedDebugToolStripMenuItem.CheckOnClick = True
+        Me.ExtendedDebugToolStripMenuItem.Name = "ExtendedDebugToolStripMenuItem"
+        Me.ExtendedDebugToolStripMenuItem.Size = New System.Drawing.Size(431, 22)
+        Me.ExtendedDebugToolStripMenuItem.Text = "Enable Extended Debug Logging"
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
@@ -1205,4 +1213,5 @@ Partial Class Form1
     Friend WithEvents pleaseWaitMessageChanger As Timer
     Friend WithEvents SetPleaseWaitBorderColorToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents barBelowColorSettings As ToolStripSeparator
+    Friend WithEvents ExtendedDebugToolStripMenuItem As ToolStripMenuItem
 End Class
