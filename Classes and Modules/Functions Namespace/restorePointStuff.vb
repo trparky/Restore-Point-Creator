@@ -16,29 +16,34 @@ Namespace Functions.restorePointStuff
         End Enum
 
         ''' <summary>A function that returns the type of restore point depending upon the Integer that comes from the WMI.</summary>
-        ''' <param name="type">Integer.</param>
+        ''' <param name="strType">String.</param>
         ''' <returns>Returns a String value containing the type of Restore Point in English.</returns>
-        Public Function whatTypeOfRestorePointIsIt(type As Integer) As String
-            If type = RestoreType.ApplicationInstall Then
-                Return "Application Install"
-            ElseIf type = RestoreType.ApplicationUninstall Then
-                Return "Application Removal"
-            ElseIf type = RestoreType.BackupRecovery Then
-                Return "Backup Recovery"
-            ElseIf type = RestoreType.CancelledOperation Then
-                Return "Cancelled Operation"
-            ElseIf type = RestoreType.Checkpoint Then
-                Return "System Checkpoint"
-            ElseIf type = RestoreType.DeviceDriverInstall Then
-                Return "Device Driver Install"
-            ElseIf type = RestoreType.FirstRun Then
-                Return "First Run"
-            ElseIf type = RestoreType.ModifySettings Then
-                Return "Settings Modified"
-            ElseIf type = RestoreType.Restore Then
-                Return "Restore"
-            ElseIf type = RestoreType.WindowsType Then
-                Return "System Restore Point"
+        Public Function whatTypeOfRestorePointIsIt(strType As Integer) As String
+            Dim intType As Integer
+            If Integer.TryParse(strType, intType) Then
+                If intType = RestoreType.ApplicationInstall Then
+                    Return "Application Install"
+                ElseIf intType = RestoreType.ApplicationUninstall Then
+                    Return "Application Removal"
+                ElseIf intType = RestoreType.BackupRecovery Then
+                    Return "Backup Recovery"
+                ElseIf intType = RestoreType.CancelledOperation Then
+                    Return "Cancelled Operation"
+                ElseIf intType = RestoreType.Checkpoint Then
+                    Return "System Checkpoint"
+                ElseIf intType = RestoreType.DeviceDriverInstall Then
+                    Return "Device Driver Install"
+                ElseIf intType = RestoreType.FirstRun Then
+                    Return "First Run"
+                ElseIf intType = RestoreType.ModifySettings Then
+                    Return "Settings Modified"
+                ElseIf intType = RestoreType.Restore Then
+                    Return "Restore"
+                ElseIf intType = RestoreType.WindowsType Then
+                    Return "System Restore Point"
+                Else
+                    Return "Unknown Type"
+                End If
             Else
                 Return "Unknown Type"
             End If

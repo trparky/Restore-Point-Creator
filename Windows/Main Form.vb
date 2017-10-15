@@ -1719,23 +1719,14 @@ Public Class Form1
                                 End If
 
                                 If restorePointDetails("Description").ToString.caseInsensitiveContains("windows update") Then
-                                    If My.Settings.debug = True Then
-                                        listViewItem.strRestorePointType = "Windows Update" & " (" & restorePointDetails("RestorePointType").ToString & ")"
-                                    Else
-                                        listViewItem.strRestorePointType = "Windows Update"
-                                    End If
+                                    listViewItem.strRestorePointType = "Windows Update"
+                                    If My.Settings.debug Then listViewItem.strRestorePointType &= " (" & restorePointDetails("RestorePointType").ToString & ")"
                                 ElseIf restorePointDetails("Description").ToString.caseInsensitiveContains("system checkpoint") Then
-                                    If My.Settings.debug = True Then
-                                        listViewItem.strRestorePointType = "System Checkpoint" & " (" & restorePointDetails("RestorePointType").ToString & ")"
-                                    Else
-                                        listViewItem.strRestorePointType = "System Checkpoint"
-                                    End If
+                                    listViewItem.strRestorePointType = "System Checkpoint"
+                                    If My.Settings.debug Then listViewItem.strRestorePointType &= " (" & restorePointDetails("RestorePointType").ToString & ")"
                                 Else
-                                    If My.Settings.debug = True Then
-                                        listViewItem.strRestorePointType = Functions.restorePointStuff.whatTypeOfRestorePointIsIt(Integer.Parse(restorePointDetails("RestorePointType").ToString)) & " (" & restorePointDetails("RestorePointType").ToString & ")"
-                                    Else
-                                        listViewItem.strRestorePointType = Functions.restorePointStuff.whatTypeOfRestorePointIsIt(Integer.Parse(restorePointDetails("RestorePointType").ToString))
-                                    End If
+                                    listViewItem.strRestorePointType = Functions.restorePointStuff.whatTypeOfRestorePointIsIt(restorePointDetails("RestorePointType").ToString)
+                                    If My.Settings.debug Then listViewItem.strRestorePointType &= " (" & restorePointDetails("RestorePointType").ToString & ")"
                                 End If
 
                                 listViewItem.SubItems.Add(listViewItem.strRestorePointType)
