@@ -2256,6 +2256,11 @@ Public Class Form1
             End If
 
             chkShowVersionInTitleBarToolStripMenuItem.Checked = My.Settings.boolShowVersionInWindowTitle
+
+            If Not globalVariables.version.boolDebugBuild Then
+                My.Settings.debug = False
+            End If
+
             ExtendedDebugToolStripMenuItem.Visible = globalVariables.version.boolDebugBuild
             ExtendedDebugToolStripMenuItem.Checked = My.Settings.debug
 
