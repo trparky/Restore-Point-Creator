@@ -87,7 +87,7 @@
         Private _intRestorePointID As Integer
         Private _dateRestorePointDate As Date
 
-        Public Property intRestorePointID() As Integer
+        Public Property intID() As Integer
             Get
                 Return _intRestorePointID
             End Get
@@ -96,7 +96,7 @@
             End Set
         End Property
 
-        Public Property strRestorePointID() As String
+        Public Property strID() As String
             Get
                 Return _strRestorePointID
             End Get
@@ -105,7 +105,7 @@
             End Set
         End Property
 
-        Public Property strRestorePointAge() As String
+        Public Property strAge() As String
             Get
                 Return _strRestorePointAge
             End Get
@@ -114,7 +114,7 @@
             End Set
         End Property
 
-        Public Property strRestorePointName() As String
+        Public Property strName() As String
             Get
                 Return _strRestorePointName
             End Get
@@ -123,7 +123,7 @@
             End Set
         End Property
 
-        Public Property strRestorePointDate() As String
+        Public Property strCreatedDate() As String
             Get
                 Return _strRestorePointDate
             End Get
@@ -141,7 +141,7 @@
             End Set
         End Property
 
-        Public Property dateRestorePointDate() As Date
+        Public Property dateCreated() As Date
             Get
                 Return _dateRestorePointDate
             End Get
