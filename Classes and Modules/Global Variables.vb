@@ -196,7 +196,7 @@ Namespace globalVariables
 
         Public Const gdiHandles As Short = 0
         Public Const userHandles As Short = 1
-        Public Const warningPercentage As Short = 90
+        Public Const warningPercentage As Short = 80
         Public boolPortableMode As Boolean = False
 
         Public Const constStringRoot As String = "root"
