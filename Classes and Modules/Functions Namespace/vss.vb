@@ -133,7 +133,7 @@
             End Try
         End Sub
 
-        Public Sub checkSystemDrivesForFullShadowStorage()
+        Public Sub checkSystemDrivesForFullShadowStorage(parentForm As Form1)
             Try
                 Dim boolGetVSSDataResult As Boolean
                 Dim shadowStorageStatistics As supportClasses.ShadowStorageData = getData(globalVariables.systemDriveLetter, boolGetVSSDataResult)
@@ -144,9 +144,11 @@
                         shadowStorageUsePercentage = support.calculatePercentageValue(shadowStorageStatistics.UsedSpace, shadowStorageStatistics.MaxSpace)
 
                         If shadowStorageUsePercentage > globalVariables.warningPercentage Then
-                            Dim fullSystemDriveDialog As New Reserved_Space_for_System_Drive()
-                            fullSystemDriveDialog.StartPosition = FormStartPosition.CenterParent
-                            fullSystemDriveDialog.ShowDialog()
+                            parentForm.Invoke(Sub()
+                                                  Dim fullSystemDriveDialog As New Reserved_Space_for_System_Drive()
+                                                  fullSystemDriveDialog.StartPosition = FormStartPosition.CenterParent
+                                                  fullSystemDriveDialog.ShowDialog()
+                                              End Sub)
                         End If
                     End If
 
