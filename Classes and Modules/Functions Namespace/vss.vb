@@ -186,6 +186,8 @@
 
         ' driveLetter is just that, "C:"
         Public Sub setShadowStorageSize(driveLetter As String, size As Long)
+            eventLogFunctions.writeToSystemEventLog(String.Format("Setting reserved system restore space for drive {0} to {1}.", driveLetter, support.bytesToHumanSize(size)), EventLogEntryType.Information)
+
             Try
                 driveLetter = driveLetter.ToUpper
 
