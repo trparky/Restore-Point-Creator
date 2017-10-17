@@ -2950,14 +2950,26 @@ Public Class Form1
         Functions.support.launchURLInWebBrowser(globalVariables.webURLs.core.strWebSite, "An error occurred when trying to launch the product's web site URL in your default browser. The URL has been copied to your Windows Clipboard for you to paste into the address bar in the browser of your choice.")
     End Sub
 
+    Private Function getReferencedAssemblyVersion(strAssemblyName As String) As Version
+        Dim assemblyName As Reflection.AssemblyName = Reflection.Assembly.GetExecutingAssembly().GetReferencedAssemblies().FirstOrDefault(Function(assembly As Reflection.AssemblyName) assembly.Name.Equals(strAssemblyName, StringComparison.OrdinalIgnoreCase))
+
+        If assemblyName IsNot Nothing Then
+            Return assemblyName.Version
+        Else
+            Return New Version(0, 0, 0)
+        End If
+    End Function
+
     Private Sub AboutThisProgramToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutThisProgramToolStripMenuItem.Click
+        Dim taskLibraryVersion As Version = getReferencedAssemblyVersion("Microsoft.Win32.TaskScheduler")
+        Dim strTaskLibraryVersion As String = String.Format("{0}.{1} Build {2}", taskLibraryVersion.Major, taskLibraryVersion.Minor, taskLibraryVersion.Build)
         Dim stringBuilder As New StringBuilder
 
         stringBuilder.AppendLine("Restore Point Creator")
         stringBuilder.AppendLine("Written By Tom Parkison")
         stringBuilder.AppendLine("Copyright Thomas Parkison 2012-2018.")
         stringBuilder.AppendLine()
-        stringBuilder.AppendLine("This program uses the Microsoft.Win32.TaskScheduler library version 2.5.28 to interface with the Windows Task Scheduler, copyright David Hall.")
+        stringBuilder.AppendLine("This program uses the Microsoft.Win32.TaskScheduler library version " & strTaskLibraryVersion & " to interface with the Windows Task Scheduler, copyright David Hall.")
         stringBuilder.AppendLine()
 
         If globalVariables.version.boolBeta Then
