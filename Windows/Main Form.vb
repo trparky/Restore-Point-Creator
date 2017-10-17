@@ -2969,8 +2969,6 @@ Public Class Form1
         stringBuilder.AppendLine("Written By Tom Parkison")
         stringBuilder.AppendLine("Copyright Thomas Parkison 2012-2018.")
         stringBuilder.AppendLine()
-        stringBuilder.AppendLine("This program uses the Microsoft.Win32.TaskScheduler library version " & strTaskLibraryVersion & " to interface with the Windows Task Scheduler, copyright David Hall.")
-        stringBuilder.AppendLine()
 
         If globalVariables.version.boolBeta Then
             stringBuilder.AppendFormat("Version {0} Public Beta {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion)
@@ -2986,6 +2984,9 @@ Public Class Form1
         Else
             stringBuilder.AppendLine()
         End If
+
+        stringBuilder.AppendLine()
+        stringBuilder.AppendLine("This program uses the Microsoft.Win32.TaskScheduler library version " & strTaskLibraryVersion & " to interface with the Windows Task Scheduler, copyright David Hall.")
 
         stringBuilder.AppendLine()
         stringBuilder.AppendLine("All operations that have to do with Microsoft Windows System Restore are processed by approved Microsoft APIs, System DLLs, and Microsoft Windows Management Instrumentation APIs.")
