@@ -2957,7 +2957,7 @@ Public Class Form1
         stringBuilder.AppendLine("Written By Tom Parkison")
         stringBuilder.AppendLine("Copyright Thomas Parkison 2012-2018.")
         stringBuilder.AppendLine()
-        stringBuilder.AppendLine("This program uses the Microsoft.Win32.TaskScheduler library version 2.5.23 to interface with the Windows Task Scheduler, copyright David Hall.")
+        stringBuilder.AppendLine("This program uses the Microsoft.Win32.TaskScheduler library version 2.5.28 to interface with the Windows Task Scheduler, copyright David Hall.")
         stringBuilder.AppendLine()
 
         If globalVariables.version.boolBeta Then
