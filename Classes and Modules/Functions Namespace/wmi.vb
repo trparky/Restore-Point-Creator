@@ -294,8 +294,6 @@ Namespace Functions.wmi
 
         Public Function getNewestSystemRestorePointID() As Integer
             Try
-                Dim newestSystemRestoreID As Integer = 0 ' Resets the newest System Restore ID to 0.
-
                 ' Get all System Restore Points from the Windows Management System and puts then in the systemRestorePoints variable.
                 Dim systemRestorePoints As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
 
@@ -303,16 +301,12 @@ Namespace Functions.wmi
                     Dim managementObjectCollection As Management.ManagementObjectCollection = systemRestorePoints.Get()
 
                     If managementObjectCollection IsNot Nothing Then
-                        Dim systemRestoreIDs As New ArrayList
-
                         ' Checks to see if there are any System Restore Points to be listed.
                         If managementObjectCollection.Count <> 0 Then
-                            Return managementObjectCollection.Cast(Of Management.ManagementObject).ToList().Max(Function(managmentObject As Management.ManagementObject) Integer.Parse(managmentObject("SequenceNumber").ToString))
+                            Return managementObjectCollection.Cast(Of Management.ManagementObject).ToList().Max(Function(managementObject As Management.ManagementObject) Integer.Parse(managementObject("SequenceNumber").ToString))
                         Else
-                            newestSystemRestoreID = 0
+                            Return 0
                         End If
-
-                        Return newestSystemRestoreID
                     Else
                         Return 0
                     End If
