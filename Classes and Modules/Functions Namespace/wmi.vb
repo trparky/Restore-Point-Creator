@@ -307,17 +307,7 @@ Namespace Functions.wmi
 
                         ' Checks to see if there are any System Restore Points to be listed.
                         If managementObjectCollection.Count <> 0 Then
-                            ' Loops through systemRestorePoints.
-                            For Each managementObject As Management.ManagementObject In managementObjectCollection
-                                systemRestoreIDs.Add(managementObject("SequenceNumber").ToString)
-                            Next
-
-                            If systemRestoreIDs.Count = 0 Then
-                                newestSystemRestoreID = 0
-                            Else
-                                systemRestoreIDs.Sort()
-                                newestSystemRestoreID = Integer.Parse(systemRestoreIDs.Item(systemRestoreIDs.Count - 1))
-                            End If
+                            Return managementObjectCollection.Cast(Of Management.ManagementObject).ToList().Max(Function(managmentObject As Management.ManagementObject) Integer.Parse(managmentObject("SequenceNumber").ToString))
                         Else
                             newestSystemRestoreID = 0
                         End If
