@@ -1983,7 +1983,7 @@ Public Class Form1
     End Sub
 
     Private Sub txtRestorePointDescription_TextChanged(sender As Object, e As EventArgs) Handles txtRestorePointDescription.TextChanged
-        If txtRestorePointDescription.Text.caseInsensitiveContains(strTypeYourRestorePointName) = False And txtRestorePointDescription.Text.Trim IsNot Nothing And Functions.support.areWeInSafeMode() = False Then
+        If txtRestorePointDescription.Text.caseInsensitiveContains(strTypeYourRestorePointName) = False And Not String.IsNullOrEmpty(txtRestorePointDescription.Text.Trim) And Functions.support.areWeInSafeMode() = False Then
             btnCreate.Enabled = True
         ElseIf txtRestorePointDescription.Text.caseInsensitiveContains(strTypeYourRestorePointName) = True Then
             doTheGrayingOfTheRestorePointNameTextBox()
@@ -1991,7 +1991,8 @@ Public Class Form1
     End Sub
 
     Private Sub txtRestorePointDescription_KeyUp(sender As Object, e As KeyEventArgs) Handles txtRestorePointDescription.KeyUp
-        If e.KeyCode = Keys.Enter And btnCreate.Enabled = True And txtRestorePointDescription.Text.Trim IsNot Nothing And Functions.support.areWeInSafeMode() = False Then
+        If String.IsNullOrEmpty(txtRestorePointDescription.Text.Trim) Then btnCreate.Enabled = False
+        If e.KeyCode = Keys.Enter And btnCreate.Enabled = True And Not String.IsNullOrEmpty(txtRestorePointDescription.Text.Trim) And Functions.support.areWeInSafeMode() = False Then
             btnCreate.PerformClick()
         End If
     End Sub
