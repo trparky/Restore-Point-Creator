@@ -325,52 +325,6 @@ Namespace Functions.wmi
             End Try
         End Function
 
-        Private Function getNewestSystemRestorePointIDMadeByRestorePointCreator(strRestorePointDescription As String) As Integer
-            Try
-                Dim newestSystemRestoreID As Integer = 0 ' Resets the newest System Restore ID to 0.
-
-                ' Get all System Restore Points from the Windows Management System and puts then in the systemRestorePoints variable.
-                Dim managementObjectSearcher As New Management.ManagementObjectSearcher("root\DEFAULT", "SELECT * FROM SystemRestore")
-
-                If managementObjectSearcher IsNot Nothing Then
-                    Dim managementObjectCollection As Management.ManagementObjectCollection = managementObjectSearcher.Get()
-
-                    If managementObjectCollection IsNot Nothing Then
-                        Dim systemRestoreIDs As New ArrayList
-                        Dim restorePointNameOnSystem As String
-
-                        ' Checks to see if there are any System Restore Points to be listed.
-                        If managementObjectCollection.Count <> 0 Then
-                            ' Loops through systemRestorePoints.
-                            For Each managementObject As Management.ManagementObject In managementObjectCollection
-                                restorePointNameOnSystem = managementObject("Description").ToString.Trim
-
-                                ' We need only the Restore Point IDs made by this program, nothing else.
-                                If restorePointNameOnSystem.Trim.Equals(globalVariables.strDefaultNameForScheduledTasks.Trim, StringComparison.OrdinalIgnoreCase) Or restorePointNameOnSystem.Trim.Equals(strRestorePointDescription.Trim, StringComparison.OrdinalIgnoreCase) Then
-                                    systemRestoreIDs.Add(managementObject("SequenceNumber").ToString)
-                                End If
-                            Next
-
-                            If systemRestoreIDs.Count = 0 Then
-                                Return 0
-                            Else
-                                systemRestoreIDs.Sort()
-                                Return Integer.Parse(systemRestoreIDs.Item(systemRestoreIDs.Count - 1))
-                            End If
-                        Else
-                            Return 0
-                        End If
-                    Else
-                        Return 0
-                    End If
-                Else
-                    Return 0
-                End If
-            Catch ex As Exception
-                Return 0
-            End Try
-        End Function
-
         Public Function getSystemProcessor() As supportClasses.processorInfoClass
             Try
                 Dim managementObjectSearcher As New Management.ManagementObjectSearcher("root\CIMV2", "Select * FROM Win32_Processor")
