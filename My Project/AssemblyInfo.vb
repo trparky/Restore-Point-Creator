@@ -12,7 +12,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("")>
 <Assembly: AssemblyCompany("")>
 <Assembly: AssemblyProduct("Restore Point Creator")>
-<Assembly: AssemblyCopyright("Copyright Thomas R. Parkison © 2013-2018")>
+<Assembly: AssemblyCopyright("Copyright Thomas R. Parkison © 2012-2019")>
 <Assembly: AssemblyTrademark("")>
 
 <Assembly: ComVisible(False)>
