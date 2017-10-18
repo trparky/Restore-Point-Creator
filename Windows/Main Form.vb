@@ -3493,6 +3493,7 @@ Public Class Form1
 
     Private Sub closePleaseWaitPanel()
         Functions.support.enableControlsOnForm(Me)
+        btnCreate.Enabled = False
 
         pleaseWaitPanel.Visible = False
         pleaseWaitProgressBarChanger.Enabled = False
