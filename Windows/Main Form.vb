@@ -2952,12 +2952,7 @@ Public Class Form1
 
     Private Function getReferencedAssemblyVersion(strAssemblyName As String) As Version
         Dim assemblyName As Reflection.AssemblyName = Reflection.Assembly.GetExecutingAssembly().GetReferencedAssemblies().FirstOrDefault(Function(assembly As Reflection.AssemblyName) assembly.Name.Equals(strAssemblyName, StringComparison.OrdinalIgnoreCase))
-
-        If assemblyName IsNot Nothing Then
-            Return assemblyName.Version
-        Else
-            Return New Version(0, 0, 0)
-        End If
+        Return If(assemblyName Is Nothing, New Version(0, 0, 0), assemblyName.Version)
     End Function
 
     Private Sub AboutThisProgramToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutThisProgramToolStripMenuItem.Click
