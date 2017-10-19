@@ -192,6 +192,11 @@ Namespace Functions.eventLogFunctions
             Return newLogEntryList
         End Function
 
+        Private Sub deleteEntryFromLogSubRoutine(ByRef applicationLog As List(Of restorePointCreatorExportedLog), longIDToBeDeleted As Long)
+            Dim itemToBeRemoved As List(Of restorePointCreatorExportedLog) = applicationLog.Where(Function(logObject As restorePointCreatorExportedLog) (logObject.logID = longIDToBeDeleted)).ToList()
+            applicationLog.Remove(itemToBeRemoved(0))
+        End Sub
+
         ''' <summary>Deletes a list of individual log entries from the log.</summary>
         Public Sub deleteEntryFromLog(idsOfLogsToBeDeleted As List(Of Long))
             If globalVariables.boolLogToSystemLog = True Then
@@ -207,9 +212,7 @@ Namespace Functions.eventLogFunctions
                         applicationLog = xmlSerializerObject.Deserialize(streamReader)
 
                         For Each longIDToBeDeleted As Long In idsOfLogsToBeDeleted
-                            For Each item As restorePointCreatorExportedLog In applicationLog.Where(Function(logObject As restorePointCreatorExportedLog) (logObject.logID = longIDToBeDeleted)).ToList()
-                                applicationLog.Remove(item)
-                            Next
+                            deleteEntryFromLogSubRoutine(applicationLog, longIDToBeDeleted)
                         Next
 
                         applicationLog = reIDTheLogEntries(applicationLog)
@@ -245,10 +248,7 @@ Namespace Functions.eventLogFunctions
                         Dim streamReader As New IO.StreamReader(fileStream)
                         applicationLog = xmlSerializerObject.Deserialize(streamReader)
 
-                        For Each item As restorePointCreatorExportedLog In applicationLog.Where(Function(logObject As restorePointCreatorExportedLog) (logObject.logID = longIDToBeDeleted)).ToList()
-                            applicationLog.Remove(item)
-                        Next
-
+                        deleteEntryFromLogSubRoutine(applicationLog, longIDToBeDeleted)
                         applicationLog = reIDTheLogEntries(applicationLog)
 
                         fileStream.Position = 0
