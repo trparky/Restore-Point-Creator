@@ -78,7 +78,12 @@ Namespace Functions.eventLogFunctions
                     Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.Read)
                         Using streamReader As New IO.StreamReader(fileStream)
                             Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(internalApplicationLog.GetType)
-                            internalApplicationLog = xmlSerializerObject.Deserialize(streamReader)
+
+                            Try
+                                internalApplicationLog = xmlSerializerObject.Deserialize(streamReader)
+                            Catch ex As Exception
+                                handleCorruptedXMLLogFile(internalApplicationLog, fileStream)
+                            End Try
                         End Using
                     End Using
                 Catch ex As myExceptions.unableToGetLockOnLogFile
@@ -268,6 +273,24 @@ Namespace Functions.eventLogFunctions
             End If
         End Sub
 
+        Private Sub handleCorruptedXMLLogFile(ByRef applicationLog As List(Of restorePointCreatorExportedLog), ByRef fileStream As IO.FileStream)
+            If IO.File.Exists(strLogFile & ".corrupted") Then IO.File.Delete(strLogFile & ".corrupted")
+
+            Using newCorruptedLogFileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile & ".corrupted", IO.FileAccess.Write, IO.FileMode.CreateNew)
+                fileStream.Position = 0
+                fileStream.CopyTo(newCorruptedLogFileStream)
+            End Using
+
+            applicationLog.Add(New restorePointCreatorExportedLog With {
+                .logData = "A corrupted XML log file was detected, the corrupted log file was backed up and a new log file has been created.",
+                .logType = EventLogEntryType.Error,
+                .unixTime = 0,
+                .logSource = "Restore Point Creator",
+                .logID = applicationLog.Count,
+                .dateObject = Now.ToUniversalTime
+            })
+        End Sub
+
         ''' <summary>Writes a log entry to the System Event Log.</summary>
         ''' <param name="logMessage">The text you want to have in your new System Event Log entry.</param>
         ''' <param name="logType">The type of log that you want your entry to be. The three major options are Error, Information, and Warning.</param>
@@ -283,7 +306,12 @@ Namespace Functions.eventLogFunctions
                     shortNumberOfRecalledGetFileStreamFunction = 0
                     Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.ReadWrite)
                         Dim streamReader As New IO.StreamReader(fileStream)
-                        applicationLog = xmlSerializerObject.Deserialize(streamReader)
+
+                        Try
+                            applicationLog = xmlSerializerObject.Deserialize(streamReader)
+                        Catch ex As InvalidOperationException
+                            handleCorruptedXMLLogFile(applicationLog, fileStream)
+                        End Try
 
                         applicationLog.Add(New restorePointCreatorExportedLog With {
                             .logData = logMessage,
