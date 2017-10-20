@@ -191,6 +191,7 @@ Namespace Functions.wmi
 
                 Return oOutParams("ReturnValue")
             Catch ex4 As UnauthorizedAccessException
+                eventLogFunctions.writeCrashToEventLog(ex4)
                 eventLogFunctions.writeToSystemEventLog("Falling back to core Windows APIs to create restore point.", EventLogEntryType.Warning)
 
                 Try
@@ -203,6 +204,7 @@ Namespace Functions.wmi
                     Return APIs.errorCodes.ERROR_ACCESS_DENIED
                 End Try
             Catch ex3 As Runtime.InteropServices.COMException
+                eventLogFunctions.writeCrashToEventLog(ex3)
                 eventLogFunctions.writeToSystemEventLog("Falling back to core Windows APIs to create restore point.", EventLogEntryType.Warning)
 
                 Try
