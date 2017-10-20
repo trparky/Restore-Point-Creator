@@ -225,7 +225,8 @@ Namespace Functions.support
                     GetType(ObjectDisposedException),
                     GetType(StackOverflowException),
                     GetType(PlatformNotSupportedException),
-                    GetType(NotSupportedException)
+                    GetType(NotSupportedException),
+                    GetType(UnauthorizedAccessException)
                 }
 
                 If listExceptionTypes.Contains(exceptionType) Then
@@ -239,6 +240,9 @@ Namespace Functions.support
                         If Not String.IsNullOrEmpty(FileNotFoundExceptionObject.FusionLog) Then
                             stringBuilder.AppendLine("Reason: " & FileNotFoundExceptionObject.FusionLog)
                         End If
+                    ElseIf exceptionType.Equals(GetType(UnauthorizedAccessException)) Then
+                        Dim intErrorCode As Integer = DirectCast(rawExceptionObject, UnauthorizedAccessException).HResult
+                        stringBuilder.AppendLine(String.Format("Error Code: {0} ({1})", intErrorCode, convertErrorCodeToHex(intErrorCode)))
                     ElseIf exceptionType.Equals(GetType(PlatformNotSupportedException)) Then
                         stringBuilder.AppendLine("Source: " & DirectCast(rawExceptionObject, PlatformNotSupportedException).Source)
                     ElseIf exceptionType.Equals(GetType(NotSupportedException)) Then
