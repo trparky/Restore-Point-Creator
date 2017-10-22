@@ -1970,8 +1970,10 @@ Public Class Form1
 
 #Region "--== Misc. Event Code ==--"
     Private Sub txtRestorePointDescription_Click(sender As Object, e As EventArgs) Handles txtRestorePointDescription.Click
-        txtRestorePointDescription.ForeColor = Color.Black
-        txtRestorePointDescription.Text = ""
+        If txtRestorePointDescription.Text.caseInsensitiveContains(strTypeYourRestorePointName) Then
+            txtRestorePointDescription.ForeColor = Color.Black
+            txtRestorePointDescription.Text = ""
+        End If
     End Sub
 
     Private Sub txtRestorePointDescription_Leave(sender As Object, e As EventArgs) Handles txtRestorePointDescription.Leave
