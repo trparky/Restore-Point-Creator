@@ -49,7 +49,7 @@ Namespace Functions.privilegeChecks
                         fsarDirectoryAccessRights = DirectCast(arAccessRule, FileSystemAccessRule)
 
                         If fsarDirectoryAccessRights.AccessControlType = AccessControlType.Allow Then
-                            If fsarDirectoryAccessRights.FileSystemRights = (FileSystemRights.Modify Or FileSystemRights.WriteData Or FileSystemRights.FullControl) Then
+                            If fsarDirectoryAccessRights.FileSystemRights = FileSystemRights.Modify Or fsarDirectoryAccessRights.FileSystemRights = FileSystemRights.WriteData Or fsarDirectoryAccessRights.FileSystemRights = FileSystemRights.FullControl Then
                                 Return True
                             End If
                         End If
