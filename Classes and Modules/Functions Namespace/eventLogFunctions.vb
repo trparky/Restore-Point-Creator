@@ -198,8 +198,8 @@ Namespace Functions.eventLogFunctions
         End Function
 
         Private Sub deleteEntryFromLogSubRoutine(ByRef applicationLog As List(Of restorePointCreatorExportedLog), longIDToBeDeleted As Long)
-            Dim itemToBeRemoved As List(Of restorePointCreatorExportedLog) = applicationLog.Where(Function(logObject As restorePointCreatorExportedLog) (logObject.logID = longIDToBeDeleted)).ToList()
-            applicationLog.Remove(itemToBeRemoved(0))
+            Dim itemToBeRemoved As restorePointCreatorExportedLog = applicationLog.Where(Function(logObject As restorePointCreatorExportedLog) (logObject.logID = longIDToBeDeleted))(0)
+            applicationLog.Remove(itemToBeRemoved)
         End Sub
 
         ''' <summary>Deletes a list of individual log entries from the log.</summary>
