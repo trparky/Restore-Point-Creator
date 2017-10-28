@@ -11,6 +11,7 @@
     Private eventLogContents As New List(Of myListViewItemTypes.eventLogListEntry)
     Private workingThread As Threading.Thread
     Private dateLastFileSystemWatcherEventRaised As Date
+    Private areWeAnAdministrator As Boolean = Functions.privilegeChecks.areWeAnAdministrator()
 
     Private Function convertToEventLogType(input As Short) As EventLogEntryType
         If input = EventLogEntryType.Error Then
@@ -227,9 +228,12 @@
         chkAskMeToSubmitIfViewingAnExceptionEntry.Checked = My.Settings.boolAskMeToSubmitIfViewingAnExceptionEntry
         applySavedSorting()
 
-        If Not Functions.privilegeChecks.areWeAnAdministrator() Then
+        If Not areWeAnAdministrator Then
             btnCleanLogFile.Enabled = False
             btnCleanLogFile.Text &= " (Disabled)"
+            btnDeleteIndividualLogEntry.Enabled = False
+            chkMultiSelectMode.Enabled = False
+            Me.Text &= " (Operating in Read-Only Mode)"
         End If
 
         chkMultiSelectMode.Checked = eventLogList.MultiSelect
@@ -370,7 +374,7 @@
     Private Sub eventLogList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles eventLogList.SelectedIndexChanged
         Try
             If eventLogList.SelectedItems.Count <> 0 Then
-                btnDeleteIndividualLogEntry.Enabled = True
+                If areWeAnAdministrator Then btnDeleteIndividualLogEntry.Enabled = True
                 eventLogText.Text = DirectCast(eventLogList.SelectedItems(0), myListViewItemTypes.eventLogListEntry).strEventLogText
 
                 If eventLogText.Text.caseInsensitiveContains("exception") And chkAskMeToSubmitIfViewingAnExceptionEntry.Checked And selectedIndex <> eventLogList.SelectedIndices(0) Then
@@ -605,7 +609,11 @@
     Private Sub closePleaseWaitPanel()
         Functions.support.enableControlsOnForm(Me)
 
-        If Not Functions.privilegeChecks.areWeAnAdministrator() Then btnCleanLogFile.Enabled = False
+        If Not areWeAnAdministrator Then
+            btnCleanLogFile.Enabled = False
+            btnDeleteIndividualLogEntry.Enabled = False
+            chkMultiSelectMode.Enabled = False
+        End If
 
         pleaseWaitPanel.Visible = False
         pleaseWaitProgressBarChanger.Enabled = False
