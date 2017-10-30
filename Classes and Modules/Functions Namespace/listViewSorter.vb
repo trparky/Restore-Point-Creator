@@ -53,6 +53,11 @@ Namespace Functions.listViewSorter
                     Dim vol2 As myListViewItemTypes.volumeShadowCopyListItem = DirectCast(lvSecondListView, myListViewItemTypes.volumeShadowCopyListItem)
 
                     Return vol1.dateCreated.CompareTo(vol2.dateCreated)
+                ElseIf lvFirstListViewType.Equals(GetType(myListViewItemTypes.eventLogListEntry)) And lvSecondListViewType.Equals(GetType(myListViewItemTypes.eventLogListEntry)) And intColumnNumber = 1 Then
+                    date1 = DirectCast(lvFirstListView, myListViewItemTypes.eventLogListEntry).logDate
+                    date2 = DirectCast(lvSecondListView, myListViewItemTypes.eventLogListEntry).logDate
+
+                    Return date1.CompareTo(date2)
                 Else
                     If Double.TryParse(strFirstString, dbl1) And Double.TryParse(strSecondString, dbl2) Then
                         Return dbl1.CompareTo(dbl2)
@@ -70,6 +75,11 @@ Namespace Functions.listViewSorter
                     Dim vol2 As myListViewItemTypes.volumeShadowCopyListItem = DirectCast(lvSecondListView, myListViewItemTypes.volumeShadowCopyListItem)
 
                     Return vol2.dateCreated.CompareTo(vol1.dateCreated)
+                ElseIf lvFirstListViewType.Equals(GetType(myListViewItemTypes.eventLogListEntry)) And lvSecondListViewType.Equals(GetType(myListViewItemTypes.eventLogListEntry)) And intColumnNumber = 1 Then
+                    date1 = DirectCast(lvFirstListView, myListViewItemTypes.eventLogListEntry).logDate
+                    date2 = DirectCast(lvSecondListView, myListViewItemTypes.eventLogListEntry).logDate
+
+                    Return date2.CompareTo(date1)
                 Else
                     If Double.TryParse(strFirstString, dbl1) And Double.TryParse(strSecondString, dbl2) Then
                         Return dbl2.CompareTo(dbl1)

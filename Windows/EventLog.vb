@@ -65,9 +65,11 @@
                     End Select
 
                     If logEntry.unixTime = 0 Then
-                        .SubItems.Add(logEntry.dateObject.ToLocalTime.ToString)
+                        .logDate = logEntry.dateObject.ToLocalTime
+                        .SubItems.Add(.logDate.ToString)
                     Else
-                        .SubItems.Add(UNIXTimestampToDate(logEntry.unixTime).ToString)
+                        .logDate = UNIXTimestampToDate(logEntry.unixTime)
+                        .SubItems.Add(.logDate.ToString)
                     End If
 
                     .SubItems.Add(logEntry.logID.ToString("N0"))

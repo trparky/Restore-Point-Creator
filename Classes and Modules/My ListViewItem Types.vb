@@ -28,11 +28,21 @@
     Public Class eventLogListEntry
         Inherits ListViewItem
         Private _longEventLogEntryID As Long, _strEventLogSource, _strEventLogText, _strLevel As String, _shortLevelType As Short
+        Private _logDate As Date
 
         Public Sub New(strInput As String)
             Me.Text = strInput
             Me.strEventLogLevel = strInput
         End Sub
+
+        Public Property logDate() As Date
+            Get
+                Return _logDate
+            End Get
+            Set(value As Date)
+                _logDate = value
+            End Set
+        End Property
 
         Public Property strEventLogLevel() As String
             Get
