@@ -18,6 +18,7 @@ Namespace Functions.listViewSorter
         ' for objects x and y.
         Public Function Compare(ByVal lvInputFirstListView As Object, ByVal lvInputSecondListView As Object) As Integer Implements IComparer.Compare
             Dim dbl1, dbl2 As Double
+            Dim int1, int2 As Integer
             Dim long1, long2 As Long
             Dim date1, date2 As Date
             Dim strFirstString, strSecondString As String
@@ -58,6 +59,11 @@ Namespace Functions.listViewSorter
                     date2 = DirectCast(lvSecondListView, myListViewItemTypes.eventLogListEntry).logDate
 
                     Return date1.CompareTo(date2)
+                ElseIf lvFirstListViewType.Equals(GetType(myListViewItemTypes.restorePointEntryItem)) And lvSecondListViewType.Equals(GetType(myListViewItemTypes.restorePointEntryItem)) And intColumnNumber = 0 Then
+                    int1 = DirectCast(lvFirstListView, myListViewItemTypes.restorePointEntryItem).intID
+                    int2 = DirectCast(lvSecondListView, myListViewItemTypes.restorePointEntryItem).intID
+
+                    Return int1.CompareTo(int2)
                 Else
                     If Double.TryParse(strFirstString, dbl1) And Double.TryParse(strSecondString, dbl2) Then
                         Return dbl1.CompareTo(dbl2)
@@ -80,6 +86,11 @@ Namespace Functions.listViewSorter
                     date2 = DirectCast(lvSecondListView, myListViewItemTypes.eventLogListEntry).logDate
 
                     Return date2.CompareTo(date1)
+                ElseIf lvFirstListViewType.Equals(GetType(myListViewItemTypes.restorePointEntryItem)) And lvSecondListViewType.Equals(GetType(myListViewItemTypes.restorePointEntryItem)) And intColumnNumber = 0 Then
+                    int1 = DirectCast(lvFirstListView, myListViewItemTypes.restorePointEntryItem).intID
+                    int2 = DirectCast(lvSecondListView, myListViewItemTypes.restorePointEntryItem).intID
+
+                    Return int2.CompareTo(int1)
                 Else
                     If Double.TryParse(strFirstString, dbl1) And Double.TryParse(strSecondString, dbl2) Then
                         Return dbl2.CompareTo(dbl1)
