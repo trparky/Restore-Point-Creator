@@ -121,7 +121,7 @@ Namespace Functions.support
                     End If
 
                     ' Let's check to see if the user's update channel preference is set to "beta" or "tom".
-                    If My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta) Or My.Settings.updateChannel.Equals(globalVariables.updateChannels.tom) Then
+                    If My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta, StringComparison.OrdinalIgnoreCase) Or My.Settings.updateChannel.Equals(globalVariables.updateChannels.tom, StringComparison.OrdinalIgnoreCase) Then
                         ' Yes, it is set to the "beta" or "tom" channel.
 
                         ' Now let's check to see if the user wants any betas if the current new version is a beta.
@@ -131,18 +131,21 @@ Namespace Functions.support
                             Return False
                         End If
 
-                        ' Let's try and get the "betaRCVersion" from the XML document. We don't want to crash so we check to see if the object is null first.
-                        If xmlNode.SelectSingleNode("betaRCVersion") IsNot Nothing Then
-                            ' Get the "strRemoteBetaRCVersion" version string from the XML data.
-                            strRemoteBetaRCVersion = xmlNode.SelectSingleNode("betaRCVersion").InnerText.Trim
+                        ' Checks to see if the remote build type is not "release" since only the "beta" and "candidate" build types have a betaRCVersion node.
+                        If Not strRemoteType.Equals("release", StringComparison.OrdinalIgnoreCase) Then
+                            ' Let's try and get the "betaRCVersion" from the XML document. We don't want to crash so we check to see if the object is null first.
+                            If xmlNode.SelectSingleNode("betaRCVersion") IsNot Nothing Then
+                                ' Get the "strRemoteBetaRCVersion" version string from the XML data.
+                                strRemoteBetaRCVersion = xmlNode.SelectSingleNode("betaRCVersion").InnerText.Trim
 
-                            ' This checks to see if the "betaRCVersion" node doesn't contain either "Public Beta" or "Release Candidate".
-                            ' If it doesn't then it prepends the appropriate string based upon the value of the "type" node.
-                            If (Not strRemoteBetaRCVersion.caseInsensitiveContains("Public Beta")) And (Not strRemoteBetaRCVersion.caseInsensitiveContains("Release Candidate")) Then
-                                If strRemoteType.Equals("beta", StringComparison.OrdinalIgnoreCase) Then
-                                    strRemoteBetaRCVersion = "Public Beta " & strRemoteBetaRCVersion
-                                ElseIf strRemoteType.Equals("candidate", StringComparison.OrdinalIgnoreCase) Then
-                                    strRemoteBetaRCVersion = "Release Candidate " & strRemoteBetaRCVersion
+                                ' This checks to see if the "betaRCVersion" node doesn't contain either "Public Beta" or "Release Candidate".
+                                ' If it doesn't then it prepends the appropriate string based upon the value of the "type" node.
+                                If (Not strRemoteBetaRCVersion.caseInsensitiveContains("Public Beta")) And (Not strRemoteBetaRCVersion.caseInsensitiveContains("Release Candidate")) Then
+                                    If strRemoteType.Equals("beta", StringComparison.OrdinalIgnoreCase) Then
+                                        strRemoteBetaRCVersion = "Public Beta " & strRemoteBetaRCVersion
+                                    ElseIf strRemoteType.Equals("candidate", StringComparison.OrdinalIgnoreCase) Then
+                                        strRemoteBetaRCVersion = "Release Candidate " & strRemoteBetaRCVersion
+                                    End If
                                 End If
                             End If
                         End If
