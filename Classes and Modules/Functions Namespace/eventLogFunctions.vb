@@ -143,8 +143,7 @@ Namespace Functions.eventLogFunctions
                     writeToSystemEventLog(String.Format("Converted log data to new log file format in {0}ms. No old log entries were detected.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information)
                 End If
             Catch ex As Exception
-            Finally
-                registryStuff.setBooleanValueInRegistry("Exported Old Logs", True)
+                writeCrashToEventLog(ex)
             End Try
         End Sub
 
@@ -335,7 +334,7 @@ Namespace Functions.eventLogFunctions
                     oldEventLogFunctions.boolShowErrorMessage = True
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
                 Catch ex As Exception
-                    ' Does nothing
+                    oldEventLogFunctions.writeCrashToEventLog(ex)
                 End Try
             End If
         End Sub
@@ -356,63 +355,89 @@ Namespace Functions.eventLogFunctions
             End If
         End Function
 
+        ''' <summary>A function that is called in two different functions to assemble the crash data that's being written to the log file.</summary>
+        ''' <param name="exceptionObject">The Exception Object.</param>
+        ''' <param name="errorType">The ErrorType.</param>
+        ''' <returns>A String value.</returns>
+        Private Function assembleCrashData(exceptionObject As Exception, errorType As EventLogEntryType) As String
+            Dim stringBuilder As New Text.StringBuilder
+
+            stringBuilder.AppendLine("System Information")
+            stringBuilder.AppendLine("Time of Crash: " & Now.ToString)
+            stringBuilder.AppendLine("Operating System: " & osVersionInfo.getFullOSVersionString())
+            stringBuilder.AppendLine("System RAM: " & support.getSystemRAM())
+
+            If Debugger.IsAttached Then
+                stringBuilder.AppendLine("Debug Mode: True")
+            Else
+                stringBuilder.AppendLine("Debug Mode: False")
+            End If
+
+            If globalVariables.version.boolDebugBuild Then
+                stringBuilder.AppendLine("Debug Build: True")
+            Else
+                stringBuilder.AppendLine("Debug Build: False")
+            End If
+
+            Dim processorInfo As supportClasses.processorInfoClass = wmi.getSystemProcessor()
+            stringBuilder.AppendLine("CPU: " & processorInfo.strProcessor)
+            stringBuilder.AppendLine("Number of Cores: " & processorInfo.strNumberOfCores.ToString)
+
+            stringBuilder.AppendLine()
+
+            If globalVariables.version.boolBeta = True Then
+                stringBuilder.AppendLine("Program Version: " & String.Format("{0} Public Beta {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion))
+            ElseIf globalVariables.version.boolReleaseCandidate = True Then
+                stringBuilder.AppendLine("Program Version: " & String.Format("{0} Release Candidate {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion))
+            Else
+                stringBuilder.AppendLine("Program Version: " & globalVariables.version.strFullVersionString)
+            End If
+
+            support.addExtendedCrashData(stringBuilder, exceptionObject)
+
+            stringBuilder.AppendLine("Log Type: " & convertLogTypeToText(errorType))
+            stringBuilder.AppendLine("Running As: " & Environment.UserName)
+            stringBuilder.AppendLine("Exception Type: " & exceptionObject.GetType.ToString)
+            stringBuilder.AppendLine("Message: " & support.removeSourceCodePathInfo(exceptionObject.Message))
+
+            stringBuilder.AppendLine()
+
+            stringBuilder.Append("The exception occurred ")
+
+            stringBuilder.AppendLine(support.removeSourceCodePathInfo(exceptionObject.StackTrace.Trim))
+
+            Return stringBuilder.ToString.Trim
+        End Function
+
+        ''' <summary>Writes the exception event to the System Log File. This is a universal exception logging function that's built to handle various forms of exceptions and not not any particular type.</summary>
+        ''' <param name="logEntries">The list of restorePointCreatorExportedLog Objects.</param>
+        ''' <param name="exceptionObject">The exception object.</param>
+        ''' <param name="errorType">The type of Event Log you want the Exception Event to be recorded to the Application Event Log as.</param>
+        ''' <example>functions.eventLogFunctions.writeCrashToEventLog(ex)</example>
+        Public Sub writeCrashToEventLog(ByRef logEntries As List(Of restorePointCreatorExportedLog), exceptionObject As Exception, Optional errorType As EventLogEntryType = EventLogEntryType.Error)
+            Try
+                logEntries.Add(New restorePointCreatorExportedLog With {
+                    .logData = assembleCrashData(exceptionObject, errorType),
+                    .logType = errorType,
+                    .unixTime = 0,
+                    .logSource = "Restore Point Creator",
+                    .logID = logEntries.Count,
+                    .dateObject = Now.ToUniversalTime
+                })
+            Catch ex2 As Exception
+                oldEventLogFunctions.writeCrashToEventLog(ex2)
+            End Try
+        End Sub
+
         ''' <summary>Writes the exception event to the System Log File. This is a universal exception logging function that's built to handle various forms of exceptions and not not any particular type.</summary>
         ''' <param name="exceptionObject">The exception object.</param>
         ''' <param name="errorType">The type of Event Log you want the Exception Event to be recorded to the Application Event Log as.</param>
         ''' <example>functions.eventLogFunctions.writeCrashToEventLog(ex)</example>
         Public Sub writeCrashToEventLog(exceptionObject As Exception, Optional errorType As EventLogEntryType = EventLogEntryType.Error)
             Try
-                Dim stringBuilder As New Text.StringBuilder
-
-                stringBuilder.AppendLine("System Information")
-                stringBuilder.AppendLine("Time of Crash: " & Now.ToString)
-                stringBuilder.AppendLine("Operating System: " & osVersionInfo.getFullOSVersionString())
-                stringBuilder.AppendLine("System RAM: " & support.getSystemRAM())
-
-                If Debugger.IsAttached Then
-                    stringBuilder.AppendLine("Debug Mode: True")
-                Else
-                    stringBuilder.AppendLine("Debug Mode: False")
-                End If
-
-                If globalVariables.version.boolDebugBuild Then
-                    stringBuilder.AppendLine("Debug Build: True")
-                Else
-                    stringBuilder.AppendLine("Debug Build: False")
-                End If
-
-                Dim processorInfo As supportClasses.processorInfoClass = wmi.getSystemProcessor()
-                stringBuilder.AppendLine("CPU: " & processorInfo.strProcessor)
-                stringBuilder.AppendLine("Number of Cores: " & processorInfo.strNumberOfCores.ToString)
-
-                stringBuilder.AppendLine()
-
-                If globalVariables.version.boolBeta = True Then
-                    stringBuilder.AppendLine("Program Version: " & String.Format("{0} Public Beta {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion))
-                ElseIf globalVariables.version.boolReleaseCandidate = True Then
-                    stringBuilder.AppendLine("Program Version: " & String.Format("{0} Release Candidate {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion))
-                Else
-                    stringBuilder.AppendLine("Program Version: " & globalVariables.version.strFullVersionString)
-                End If
-
-                support.addExtendedCrashData(stringBuilder, exceptionObject)
-
-                stringBuilder.AppendLine("Log Type: " & convertLogTypeToText(errorType))
-                stringBuilder.AppendLine("Running As: " & Environment.UserName)
-                stringBuilder.AppendLine("Exception Type: " & exceptionObject.GetType.ToString)
-                stringBuilder.AppendLine("Message: " & support.removeSourceCodePathInfo(exceptionObject.Message))
-
-                stringBuilder.AppendLine()
-
-                stringBuilder.Append("The exception occurred ")
-
-                stringBuilder.AppendLine(support.removeSourceCodePathInfo(exceptionObject.StackTrace.Trim))
-
-                writeToSystemEventLog(stringBuilder.ToString.Trim, errorType)
-
-                stringBuilder = Nothing
+                writeToSystemEventLog(assembleCrashData(exceptionObject, errorType), errorType)
             Catch ex2 As Exception
-                ' Does nothing
+                oldEventLogFunctions.writeCrashToEventLog(ex2)
             End Try
         End Sub
 
@@ -458,7 +483,7 @@ Namespace Functions.eventLogFunctions
                     eventLogQuery = Nothing
                 End If
             Catch ex As Exception
-                writeCrashToEventLog(ex)
+                writeCrashToEventLog(logEntries, ex)
             End Try
         End Sub
     End Module

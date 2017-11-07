@@ -2152,6 +2152,7 @@ Public Class Form1
             Threading.ThreadPool.QueueUserWorkItem(Sub()
                                                        ' This calls the function that converts the logs.
                                                        Functions.eventLogFunctions.getOldLogsFromWindowsEventLog()
+                                                       Functions.registryStuff.setBooleanValueInRegistry("Exported Old Logs", True)
 
                                                        ' Now we need to do some work on the main thread.
                                                        Me.Invoke(Sub()
