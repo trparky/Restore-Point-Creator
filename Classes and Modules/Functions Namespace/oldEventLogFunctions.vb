@@ -36,42 +36,7 @@
         ''' <example>functions.eventLogFunctions.writeCrashToEventLog(ex)</example>
         Public Sub writeCrashToEventLog(exceptionObject As Exception, Optional errorType As EventLogEntryType = EventLogEntryType.Error)
             Try
-                Dim stringBuilder As New Text.StringBuilder
-
-                stringBuilder.AppendLine("System Information")
-                stringBuilder.AppendLine("Time of Crash: " & Now.ToString)
-                stringBuilder.AppendLine("Operating System: " & osVersionInfo.getFullOSVersionString())
-                stringBuilder.AppendLine("System RAM: " & support.getSystemRAM())
-
-                Dim processorInfo As supportClasses.processorInfoClass = wmi.getSystemProcessor()
-                stringBuilder.AppendLine("CPU: " & processorInfo.strProcessor)
-                stringBuilder.AppendLine("Number of Cores: " & processorInfo.strNumberOfCores.ToString)
-
-                stringBuilder.AppendLine()
-
-                If globalVariables.version.boolBeta = True Then
-                    stringBuilder.AppendLine("Program Version: " & String.Format("{0} Public Beta {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion))
-                ElseIf globalVariables.version.boolReleaseCandidate = True Then
-                    stringBuilder.AppendLine("Program Version: " & String.Format("{0} Release Candidate {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion))
-                Else
-                    stringBuilder.AppendLine("Program Version: " & globalVariables.version.strFullVersionString)
-                End If
-
-                support.addExtendedCrashData(stringBuilder, exceptionObject)
-
-                stringBuilder.AppendLine("Log Type: " & eventLogFunctions.convertLogTypeToText(errorType))
-                stringBuilder.AppendLine("Running As: " & Environment.UserName)
-                stringBuilder.AppendLine("Exception Type: " & exceptionObject.GetType.ToString)
-                stringBuilder.AppendLine("Message: " & support.removeSourceCodePathInfo(exceptionObject.Message))
-
-                stringBuilder.AppendLine()
-
-                stringBuilder.Append("The exception occurred ")
-
-                stringBuilder.AppendLine(support.removeSourceCodePathInfo(exceptionObject.StackTrace.Trim))
-
-                writeToSystemEventLog(stringBuilder.ToString.Trim, errorType)
-                stringBuilder = Nothing
+                writeToSystemEventLog(eventLogFunctions.assembleCrashData(exceptionObject, errorType), errorType)
             Catch ex2 As Exception
                 ' Does nothing
             End Try

@@ -359,7 +359,7 @@ Namespace Functions.eventLogFunctions
         ''' <param name="exceptionObject">The Exception Object.</param>
         ''' <param name="errorType">The ErrorType.</param>
         ''' <returns>A String value.</returns>
-        Private Function assembleCrashData(exceptionObject As Exception, errorType As EventLogEntryType) As String
+        Public Function assembleCrashData(exceptionObject As Exception, errorType As EventLogEntryType) As String
             Dim stringBuilder As New Text.StringBuilder
 
             stringBuilder.AppendLine("System Information")
