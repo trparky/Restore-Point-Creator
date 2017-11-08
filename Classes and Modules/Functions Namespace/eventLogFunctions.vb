@@ -410,26 +410,6 @@ Namespace Functions.eventLogFunctions
         End Function
 
         ''' <summary>Writes the exception event to the System Log File. This is a universal exception logging function that's built to handle various forms of exceptions and not not any particular type.</summary>
-        ''' <param name="logEntries">The list of restorePointCreatorExportedLog Objects.</param>
-        ''' <param name="exceptionObject">The exception object.</param>
-        ''' <param name="errorType">The type of Event Log you want the Exception Event to be recorded to the Application Event Log as.</param>
-        ''' <example>functions.eventLogFunctions.writeCrashToEventLog(ex)</example>
-        Public Sub writeCrashToEventLog(ByRef logEntries As List(Of restorePointCreatorExportedLog), exceptionObject As Exception, Optional errorType As EventLogEntryType = EventLogEntryType.Error)
-            Try
-                logEntries.Add(New restorePointCreatorExportedLog With {
-                    .logData = assembleCrashData(exceptionObject, errorType),
-                    .logType = errorType,
-                    .unixTime = 0,
-                    .logSource = "Restore Point Creator",
-                    .logID = logEntries.Count,
-                    .dateObject = Now.ToUniversalTime
-                })
-            Catch ex2 As Exception
-                oldEventLogFunctions.writeCrashToEventLog(ex2)
-            End Try
-        End Sub
-
-        ''' <summary>Writes the exception event to the System Log File. This is a universal exception logging function that's built to handle various forms of exceptions and not not any particular type.</summary>
         ''' <param name="exceptionObject">The exception object.</param>
         ''' <param name="errorType">The type of Event Log you want the Exception Event to be recorded to the Application Event Log as.</param>
         ''' <example>functions.eventLogFunctions.writeCrashToEventLog(ex)</example>
@@ -483,7 +463,14 @@ Namespace Functions.eventLogFunctions
                     eventLogQuery = Nothing
                 End If
             Catch ex As Exception
-                writeCrashToEventLog(logEntries, ex)
+                logEntries.Add(New restorePointCreatorExportedLog With {
+                    .logData = assembleCrashData(ex, EventLogEntryType.Error),
+                    .logType = EventLogEntryType.Error,
+                    .unixTime = 0,
+                    .logSource = "Restore Point Creator",
+                    .logID = logEntries.Count,
+                    .dateObject = Now.ToUniversalTime
+                })
             End Try
         End Sub
     End Module
