@@ -187,8 +187,6 @@ Namespace globalVariables
         Public pleaseWaitPanelColor As Color = Functions.support.getDWMGlassColor()
         Public pleaseWaitPanelFontColor As Color = Functions.support.getGoodTextColorBasedUponBackgroundColor(pleaseWaitPanelColor)
 
-        Public boolLogToSystemLog As Boolean = True
-
         ' Creates the Regular Expression Parser that's used to parse the System Restore Point Creation Date
         Public regexRestorePointCreationTimeParser As Regex = New Regex("(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})(?<hour>\d{2})(?<minute>\d{2})(?<second>\d{2})\.", RegexOptions.IgnoreCase + RegexOptions.Compiled)
 

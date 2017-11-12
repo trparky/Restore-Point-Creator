@@ -68,7 +68,6 @@ Partial Class Form1
         Me.InterfaceTooBigToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.AdditionalOptionsAndSettingsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CheckSystemDrivesForFullShadowStorageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.EnableSystemEventLoggingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.toolStripConfirmDeletions = New System.Windows.Forms.ToolStripMenuItem()
         Me.ConfirmRestorePointDeletionsInBatchesToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.toolStripLogRestorePointDeletions = New System.Windows.Forms.ToolStripMenuItem()
@@ -86,6 +85,7 @@ Partial Class Form1
         Me.SetBarColorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SetPleaseWaitBorderColorToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.barBelowColorSettings = New System.Windows.Forms.ToolStripSeparator()
+        Me.ExtendedDebugToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.toolStripClear = New System.Windows.Forms.ToolStripMenuItem()
         Me.toolStripMyComputer = New System.Windows.Forms.ToolStripMenuItem()
@@ -144,7 +144,6 @@ Partial Class Form1
         Me.pleaseWaitProgressBar = New Tom.SmoothProgressBar()
         Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
         Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
-        Me.ExtendedDebugToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.restorePointListContextMenu.SuspendLayout()
         Me.buttonTableLayout.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
@@ -520,7 +519,7 @@ Partial Class Form1
         '
         'AdditionalOptionsAndSettingsToolStripMenuItem
         '
-        Me.AdditionalOptionsAndSettingsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CheckSystemDrivesForFullShadowStorageToolStripMenuItem, Me.EnableSystemEventLoggingToolStripMenuItem, Me.toolStripConfirmDeletions, Me.ConfirmRestorePointDeletionsInBatchesToolStripMenuItem, Me.toolStripLogRestorePointDeletions, Me.toolStripCloseAfterRestorePointIsCreated, Me.AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem, Me.BypassNoUACLauncherToolStripMenuItem, Me.LogProgramLoadsAndExitsToEventLogToolStripMenuItem, Me.ExtendedLoggingForScheduledTasks, Me.AskBeforeCreatingRestorePointToolStripMenuItem, Me.chkShowVersionInTitleBarToolStripMenuItem})
+        Me.AdditionalOptionsAndSettingsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CheckSystemDrivesForFullShadowStorageToolStripMenuItem, Me.toolStripConfirmDeletions, Me.ConfirmRestorePointDeletionsInBatchesToolStripMenuItem, Me.toolStripLogRestorePointDeletions, Me.toolStripCloseAfterRestorePointIsCreated, Me.AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem, Me.BypassNoUACLauncherToolStripMenuItem, Me.LogProgramLoadsAndExitsToEventLogToolStripMenuItem, Me.ExtendedLoggingForScheduledTasks, Me.AskBeforeCreatingRestorePointToolStripMenuItem, Me.chkShowVersionInTitleBarToolStripMenuItem})
         Me.AdditionalOptionsAndSettingsToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.increase
         Me.AdditionalOptionsAndSettingsToolStripMenuItem.Name = "AdditionalOptionsAndSettingsToolStripMenuItem"
         Me.AdditionalOptionsAndSettingsToolStripMenuItem.Size = New System.Drawing.Size(431, 22)
@@ -533,13 +532,6 @@ Partial Class Form1
         Me.CheckSystemDrivesForFullShadowStorageToolStripMenuItem.Name = "CheckSystemDrivesForFullShadowStorageToolStripMenuItem"
         Me.CheckSystemDrivesForFullShadowStorageToolStripMenuItem.Size = New System.Drawing.Size(435, 22)
         Me.CheckSystemDrivesForFullShadowStorageToolStripMenuItem.Text = "Check Windows Drive for Full Shadow Storage at Program Launch"
-        '
-        'EnableSystemEventLoggingToolStripMenuItem
-        '
-        Me.EnableSystemEventLoggingToolStripMenuItem.CheckOnClick = True
-        Me.EnableSystemEventLoggingToolStripMenuItem.Name = "EnableSystemEventLoggingToolStripMenuItem"
-        Me.EnableSystemEventLoggingToolStripMenuItem.Size = New System.Drawing.Size(435, 22)
-        Me.EnableSystemEventLoggingToolStripMenuItem.Text = "Enable System Event Logging"
         '
         'toolStripConfirmDeletions
         '
@@ -652,6 +644,13 @@ Partial Class Form1
         '
         Me.barBelowColorSettings.Name = "barBelowColorSettings"
         Me.barBelowColorSettings.Size = New System.Drawing.Size(428, 6)
+        '
+        'ExtendedDebugToolStripMenuItem
+        '
+        Me.ExtendedDebugToolStripMenuItem.CheckOnClick = True
+        Me.ExtendedDebugToolStripMenuItem.Name = "ExtendedDebugToolStripMenuItem"
+        Me.ExtendedDebugToolStripMenuItem.Size = New System.Drawing.Size(431, 22)
+        Me.ExtendedDebugToolStripMenuItem.Text = "Enable Extended Debug Logging"
         '
         'RoundTheAgeOfRestorePointInDaysToHowManyDecimalsToolStripMenuItem
         '
@@ -1052,13 +1051,6 @@ Partial Class Form1
         '
         Me.pleaseWaitMessageChanger.Interval = 250
         '
-        'ExtendedDebugToolStripMenuItem
-        '
-        Me.ExtendedDebugToolStripMenuItem.CheckOnClick = True
-        Me.ExtendedDebugToolStripMenuItem.Name = "ExtendedDebugToolStripMenuItem"
-        Me.ExtendedDebugToolStripMenuItem.Size = New System.Drawing.Size(431, 22)
-        Me.ExtendedDebugToolStripMenuItem.Text = "Enable Extended Debug Logging"
-        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
@@ -1148,7 +1140,6 @@ Partial Class Form1
     Friend WithEvents InterfaceTooBigToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents AdditionalOptionsAndSettingsToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents CheckSystemDrivesForFullShadowStorageToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents EnableSystemEventLoggingToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents toolStripConfirmDeletions As ToolStripMenuItem
     Friend WithEvents toolStripLogRestorePointDeletions As ToolStripMenuItem
     Friend WithEvents toolStripCloseAfterRestorePointIsCreated As ToolStripMenuItem

@@ -371,7 +371,6 @@ Public Class Form1
             ShowMessageBoxAfterSuccessfulCreationOfRestorePointToolStripMenuItem.Checked = My.Settings.ShowMessageBoxAfterSuccessfulCreationOfRestorePoint
             ShowMessageBoxAfterSuccessfulDeletionOfRestorePointsToolStripMenuItem.Checked = My.Settings.ShowMessageBoxAfterSuccessfulDeletionOfRestorePoints
             CheckSystemDrivesForFullShadowStorageToolStripMenuItem.Checked = My.Settings.checkSystemDrivesForFullShadowStorage
-            EnableSystemEventLoggingToolStripMenuItem.Checked = globalVariables.boolLogToSystemLog
             LogProgramLoadsAndExitsToEventLogToolStripMenuItem.Checked = globalVariables.boolLogLoadsAndExits
             UseSSLToolStripMenuItem.Checked = My.Settings.useSSL
             AskBeforeUpgradingUpdatingToolStripMenuItem.Checked = My.Settings.askToUpgrade
@@ -2651,16 +2650,6 @@ Public Class Form1
             globalVariables.windows.frmCreateRestorePointAtUserLogon.Show()
         Else
             globalVariables.windows.frmCreateRestorePointAtUserLogon.BringToFront()
-        End If
-    End Sub
-
-    Private Sub EnableSystemEventLoggingToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EnableSystemEventLoggingToolStripMenuItem.Click
-        If EnableSystemEventLoggingToolStripMenuItem.Checked = True Then
-            savePreferenceToRegistry("Enable System Logging", "True")
-            globalVariables.boolLogToSystemLog = True
-        Else
-            savePreferenceToRegistry("Enable System Logging", "False")
-            globalVariables.boolLogToSystemLog = False
         End If
     End Sub
 

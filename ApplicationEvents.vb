@@ -324,7 +324,6 @@ Namespace My
                         Short.TryParse(registryKey.GetValue("Keep X Amount of Restore Points Value", "-10"), globalVariables.KeepXAmountofRestorePointsValue)
                     End If
 
-                    globalVariables.boolLogToSystemLog = Functions.registryStuff.getBooleanValueFromRegistry(registryKey, "Enable System Logging", True)
                     globalVariables.boolLogLoadsAndExits = Functions.registryStuff.getBooleanValueFromRegistry(registryKey, "Log Program Loads and Exits to Event Log", True)
 
                     registryKey.Close()

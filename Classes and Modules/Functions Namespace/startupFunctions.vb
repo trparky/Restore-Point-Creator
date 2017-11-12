@@ -257,7 +257,6 @@ Namespace Functions.startupFunctions
         End Sub
 
         Public Sub giveMessageToUserAboutNotBeingAbleToCreateRegistrySubKey()
-            globalVariables.boolLogToSystemLog = True
             eventLogFunctions.writeToSystemEventLog("Unable to create Registry Key for program in HKEY_LOCAL_MACHINE\SOFTWARE. Restore Point Creator can't continue. Please check with your System Administrator to see if you have access rights to HKEY_LOCAL_MACHINE.", EventLogEntryType.Error)
             MsgBox("Unable to create Registry Key for program in HKEY_LOCAL_MACHINE\SOFTWARE. Restore Point Creator can't continue. Please check with your System Administrator to see if you have access rights to HKEY_LOCAL_MACHINE.", MsgBoxStyle.Critical, "Restore Point Creator")
         End Sub

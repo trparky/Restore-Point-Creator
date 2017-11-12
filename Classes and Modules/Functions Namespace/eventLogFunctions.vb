@@ -203,73 +203,69 @@ Namespace Functions.eventLogFunctions
 
         ''' <summary>Deletes a list of individual log entries from the log.</summary>
         Public Sub deleteEntryFromLog(idsOfLogsToBeDeleted As List(Of Long))
-            If globalVariables.boolLogToSystemLog = True Then
-                Try
-                    Dim applicationLog As New List(Of restorePointCreatorExportedLog)
-                    Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
+            Try
+                Dim applicationLog As New List(Of restorePointCreatorExportedLog)
+                Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
 
-                    If Not IO.File.Exists(strLogFile) Then createLogFile()
+                If Not IO.File.Exists(strLogFile) Then createLogFile()
 
-                    shortNumberOfRecalledGetFileStreamFunction = 0
-                    Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.ReadWrite)
-                        Dim streamReader As New IO.StreamReader(fileStream)
-                        applicationLog = xmlSerializerObject.Deserialize(streamReader)
+                shortNumberOfRecalledGetFileStreamFunction = 0
+                Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.ReadWrite)
+                    Dim streamReader As New IO.StreamReader(fileStream)
+                    applicationLog = xmlSerializerObject.Deserialize(streamReader)
 
-                        For Each longIDToBeDeleted As Long In idsOfLogsToBeDeleted
-                            deleteEntryFromLogSubRoutine(applicationLog, longIDToBeDeleted)
-                        Next
+                    For Each longIDToBeDeleted As Long In idsOfLogsToBeDeleted
+                        deleteEntryFromLogSubRoutine(applicationLog, longIDToBeDeleted)
+                    Next
 
-                        applicationLog = reIDTheLogEntries(applicationLog)
+                    applicationLog = reIDTheLogEntries(applicationLog)
 
-                        fileStream.Position = 0
-                        fileStream.SetLength(0)
+                    fileStream.Position = 0
+                    fileStream.SetLength(0)
 
-                        Dim streamWriter As New IO.StreamWriter(fileStream)
-                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
+                    Dim streamWriter As New IO.StreamWriter(fileStream)
+                    xmlSerializerObject.Serialize(streamWriter, applicationLog)
 
-                        streamReader.Dispose()
-                    End Using
-                Catch ex As myExceptions.unableToGetLockOnLogFile
-                    oldEventLogFunctions.boolShowErrorMessage = True
-                    oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
-                Catch ex As Exception
-                    ' Does nothing
-                End Try
-            End If
+                    streamReader.Dispose()
+                End Using
+            Catch ex As myExceptions.unableToGetLockOnLogFile
+                oldEventLogFunctions.boolShowErrorMessage = True
+                oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
+            Catch ex As Exception
+                ' Does nothing
+            End Try
         End Sub
 
         ''' <summary>Deletes an individual log entry from the log.</summary>
         Public Sub deleteEntryFromLog(longIDToBeDeleted As Long)
-            If globalVariables.boolLogToSystemLog = True Then
-                Try
-                    Dim applicationLog As New List(Of restorePointCreatorExportedLog)
-                    Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
+            Try
+                Dim applicationLog As New List(Of restorePointCreatorExportedLog)
+                Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
 
-                    If Not IO.File.Exists(strLogFile) Then createLogFile()
+                If Not IO.File.Exists(strLogFile) Then createLogFile()
 
-                    shortNumberOfRecalledGetFileStreamFunction = 0
-                    Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.ReadWrite)
-                        Dim streamReader As New IO.StreamReader(fileStream)
-                        applicationLog = xmlSerializerObject.Deserialize(streamReader)
+                shortNumberOfRecalledGetFileStreamFunction = 0
+                Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.ReadWrite)
+                    Dim streamReader As New IO.StreamReader(fileStream)
+                    applicationLog = xmlSerializerObject.Deserialize(streamReader)
 
-                        deleteEntryFromLogSubRoutine(applicationLog, longIDToBeDeleted)
-                        applicationLog = reIDTheLogEntries(applicationLog)
+                    deleteEntryFromLogSubRoutine(applicationLog, longIDToBeDeleted)
+                    applicationLog = reIDTheLogEntries(applicationLog)
 
-                        fileStream.Position = 0
-                        fileStream.SetLength(0)
+                    fileStream.Position = 0
+                    fileStream.SetLength(0)
 
-                        Dim streamWriter As New IO.StreamWriter(fileStream)
-                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
+                    Dim streamWriter As New IO.StreamWriter(fileStream)
+                    xmlSerializerObject.Serialize(streamWriter, applicationLog)
 
-                        streamReader.Dispose()
-                    End Using
-                Catch ex As myExceptions.unableToGetLockOnLogFile
-                    oldEventLogFunctions.boolShowErrorMessage = True
-                    oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
-                Catch ex As Exception
-                    ' Does nothing
-                End Try
-            End If
+                    streamReader.Dispose()
+                End Using
+            Catch ex As myExceptions.unableToGetLockOnLogFile
+                oldEventLogFunctions.boolShowErrorMessage = True
+                oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
+            Catch ex As Exception
+                ' Does nothing
+            End Try
         End Sub
 
         Private Sub handleCorruptedXMLLogFile(ByRef applicationLog As List(Of restorePointCreatorExportedLog), ByRef fileStream As IO.FileStream)
@@ -295,48 +291,46 @@ Namespace Functions.eventLogFunctions
         ''' <param name="logType">The type of log that you want your entry to be. The three major options are Error, Information, and Warning.</param>
         ''' <example>functions.eventLogFunctions.writeToSystemEventLog("My Event Log Entry", EventLogEntryType.Information)</example>
         Public Sub writeToSystemEventLog(logMessage As String, Optional logType As EventLogEntryType = EventLogEntryType.Information)
-            If globalVariables.boolLogToSystemLog = True Then
-                Try
-                    Dim applicationLog As New List(Of restorePointCreatorExportedLog)
-                    Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
+            Try
+                Dim applicationLog As New List(Of restorePointCreatorExportedLog)
+                Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
 
-                    If Not IO.File.Exists(strLogFile) Then createLogFile()
+                If Not IO.File.Exists(strLogFile) Then createLogFile()
 
-                    shortNumberOfRecalledGetFileStreamFunction = 0
-                    Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.ReadWrite)
-                        Dim streamReader As New IO.StreamReader(fileStream)
+                shortNumberOfRecalledGetFileStreamFunction = 0
+                Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.ReadWrite)
+                    Dim streamReader As New IO.StreamReader(fileStream)
 
-                        Try
-                            applicationLog = xmlSerializerObject.Deserialize(streamReader)
-                        Catch ex As InvalidOperationException
-                            handleCorruptedXMLLogFile(applicationLog, fileStream)
-                        End Try
+                    Try
+                        applicationLog = xmlSerializerObject.Deserialize(streamReader)
+                    Catch ex As InvalidOperationException
+                        handleCorruptedXMLLogFile(applicationLog, fileStream)
+                    End Try
 
-                        applicationLog.Add(New restorePointCreatorExportedLog With {
-                            .logData = logMessage,
-                            .logType = logType,
-                            .unixTime = 0,
-                            .logSource = "Restore Point Creator",
-                            .logID = applicationLog.Count,
-                            .dateObject = Now.ToUniversalTime
-                        })
+                    applicationLog.Add(New restorePointCreatorExportedLog With {
+                        .logData = logMessage,
+                        .logType = logType,
+                        .unixTime = 0,
+                        .logSource = "Restore Point Creator",
+                        .logID = applicationLog.Count,
+                        .dateObject = Now.ToUniversalTime
+                    })
 
-                        fileStream.Position = 0
-                        fileStream.SetLength(0)
+                    fileStream.Position = 0
+                    fileStream.SetLength(0)
 
-                        Dim streamWriter As New IO.StreamWriter(fileStream)
-                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
+                    Dim streamWriter As New IO.StreamWriter(fileStream)
+                    xmlSerializerObject.Serialize(streamWriter, applicationLog)
 
-                        streamReader.Dispose()
-                    End Using
-                Catch ex As myExceptions.unableToGetLockOnLogFile
-                    oldEventLogFunctions.writeToSystemEventLog(logMessage, logType)
-                    oldEventLogFunctions.boolShowErrorMessage = True
-                    oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
-                Catch ex As Exception
-                    oldEventLogFunctions.writeCrashToEventLog(ex)
-                End Try
-            End If
+                    streamReader.Dispose()
+                End Using
+            Catch ex As myExceptions.unableToGetLockOnLogFile
+                oldEventLogFunctions.writeToSystemEventLog(logMessage, logType)
+                oldEventLogFunctions.boolShowErrorMessage = True
+                oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
+            Catch ex As Exception
+                oldEventLogFunctions.writeCrashToEventLog(ex)
+            End Try
         End Sub
 
         Public Function convertLogTypeToText(errorType As EventLogEntryType) As String
