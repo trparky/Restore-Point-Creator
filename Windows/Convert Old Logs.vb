@@ -1,12 +1,12 @@
 ﻿Public Class convertOldLogs
+    Private _userResponse As userResponseENum
+    Private boolUserResponded As Boolean = False
+
     Public Enum userResponseENum As Short
         yes
         no
         dontConvertThemEver
     End Enum
-
-    Private _userResponse As userResponseENum
-    Private boolUserResponded As Boolean = False
 
     Public ReadOnly Property userResponse As userResponseENum
         Get
