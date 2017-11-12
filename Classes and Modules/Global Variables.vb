@@ -78,8 +78,8 @@ Namespace globalVariables
 #If DEBUG Then
             Public Const boolDebugBuild As Boolean = True
 
-            Public Const boolBeta As Boolean = True
-            Public Const shortBetaVersion As Short = 1
+            Public Const boolBeta As Boolean = False
+            Public Const shortBetaVersion As Short = 0
 
             Public Const boolReleaseCandidate As Boolean = False
             Public Const shortReleaseCandidateVersion As Short = 0
