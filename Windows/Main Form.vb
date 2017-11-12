@@ -2143,26 +2143,43 @@ Public Class Form1
             openPleaseWaitPanel("Loading Restore Points... Please Wait.")
             Threading.ThreadPool.QueueUserWorkItem(AddressOf startSystemRestorePointListLoadThreadSub)
         Else
-            ' The log hasn't been converted yet so let's do it now.
+            Dim convertOldLogsInstance As New convertOldLogs()
+            convertOldLogsInstance.StartPosition = FormStartPosition.CenterParent
+            convertOldLogsInstance.ShowDialog()
 
-            ' Open a Please Wait panel to tell the user that we have to do some work.
-            openPleaseWaitPanel("Converting old application logs... Please wait.")
+            If convertOldLogsInstance.userResponse = convertOldLogs.userResponseENum.dontConvertThemEver Then
+                ' This happens if the user presses either the "Don't Convert Them Ever" button.
+                Functions.registryStuff.setBooleanValueInRegistry("Exported Old Logs", True)
+            End If
 
-            ' Start a background thread to do the work.
-            Threading.ThreadPool.QueueUserWorkItem(Sub()
-                                                       ' This calls the function that converts the logs.
-                                                       Functions.eventLogFunctions.getOldLogsFromWindowsEventLog()
-                                                       Functions.registryStuff.setBooleanValueInRegistry("Exported Old Logs", True)
+            If convertOldLogsInstance.userResponse = convertOldLogs.userResponseENum.yes Then
+                ' This happens if the user presses either the "Convert Now" button.
 
-                                                       ' Now we need to do some work on the main thread.
-                                                       Me.Invoke(Sub()
-                                                                     closePleaseWaitPanel() ' First we close the Please Wait panel.
-                                                                     openPleaseWaitPanel("Loading Restore Points... Please Wait.") ' And open a new one.
-                                                                 End Sub)
+                ' Open a Please Wait panel to tell the user that we have to do some work.
+                openPleaseWaitPanel("Converting old application logs... Please wait.")
 
-                                                       ' Now we load the restore points.
-                                                       startSystemRestorePointListLoadThreadSub()
-                                                   End Sub)
+                ' Start a background thread to do the work.
+                Threading.ThreadPool.QueueUserWorkItem(Sub()
+                                                           ' This calls the function that converts the logs.
+                                                           Functions.eventLogFunctions.getOldLogsFromWindowsEventLog()
+                                                           Functions.registryStuff.setBooleanValueInRegistry("Exported Old Logs", True)
+
+                                                           ' Now we need to do some work on the main thread.
+                                                           Me.Invoke(Sub()
+                                                                         closePleaseWaitPanel() ' First we close the Please Wait panel.
+                                                                         openPleaseWaitPanel("Loading Restore Points... Please Wait.") ' And open a new one.
+                                                                     End Sub)
+
+                                                           ' Now we load the restore points.
+                                                           startSystemRestorePointListLoadThreadSub()
+                                                       End Sub)
+            Else
+                ' This happens if the user presses either the "Convert Them Later" or the "Don't Convert Them Ever" button.
+                openPleaseWaitPanel("Loading Restore Points... Please Wait.")
+                Threading.ThreadPool.QueueUserWorkItem(AddressOf startSystemRestorePointListLoadThreadSub)
+            End If
+
+            convertOldLogsInstance = Nothing
         End If
     End Sub
 

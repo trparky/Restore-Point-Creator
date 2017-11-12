@@ -186,6 +186,12 @@
     <Compile Include="Windows\Confirm Restore Point Deletions Form.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Windows\Convert Old Logs.Designer.vb">
+      <DependentUpon>Convert Old Logs.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Convert Old Logs.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Windows\Reserved Space for System Drive.Designer.vb">
       <DependentUpon>Reserved Space for System Drive.vb</DependentUpon>
     </Compile>
@@ -372,6 +378,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Confirm Restore Point Deletions Form.resx">
       <DependentUpon>Confirm Restore Point Deletions Form.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Convert Old Logs.resx">
+      <DependentUpon>Convert Old Logs.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Create Restore Point at User Logon.resx">
       <DependentUpon>Create Restore Point at User Logon.vb</DependentUpon>

@@ -1,13 +1,13 @@
 ﻿Public Class frmConfirmDelete
+    Public userResponse As userResponseENum
+    Private boolUserResponded As Boolean = False
+
     Public Enum userResponseENum
         yes
         no
         cancel
         yesAndDontAskAgain
     End Enum
-
-    Public userResponse As userResponseENum
-    Private boolUserResponded As Boolean = False
 
     Private Sub btnNo_Click(sender As Object, e As EventArgs) Handles btnNo.Click
         boolUserResponded = True
