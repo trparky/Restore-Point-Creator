@@ -293,7 +293,7 @@ Public Class Form1
         Try
             ConfigureHTTPTimeoutToolStripMenuItem.Text = String.Format("Configure HTTP Timeout ({0} Seconds)", My.Settings.httpTimeout)
             Dim registryObject As RegistryKey
-            My.Settings.firstRun = False
+            My.Settings.boolFirstRun = False
             My.Settings.Save()
             Dim boolUpdateAtNextRunTime As Boolean
 
