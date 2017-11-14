@@ -8,6 +8,7 @@ Imports System.Management
 
 Public Class Form1
 #Region "--== Program-Wide Variables ==--"
+    Private boolFirstRun As Boolean
     Private boolDoneLoading As Boolean = False
     Private boolShowDonationMessage As Boolean = True
 
@@ -293,8 +294,13 @@ Public Class Form1
         Try
             ConfigureHTTPTimeoutToolStripMenuItem.Text = String.Format("Configure HTTP Timeout ({0} Seconds)", My.Settings.httpTimeout)
             Dim registryObject As RegistryKey
-            My.Settings.boolFirstRun = False
-            My.Settings.Save()
+
+            boolFirstRun = My.Settings.boolFirstRun
+            If My.Settings.boolFirstRun Then
+                My.Settings.boolFirstRun = False
+                My.Settings.Save()
+            End If
+
             Dim boolUpdateAtNextRunTime As Boolean
 
             If Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey) Is Nothing Then
@@ -2136,6 +2142,11 @@ Public Class Form1
             End If
         End Using
 
+        If boolFirstRun Then
+            boolExportedOldLogs = True
+            Functions.registryStuff.setBooleanValueInRegistry("Exported Old Logs", True)
+        End If
+
         ' This checks to see if we have converted the logs by checking the Boolean value we parsed above.
         If boolExportedOldLogs Then
             ' OK, so the log have already been converted so we just load the restore points.
@@ -2287,8 +2298,6 @@ Public Class Form1
 
             boolDoneLoading = True
             systemRestorePointsList.Select()
-
-            My.Settings.boolFirstRun = False
         Catch ex2 As IO.IOException
             handleConfigFileAccessViolation(ex2)
         Catch ex As Exception
