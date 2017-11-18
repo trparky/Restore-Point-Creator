@@ -105,7 +105,6 @@
             loadEventLogData()
 
             Dim longElapsedMilisecond As Long = timeStamp.ElapsedMilliseconds
-            Dim dblElapsedSeconds As Double = timeStamp.Elapsed.TotalSeconds
 
             If timeStamp.Elapsed.Milliseconds < 1000 Then Threading.Thread.Sleep(1000 - timeStamp.Elapsed.Milliseconds)
 
@@ -120,7 +119,7 @@
 
                           closePleaseWaitPanel()
                           timeStamp.Stop()
-                          lblProcessedIn.Text = String.Format("Event Log Loaded and Processed in {0}ms ({1} seconds).", longElapsedMilisecond.ToString("N0"), Math.Round(dblElapsedSeconds, 2))
+                          lblProcessedIn.Text = String.Format("Event Log Loaded and Processed in {0}ms.", longElapsedMilisecond.ToString("N0"))
                       End Sub)
         Catch ex As Threading.ThreadAbortException
         Finally
