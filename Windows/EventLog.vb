@@ -119,7 +119,7 @@
 
                           closePleaseWaitPanel()
                           timeStamp.Stop()
-                          lblProcessedIn.Text = String.Format("Event Log Loaded and Processed in {0}ms.", longElapsedMilisecond.ToString("N0"))
+                          lblProcessedIn.Text = String.Format("Application Event Log File Loaded and Processed in {0}ms.", longElapsedMilisecond.ToString("N0"))
                       End Sub)
         Catch ex As Threading.ThreadAbortException
         Finally
