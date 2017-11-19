@@ -268,10 +268,20 @@ Namespace Functions.eventLogFunctions
             End Try
         End Sub
 
-        Private Sub handleCorruptedXMLLogFile(ByRef applicationLog As List(Of restorePointCreatorExportedLog), ByRef fileStream As IO.FileStream)
-            If IO.File.Exists(strLogFile & ".corrupted") Then IO.File.Delete(strLogFile & ".corrupted")
+        Private Function incrementFileName(input As String) As String
+            If IO.File.Exists(input) Then
+                Dim i As Short = 1
+                While IO.File.Exists(input & i.ToString)
+                    i += 1
+                End While
+                Return input & i.ToString
+            Else
+                Return input
+            End If
+        End Function
 
-            Using newCorruptedLogFileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile & ".corrupted", IO.FileAccess.Write, IO.FileMode.CreateNew)
+        Private Sub handleCorruptedXMLLogFile(ByRef applicationLog As List(Of restorePointCreatorExportedLog), ByRef fileStream As IO.FileStream)
+            Using newCorruptedLogFileStream As IO.FileStream = getFileStreamWithWaiting(incrementFileName(strLogFile & ".corrupted"), IO.FileAccess.Write, IO.FileMode.CreateNew)
                 fileStream.Position = 0
                 fileStream.CopyTo(newCorruptedLogFileStream)
             End Using
