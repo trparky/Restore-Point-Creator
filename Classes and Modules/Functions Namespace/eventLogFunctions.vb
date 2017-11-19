@@ -37,7 +37,7 @@ Namespace Functions.eventLogFunctions
         ''' <param name="strFileToBeExportedTo">The path to the file we will be exporting the data to.</param>
         ''' <param name="logCount">This is a ByRef argument which passes back the number of logs that this function exported.</param>
         ''' <returns>Returns a Boolean value. If True the logs were successfully exported, if False then something went wrong.</returns>
-        Public Function exportLogsToFile(ByVal strFileToBeExportedTo As String, ByRef logCount As ULong) As Boolean
+        Public Function exportLogsToFile(ByVal strFileToBeExportedTo As String, ByRef logCount As Long) As Boolean
             Try
                 Dim jsonEngine As New Web.Script.Serialization.JavaScriptSerializer
 
@@ -102,7 +102,7 @@ Namespace Functions.eventLogFunctions
 
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
                 Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
-                Dim logCount, longOldLogCount As ULong
+                Dim logCount, longOldLogCount As Long
                 Dim stopwatch As Stopwatch = Stopwatch.StartNew
 
                 Try
@@ -131,7 +131,7 @@ Namespace Functions.eventLogFunctions
                     Exit Sub
                 End Try
 
-                Dim longNumberOfImportedLogs As ULong = applicationLog.Count - longOldLogCount
+                Dim longNumberOfImportedLogs As Long = applicationLog.Count - longOldLogCount
 
                 writeToSystemEventLog("Log conversion process complete.", EventLogEntryType.Information)
 
@@ -418,7 +418,7 @@ Namespace Functions.eventLogFunctions
         ''' <summary>This sub-routine is called by the exportLogsToFile() sub-routine, this is not intended to be called outside of this module.</summary>
         ''' <param name="logCount">This is a ByRef argument which passes back the number of logs that this function exported.</param>
         ''' <param name="strEventLog">The log that we're exporting.</param>
-        Private Sub exportApplicationEventLogEntriesToFile(ByVal strEventLog As String, ByRef logEntries As List(Of restorePointCreatorExportedLog), ByRef logCount As ULong)
+        Private Sub exportApplicationEventLogEntriesToFile(ByVal strEventLog As String, ByRef logEntries As List(Of restorePointCreatorExportedLog), ByRef logCount As Long)
             Dim eventLogQuery As Eventing.Reader.EventLogQuery
             Dim logReader As Eventing.Reader.EventLogReader
             Dim eventInstance As Eventing.Reader.EventRecord
