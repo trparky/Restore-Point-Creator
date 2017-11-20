@@ -13,16 +13,14 @@ Module keepThisVeryImportantStuff
     Sub createJumpListItem(ByRef jumpList As Windows.Shell.JumpList, ByVal name As String, ByVal category As String, ByVal Optional cmdLineArgument As String = Nothing)
         Try
             Dim jumpTask As New Windows.Shell.JumpTask With {
-                    .ApplicationPath = Application.ExecutablePath,
-                    .IconResourcePath = Application.ExecutablePath,
-                    .IconResourceIndex = 0,
-                    .Title = name,
-                    .CustomCategory = category
-                }
+                .ApplicationPath = Application.ExecutablePath,
+                .IconResourcePath = Application.ExecutablePath,
+                .IconResourceIndex = 0,
+                .Title = name,
+                .CustomCategory = category
+            }
 
-            If cmdLineArgument.Equals(Nothing) = False Then
-                jumpTask.Arguments = cmdLineArgument
-            End If
+            If Not String.IsNullOrEmpty(cmdLineArgument) Then jumpTask.Arguments = cmdLineArgument
 
             jumpList.JumpItems.Add(jumpTask)
         Catch ex As Exception
