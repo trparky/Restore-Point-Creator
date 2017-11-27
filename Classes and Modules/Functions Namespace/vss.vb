@@ -1,5 +1,22 @@
 ﻿Namespace Functions.vss
     Module vss
+        Public Sub checkVSSServiceStatus()
+            Try
+                Dim strResult As String = wmi.getServiceStartType("VSS")
+
+                If String.IsNullOrEmpty(strResult) Then
+                    eventLogFunctions.writeToSystemEventLog("The WMI system returned an invalid response for the Startup type parameter.", EventLogEntryType.Error)
+                Else
+                    If Not strResult.Equals("manual", StringComparison.OrdinalIgnoreCase) Then
+                        eventLogFunctions.writeToSystemEventLog("The VSS System Service Startup Type was detected to be not setup correctly, this has been corrected.", EventLogEntryType.Warning)
+                        wmi.setServiceStartMode("VSS")
+                    End If
+                End If
+            Catch ex As Exception
+                eventLogFunctions.writeToSystemEventLog("Unable to find the VSS System Service.", EventLogEntryType.Error)
+            End Try
+        End Sub
+
         ''' <summary>Gets the Shadow Storage Information for a particular storage device in the system.</summary>
         ''' <param name="volumeID">This input can accept either a storage device GUID or a drive letter such as "C:".</param>
         ''' <returns>A ShadowStorageData Class instance.</returns>

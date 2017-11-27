@@ -2,6 +2,41 @@
 
 Namespace Functions.wmi
     Module wmi
+        ''' <summary>Gets the startup type for a system service.</summary>
+        ''' <param name="strServiceName">The name of the System Service you are querying the status of.</param>
+        ''' <returns>A String Value.</returns>
+        ''' <exception cref="ArgumentException">If this function returns an ArgumentException exception it means that the program could not find the system service that you passed to it.</exception>
+        Public Function getServiceStartType(strServiceName As String) As String
+            Dim startMode As String = ""
+            Dim managementObjectSearcher As Management.ManagementObjectSearcher = New Management.ManagementObjectSearcher(String.Format("SELECT StartMode FROM Win32_Service WHERE Name = '{0}'", strServiceName))
+
+            If managementObjectSearcher Is Nothing Then
+                Throw New ArgumentException("Unable to find the System Service named " & strServiceName & ".")
+            Else
+                Try
+                    Dim managementObject As Management.ManagementObject = managementObjectSearcher.Get()(0)
+                    startMode = managementObject.GetPropertyValue("StartMode").ToString()
+                Catch ex As Exception
+                    eventLogFunctions.writeCrashToEventLog(ex)
+                    eventLogFunctions.writeToSystemEventLog("Unable to get Startup Type for the " & strServiceName & " System Service.", EventLogEntryType.Error)
+                End Try
+            End If
+
+            Return startMode
+        End Function
+
+        Public Sub setServiceStartMode(strServiceName As String, Optional strStartType As String = "Manual")
+            Try
+                Dim managementObject As New Management.ManagementObject("root\CIMV2", "Win32_Service.Name='" & strServiceName & "'", Nothing)
+                Dim managementParameters As Management.ManagementBaseObject = managementObject.GetMethodParameters("ChangeStartMode")
+                managementParameters("StartMode") = strStartType
+                managementObject.InvokeMethod("ChangeStartMode", managementParameters, Nothing)
+            Catch ex As Exception
+                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeToSystemEventLog("Unable to set Startup Type for the " & strServiceName & " System Service.", EventLogEntryType.Error)
+            End Try
+        End Sub
+
         ''' <summary>Gets the total capcity of a system drive.</summary>
         ''' <param name="driveLetter">C: or D:</param>
         ''' <returns></returns>

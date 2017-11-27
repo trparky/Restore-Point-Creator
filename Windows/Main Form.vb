@@ -2390,6 +2390,8 @@ Public Class Form1
         If MsgBox("You are about to forcefully fix System Restore on your system by enabling System Restore on the system drive. Use this tool only if you have received errors from the program such as Error 1058." & vbCrLf & vbCrLf & "WARNING! This tool may have unintended consequences such as lost restore points. By using this tool you agree that the developer of System Restore Point Creator is not liable for any lost restore points." & vbCrLf & vbCrLf & "Are you sure you want to do this?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, strMessageBoxTitle) = MsgBoxResult.Yes Then
             Functions.eventLogFunctions.writeToSystemEventLog("The Manual System Restore Fix Tool has been engaged.", EventLogEntryType.Information)
 
+            Functions.vss.checkVSSServiceStatus()
+
             Dim gigabytesInBytes As Long = 1073741824
             Dim newSize As Long = gigabytesInBytes * 20 ' Sets the size to 20 GBs.
 
