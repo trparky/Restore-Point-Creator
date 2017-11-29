@@ -13,6 +13,18 @@
                         eventLogFunctions.writeToSystemEventLog("The VSS System Service Startup Type was detected to be not setup correctly, this has been corrected.", EventLogEntryType.Warning)
                         wmi.setServiceStartMode("VSS")
                     End If
+
+                    eventLogFunctions.writeToSystemEventLog("Attempting to start the VSS System Service.", EventLogEntryType.Information)
+
+                    Try
+                        Using systemServiceController As New ServiceProcess.ServiceController("VSS")
+                            systemServiceController.Start()
+                            eventLogFunctions.writeToSystemEventLog("The VSS System Service has been successfully started.", EventLogEntryType.Information)
+                        End Using
+                    Catch ex As Exception
+                        eventLogFunctions.writeToSystemEventLog("The VSS System Service has failed to start.", EventLogEntryType.Error)
+                        eventLogFunctions.writeCrashToEventLog(ex, EventLogEntryType.Error)
+                    End Try
                 End If
             Catch ex As Exception
                 eventLogFunctions.writeToSystemEventLog("Unable to find the VSS System Service.", EventLogEntryType.Error)
