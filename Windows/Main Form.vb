@@ -1233,7 +1233,7 @@ Public Class Form1
 
             If result <> Functions.APIs.errorCodes.ERROR_SUCCESS Then
                 If result <> Functions.APIs.errorCodes.ERROR_SERVICE_DISABLED Then
-                    Functions.eventLogFunctions.writeToSystemEventLog("The system restore point API returned an error code (" & result & ").", EventLogEntryType.Warning)
+                    Functions.eventLogFunctions.writeToSystemEventLog("The system restore point API returned an error code (" & Functions.support.convertErrorCodeToHex(result) & ").", EventLogEntryType.Warning)
                 End If
 
                 closePleaseWaitPanel()
