@@ -7,6 +7,8 @@
                 If String.IsNullOrEmpty(strResult) Then
                     eventLogFunctions.writeToSystemEventLog("The WMI system returned an invalid response for the Startup type parameter.", EventLogEntryType.Error)
                 Else
+                    eventLogFunctions.writeToSystemEventLog(String.Format("VSS System Service Startup Type is set to {0}{1}{0}.", Chr(34), strResult), EventLogEntryType.Information)
+
                     If Not strResult.Equals("manual", StringComparison.OrdinalIgnoreCase) Then
                         eventLogFunctions.writeToSystemEventLog("The VSS System Service Startup Type was detected to be not setup correctly, this has been corrected.", EventLogEntryType.Warning)
                         wmi.setServiceStartMode("VSS")
