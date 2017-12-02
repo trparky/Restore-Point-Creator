@@ -21,17 +21,18 @@ Namespace Functions.taskStuff
             End Try
         End Function
 
-        Public Function doesTaskExist(ByVal nameOfTask As String, ByRef taskObject As TaskScheduler.Task) As Boolean
+        Public Function doesTaskExist(ByVal nameOfTask As String, ByRef taskObject As TaskScheduler.Task, Optional disposeOfTaskServiceObject As Boolean = True) As Boolean
             Try
-                Using taskServiceObject As TaskScheduler.TaskService = New TaskScheduler.TaskService()
-                    taskObject = taskServiceObject.GetTask(nameOfTask)
+                Dim taskServiceObject As TaskScheduler.TaskService = New TaskScheduler.TaskService()
+                taskObject = taskServiceObject.GetTask(nameOfTask)
 
-                    If taskObject Is Nothing Then
-                        Return False
-                    Else
-                        Return True
-                    End If
-                End Using
+                If taskObject Is Nothing Then
+                    If disposeOfTaskServiceObject Then taskServiceObject.Dispose()
+                    Return False
+                Else
+                    If disposeOfTaskServiceObject Then taskServiceObject.Dispose()
+                    Return True
+                End If
             Catch ex As Exception
                 Return False
             End Try
@@ -125,6 +126,7 @@ Namespace Functions.taskStuff
                     .StopIfGoingOnBatteries = False
                     .AllowHardTerminate = False
                     .ExecutionTimeLimit = Nothing
+                    .Priority = ProcessPriorityClass.Normal
                 End With
 
                 If boolAllowParallelRunMode = True Then
@@ -267,6 +269,43 @@ Namespace Functions.taskStuff
                 End Using
             Catch ex As Exception
             End Try
+        End Sub
+
+        Private Sub addPrioritySettingsSubRoutine(ByRef task As TaskScheduler.Task)
+            Try
+                If task.Definition.Settings.Priority <> ProcessPriorityClass.Normal Then
+                    task.Definition.Settings.Priority = ProcessPriorityClass.Normal
+                    task.RegisterChanges()
+
+                    eventLogFunctions.writeToSystemEventLog("Setting priority settings for the task named """ & task.Name & """.", EventLogEntryType.Information)
+                    task.Dispose()
+                End If
+            Catch ex As Exception
+                eventLogFunctions.writeCrashToEventLog(ex)
+            End Try
+        End Sub
+
+        Public Sub addPrioritySettings()
+            Dim task As TaskScheduler.Task = Nothing
+
+            If doesTaskExist("System Restore Checkpoint by System Restore Point Creator", task, False) Then
+                addPrioritySettingsSubRoutine(task)
+            End If
+            If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Restore Point)", task) Then
+                addPrioritySettingsSubRoutine(task)
+            End If
+            If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Custom Restore Point)", task) Then
+                addPrioritySettingsSubRoutine(task)
+            End If
+            If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC", task) Then
+                addPrioritySettingsSubRoutine(task)
+            End If
+            If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Delete old Restore Points)", task) Then
+                addPrioritySettingsSubRoutine(task)
+            End If
+            If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Keep X Number of Restore Points)", task) Then
+                addPrioritySettingsSubRoutine(task)
+            End If
         End Sub
 
         Public Sub setMultiRunForTask()

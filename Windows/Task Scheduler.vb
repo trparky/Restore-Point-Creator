@@ -368,6 +368,7 @@ Public Class frmTaskScheduler
             newTask.Settings.AllowDemandStart = True
             newTask.Settings.AllowHardTerminate = False
             newTask.Settings.StartWhenAvailable = chkRunMissedTask.Checked
+            newTask.Settings.Priority = ProcessPriorityClass.Normal
 
             newTask.Settings.DisallowStartIfOnBatteries = False
             newTask.Settings.RunOnlyIfIdle = False
@@ -597,6 +598,7 @@ Public Class frmTaskScheduler
             newTask.Settings.AllowDemandStart = True
             newTask.Settings.AllowHardTerminate = False
             newTask.Settings.StartWhenAvailable = chkRunMissedTaskDelete.Checked
+            newTask.Settings.Priority = ProcessPriorityClass.Normal
 
             newTask.Settings.DisallowStartIfOnBatteries = False
             newTask.Settings.RunOnlyIfIdle = False

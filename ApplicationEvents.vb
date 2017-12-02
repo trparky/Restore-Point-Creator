@@ -606,6 +606,7 @@ Namespace My
             If boolAreWeAnAdministrator = True Then
                 Functions.taskStuff.updateScheduledRestorePointCreationTaskWithEverySetting()
                 Functions.taskStuff.setMultiRunForTask()
+                Functions.taskStuff.addPrioritySettings()
             End If
         End Sub
 
