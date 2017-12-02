@@ -274,11 +274,10 @@ Namespace Functions.taskStuff
 
             If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC", task) = True Then
                 If task.Definition.Settings.MultipleInstances <> TaskScheduler.TaskInstancesPolicy.Parallel Then
-                    deleteTask(task)
+                    task.Definition.Settings.MultipleInstances = TaskScheduler.TaskInstancesPolicy.Parallel
+                    task.RegisterChanges()
                     task.Dispose()
-
-                    eventLogFunctions.writeToSystemEventLog("Re-Created RunTime Task with MultiRun mode enabled.", EventLogEntryType.Information)
-                    addRunTimeTask("Restore Point Creator -- Run with no UAC", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, "", True)
+                    eventLogFunctions.writeToSystemEventLog("Modified RunTime Task with MultiRun mode enabled.", EventLogEntryType.Information)
                 End If
             End If
         End Sub
