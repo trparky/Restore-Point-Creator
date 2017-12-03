@@ -604,9 +604,9 @@ Namespace My
             End Try
 
             If boolAreWeAnAdministrator = True Then
-                Functions.taskStuff.updateScheduledRestorePointCreationTaskWithEverySetting()
-                Functions.taskStuff.setMultiRunForTask()
-                Functions.taskStuff.addPrioritySettings()
+                If Not Functions.registryStuff.getBooleanValueFromRegistry("Updated Scheduled Tasks with Every Setting", False) Then Functions.taskStuff.updateScheduledRestorePointCreationTaskWithEverySetting()
+                If Not Functions.registryStuff.getBooleanValueFromRegistry("Added MultiRun For Runtime Task", False) Then Functions.taskStuff.setMultiRunForTask()
+                If Not Functions.registryStuff.getBooleanValueFromRegistry("Added Priority Settings to Tasks", False) Then Functions.taskStuff.addPrioritySettings()
             End If
         End Sub
 

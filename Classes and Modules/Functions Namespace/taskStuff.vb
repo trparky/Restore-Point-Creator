@@ -239,6 +239,8 @@ Namespace Functions.taskStuff
                         taskService = Nothing
                     End If
                 End If
+
+                registryStuff.setBooleanValueInRegistry("Updated Scheduled Tasks with Every Setting", True)
             Catch ex As Exception
                 ' OK, we have some errors so lets add them to the Event Log.
                 eventLogFunctions.writeToSystemEventLog("An error occurred while upgrading scheduled task.", EventLogEntryType.Error)
@@ -306,6 +308,8 @@ Namespace Functions.taskStuff
             If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Keep X Number of Restore Points)", task) Then
                 addPrioritySettingsSubRoutine(task)
             End If
+
+            registryStuff.setBooleanValueInRegistry("Added Priority Settings to Tasks", True)
         End Sub
 
         Public Sub setMultiRunForTask()
@@ -319,6 +323,8 @@ Namespace Functions.taskStuff
                     eventLogFunctions.writeToSystemEventLog("Modified RunTime Task with MultiRun mode enabled.", EventLogEntryType.Information)
                 End If
             End If
+
+            registryStuff.setBooleanValueInRegistry("Added MultiRun For Runtime Task", True)
         End Sub
 
         ''' <summary>Checks to see if a run time task to launch this program with elevated user rights without a UAC prompt exists.</summary>
