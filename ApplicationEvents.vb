@@ -38,6 +38,12 @@ Namespace My
             Try
                 Dim strParentProcess As String = Process.GetCurrentProcess.Parent.ProcessName
                 Return strParentProcess.caseInsensitiveContains("svchost") Or strParentProcess.caseInsensitiveContains("taskeng")
+            Catch ex2 As Functions.myExceptions.unableToGetParentProcessException
+                Functions.eventLogFunctions.writeCrashToEventLog(ex2)
+                Return False
+            Catch ex3 As Functions.myExceptions.integerTryParseException
+                Functions.eventLogFunctions.writeCrashToEventLog(ex3)
+                Return False
             Catch ex As Exception
                 Return False
             End Try

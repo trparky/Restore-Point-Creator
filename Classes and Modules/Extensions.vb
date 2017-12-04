@@ -6,22 +6,34 @@ Module ProcessExtensions
     ''' <param name="process">Pass it Process.GetCurrentProcess.</param>
     ''' <returns>A Process Object.</returns>
     ''' <exception cref="Functions.myExceptions.unableToGetParentProcessException">If this function throws this exception it means that it wasn't able to get the parent process.</exception>
+    ''' <exception cref="Functions.myExceptions.integerTryParseException">If this function throws this exception it means that it wasn't able to parse what the Windows WMI returned to it.</exception>
     <Extension()>
     Public Function Parent(process As Process) As Process
         Using managementObjectSearcher As New Management.ManagementObjectSearcher("root\CIMV2", String.Format("SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {0}", process.Id))
             If managementObjectSearcher Is Nothing Then
                 Throw New Functions.myExceptions.unableToGetParentProcessException()
             Else
-                Dim intParentProcessID As Integer
+                Dim managementObjectCollection As Management.ManagementObjectCollection = managementObjectSearcher.Get()
 
-                If Integer.TryParse(managementObjectSearcher.Get()(0)("ParentProcessId").ToString(), intParentProcessID) Then
-                    Try
-                        Return Process.GetProcessById(intParentProcessID)
-                    Catch ex As Exception
-                        Throw New Functions.myExceptions.unableToGetParentProcessException()
-                    End Try
-                Else
+                If managementObjectCollection Is Nothing Then
                     Throw New Functions.myExceptions.unableToGetParentProcessException()
+                Else
+                    If managementObjectCollection.Count = 0 Then
+                        Throw New Functions.myExceptions.unableToGetParentProcessException()
+                    Else
+                        If managementObjectCollection(0)("ParentProcessId") Is Nothing Then
+                            Throw New Functions.myExceptions.unableToGetParentProcessException()
+                        Else
+                            Dim strParentProcessID As String = managementObjectCollection(0)("ParentProcessId").ToString()
+                            Dim intParentProcessID As Integer
+
+                            If Integer.TryParse(strParentProcessID, intParentProcessID) Then
+                                Return Process.GetProcessById(intParentProcessID)
+                            Else
+                                Throw New Functions.myExceptions.integerTryParseException("Unable to parse Parent Process ID.") With {.strThatCouldNotBeParsedIntoAnInteger = strParentProcessID}
+                            End If
+                        End If
+                    End If
                 End If
             End If
         End Using
