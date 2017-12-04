@@ -2,31 +2,29 @@
 Imports System.Text.RegularExpressions
 
 Module ProcessExtensions
-    Private Function FindIndexedProcessName(pid As Integer) As String
-        Dim processName As String = Process.GetProcessById(pid).ProcessName
-        Dim processesByName As Process() = Process.GetProcessesByName(processName)
-        Dim processIndexdName As String = Nothing
-
-        For index As Integer = 0 To processesByName.Length - 1
-            processIndexdName = If(index = 0, processName, processName & "#" & index)
-
-            Using performanceCounterObject As New PerformanceCounter("Process", "ID Process", processIndexdName)
-                If CInt(performanceCounterObject.NextValue()).Equals(pid) Then Return processIndexdName
-            End Using
-        Next
-
-        Return processIndexdName
-    End Function
-
-    Private Function FindPidFromIndexedProcessName(indexedProcessName As String) As Process
-        Using performanceCounterObject As New PerformanceCounter("Process", "Creating Process ID", indexedProcessName)
-            Return Process.GetProcessById(CInt(performanceCounterObject.NextValue()))
-        End Using
-    End Function
-
+    ''' <summary>Gets the parent process of the current process.</summary>
+    ''' <param name="process">Pass it Process.GetCurrentProcess.</param>
+    ''' <returns>A Process Object.</returns>
+    ''' <exception cref="Functions.myExceptions.unableToGetParentProcessException">If this function throws this exception it means that it wasn't able to get the parent process.</exception>
     <Extension()>
     Public Function Parent(process As Process) As Process
-        Return FindPidFromIndexedProcessName(FindIndexedProcessName(process.Id))
+        Using managementObjectSearcher As New Management.ManagementObjectSearcher("root\CIMV2", String.Format("SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {0}", process.Id))
+            If managementObjectSearcher Is Nothing Then
+                Throw New Functions.myExceptions.unableToGetParentProcessException()
+            Else
+                Dim intParentProcessID As Integer
+
+                If Integer.TryParse(managementObjectSearcher.Get()(0)("ParentProcessId").ToString(), intParentProcessID) Then
+                    Try
+                        Return Process.GetProcessById(intParentProcessID)
+                    Catch ex As Exception
+                        Throw New Functions.myExceptions.unableToGetParentProcessException()
+                    End Try
+                Else
+                    Throw New Functions.myExceptions.unableToGetParentProcessException()
+                End If
+            End If
+        End Using
     End Function
 End Module
 
