@@ -28,7 +28,11 @@ Module ProcessExtensions
                             Dim intParentProcessID As Integer
 
                             If Integer.TryParse(strParentProcessID, intParentProcessID) Then
-                                Return Process.GetProcessById(intParentProcessID)
+                                Try
+                                    Return Process.GetProcessById(intParentProcessID)
+                                Catch ex As Exception
+                                    Throw New Functions.myExceptions.unableToGetParentProcessException()
+                                End Try
                             Else
                                 Throw New Functions.myExceptions.integerTryParseException("Unable to parse Parent Process ID.") With {.strThatCouldNotBeParsedIntoAnInteger = strParentProcessID}
                             End If
