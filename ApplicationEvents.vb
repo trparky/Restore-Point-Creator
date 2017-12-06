@@ -37,7 +37,7 @@ Namespace My
         Private Function areWeRunningAsATask() As Boolean
             Try
                 Dim strParentProcess As String = Process.GetCurrentProcess.Parent.ProcessName
-                Return strParentProcess.caseInsensitiveContains("svchost") Or strParentProcess.caseInsensitiveContains("taskeng")
+                Return If(strParentProcess.caseInsensitiveContains("svchost") Or strParentProcess.caseInsensitiveContains("taskeng"), True, False)
             Catch ex2 As Functions.myExceptions.unableToGetParentProcessException
                 Functions.eventLogFunctions.writeCrashToEventLog(ex2)
                 Return False
