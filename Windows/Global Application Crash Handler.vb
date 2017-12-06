@@ -49,48 +49,9 @@ Public Class frmCrash
             ToolTip.SetToolTip(btnSubmitData, "Secured by SSL.")
         End If
 
-        Dim stringBuilder As New StringBuilder
-
-        stringBuilder.AppendLine("System Information")
-        stringBuilder.AppendLine("Time of Crash: " & Now.ToString)
-        stringBuilder.AppendLine("Operating System: " & Functions.osVersionInfo.getFullOSVersionString())
-        stringBuilder.AppendLine("System RAM: " & Functions.support.getSystemRAM())
-
-        Dim processorInfo As Functions.supportClasses.processorInfoClass = Functions.wmi.getSystemProcessor()
-        stringBuilder.AppendLine("CPU: " & processorInfo.strProcessor)
-        stringBuilder.AppendLine("Number of Cores: " & processorInfo.strNumberOfCores.ToString)
-
-        stringBuilder.AppendLine()
-
-        If globalVariables.version.boolBeta = True Then
-            stringBuilder.AppendLine("Program Version: " & String.Format("{0} Public Beta {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion))
-        ElseIf globalVariables.version.boolReleaseCandidate = True Then
-            stringBuilder.AppendLine("Program Version: " & String.Format("{0} Release Candidate {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion))
-        Else
-            stringBuilder.AppendLine("Program Version: " & globalVariables.version.strFullVersionString)
-        End If
-
-        If globalVariables.version.boolDebugBuild = True Then
-            stringBuilder.AppendLine("Debug Build: Yes")
-        Else
-            stringBuilder.AppendLine("Debug Build: No")
-        End If
-
-        Functions.support.addExtendedCrashData(stringBuilder, rawExceptionObject)
-
-        stringBuilder.AppendLine("Running As: " & Environment.UserName)
-        stringBuilder.AppendLine("Exception Type: " & exceptionType)
-        stringBuilder.AppendLine("Message: " & exceptionMessage)
-
-        stringBuilder.AppendLine()
-
-        stringBuilder.Append("The exception occurred ")
-
-        stringBuilder.AppendLine(exceptionStackTrace.Trim)
-
-        txtStackTrace.Text = stringBuilder.ToString.Trim
-        Functions.eventLogFunctions.writeToSystemEventLog(stringBuilder.ToString.Trim, EventLogEntryType.Error)
-        stringBuilder = Nothing
+        Dim strCrashData As String = Functions.eventLogFunctions.assembleCrashData(rawExceptionObject, EventLogEntryType.Error)
+        txtStackTrace.Text = strCrashData
+        Functions.eventLogFunctions.writeToSystemEventLog(strCrashData, EventLogEntryType.Error)
 
         Dim stopBitmapIcon As New Bitmap(My.Resources.removeSmall)
         Dim stopIcon As Icon = Icon.FromHandle(stopBitmapIcon.GetHicon())
