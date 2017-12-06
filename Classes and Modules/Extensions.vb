@@ -12,26 +12,30 @@ Module ProcessExtensions
         Try
             Using managementObjectSearcher As New Management.ManagementObjectSearcher("root\CIMV2", String.Format("SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {0}", process.Id))
                 If managementObjectSearcher Is Nothing Then
-                    Throw New Functions.myExceptions.unableToGetParentProcessException()
+                    Throw New Functions.myExceptions.unableToGetParentProcessException("Management Object Searcher Object was null.")
                 Else
                     Dim managementObjectCollection As Management.ManagementObjectCollection = managementObjectSearcher.Get()
 
                     If managementObjectCollection Is Nothing Then
-                        Throw New Functions.myExceptions.unableToGetParentProcessException()
+                        Throw New Functions.myExceptions.unableToGetParentProcessException("Management Object Collection Object was null.")
                     Else
                         If managementObjectCollection.Count = 0 Then
-                            Throw New Functions.myExceptions.unableToGetParentProcessException()
+                            Throw New Functions.myExceptions.unableToGetParentProcessException("Management Object Collection Object count was null.")
                         Else
                             If managementObjectCollection(0)("ParentProcessId") Is Nothing Then
-                                Throw New Functions.myExceptions.unableToGetParentProcessException()
+                                Throw New Functions.myExceptions.unableToGetParentProcessException("ParentProcessId Object was null.")
                             Else
                                 Dim strParentProcessID As String = managementObjectCollection(0)("ParentProcessId").ToString()
                                 Dim intParentProcessID As Integer
 
                                 If Integer.TryParse(strParentProcessID, intParentProcessID) Then
-                                    Return Process.GetProcessById(intParentProcessID)
+                                    Try
+                                        Return Process.GetProcessById(intParentProcessID)
+                                    Catch ex As Exception
+                                        Throw New Functions.myExceptions.unableToGetParentProcessException("Unable to get Process Object by ID.")
+                                    End Try
                                 Else
-                                    Throw New Functions.myExceptions.integerTryParseException("Unable to parse Parent Process ID.") With {.strThatCouldNotBeParsedIntoAnInteger = strParentProcessID}
+                                    Throw New Functions.myExceptions.integerTryParseException("Unable to parse Parent Process ID into an Integer.") With {.strThatCouldNotBeParsedIntoAnInteger = strParentProcessID}
                                 End If
                             End If
                         End If
@@ -39,7 +43,7 @@ Module ProcessExtensions
                 End If
             End Using
         Catch ex As Exception
-            Throw New Functions.myExceptions.unableToGetParentProcessException()
+            Throw New Functions.myExceptions.unableToGetParentProcessException("General error.")
         End Try
     End Function
 End Module
