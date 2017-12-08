@@ -19,18 +19,16 @@ Namespace My
         End Sub
 
         Private Sub setProcessPriorities()
-            If Functions.privilegeChecks.areWeAnAdministrator() Then
-                If areWeRunningAsATask() Then
-                    Try
-                        Process.GetCurrentProcess.PriorityClass = ProcessPriorityClass.Normal
-                    Catch ex As Exception
-                    End Try
+            If Functions.privilegeChecks.areWeAnAdministrator() AndAlso areWeRunningAsATask() Then
+                Try
+                    Process.GetCurrentProcess.PriorityClass = ProcessPriorityClass.Normal
+                Catch ex As Exception
+                End Try
 
-                    Try
-                        Functions.IOPriority.SetIOPriority(Functions.IOPriority.IOPrioritySetting.Normal)
-                    Catch ex As Exception
-                    End Try
-                End If
+                Try
+                    Functions.IOPriority.SetIOPriority(Functions.IOPriority.IOPrioritySetting.Normal)
+                Catch ex As Exception
+                End Try
             End If
         End Sub
 
