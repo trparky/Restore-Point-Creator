@@ -235,7 +235,7 @@ End Class
 
 ''' <summary>Allows you to easily POST and upload files to a remote HTTP server without you, the programmer, knowing anything about how it all works. This class does it all for you. It handles adding a User Agent String, additional HTTP Request Headers, string data to your HTTP POST data, and files to be uploaded in the HTTP POST data.</summary>
 Public Class httpHelper
-    Private Const classVersion As String = "1.300"
+    Private Const classVersion As String = "1.301"
 
     Private strUserAgentString As String = Nothing
     Private boolUseProxy As Boolean = False
@@ -1574,39 +1574,20 @@ beginAgain:
 
     Public Function fileSizeToHumanReadableFormat(ByVal size As ULong, Optional roundToNearestWholeNumber As Boolean = False) As String
         Dim result As String
+        Dim shortRoundNumber As Short = If(roundToNearestWholeNumber, 0, 2)
 
         If size <= (2 ^ 10) Then
             result = size & " Bytes"
         ElseIf size > (2 ^ 10) And size <= (2 ^ 20) Then
-            If roundToNearestWholeNumber Then
-                result = Math.Round(size / (2 ^ 10), 0) & " KBs"
-            Else
-                result = Math.Round(size / (2 ^ 10), 2) & " KBs"
-            End If
+            result = Math.Round(size / (2 ^ 10), shortRoundNumber) & " KBs"
         ElseIf size > (2 ^ 20) And size <= (2 ^ 30) Then
-            If roundToNearestWholeNumber Then
-                result = Math.Round(size / (2 ^ 20), 0) & " MBs"
-            Else
-                result = Math.Round(size / (2 ^ 20), 2) & " MBs"
-            End If
+            result = Math.Round(size / (2 ^ 20), shortRoundNumber) & " MBs"
         ElseIf size > (2 ^ 30) And size <= (2 ^ 40) Then
-            If roundToNearestWholeNumber Then
-                result = Math.Round(size / (2 ^ 30), 0) & " GBs"
-            Else
-                result = Math.Round(size / (2 ^ 30), 2) & " GBs"
-            End If
+            result = Math.Round(size / (2 ^ 30), shortRoundNumber) & " GBs"
         ElseIf size > (2 ^ 40) And size <= (2 ^ 50) Then
-            If roundToNearestWholeNumber Then
-                result = Math.Round(size / (2 ^ 40), 0) & " TBs"
-            Else
-                result = Math.Round(size / (2 ^ 40), 2) & " TBs"
-            End If
+            result = Math.Round(size / (2 ^ 40), shortRoundNumber) & " TBs"
         ElseIf size > (2 ^ 50) And size <= (2 ^ 60) Then
-            If roundToNearestWholeNumber Then
-                result = Math.Round(size / (2 ^ 50), 0) & " PBs"
-            Else
-                result = Math.Round(size / (2 ^ 50), 2) & " PBs"
-            End If
+            result = Math.Round(size / (2 ^ 50), shortRoundNumber) & " PBs"
         Else
             result = "(None)"
         End If
