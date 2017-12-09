@@ -46,6 +46,7 @@ Namespace Functions.support
                     Dim color As UInteger, blend As Boolean
                     NativeMethod.NativeMethod.DwmGetColorizationColor(color, blend)
                     Dim strHexColor As String = color.ToString("x")
+                    ' Converts from Hexidecimal (Base 16 Math) to Base 10 Math.
                     Dim a As Integer = Convert.ToInt32(strHexColor.Substring(0, 2), 16)
                     Dim r As Integer = Convert.ToInt32(strHexColor.Substring(2, 2), 16)
                     Dim g As Integer = Convert.ToInt32(strHexColor.Substring(4, 2), 16)
