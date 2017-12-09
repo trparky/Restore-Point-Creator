@@ -23,7 +23,7 @@ Namespace Functions.support
             Next
         End Sub
 
-        Public Function randomStringGenerator(length As Integer)
+        Public Function randomStringGenerator(length As Integer) As String
             Dim random As Random = New Random()
             Dim builder As New Text.StringBuilder()
             Dim ch As Char
