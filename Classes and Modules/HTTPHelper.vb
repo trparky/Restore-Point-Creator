@@ -1,5 +1,4 @@
-﻿Option Strict Off
-Imports System.IO
+﻿Imports System.IO
 Imports System.Security.Cryptography
 
 Public Class FormFile
@@ -236,7 +235,7 @@ End Class
 
 ''' <summary>Allows you to easily POST and upload files to a remote HTTP server without you, the programmer, knowing anything about how it all works. This class does it all for you. It handles adding a User Agent String, additional HTTP Request Headers, string data to your HTTP POST data, and files to be uploaded in the HTTP POST data.</summary>
 Public Class httpHelper
-    Private Const classVersion As String = "1.302"
+    Private Const classVersion As String = "1.303"
 
     Private strUserAgentString As String = Nothing
     Private boolUseProxy As Boolean = False
