@@ -120,7 +120,7 @@
 
                           closePleaseWaitPanel()
                           timeStamp.Stop()
-                          lblProcessedIn.Text = String.Format("Application Event Log File Loaded and Processed in {0}ms.", longElapsedMilisecond.ToString("N0"))
+                          lblProcessedIn.Text = String.Format("Log Loaded in {0}ms.", longElapsedMilisecond.ToString("N0"))
                       End Sub)
         Catch ex As Threading.ThreadAbortException
         Finally
@@ -142,7 +142,11 @@
     Private Sub eventLogForm_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         If e.KeyCode = Keys.F5 And Not boolAreWeLoadingTheEventLogData Then
             If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
-                lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(New IO.FileInfo(Functions.eventLogFunctions.strLogFile).Length)
+                Dim logFileInfo As New IO.FileInfo(Functions.eventLogFunctions.strLogFile)
+                lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(logFileInfo.Length)
+                lblLastModified.Text = "Last Modified: " & logFileInfo.LastWriteTimeUtc.ToLocalTime.ToString()
+                logFileInfo = Nothing
+
                 openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
 
                 workingThread = New Threading.Thread(AddressOf loadEventLog)
@@ -153,6 +157,7 @@
                 lblLogEntryCount.Text = "Entries in Event Log: 0"
                 lblProcessedIn.Text = ""
                 lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
+                lblLastModified.Text = "Last Modified: (File Doesn't Exist)"
             End If
         ElseIf e.KeyCode = Keys.Delete And eventLogList.SelectedItems.Count > 0 Then
             btnDeleteIndividualLogEntry.PerformClick()
@@ -216,15 +221,18 @@
         Dim logFileInfo As New IO.FileInfo(Functions.eventLogFunctions.strLogFile)
         logFileWatcher.Path = logFileInfo.DirectoryName
         logFileWatcher.Filter = logFileInfo.Name
-        logFileInfo = Nothing
 
         If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
-            lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(New IO.FileInfo(Functions.eventLogFunctions.strLogFile).Length)
+            lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(logFileInfo.Length)
+            lblLastModified.Text = "Last Modified: " & logFileInfo.LastWriteTimeUtc.ToLocalTime.ToString()
         Else
             lblLogEntryCount.Text = "Entries in Event Log: 0"
             lblProcessedIn.Text = ""
             lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
+            lblLastModified.Text = "Last Modified: (File Doesn't Exist)"
         End If
+
+        logFileInfo = Nothing
 
         Me.Location = Functions.support.verifyWindowLocation(My.Settings.eventLogFormWindowLocation)
         chkAskMeToSubmitIfViewingAnExceptionEntry.Checked = My.Settings.boolAskMeToSubmitIfViewingAnExceptionEntry
@@ -300,7 +308,11 @@
     Private Sub btnRefreshEvents_Click(sender As Object, e As EventArgs) Handles btnRefreshEvents.Click
         If Not boolAreWeLoadingTheEventLogData Then
             If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
-                lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(New IO.FileInfo(Functions.eventLogFunctions.strLogFile).Length)
+                Dim logFileInfo As New IO.FileInfo(Functions.eventLogFunctions.strLogFile)
+                lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(logFileInfo.Length)
+                lblLastModified.Text = "Last Modified: " & logFileInfo.LastWriteTimeUtc.ToLocalTime.ToString()
+                logFileInfo = Nothing
+
                 openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
 
                 workingThread = New Threading.Thread(AddressOf loadEventLog)
@@ -312,6 +324,7 @@
                 lblLogEntryCount.Text = "Entries in Event Log: 0"
                 lblProcessedIn.Text = ""
                 lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
+                lblLastModified.Text = "Last Modified: (File Doesn't Exist)"
             End If
         End If
     End Sub
@@ -533,7 +546,10 @@
 
         If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
             If Not boolAreWeLoadingTheEventLogData Then
-                lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(New IO.FileInfo(Functions.eventLogFunctions.strLogFile).Length)
+                Dim logFileInfo As New IO.FileInfo(Functions.eventLogFunctions.strLogFile)
+                lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(logFileInfo.Length)
+                lblLastModified.Text = "Last Modified: " & logFileInfo.LastWriteTimeUtc.ToLocalTime.ToString()
+                logFileInfo = Nothing
 
                 openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
 
@@ -544,6 +560,7 @@
             End If
         Else
             lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
+            lblLastModified.Text = "Last Modified: (File Doesn't Exist)"
         End If
     End Sub
 
@@ -563,7 +580,11 @@
             logFileWatcher.EnableRaisingEvents = True
             btnClear.Enabled = False
 
-            lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(New IO.FileInfo(Functions.eventLogFunctions.strLogFile).Length)
+            Dim logFileInfo As New IO.FileInfo(Functions.eventLogFunctions.strLogFile)
+            lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(logFileInfo.Length)
+            lblLastModified.Text = "Last Modified: " & logFileInfo.LastWriteTimeUtc.ToLocalTime.ToString()
+            logFileInfo = Nothing
+
             openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
 
             workingThread = New Threading.Thread(AddressOf loadEventLog)

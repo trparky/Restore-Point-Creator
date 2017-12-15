@@ -39,9 +39,9 @@ Partial Class eventLogForm
         Me.chkMultiSelectMode = New System.Windows.Forms.CheckBox()
         Me.TableLayoutPanel2 = New System.Windows.Forms.TableLayoutPanel()
         Me.btnExportLogs = New System.Windows.Forms.Button()
-        Me.btnSearch = New System.Windows.Forms.Button()
         Me.btnDeleteIndividualLogEntry = New System.Windows.Forms.Button()
         Me.btnClear = New System.Windows.Forms.Button()
+        Me.btnSearch = New System.Windows.Forms.Button()
         Me.chkAskMeToSubmitIfViewingAnExceptionEntry = New System.Windows.Forms.CheckBox()
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
         Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
@@ -51,6 +51,7 @@ Partial Class eventLogForm
         Me.pleaseWaitProgressBar = New Tom.SmoothProgressBar()
         Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
         Me.logFileWatcher = New System.IO.FileSystemWatcher()
+        Me.lblLastModified = New System.Windows.Forms.ToolStripStatusLabel()
         Me.StatusStrip1.SuspendLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
@@ -127,7 +128,7 @@ Partial Class eventLogForm
         '
         'StatusStrip1
         '
-        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.lblLogEntryCount, Me.lblProcessedIn, Me.lblLogFileSize})
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.lblLogEntryCount, Me.lblProcessedIn, Me.lblLogFileSize, Me.lblLastModified})
         Me.StatusStrip1.Location = New System.Drawing.Point(0, 310)
         Me.StatusStrip1.Name = "StatusStrip1"
         Me.StatusStrip1.Size = New System.Drawing.Size(860, 22)
@@ -234,20 +235,6 @@ Partial Class eventLogForm
         Me.btnExportLogs.Text = "Export Application Event Logs"
         Me.btnExportLogs.UseVisualStyleBackColor = True
         '
-        'btnSearch
-        '
-        Me.btnSearch.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.btnSearch.Image = Global.Restore_Point_Creator.My.Resources.Resources.view
-        Me.btnSearch.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.btnSearch.Location = New System.Drawing.Point(3, 61)
-        Me.btnSearch.Name = "btnSearch"
-        Me.btnSearch.Size = New System.Drawing.Size(203, 26)
-        Me.btnSearch.TabIndex = 7
-        Me.btnSearch.Text = "Search Event Log"
-        Me.btnSearch.UseVisualStyleBackColor = True
-        '
         'btnDeleteIndividualLogEntry
         '
         Me.btnDeleteIndividualLogEntry.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
@@ -277,6 +264,20 @@ Partial Class eventLogForm
         Me.btnClear.TabIndex = 8
         Me.btnClear.Text = "Clear Search Results"
         Me.btnClear.UseVisualStyleBackColor = True
+        '
+        'btnSearch
+        '
+        Me.btnSearch.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnSearch.Image = Global.Restore_Point_Creator.My.Resources.Resources.view
+        Me.btnSearch.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnSearch.Location = New System.Drawing.Point(3, 61)
+        Me.btnSearch.Name = "btnSearch"
+        Me.btnSearch.Size = New System.Drawing.Size(203, 26)
+        Me.btnSearch.TabIndex = 7
+        Me.btnSearch.Text = "Search Event Log"
+        Me.btnSearch.UseVisualStyleBackColor = True
         '
         'chkAskMeToSubmitIfViewingAnExceptionEntry
         '
@@ -346,6 +347,13 @@ Partial Class eventLogForm
         Me.logFileWatcher.EnableRaisingEvents = True
         Me.logFileWatcher.SynchronizingObject = Me
         '
+        'lblLastModified
+        '
+        Me.lblLastModified.Name = "lblLastModified"
+        Me.lblLastModified.Padding = New System.Windows.Forms.Padding(30, 0, 0, 0)
+        Me.lblLastModified.Size = New System.Drawing.Size(150, 17)
+        Me.lblLastModified.Text = "ToolStripStatusLabel1"
+        '
         'eventLogForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
@@ -404,4 +412,5 @@ Partial Class eventLogForm
     Friend WithEvents logFileWatcher As IO.FileSystemWatcher
     Friend WithEvents btnDeleteIndividualLogEntry As Button
     Friend WithEvents chkMultiSelectMode As CheckBox
+    Friend WithEvents lblLastModified As ToolStripStatusLabel
 End Class
