@@ -2274,7 +2274,7 @@ Public Class Form1
                     RemoveSafeModeBootOptionToolStripMenuItem.Font = New Font("Segoe UI", 9.0!, FontStyle.Bold, GraphicsUnit.Point, CType(0, Byte))
                 Catch ex As Exception
                     Functions.eventLogFunctions.writeToSystemEventLog("There was an error setting the font size to Bold.", EventLogEntryType.Warning)
-                    Functions.eventLogFunctions.writeCrashToEventLog(ex)
+                    Functions.eventLogFunctions.writeCrashToEventLog(ex, EventLogEntryType.Warning)
                 End Try
             Else
                 RemoveSafeModeBootOptionToolStripMenuItem.Visible = False
