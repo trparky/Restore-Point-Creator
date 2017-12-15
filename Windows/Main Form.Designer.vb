@@ -505,7 +505,6 @@ Partial Class Form1
         '
         'RemoveSafeModeBootOptionToolStripMenuItem
         '
-        Me.RemoveSafeModeBootOptionToolStripMenuItem.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.RemoveSafeModeBootOptionToolStripMenuItem.Name = "RemoveSafeModeBootOptionToolStripMenuItem"
         Me.RemoveSafeModeBootOptionToolStripMenuItem.Size = New System.Drawing.Size(431, 22)
         Me.RemoveSafeModeBootOptionToolStripMenuItem.Text = "Stuck in Safe Mode? Remove Safe Mode Boot Option"
