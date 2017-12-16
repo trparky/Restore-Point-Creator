@@ -43,6 +43,7 @@ Module ProcessExtensions
                 End If
             End Using
         Catch ex As Exception
+            Functions.eventLogFunctions.writeCrashToEventLog(ex, EventLogEntryType.Warning)
             Throw New Functions.myExceptions.unableToGetParentProcessException("General error.")
         End Try
     End Function
