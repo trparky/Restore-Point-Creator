@@ -410,6 +410,12 @@ Namespace Functions.eventLogFunctions
 
             stringBuilder.AppendLine(support.removeSourceCodePathInfo(exceptionObject.StackTrace.Trim))
 
+            If exceptionObject.GetType.Equals(GetType(myExceptions.unableToGetParentProcessException)) AndAlso exceptionObject.InnerException IsNot Nothing Then
+                stringBuilder.AppendLine("--== Begin unableToGetParentProcessException Inner Exception Data ==--")
+                stringBuilder.AppendLine(assembleCrashData(exceptionObject.InnerException, EventLogEntryType.Warning).Trim)
+                stringBuilder.AppendLine("--== End unableToGetParentProcessException Inner Exception Data ==--")
+            End If
+
             Return stringBuilder.ToString.Trim
         End Function
 

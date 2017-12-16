@@ -32,7 +32,7 @@ Module ProcessExtensions
                                     Try
                                         Return Process.GetProcessById(intParentProcessID)
                                     Catch ex As Exception
-                                        Throw New Functions.myExceptions.unableToGetParentProcessException("Unable to get Process Object by ID.")
+                                        Throw New Functions.myExceptions.unableToGetParentProcessException("Unable to get Process Object by ID.", ex)
                                     End Try
                                 Else
                                     Throw New Functions.myExceptions.integerTryParseException("Unable to parse Parent Process ID into an Integer.") With {.strThatCouldNotBeParsedIntoAnInteger = strParentProcessID}
@@ -43,8 +43,12 @@ Module ProcessExtensions
                 End If
             End Using
         Catch ex As Exception
-            Functions.eventLogFunctions.writeCrashToEventLog(ex, EventLogEntryType.Warning)
-            Throw New Functions.myExceptions.unableToGetParentProcessException("General error.")
+            If ex.GetType.Equals(GetType(Functions.myExceptions.unableToGetParentProcessException)) Or ex.GetType.Equals(GetType(Functions.myExceptions.integerTryParseException)) Then
+                Return Nothing
+            Else
+                Functions.eventLogFunctions.writeCrashToEventLog(ex)
+                Throw New Functions.myExceptions.unableToGetParentProcessException("General error.", ex)
+            End If
         End Try
     End Function
 End Module
