@@ -298,9 +298,9 @@ Namespace Functions.eventLogFunctions
 
         ''' <summary>Writes a log entry to the System Event Log.</summary>
         ''' <param name="logMessage">The text you want to have in your new System Event Log entry.</param>
-        ''' <param name="logType">The type of log that you want your entry to be. The three major options are Error, Information, and Warning.</param>
+        ''' <param name="eventLogType">The type of log that you want your entry to be. The three major options are Error, Information, and Warning.</param>
         ''' <example>functions.eventLogFunctions.writeToSystemEventLog("My Event Log Entry", EventLogEntryType.Information)</example>
-        Public Sub writeToSystemEventLog(logMessage As String, Optional logType As EventLogEntryType = EventLogEntryType.Information)
+        Public Sub writeToSystemEventLog(logMessage As String, Optional eventLogType As EventLogEntryType = EventLogEntryType.Information)
             Try
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
                 Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
@@ -319,7 +319,7 @@ Namespace Functions.eventLogFunctions
 
                     applicationLog.Add(New restorePointCreatorExportedLog With {
                         .logData = logMessage,
-                        .logType = logType,
+                        .logType = eventLogType,
                         .unixTime = 0,
                         .logSource = "Restore Point Creator",
                         .logID = applicationLog.Count,
@@ -335,7 +335,7 @@ Namespace Functions.eventLogFunctions
                     streamReader.Dispose()
                 End Using
             Catch ex As myExceptions.unableToGetLockOnLogFile
-                oldEventLogFunctions.writeToSystemEventLog(logMessage, logType)
+                oldEventLogFunctions.writeToSystemEventLog(logMessage, eventLogType)
                 oldEventLogFunctions.boolShowErrorMessage = True
                 oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
             Catch ex As Exception
