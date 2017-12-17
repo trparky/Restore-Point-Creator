@@ -42,13 +42,8 @@ Module ProcessExtensions
                     End If
                 End If
             End Using
-        Catch ex As Exception
-            If ex.GetType.Equals(GetType(Functions.myExceptions.unableToGetParentProcessException)) Or ex.GetType.Equals(GetType(Functions.myExceptions.integerTryParseException)) Then
-                Return Nothing
-            Else
-                Functions.eventLogFunctions.writeCrashToEventLog(ex)
-                Throw New Functions.myExceptions.unableToGetParentProcessException("General error.", ex)
-            End If
+        Catch ex As IO.FileNotFoundException
+            Throw New Functions.myExceptions.unableToGetParentProcessException("Windows WMI returned a File Not Found exception.", ex)
         End Try
     End Function
 End Module
