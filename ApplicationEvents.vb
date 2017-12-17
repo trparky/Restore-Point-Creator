@@ -33,7 +33,7 @@ Namespace My
         End Sub
 
         Private Function areWeRunningAsATask() As Boolean
-            If boolAreWeInUpdateMode() Then Return False
+            If boolAreWeInUpdateOrNoParentProcessCheckMode() Then Return False
 
             Try
                 Dim strParentProcess As String = Process.GetCurrentProcess.Parent.ProcessName
@@ -49,11 +49,11 @@ Namespace My
             End Try
         End Function
 
-        Private Function boolAreWeInUpdateMode() As Boolean
+        Private Function boolAreWeInUpdateOrNoParentProcessCheckMode() As Boolean
             If My.Application.CommandLineArgs.Count >= 1 Then
                 Dim commandLineArgument As String = My.Application.CommandLineArgs(0)
 
-                If commandLineArgument.Equals("-update", StringComparison.OrdinalIgnoreCase) Or commandLineArgument.Equals("-updatewithoutuninstallinfoupdate", StringComparison.OrdinalIgnoreCase) Then
+                If commandLineArgument.Equals("-update", StringComparison.OrdinalIgnoreCase) Or commandLineArgument.Equals("-updatewithoutuninstallinfoupdate", StringComparison.OrdinalIgnoreCase) Or commandLineArgument.Equals("-noparentprocesscheck", StringComparison.OrdinalIgnoreCase) Then
                     Return True
                 Else
                     Return False

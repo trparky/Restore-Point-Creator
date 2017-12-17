@@ -463,7 +463,7 @@ Namespace Functions.startupFunctions
 
                             eventLogFunctions.writeToSystemEventLog("Application Update Procedure Complete.", EventLogEntryType.Information)
 
-                            Process.Start(New ProcessStartInfo With {.FileName = restorePointCreatorMainEXEName, .Verb = "runas"})
+                            Process.Start(New ProcessStartInfo With {.FileName = restorePointCreatorMainEXEName, .Verb = "runas", .Arguments = "-noparentprocesscheck"})
                         Else
                             MsgBox("Something went wrong during the update process.", MsgBoxStyle.Critical, "Restore Point Creator Update Procedure")
                             Process.Start(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe"), New FileInfo(Application.ExecutablePath).DirectoryName)
