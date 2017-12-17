@@ -410,12 +410,29 @@ Namespace Functions.eventLogFunctions
 
             stringBuilder.AppendLine(support.removeSourceCodePathInfo(exceptionObject.StackTrace.Trim))
 
-            If exceptionObject.GetType.Equals(GetType(myExceptions.unableToGetParentProcessException)) AndAlso exceptionObject.InnerException IsNot Nothing Then
-                stringBuilder.AppendLine()
-                stringBuilder.AppendLine("--== Begin unableToGetParentProcessException Inner Exception Data ==--")
-                stringBuilder.AppendLine(assembleCrashData(exceptionObject.InnerException, EventLogEntryType.Warning).Trim)
-                stringBuilder.AppendLine("--== End unableToGetParentProcessException Inner Exception Data ==--")
+            If exceptionObject.InnerException IsNot Nothing Then
+                Try
+                    stringBuilder.AppendLine()
+                    stringBuilder.AppendLine()
+                    stringBuilder.AppendLine()
+                    stringBuilder.AppendLine("An inner exception was found, below is the data from it...")
+                    stringBuilder.AppendLine()
+                    stringBuilder.AppendLine(exceptionObject.InnerException.GetType.ToString & " Inner Exception Data")
+                    stringBuilder.AppendLine(assembleInnerExceptionCrashData(exceptionObject.InnerException).Trim)
+                Catch ex As Exception
+                End Try
             End If
+
+            Return stringBuilder.ToString.Trim
+        End Function
+
+        Private Function assembleInnerExceptionCrashData(exceptionObject As Exception)
+            Dim stringBuilder As New Text.StringBuilder
+            stringBuilder.AppendLine("Exception Type: " & exceptionObject.GetType.ToString)
+            stringBuilder.AppendLine("Message: " & support.removeSourceCodePathInfo(exceptionObject.Message))
+            stringBuilder.AppendLine()
+            stringBuilder.Append("The exception occurred ")
+            stringBuilder.AppendLine(support.removeSourceCodePathInfo(exceptionObject.StackTrace.Trim))
 
             Return stringBuilder.ToString.Trim
         End Function
