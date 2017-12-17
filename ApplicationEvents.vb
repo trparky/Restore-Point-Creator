@@ -33,6 +33,8 @@ Namespace My
         End Sub
 
         Private Function areWeRunningAsATask() As Boolean
+            If boolAreWeInUpdateMode() Then Return False
+
             Try
                 Dim strParentProcess As String = Process.GetCurrentProcess.Parent.ProcessName
                 Return If(strParentProcess.caseInsensitiveContains("svchost") Or strParentProcess.caseInsensitiveContains("taskeng"), True, False)
@@ -45,6 +47,20 @@ Namespace My
             Catch ex As Exception
                 Return False
             End Try
+        End Function
+
+        Private Function boolAreWeInUpdateMode() As Boolean
+            If My.Application.CommandLineArgs.Count >= 1 Then
+                Dim commandLineArgument As String = My.Application.CommandLineArgs(0)
+
+                If commandLineArgument.Equals("-update", StringComparison.OrdinalIgnoreCase) Or commandLineArgument.Equals("-updatewithoutuninstallinfoupdate", StringComparison.OrdinalIgnoreCase) Then
+                    Return True
+                Else
+                    Return False
+                End If
+            Else
+                Return False
+            End If
         End Function
 
         Private Sub MyApplication_Startup(sender As Object, e As ApplicationServices.StartupEventArgs) Handles Me.Startup
