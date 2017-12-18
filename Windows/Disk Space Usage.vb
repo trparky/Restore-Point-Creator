@@ -330,18 +330,20 @@ Public Class Disk_Space_Usage
     End Sub
 
     Sub doTheResizingOfTheBars()
-        If GroupBox1.VerticalScroll.Visible = True Then
-            For Each control As Control In GroupBox1.Controls
-                If control.GetType = GetType(SmoothProgressBar) Then
-                    DirectCast(control, SmoothProgressBar).Width = GroupBox1.Width - 48
-                End If
-            Next
-        Else
-            For Each control As Control In GroupBox1.Controls
-                If control.GetType = GetType(SmoothProgressBar) Then
-                    DirectCast(control, SmoothProgressBar).Width = GroupBox1.Width - 30
-                End If
-            Next
+        If GroupBox1 IsNot Nothing Then
+            If GroupBox1.VerticalScroll.Visible Then
+                For Each controlObject As Control In GroupBox1.Controls
+                    If controlObject IsNot Nothing AndAlso controlObject.GetType = GetType(SmoothProgressBar) Then
+                        If controlObject IsNot Nothing Then DirectCast(controlObject, SmoothProgressBar).Width = GroupBox1.Width - 48
+                    End If
+                Next
+            Else
+                For Each controlObject As Control In GroupBox1.Controls
+                    If controlObject IsNot Nothing AndAlso controlObject.GetType = GetType(SmoothProgressBar) Then
+                        If controlObject IsNot Nothing Then DirectCast(controlObject, SmoothProgressBar).Width = GroupBox1.Width - 30
+                    End If
+                Next
+            End If
         End If
     End Sub
 
