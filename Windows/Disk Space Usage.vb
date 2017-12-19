@@ -183,14 +183,14 @@ Public Class Disk_Space_Usage
                         ' Handles the creation of the Free Disk Space progress bar.
                         createColoredBar(usedSpacePercentage, freeSpacePercentage, 12, yPosition)
 
-                        If currentDriveLetter = globalVariables.systemDriveLetter Then
-                            yPosition += 22 ' Advances the Y position down a bit so that we make room for the next object.
-                            xPosition = 12 ' Resets the X position back to the beginning of the line.
-
+                        If currentDriveLetter = globalVariables.systemDriveLetter Or chkShowSystemRestoreSpaceForAllDrives.Checked Then
                             Dim boolGetVSSDataResult As Boolean
-                            Dim shadowStorageData As Functions.supportClasses.ShadowStorageData = Functions.vss.getData(globalVariables.systemDriveLetter, boolGetVSSDataResult)
+                            Dim shadowStorageData As Functions.supportClasses.ShadowStorageData = Functions.vss.getData(currentDriveLetter, boolGetVSSDataResult)
 
                             If shadowStorageData IsNot Nothing And boolGetVSSDataResult = True Then
+                                yPosition += 22 ' Advances the Y position down a bit so that we make room for the next object.
+                                xPosition = 12 ' Resets the X position back to the beginning of the line.
+
                                 shadowStorageFreeSpace = shadowStorageData.MaxSpace - shadowStorageData.UsedSpace
 
                                 shadowStorageUsedPercentage = Functions.support.calculatePercentageValue(shadowStorageData.UsedSpace, shadowStorageData.MaxSpace)
@@ -218,7 +218,7 @@ Public Class Disk_Space_Usage
                                 xPosition = createLabel(String.Format("{0} ({1}%)", Functions.support.bytesToHumanSize(shadowStorageFreeSpace), shadowStorageFreeSpacePercentage), xPosition - 2, yPosition, False)
 
                                 ' Handles the creation of the Manage Disk Space control lable.
-                                createLinkLabel("Manage System Restore Space", xPosition + 10, yPosition, globalVariables.systemDriveLetter)
+                                createLinkLabel("Manage System Restore Space", xPosition + 10, yPosition, currentDriveLetter)
 
 
 
@@ -428,6 +428,7 @@ Public Class Disk_Space_Usage
     End Sub
 
     Private Sub Disk_Space_Usage_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        chkShowSystemRestoreSpaceForAllDrives.Checked = My.Settings.showSystemRestoreSpaceForAllDrivesOnDiskSpaceUsage
         Me.MaximumSize = New Size(859, Screen.FromControl(Me).Bounds.Height)
         Me.Location = Functions.support.verifyWindowLocation(My.Settings.DiskSpaceUsageWindowLocation)
         currentScreen = Screen.FromControl(Me)
@@ -444,6 +445,11 @@ Public Class Disk_Space_Usage
         Catch ex As Exception
             ' Does nothing.
         End Try
+    End Sub
+
+    Private Sub chkShowSystemRestoreSpaceForAllDrives_Click(sender As Object, e As EventArgs) Handles chkShowSystemRestoreSpaceForAllDrives.Click
+        btnRefresh.PerformClick()
+        My.Settings.showSystemRestoreSpaceForAllDrivesOnDiskSpaceUsage = chkShowSystemRestoreSpaceForAllDrives.Checked
     End Sub
 
 #Region "--== Please Wait Panel Code ==--"

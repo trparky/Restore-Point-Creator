@@ -45,7 +45,10 @@ Public Class frmManageSystemRestoreStorageSpace
     End Sub
 
     Private Sub frmManageSystemRestoreStorageSpace_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Dim strDriveWeAreLoadingDataFor As String = globalVariables.systemDriveLetter
+
         If Not String.IsNullOrEmpty(strDriveLetterWeAreWorkingWith) Then
+            strDriveWeAreLoadingDataFor = strDriveLetterWeAreWorkingWith
             showDrivesPanel()
             chkAdvancedMode.Checked = True
         Else
@@ -73,7 +76,7 @@ Public Class frmManageSystemRestoreStorageSpace
         Me.Location = Functions.support.verifyWindowLocation(My.Settings.ManageSystemRestoreStorageSpaceWindowLocation)
         percentageIndicator.ProgressBarColor = My.Settings.barColor
 
-        loadDriveData(globalVariables.systemDriveLetter)
+        loadDriveData(strDriveWeAreLoadingDataFor)
 
         calculateWindowSize()
     End Sub
