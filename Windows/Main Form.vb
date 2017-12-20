@@ -1485,13 +1485,21 @@ Public Class Form1
                 Functions.eventLogFunctions.writeToSystemEventLog("New executable exists, executing it in update mode.", EventLogEntryType.Information)
             End If
 
-            Process.Start(New ProcessStartInfo With {
-                .FileName = strNewApplicationFileNameFullName,
-                .Arguments = "-update",
-                .Verb = "runas"
-            })
-            Process.GetCurrentProcess.Kill()
+            Try
+                Process.Start(New ProcessStartInfo With {
+                    .FileName = strNewApplicationFileNameFullName,
+                    .Arguments = "-update",
+                    .Verb = "runas"
+                })
+                Process.GetCurrentProcess.Kill()
+            Catch ex As ComponentModel.Win32Exception
+                Me.Invoke(Sub() closePleaseWaitPanel())
+                Functions.eventLogFunctions.writeCrashToEventLog(ex)
+                Functions.eventLogFunctions.writeToSystemEventLog("Something went wrong while attempting to launch the new program binary in update mode.", EventLogEntryType.Error)
+                MsgBox("Something went wrong while attempting to launch the new program binary in update mode, update process aborted.", MsgBoxStyle.Critical, strMessageBoxTitle)
+            End Try
         Else
+            Me.Invoke(Sub() closePleaseWaitPanel())
             Functions.eventLogFunctions.writeToSystemEventLog("New executable doesn't exists, update process aborted.", EventLogEntryType.Error)
             MsgBox("Something went wrong during the download, update process aborted.", MsgBoxStyle.Critical, strMessageBoxTitle)
         End If
