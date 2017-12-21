@@ -919,7 +919,7 @@ Namespace Functions.support
 
         Public Function getSystemRAM() As String
             Try
-                Return support.bytesToHumanSize((New Devices.ComputerInfo()).TotalPhysicalMemory, True)
+                Return bytesToHumanSize((New Devices.ComputerInfo()).TotalPhysicalMemory, True)
             Catch ex As Exception
                 Return "Unknown amount of System RAM"
             End Try
