@@ -621,17 +621,6 @@ Namespace Functions.support
             End Try
         End Function
 
-        Private Function tryToParseShort(value As String) As Boolean
-            Dim number As Short
-            Dim result As Boolean = Short.TryParse(value, number)
-
-            If result Then
-                Return True
-            Else
-                Return False
-            End If
-        End Function
-
         ''' <summary>Tests to see if the RegEx pattern is valid or not.</summary>
         ''' <param name="strPattern">A RegEx pattern.</param>
         ''' <returns>A Boolean value. If True, the RegEx pattern is valid. If False, the RegEx pattern is not valid.</returns>
