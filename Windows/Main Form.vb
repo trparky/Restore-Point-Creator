@@ -2184,8 +2184,8 @@ Public Class Form1
 
                                                            ' Now we need to do some work on the main thread.
                                                            Me.Invoke(Sub()
-                                                                         closePleaseWaitPanel() ' First we close the Please Wait panel.
-                                                                         openPleaseWaitPanel("Loading Restore Points... Please Wait.") ' And open a new one.
+                                                                         ' Change the text inside the Please Wait panel.
+                                                                         strPleaseWaitLabelText = "Loading Restore Points... Please Wait."
                                                                      End Sub)
 
                                                            ' Now we load the restore points.
