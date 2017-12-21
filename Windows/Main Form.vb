@@ -660,13 +660,13 @@ Public Class Form1
         'End If
     End Sub
 
-    Private Function openUpdateDialog(versionUpdateType As Update_Message.versionUpdateType, remoteVersion As String, remoteBuild As String, strRemoteBetaRCVersion As String) As Update_Message.userResponse
+    Private Function openUpdateDialog(versionUpdateType As Update_Message.versionUpdateType, strRemoteVersion As String, strRemoteBuild As String, strRemoteBetaRCVersion As String) As Update_Message.userResponse
         Dim updateMessageDialog As New Update_Message With {
             .StartPosition = FormStartPosition.CenterScreen,
             .versionUpdate = versionUpdateType,
-            .remoteVersion = remoteVersion,
-            .remoteBuild = remoteBuild,
-            .strRemoteBetaRCVersion = strRemoteBetaRCVersion,
+            .remoteVersion = strRemoteVersion,
+            .remoteBuild = strRemoteBuild,
+            .remoteBetaRCVersion = strRemoteBetaRCVersion,
             .TopMost = True
         }
 

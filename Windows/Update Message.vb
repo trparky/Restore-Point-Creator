@@ -17,7 +17,7 @@
     ' dialogResponse is the Public Variable that exposes the user's response outside of this form.
     Public dialogResponse As userResponse = userResponse.dontDoTheUpdate
 
-    Public remoteVersion, remoteBuild, strRemoteBetaRCVersion As String
+    Public remoteVersion, remoteBuild, remoteBetaRCVersion As String
 
     ' versionUpdate is the Public Variable that is used by code outside of this form to write to it when a totally new version is released.
     ' It's only used when versionUpdate is equal to versionUpdateType.totallyNewVersionUpdate.
@@ -120,9 +120,9 @@
         ElseIf versionUpdate = versionUpdateType.totallyNewVersionUpdate Then
             lblTopUpdateMessage.Text = String.Format("Restore Point Creator version {0} is no longer supported and has been replaced by version {1}. Completely new versions are more important than{2}simple new builds of an existing version.", globalVariables.version.versionStringWithoutBuild, remoteBuild, vbCrLf)
         ElseIf versionUpdate = versionUpdateType.betaVersionUpdate Then
-            lblTopUpdateMessage.Text = String.Format("There is an updated Public Beta version of System Restore Point Creator. Version {0} Build {1} {2}.", globalVariables.version.versionStringWithoutBuild, remoteBuild, strRemoteBetaRCVersion)
+            lblTopUpdateMessage.Text = String.Format("There is an updated Public Beta version of System Restore Point Creator. Version {0} Build {1} {2}.", globalVariables.version.versionStringWithoutBuild, remoteBuild, remoteBetaRCVersion)
         ElseIf versionUpdate = versionUpdateType.releaseCandidateVersionUpdate Then
-            lblTopUpdateMessage.Text = String.Format("There is an updated Release Candidate version of System Restore Point Creator. Version {0} Build {1} {2}.", globalVariables.version.versionStringWithoutBuild, remoteBuild, strRemoteBetaRCVersion)
+            lblTopUpdateMessage.Text = String.Format("There is an updated Release Candidate version of System Restore Point Creator. Version {0} Build {1} {2}.", globalVariables.version.versionStringWithoutBuild, remoteBuild, remoteBetaRCVersion)
         End If
 
         If globalVariables.version.boolBeta Then
