@@ -81,11 +81,7 @@ Namespace Functions.support
         End Function
 
         Public Function verifyWindowLocation(point As Point) As Point
-            If point.X < 0 Or point.Y < 0 Then
-                Return New Point(0, 0)
-            Else
-                Return point
-            End If
+            Return If(point.X < 0 Or point.Y < 0, New Point(0, 0), point)
         End Function
 
         Public Function processUpdateXMLData(ByVal xmlData As String, ByRef updateType As updateType, ByRef remoteVersion As String, ByRef remoteBuild As String, ByRef strRemoteBetaRCVersion As String) As Boolean
