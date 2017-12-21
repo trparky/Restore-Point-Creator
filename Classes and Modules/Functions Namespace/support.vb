@@ -893,10 +893,6 @@ Namespace Functions.support
             End If
         End Function
 
-        Private Function convertToJSON(input As Object) As String
-            Return (New Web.Script.Serialization.JavaScriptSerializer).Serialize(input)
-        End Function
-
         Public Function getDateInShortForm() As String
             Dim year, month, day As String
             year = Now.Year
