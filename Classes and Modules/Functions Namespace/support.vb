@@ -732,17 +732,6 @@ Namespace Functions.support
             End If
         End Sub
 
-        ''' <summary>Converts an Integer representing days to English. Like "1 day" or "2 days".</summary>
-        ''' <param name="input">Days.</param>
-        ''' <returns>A String.</returns>
-        Private Function daysToString(input As Integer) As String
-            If input = 1 Then
-                Return "1 day"
-            Else
-                Return input & " days"
-            End If
-        End Function
-
         ''' <summary>Creates a Window Shortcut.</summary>
         ''' <param name="locationOfShortcut">The location where we want to create the Windows shortcut.</param>
         ''' <param name="pathToExecutable">The path to the executable that the shortcut will launch.</param>
