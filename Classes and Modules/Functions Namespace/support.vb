@@ -664,12 +664,12 @@ Namespace Functions.support
             End Try
         End Sub
 
-        Public Sub executeCommand(pathToExecutable As String, arguments As String, Optional runAsAdmin As Boolean = False)
+        Public Sub executeCommand(pathToExecutable As String, strArguments As String, Optional runAsAdmin As Boolean = False)
             If IO.File.Exists(pathToExecutable) = True Then
                 Dim processStartInfo As New ProcessStartInfo() With {
                     .FileName = pathToExecutable,
                     .WindowStyle = ProcessWindowStyle.Hidden,
-                    .arguments = arguments,
+                    .Arguments = strArguments,
                     .CreateNoWindow = True
                 }
 
@@ -693,12 +693,12 @@ Namespace Functions.support
             End If
         End Sub
 
-        Public Sub executeCommandWithWait(pathToExecutable As String, arguments As String, Optional runAsAdmin As Boolean = False)
+        Public Sub executeCommandWithWait(pathToExecutable As String, strArguments As String, Optional runAsAdmin As Boolean = False)
             If IO.File.Exists(pathToExecutable) = True Then
                 Dim processStartInfo As New ProcessStartInfo() With {
                     .FileName = pathToExecutable,
                     .WindowStyle = ProcessWindowStyle.Hidden,
-                    .arguments = arguments,
+                    .Arguments = strArguments,
                     .CreateNoWindow = True
                 }
 
