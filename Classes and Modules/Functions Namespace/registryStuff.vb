@@ -135,17 +135,10 @@ Namespace Functions.registryStuff
         ''' <returns>A Boolean value.</returns>
         Public Function getBooleanValueFromRegistry(ByRef registryObject As RegistryKey, ByVal valueToGetFromRegistry As String, ByVal boolDefaultValue As Boolean) As Boolean
             Try
-                Dim boolTemp As Boolean, strDefaultValue As String
+                Dim boolTemp As Boolean
+                Dim strDefaultValue As String = If(boolDefaultValue, globalVariables.booleans.strTrue, globalVariables.booleans.strFalse)
 
-                If boolDefaultValue Then
-                    strDefaultValue = globalVariables.booleans.strTrue
-                Else
-                    strDefaultValue = globalVariables.booleans.strFalse
-                End If
-
-                If Not Boolean.TryParse(registryObject.GetValue(valueToGetFromRegistry, strDefaultValue), boolTemp) Then
-                    boolTemp = boolDefaultValue
-                End If
+                If Not Boolean.TryParse(registryObject.GetValue(valueToGetFromRegistry, strDefaultValue), boolTemp) Then boolTemp = boolDefaultValue
 
                 Return boolTemp
             Catch ex As Exception
