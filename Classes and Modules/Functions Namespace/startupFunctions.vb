@@ -57,13 +57,16 @@ Namespace Functions.startupFunctions
 
                 Dim oldNewestRestorePointID As Integer = wmi.getNewestSystemRestorePointID()
                 result = wmi.createRestorePoint(strRestorePointDescription, restorePointStuff.RestoreType.WindowsType, newRestorePointID)
-                wait.closePleaseWaitWindow()
 
                 If displayMessage = True Then
                     Dim msgBoxTitle As String = "Restore Point Creator"
 
                     If result = APIs.errorCodes.ERROR_SUCCESS Then
-                        ' Does nothing.
+                        While wmi.getNewestSystemRestorePointID() = oldNewestRestorePointID
+                            Threading.Thread.Sleep(500)
+                        End While
+
+                        wait.closePleaseWaitWindow()
                     ElseIf result = APIs.errorCodes.ERROR_DISK_FULL Then
                         MsgBox("System Restore Point Creation Failed.  Disk Full." & vbCrLf & vbCrLf & "Internal Windows Error Code: ERROR_DISK_FULL (112)", MsgBoxStyle.Critical, msgBoxTitle)
                     ElseIf result = APIs.errorCodes.ERROR_ACCESS_DENIED Then
