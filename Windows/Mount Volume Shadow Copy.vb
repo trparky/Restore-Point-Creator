@@ -74,7 +74,7 @@ Public Class Mount_Volume_Shadow_Copy
             btnUnmount.Enabled = True
         Catch ex As NullReferenceException
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
-            Functions.eventLogFunctions.writeToSystemEventLog("Something went wrong, unable to find entry in shadowCopyCache Object.", EventLogEntryType.Error)
+            Functions.eventLogFunctions.writeToApplicationLogFile("Something went wrong, unable to find entry in shadowCopyCache Object.", EventLogEntryType.Error)
 
             MsgBox("Something went wrong, unable to find entry in shadowCopyCache Object.", MsgBoxStyle.Critical, Me.Text)
         End Try

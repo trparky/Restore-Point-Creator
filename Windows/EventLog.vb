@@ -511,7 +511,7 @@
             End If
         Catch ex As Exception
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
-            Functions.eventLogFunctions.writeToSystemEventLog("There was an error while attempting to export the program's event log entries.", EventLogEntryType.Error)
+            Functions.eventLogFunctions.writeToApplicationLogFile("There was an error while attempting to export the program's event log entries.", EventLogEntryType.Error)
 
             MsgBox("There was an error while exporting the log data.", MsgBoxStyle.Critical, Me.Text)
             btnRefreshEvents.PerformClick()
@@ -533,7 +533,7 @@
 
     Private Sub btnCleanLogFile_Click(sender As Object, e As EventArgs) Handles btnCleanLogFile.Click
         IO.File.Delete(Functions.eventLogFunctions.strLogFile)
-        Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Log file cleaned by user {0}.", Environment.UserName), EventLogEntryType.Information)
+        Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Log file cleaned by user {0}.", Environment.UserName), EventLogEntryType.Information)
     End Sub
 
     Private Sub logFileWatcher_Changed(sender As Object, e As IO.FileSystemEventArgs) Handles logFileWatcher.Changed

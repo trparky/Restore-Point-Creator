@@ -39,32 +39,32 @@
 
                     If httpErrorResponse IsNot Nothing Then
                         If httpErrorResponse.StatusCode = Net.HttpStatusCode.InternalServerError Then
-                            eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP Protocol Error (Server 500 Error) while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
+                            eventLogFunctions.writeToApplicationLogFile(String.Format("The server responded with an HTTP Protocol Error (Server 500 Error) while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
                         ElseIf httpErrorResponse.StatusCode = Net.HttpStatusCode.NotFound Then
-                            eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP Protocol Error (HTTP 404 File Not Found) while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
+                            eventLogFunctions.writeToApplicationLogFile(String.Format("The server responded with an HTTP Protocol Error (HTTP 404 File Not Found) while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
                         ElseIf httpErrorResponse.StatusCode = Net.HttpStatusCode.Unauthorized Then
-                            eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP Protocol Error (HTTP 401 Unauthorized) while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
+                            eventLogFunctions.writeToApplicationLogFile(String.Format("The server responded with an HTTP Protocol Error (HTTP 401 Unauthorized) while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
                         ElseIf httpErrorResponse.StatusCode = Net.HttpStatusCode.ServiceUnavailable Then
-                            eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP Protocol Error (HTTP 503 Service Unavailable) while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
+                            eventLogFunctions.writeToApplicationLogFile(String.Format("The server responded with an HTTP Protocol Error (HTTP 503 Service Unavailable) while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
                         ElseIf httpErrorResponse.StatusCode = Net.HttpStatusCode.Forbidden Then
-                            eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP Protocol Error (HTTP 403 Forbidden) while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
+                            eventLogFunctions.writeToApplicationLogFile(String.Format("The server responded with an HTTP Protocol Error (HTTP 403 Forbidden) while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
                         Else
-                            eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP Protocol Error while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
+                            eventLogFunctions.writeToApplicationLogFile(String.Format("The server responded with an HTTP Protocol Error while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
                         End If
                     Else
-                        eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP Protocol Error while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
+                        eventLogFunctions.writeToApplicationLogFile(String.Format("The server responded with an HTTP Protocol Error while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
                     End If
                 ElseIf ex2.Status = Net.WebExceptionStatus.TrustFailure Then
-                    eventLogFunctions.writeToSystemEventLog(String.Format("There was an error establishing an SSL connection while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
+                    eventLogFunctions.writeToApplicationLogFile(String.Format("There was an error establishing an SSL connection while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
                 ElseIf ex2.Status = Net.WebExceptionStatus.NameResolutionFailure Then
-                    eventLogFunctions.writeToSystemEventLog(String.Format("There was an error while resolving the domain name when attempting to request the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
+                    eventLogFunctions.writeToApplicationLogFile(String.Format("There was an error while resolving the domain name when attempting to request the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
                 Else
-                    eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP Protocol Error while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
+                    eventLogFunctions.writeToApplicationLogFile(String.Format("The server responded with an HTTP Protocol Error while accessing the URL {0}{1}{0}.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
                 End If
             ElseIf TypeOf ex Is httpProtocolException Then
-                eventLogFunctions.writeToSystemEventLog(String.Format("The server responded with an HTTP error while accessing the URL {0}{1}{0}. This may be because the web site is down or some other kind of issue. Please check back at at later time.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
+                eventLogFunctions.writeToApplicationLogFile(String.Format("The server responded with an HTTP error while accessing the URL {0}{1}{0}. This may be because the web site is down or some other kind of issue. Please check back at at later time.", Chr(34), lastAccessedURL), EventLogEntryType.Warning)
             ElseIf TypeOf ex Is sslErrorException Then
-                eventLogFunctions.writeToSystemEventLog("An HTTP SSL error occurred.", EventLogEntryType.Warning)
+                eventLogFunctions.writeToApplicationLogFile("An HTTP SSL error occurred.", EventLogEntryType.Warning)
             End If
         End Sub
 

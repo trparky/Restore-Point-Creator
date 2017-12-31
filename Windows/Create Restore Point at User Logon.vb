@@ -56,7 +56,7 @@ Public Class Create_Restore_Point_at_User_Logon
 
                     If newTask.Validate() Then
                         Dim taskFolderObject As TaskFolder = Functions.taskStuff.getOurTaskFolder(taskServiceObject)
-                        Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Creating scheduled task ""{0}"" in ""{1}"".", strTaskName, taskFolderObject.Name))
+                        Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Creating scheduled task ""{0}"" in ""{1}"".", strTaskName, taskFolderObject.Name))
                         taskFolderObject.RegisterTaskDefinition(strTaskName, newTask)
 
                         taskFolderObject.Dispose()
@@ -206,7 +206,7 @@ Public Class Create_Restore_Point_at_User_Logon
             newTask.Dispose()
             taskService.Dispose()
 
-            Functions.eventLogFunctions.writeToSystemEventLog("There was an error while validating the task definition settings.", EventLogEntryType.Error)
+            Functions.eventLogFunctions.writeToApplicationLogFile("There was an error while validating the task definition settings.", EventLogEntryType.Error)
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
 
             MsgBox("There was an error while validating the task definition settings. Please see the Application Event Log for more details.", MsgBoxStyle.Critical, Me.Text)
@@ -214,7 +214,7 @@ Public Class Create_Restore_Point_at_User_Logon
         End Try
 
         Dim taskFolderObject As TaskFolder = Functions.taskStuff.getOurTaskFolder(taskService)
-        Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Creating scheduled task ""{0}"" in ""{1}"".", strTaskName, taskFolderObject.Name))
+        Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Creating scheduled task ""{0}"" in ""{1}"".", strTaskName, taskFolderObject.Name))
         taskFolderObject.RegisterTaskDefinition(strTaskName, newTask)
 
         taskFolderObject.Dispose()

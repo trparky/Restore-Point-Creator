@@ -42,7 +42,7 @@ Public Class Form1
         If Not My.Settings.updateChannel.Equals(globalVariables.updateChannels.stable) And
            Not My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta) And
            Not My.Settings.updateChannel.Equals(globalVariables.updateChannels.tom) Then
-            Functions.eventLogFunctions.writeToSystemEventLog(String.Format("An invalid update channel was detected. The update channel was previously set to ""{0}"". This has been auto-corrected by setting it back to the ""stable"" update channel.", My.Settings.updateChannel), EventLogEntryType.Warning)
+            Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("An invalid update channel was detected. The update channel was previously set to ""{0}"". This has been auto-corrected by setting it back to the ""stable"" update channel.", My.Settings.updateChannel), EventLogEntryType.Warning)
             My.Settings.updateChannel = globalVariables.updateChannels.stable
         End If
     End Sub
@@ -253,7 +253,7 @@ Public Class Form1
         Catch ex3 As COMException
             taskService.RootFolder.DeleteTask(task.Name)
             Functions.eventLogFunctions.writeCrashToEventLog(ex3)
-            Functions.eventLogFunctions.writeToSystemEventLog("Invalid XML data has been detected as part of the task validation routine. The task named """ & task.Name & """ has been deleted.", EventLogEntryType.Error)
+            Functions.eventLogFunctions.writeToApplicationLogFile("Invalid XML data has been detected as part of the task validation routine. The task named """ & task.Name & """ has been deleted.", EventLogEntryType.Error)
             MsgBox("One or more of your scheduled Restore Point Creator tasks have been found to be corrupted. Please check your scheduled tasks to see if any of them have been deleted.", MsgBoxStyle.Information, strMessageBoxTitle)
         Catch ex2 As IO.FileNotFoundException
             Functions.eventLogFunctions.writeCrashToEventLog(ex2)
@@ -784,27 +784,27 @@ Public Class Form1
 
     Private Sub newFileDeleterThreadSub()
         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-            Functions.eventLogFunctions.writeToSystemEventLog("New File Deleter thread sleeping for 5 seconds for processes to close out before continuing.", EventLogEntryType.Information)
+            Functions.eventLogFunctions.writeToApplicationLogFile("New File Deleter thread sleeping for 5 seconds for processes to close out before continuing.", EventLogEntryType.Information)
         End If
 
         Threading.Thread.Sleep(5000)
         Dim strFoundFile As String = New IO.FileInfo(Application.ExecutablePath & ".new.exe").Name
 
         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-            Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Found file named {0}{1}{0}. Now searching for any processes that have parent executables files of {0}{1}{0}.", Chr(34), strFoundFile))
+            Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Found file named {0}{1}{0}. Now searching for any processes that have parent executables files of {0}{1}{0}.", Chr(34), strFoundFile))
         End If
 
         Functions.support.searchForProcessAndKillIt(Application.ExecutablePath & ".new.exe", True)
 
         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-            Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Now attempting to delete {0}{1}{0}.", Chr(34), strFoundFile))
+            Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Now attempting to delete {0}{1}{0}.", Chr(34), strFoundFile))
         End If
 
         Try
             IO.File.Delete(Application.ExecutablePath & ".new.exe")
 
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deletion of {0}{1}{0} was successful.", Chr(34), strFoundFile))
+                Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Deletion of {0}{1}{0} was successful.", Chr(34), strFoundFile))
             End If
         Catch ex As Exception
             Dim deleteAtReboot As New Functions.deleteAtReboot()
@@ -812,7 +812,7 @@ Public Class Form1
             deleteAtReboot.dispose(True)
 
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deletion of {0}{1}{0} was unsuccessful, scheduling it to be deleted at next system reboot.", Chr(34), strFoundFile))
+                Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Deletion of {0}{1}{0} was unsuccessful, scheduling it to be deleted at next system reboot.", Chr(34), strFoundFile))
             End If
         End Try
     End Sub
@@ -889,7 +889,7 @@ Public Class Form1
                 Catch ex As Exception
                     Me.Invoke(Sub() closePleaseWaitPanel())
                     MsgBox("An existing new program executable file has been found, we tried to delete it but we couldn't. Please see the Application Event Log for more details.", MsgBoxStyle.Critical, strMessageBoxTitle)
-                    Functions.eventLogFunctions.writeToSystemEventLog("An existing new program executable file has been found, we tried to delete it but we couldn't.", EventLogEntryType.Error)
+                    Functions.eventLogFunctions.writeToApplicationLogFile("An existing new program executable file has been found, we tried to delete it but we couldn't.", EventLogEntryType.Error)
                     Functions.eventLogFunctions.writeCrashToEventLog(ex)
                     Exit Sub
                 End Try
@@ -962,7 +962,7 @@ Public Class Form1
 
             My.Settings.restorePointListColumnOrder2 = (New Web.Script.Serialization.JavaScriptSerializer).Serialize(columnIndexes)
         Catch ex As Exception
-            Functions.eventLogFunctions.writeToSystemEventLog("Error saving restore point list column ordering.", EventLogEntryType.Error)
+            Functions.eventLogFunctions.writeToApplicationLogFile("Error saving restore point list column ordering.", EventLogEntryType.Error)
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
         End Try
     End Sub
@@ -980,7 +980,7 @@ Public Class Form1
             End If
         Catch ex As Exception
             My.Settings.restorePointListColumnOrder2 = Nothing
-            Functions.eventLogFunctions.writeToSystemEventLog("Error loading saved restore point list column ordering.", EventLogEntryType.Error)
+            Functions.eventLogFunctions.writeToApplicationLogFile("Error loading saved restore point list column ordering.", EventLogEntryType.Error)
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
         End Try
     End Sub
@@ -993,7 +993,7 @@ Public Class Form1
 
         Try
             If toolStripLogRestorePointDeletions.Checked Then
-                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Began deleting all System Restore Points by {0}\{1}.", Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
+                Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Began deleting all System Restore Points by {0}\{1}.", Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
             End If
 
             btnCreate.Enabled = False
@@ -1027,7 +1027,7 @@ Public Class Form1
                                 dateTime = Functions.restorePointStuff.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime").ToString)
 
                                 If toolStripLogRestorePointDeletions.Checked Then
-                                    Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deleted Restore Point named ""{0}"" which was created on {1} at {2}.", systemRestorePoint("Description").ToString, dateTime.ToShortDateString, dateTime.ToLongTimeString), EventLogEntryType.Information)
+                                    Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Deleted Restore Point named ""{0}"" which was created on {1} at {2}.", systemRestorePoint("Description").ToString, dateTime.ToShortDateString, dateTime.ToLongTimeString), EventLogEntryType.Information)
                                 End If
 
                                 dateTime = Nothing
@@ -1063,11 +1063,11 @@ Public Class Form1
         Finally
             If toolStripLogRestorePointDeletions.Checked Then
                 If numberOfOldRestorePointsDeleted = 0 Then
-                    Functions.eventLogFunctions.writeToSystemEventLog("End of processing old System Restore Points. No old System Restore Point were deleted.", EventLogEntryType.Information)
+                    Functions.eventLogFunctions.writeToApplicationLogFile("End of processing old System Restore Points. No old System Restore Point were deleted.", EventLogEntryType.Information)
                 ElseIf numberOfOldRestorePointsDeleted = 1 Then
-                    Functions.eventLogFunctions.writeToSystemEventLog("End of processing old System Restore Points. 1 old System Restore Point was deleted.", EventLogEntryType.Information)
+                    Functions.eventLogFunctions.writeToApplicationLogFile("End of processing old System Restore Points. 1 old System Restore Point was deleted.", EventLogEntryType.Information)
                 Else
-                    Functions.eventLogFunctions.writeToSystemEventLog(String.Format("End of processing old System Restore Points. {0} old System Restore Points were deleted.", numberOfOldRestorePointsDeleted), EventLogEntryType.Information)
+                    Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("End of processing old System Restore Points. {0} old System Restore Points were deleted.", numberOfOldRestorePointsDeleted), EventLogEntryType.Information)
                 End If
             End If
 
@@ -1175,22 +1175,22 @@ Public Class Form1
 
             result = Functions.wmi.createRestorePoint(stringRestorePointName, Functions.restorePointStuff.RestoreType.WindowsType, sequenceNumber)
 
-            If My.Settings.debug Then Functions.eventLogFunctions.writeToSystemEventLog(String.Format("EXTENDED DEBUG MESSAGE{0}The error code returned from System Restore API was {1} ({2}).", vbCrLf, result.ToString(), Functions.support.convertErrorCodeToHex(result)), EventLogEntryType.Information)
+            If My.Settings.debug Then Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("EXTENDED DEBUG MESSAGE{0}The error code returned from System Restore API was {1} ({2}).", vbCrLf, result.ToString(), Functions.support.convertErrorCodeToHex(result)), EventLogEntryType.Information)
 
             If result = Functions.APIs.errorCodes.ERROR_SERVICE_DISABLED Then
                 Dim reservedSpaceSize As ULong = Functions.vss.getMaxSize(globalVariables.systemDriveLetter)
 
-                Functions.eventLogFunctions.writeToSystemEventLog("The system restore point API returned error code 1058 (ERROR_SERVICE_DISABLED). Attempting to auto-correct this issue.", EventLogEntryType.Warning)
+                Functions.eventLogFunctions.writeToApplicationLogFile("The system restore point API returned error code 1058 (ERROR_SERVICE_DISABLED). Attempting to auto-correct this issue.", EventLogEntryType.Warning)
 
                 If reservedSpaceSize = 0 Then
                     If boolHaveWeTriedToCreateTheRestorePointAgain Then
-                        Functions.eventLogFunctions.writeToSystemEventLog("Auto-corrections to system configuration has failed. Unable to create restore point.", EventLogEntryType.Error)
+                        Functions.eventLogFunctions.writeToApplicationLogFile("Auto-corrections to system configuration has failed. Unable to create restore point.", EventLogEntryType.Error)
                         Exit Sub
                     Else
                         Dim gigabytesInBytes As Long = 1073741824
                         Dim newSize As Long = gigabytesInBytes * 20 ' Sets the size to 20 GBs.
 
-                        Functions.eventLogFunctions.writeToSystemEventLog("The system returned error code 1058 (ERROR_SERVICE_DISABLED). Attempting to correct it by setting up reserved system restore point space and enabling system restore on the system drive.")
+                        Functions.eventLogFunctions.writeToApplicationLogFile("The system returned error code 1058 (ERROR_SERVICE_DISABLED). Attempting to correct it by setting up reserved system restore point space and enabling system restore on the system drive.")
 
                         If MsgBox("The system has returned error code 1058 (ERROR_SERVICE_DISABLED). System Restore Point Creator can go about fixing this issue but it could have unintended consequences." & vbCrLf & vbCrLf & "Do you want System Restore Point Creator to attempt repairs to your system?", MsgBoxStyle.Question + MsgBoxStyle.YesNo + MsgBoxStyle.ApplicationModal, "System Error 1058 (ERROR_SERVICE_DISABLED) -- System Restore Point Creator") = MsgBoxResult.Yes Then
                             Functions.vss.executeVSSAdminCommand(globalVariables.systemDriveLetter)
@@ -1202,14 +1202,14 @@ Public Class Form1
                             Exit Sub
                         End If
 
-                        Functions.eventLogFunctions.writeToSystemEventLog("Attempting to create the restore point after system configuration corrections.")
+                        Functions.eventLogFunctions.writeToApplicationLogFile("Attempting to create the restore point after system configuration corrections.")
                         unifiedCreateSystemRestorePoint(stringRestorePointName)
                         Exit Sub
                     End If
                 Else
                     Dim msgBoxAndEventLogText As String = "The reserved space for restore points on the system drive appears to be set correctly, something else appears to be wrong. Auto-correction of system configurations may cause unintended side-effects. The auto-correction routine has halted."
 
-                    Functions.eventLogFunctions.writeToSystemEventLog(msgBoxAndEventLogText, EventLogEntryType.Error)
+                    Functions.eventLogFunctions.writeToApplicationLogFile(msgBoxAndEventLogText, EventLogEntryType.Error)
 
                     enableFormElements()
 
@@ -1233,7 +1233,7 @@ Public Class Form1
 
             If result <> Functions.APIs.errorCodes.ERROR_SUCCESS Then
                 If result <> Functions.APIs.errorCodes.ERROR_SERVICE_DISABLED Then
-                    Functions.eventLogFunctions.writeToSystemEventLog("The system restore point API returned an error code (" & Functions.support.convertErrorCodeToHex(result) & ").", EventLogEntryType.Warning)
+                    Functions.eventLogFunctions.writeToApplicationLogFile("The system restore point API returned an error code (" & Functions.support.convertErrorCodeToHex(result) & ").", EventLogEntryType.Warning)
                 End If
 
                 closePleaseWaitPanel()
@@ -1242,7 +1242,7 @@ Public Class Form1
                 Exit Sub
             End If
 
-            If My.Settings.debug Then Functions.eventLogFunctions.writeToSystemEventLog("EXTENDED DEBUG MESSAGE" & vbCrLf & "System Restore Point Created, waiting for system to update System Restore to catch up.", EventLogEntryType.Information)
+            If My.Settings.debug Then Functions.eventLogFunctions.writeToApplicationLogFile("EXTENDED DEBUG MESSAGE" & vbCrLf & "System Restore Point Created, waiting for system to update System Restore to catch up.", EventLogEntryType.Information)
 
             ' We wait here with this loop until the system's has the restore point created.
             While oldNewestRestorePointID = Functions.wmi.getNewestSystemRestorePointID()
@@ -1250,13 +1250,13 @@ Public Class Form1
                 Threading.Thread.Sleep(500)
             End While
 
-            If My.Settings.debug Then Functions.eventLogFunctions.writeToSystemEventLog("EXTENDED DEBUG MESSAGE" & vbCrLf & "System Restore has caught up.", EventLogEntryType.Information)
+            If My.Settings.debug Then Functions.eventLogFunctions.writeToApplicationLogFile("EXTENDED DEBUG MESSAGE" & vbCrLf & "System Restore has caught up.", EventLogEntryType.Information)
 
             If globalVariables.KeepXAmountOfRestorePoints = True Then
                 Functions.wmi.doDeletingOfXNumberOfRestorePoints(globalVariables.KeepXAmountofRestorePointsValue)
             End If
 
-            If My.Settings.debug Then Functions.eventLogFunctions.writeToSystemEventLog("EXTENDED DEBUG MESSAGE" & vbCrLf & "Finishing up restore point creation routine And closing Please Wait panel.", EventLogEntryType.Information)
+            If My.Settings.debug Then Functions.eventLogFunctions.writeToApplicationLogFile("EXTENDED DEBUG MESSAGE" & vbCrLf & "Finishing up restore point creation routine And closing Please Wait panel.", EventLogEntryType.Information)
 
             enableFormElements()
 
@@ -1269,7 +1269,7 @@ Public Class Form1
             doTheGrayingOfTheRestorePointNameTextBox()
 
             If toolStripCloseAfterRestorePointIsCreated.Checked Then
-                If My.Settings.debug Then Functions.eventLogFunctions.writeToSystemEventLog("EXTENDED DEBUG MESSAGE" & vbCrLf & "System Restore Point Created, user has instructed the program to close after creation of restore points.", EventLogEntryType.Information)
+                If My.Settings.debug Then Functions.eventLogFunctions.writeToApplicationLogFile("EXTENDED DEBUG MESSAGE" & vbCrLf & "System Restore Point Created, user has instructed the program to close after creation of restore points.", EventLogEntryType.Information)
                 Me.Close()
             End If
         Catch ex2 As Exception
@@ -1284,10 +1284,10 @@ Public Class Form1
     End Sub
 
     Private Sub downloadAndDoTheUpdate(Optional boolOverrideUserUpdateChannelPreferences As Boolean = False)
-        Functions.eventLogFunctions.writeToSystemEventLog("Beginning Application Update Procedure.", EventLogEntryType.Information)
+        Functions.eventLogFunctions.writeToApplicationLogFile("Beginning Application Update Procedure.", EventLogEntryType.Information)
 
         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-            Functions.eventLogFunctions.writeToSystemEventLog("Extended logging enabled for application update procedure.", EventLogEntryType.Information)
+            Functions.eventLogFunctions.writeToApplicationLogFile("Extended logging enabled for application update procedure.", EventLogEntryType.Information)
         End If
 
         Dim updateChannel As String = My.Settings.updateChannel
@@ -1298,19 +1298,19 @@ Public Class Form1
 
         If boolOverrideUserUpdateChannelPreferences And Not updateChannel.Equals(globalVariables.updateChannels.stable) Then
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                Functions.eventLogFunctions.writeToSystemEventLog("Forcing the update channel to the stable channel for this update session.", EventLogEntryType.Information)
+                Functions.eventLogFunctions.writeToApplicationLogFile("Forcing the update channel to the stable channel for this update session.", EventLogEntryType.Information)
             End If
 
             updateChannel = globalVariables.updateChannels.stable
 
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                Functions.eventLogFunctions.writeToSystemEventLog("Setting extractPDB flag to True.", EventLogEntryType.Information)
+                Functions.eventLogFunctions.writeToApplicationLogFile("Setting extractPDB flag to True.", EventLogEntryType.Information)
             End If
 
             extractPDB = True
 
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                Functions.eventLogFunctions.writeToSystemEventLog("Setting overrideURLPaths flag to True.", EventLogEntryType.Information)
+                Functions.eventLogFunctions.writeToApplicationLogFile("Setting overrideURLPaths flag to True.", EventLogEntryType.Information)
             End If
 
             overrideURLPaths = True
@@ -1318,7 +1318,7 @@ Public Class Form1
 
         If updateChannel = globalVariables.updateChannels.stable Then
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                Functions.eventLogFunctions.writeToSystemEventLog("Downloading compressed application ZIP package into system RAM.", EventLogEntryType.Information)
+                Functions.eventLogFunctions.writeToApplicationLogFile("Downloading compressed application ZIP package into system RAM.", EventLogEntryType.Information)
             End If
 
             Dim urlToZipFile As String = globalVariables.webURLs.updateBranch.main.strProgramZIP
@@ -1326,7 +1326,7 @@ Public Class Form1
 
             If boolOverrideUserUpdateChannelPreferences And overrideURLPaths Then
                 If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                    Functions.eventLogFunctions.writeToSystemEventLog("Overriding URL paths for download in this update session.", EventLogEntryType.Information)
+                    Functions.eventLogFunctions.writeToApplicationLogFile("Overriding URL paths for download in this update session.", EventLogEntryType.Information)
                 End If
 
                 urlToZipFile = globalVariables.webURLs.updateBranch.debug.strProgramZIP
@@ -1343,11 +1343,11 @@ Public Class Form1
             End If
 
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                Functions.eventLogFunctions.writeToSystemEventLog("Compressed application ZIP package download complete. Now verifying compressed application ZIP package integrity.", EventLogEntryType.Information)
+                Functions.eventLogFunctions.writeToApplicationLogFile("Compressed application ZIP package download complete. Now verifying compressed application ZIP package integrity.", EventLogEntryType.Information)
             End If
 
             If Functions.checksum.verifyChecksum(urlToZipFileSHA2, memoryStream, True) = False Then
-                Functions.eventLogFunctions.writeToSystemEventLog("There was an error in the download of the program's ZIP file, checksums don't match. Update process aborted.", EventLogEntryType.Error)
+                Functions.eventLogFunctions.writeToApplicationLogFile("There was an error in the download of the program's ZIP file, checksums don't match. Update process aborted.", EventLogEntryType.Error)
 
                 memoryStream.Close()
                 memoryStream.Dispose()
@@ -1358,11 +1358,11 @@ Public Class Form1
             End If
 
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                Functions.eventLogFunctions.writeToSystemEventLog("Compressed application ZIP package integrity check passed.", EventLogEntryType.Information)
+                Functions.eventLogFunctions.writeToApplicationLogFile("Compressed application ZIP package integrity check passed.", EventLogEntryType.Information)
             End If
         ElseIf updateChannel = globalVariables.updateChannels.beta Or updateChannel = globalVariables.updateChannels.tom Then
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                Functions.eventLogFunctions.writeToSystemEventLog("Downloading compressed application ZIP package into system RAM.", EventLogEntryType.Information)
+                Functions.eventLogFunctions.writeToApplicationLogFile("Downloading compressed application ZIP package into system RAM.", EventLogEntryType.Information)
             End If
 
             If Functions.http.downloadFile(globalVariables.webURLs.updateBranch.beta.strProgramZIP, memoryStream) = False Then
@@ -1375,11 +1375,11 @@ Public Class Form1
             End If
 
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                Functions.eventLogFunctions.writeToSystemEventLog("Compressed application ZIP package download complete. Now verifying compressed application ZIP package integrity.", EventLogEntryType.Information)
+                Functions.eventLogFunctions.writeToApplicationLogFile("Compressed application ZIP package download complete. Now verifying compressed application ZIP package integrity.", EventLogEntryType.Information)
             End If
 
             If Functions.checksum.verifyChecksum(globalVariables.webURLs.updateBranch.beta.strProgramZIPSHA2, memoryStream, True) = False Then
-                Functions.eventLogFunctions.writeToSystemEventLog("There was an error in the download of the program's ZIP file, checksums don't match. Update process aborted.", EventLogEntryType.Error)
+                Functions.eventLogFunctions.writeToApplicationLogFile("There was an error in the download of the program's ZIP file, checksums don't match. Update process aborted.", EventLogEntryType.Error)
 
                 memoryStream.Close()
                 memoryStream.Dispose()
@@ -1390,15 +1390,15 @@ Public Class Form1
             End If
 
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                Functions.eventLogFunctions.writeToSystemEventLog("Compressed application ZIP package integrity check passed.", EventLogEntryType.Information)
-                Functions.eventLogFunctions.writeToSystemEventLog("Setting extractPDB flag to True.", EventLogEntryType.Information)
+                Functions.eventLogFunctions.writeToApplicationLogFile("Compressed application ZIP package integrity check passed.", EventLogEntryType.Information)
+                Functions.eventLogFunctions.writeToApplicationLogFile("Setting extractPDB flag to True.", EventLogEntryType.Information)
             End If
 
             extractPDB = True
         End If
 
         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-            Functions.eventLogFunctions.writeToSystemEventLog("Download and verification of files required for update complete. Starting application update and extraction process.", EventLogEntryType.Information)
+            Functions.eventLogFunctions.writeToApplicationLogFile("Download and verification of files required for update complete. Starting application update and extraction process.", EventLogEntryType.Information)
         End If
 
         Dim strNewApplicationFileNameFullName As String = New IO.FileInfo(Application.ExecutablePath).FullName & ".new.exe"
@@ -1409,20 +1409,20 @@ Public Class Form1
             Catch ex As Exception
                 Me.Invoke(Sub() closePleaseWaitPanel())
                 MsgBox("An existing new program executable file has been found, we tried to delete it but we couldn't. Please see the Application Event Log for more details.", MsgBoxStyle.Critical, strMessageBoxTitle)
-                Functions.eventLogFunctions.writeToSystemEventLog("An existing new program executable file has been found, we tried to delete it but we couldn't.", EventLogEntryType.Error)
+                Functions.eventLogFunctions.writeToApplicationLogFile("An existing new program executable file has been found, we tried to delete it but we couldn't.", EventLogEntryType.Error)
                 Functions.eventLogFunctions.writeCrashToEventLog(ex)
                 Exit Sub
             End Try
         End If
 
         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-            Functions.eventLogFunctions.writeToSystemEventLog("Setting position for the IO.MemoryStream() back to the beginning of the stream to ready it for file extraction.", EventLogEntryType.Information)
+            Functions.eventLogFunctions.writeToApplicationLogFile("Setting position for the IO.MemoryStream() back to the beginning of the stream to ready it for file extraction.", EventLogEntryType.Information)
         End If
 
         memoryStream.Position = 0
 
         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-            Functions.eventLogFunctions.writeToSystemEventLog("Opening ZIP file package in system RAM for file extractions.", EventLogEntryType.Information)
+            Functions.eventLogFunctions.writeToApplicationLogFile("Opening ZIP file package in system RAM for file extractions.", EventLogEntryType.Information)
         End If
 
         Dim zipFileObject As New IO.Compression.ZipArchive(memoryStream, IO.Compression.ZipArchiveMode.Read) ' Create a new ZIPFile Object.
@@ -1430,11 +1430,11 @@ Public Class Form1
         If extractPDB = True Then
             If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.pdbFileNameInZIP, globalVariables.pdbFileNameInZIP & ".new") = False Then
                 ' This code executes only if the file extraction from the ZIP file fails.
-                Functions.eventLogFunctions.writeToSystemEventLog("There was an issue extracting data from the downloaded ZIP file.", EventLogEntryType.Error)
+                Functions.eventLogFunctions.writeToApplicationLogFile("There was an issue extracting data from the downloaded ZIP file.", EventLogEntryType.Error)
                 MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, strMessageBoxTitle) ' Gives some feedback.
 
                 If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                    Functions.eventLogFunctions.writeToSystemEventLog("Closing out ZIP File Object and freeing up memory.", EventLogEntryType.Information)
+                    Functions.eventLogFunctions.writeToApplicationLogFile("Closing out ZIP File Object and freeing up memory.", EventLogEntryType.Information)
                 End If
 
                 zipFileObject.Dispose() ' This closes our ZIPFile Object.
@@ -1442,7 +1442,7 @@ Public Class Form1
                 memoryStream.Dispose()
                 memoryStream = Nothing
 
-                Functions.eventLogFunctions.writeToSystemEventLog("Update proceess failed, aborting update procedure.", EventLogEntryType.Error)
+                Functions.eventLogFunctions.writeToApplicationLogFile("Update proceess failed, aborting update procedure.", EventLogEntryType.Error)
 
                 Exit Sub ' Exits the routine
             End If
@@ -1450,11 +1450,11 @@ Public Class Form1
 
         If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.programFileNameInZIP, strNewApplicationFileNameFullName) = False Then
             ' This code executes only if the file extraction from the ZIP file fails.
-            Functions.eventLogFunctions.writeToSystemEventLog("There was an issue extracting data from the downloaded ZIP file.", EventLogEntryType.Error)
+            Functions.eventLogFunctions.writeToApplicationLogFile("There was an issue extracting data from the downloaded ZIP file.", EventLogEntryType.Error)
             MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, strMessageBoxTitle) ' Gives some feedback.
 
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                Functions.eventLogFunctions.writeToSystemEventLog("Closing out ZIP File Object and freeing up memory.", EventLogEntryType.Information)
+                Functions.eventLogFunctions.writeToApplicationLogFile("Closing out ZIP File Object and freeing up memory.", EventLogEntryType.Information)
             End If
 
             zipFileObject.Dispose() ' This closes our ZIPFile Object.
@@ -1462,13 +1462,13 @@ Public Class Form1
             memoryStream.Dispose()
             memoryStream = Nothing
 
-            Functions.eventLogFunctions.writeToSystemEventLog("Update proceess failed, aborting update procedure.", EventLogEntryType.Error)
+            Functions.eventLogFunctions.writeToApplicationLogFile("Update proceess failed, aborting update procedure.", EventLogEntryType.Error)
 
             Exit Sub ' Exits the routine
         End If
 
         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-            Functions.eventLogFunctions.writeToSystemEventLog("Closing out ZIP File Object and freeing up memory.", EventLogEntryType.Information)
+            Functions.eventLogFunctions.writeToApplicationLogFile("Closing out ZIP File Object and freeing up memory.", EventLogEntryType.Information)
         End If
 
         zipFileObject.Dispose() ' This closes our ZIPFile Object.
@@ -1477,12 +1477,12 @@ Public Class Form1
         memoryStream = Nothing
 
         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-            Functions.eventLogFunctions.writeToSystemEventLog("Making sure new executable file exists.", EventLogEntryType.Information)
+            Functions.eventLogFunctions.writeToApplicationLogFile("Making sure new executable file exists.", EventLogEntryType.Information)
         End If
 
         If IO.File.Exists(strNewApplicationFileNameFullName) = True Then
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                Functions.eventLogFunctions.writeToSystemEventLog("New executable exists, executing it in update mode.", EventLogEntryType.Information)
+                Functions.eventLogFunctions.writeToApplicationLogFile("New executable exists, executing it in update mode.", EventLogEntryType.Information)
             End If
 
             Try
@@ -1495,12 +1495,12 @@ Public Class Form1
             Catch ex As ComponentModel.Win32Exception
                 Me.Invoke(Sub() closePleaseWaitPanel())
                 Functions.eventLogFunctions.writeCrashToEventLog(ex)
-                Functions.eventLogFunctions.writeToSystemEventLog("Something went wrong while attempting to launch the new program binary in update mode.", EventLogEntryType.Error)
+                Functions.eventLogFunctions.writeToApplicationLogFile("Something went wrong while attempting to launch the new program binary in update mode.", EventLogEntryType.Error)
                 MsgBox("Something went wrong while attempting to launch the new program binary in update mode, update process aborted.", MsgBoxStyle.Critical, strMessageBoxTitle)
             End Try
         Else
             Me.Invoke(Sub() closePleaseWaitPanel())
-            Functions.eventLogFunctions.writeToSystemEventLog("New executable doesn't exists, update process aborted.", EventLogEntryType.Error)
+            Functions.eventLogFunctions.writeToApplicationLogFile("New executable doesn't exists, update process aborted.", EventLogEntryType.Error)
             MsgBox("Something went wrong during the download, update process aborted.", MsgBoxStyle.Critical, strMessageBoxTitle)
         End If
     End Sub
@@ -1570,7 +1570,7 @@ Public Class Form1
 
         If Functions.support.processUpdateXMLData(xmlData, updateType, remoteVersion, remoteBuild, strRemoteBetaRCVersion) Then
             If My.Settings.ignoreThisVersion = String.Format("{0} Build {1}", remoteVersion, remoteBuild) Then
-                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("There was an update but you have chosen to ignore it ({0}).", My.Settings.ignoreThisVersion), EventLogEntryType.Information)
+                Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("There was an update but you have chosen to ignore it ({0}).", My.Settings.ignoreThisVersion), EventLogEntryType.Information)
                 Exit Sub
             End If
 
@@ -1615,17 +1615,17 @@ Public Class Form1
                 ' The user said yes.
                 openThePleaseWaitWindowAndStartTheDownloadThread(boolOverrideUserUpdateChannelPreferences) ' Starts the download and update thread.
             ElseIf updateDialogResponse = Update_Message.userResponse.dontDoTheUpdate Then
-                Functions.eventLogFunctions.writeToSystemEventLog("There was an update but you have chosen not download it.", EventLogEntryType.Information)
+                Functions.eventLogFunctions.writeToApplicationLogFile("There was an update but you have chosen not download it.", EventLogEntryType.Information)
                 giveFeedbackToUser("The update will not be downloaded.")
             End If
 
             Exit Sub ' Exit the routine.
         Else
             If updateType = Functions.support.updateType.buildLessThanError Then
-                Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and something weird happened. Your current version is newer than what is listed on the web site.") ' Log it.
+                Functions.eventLogFunctions.writeToApplicationLogFile("A software update check was performed and something weird happened. Your current version is newer than what is listed on the web site.") ' Log it.
                 giveFeedbackToUser("Something weird happened. Your current version is newer than what is listed on the web site.") ' Gives feedback.
             Else
-                Functions.eventLogFunctions.writeToSystemEventLog("A software update check was performed and it's been determined that you already have the latest version.") ' Log it.
+                Functions.eventLogFunctions.writeToApplicationLogFile("A software update check was performed and it's been determined that you already have the latest version.") ' Log it.
                 giveFeedbackToUser("You already have the latest version.") ' Gives feedback.
             End If
 
@@ -1880,7 +1880,7 @@ Public Class Form1
                     If boolEnableLogging Then
                         restorePointCreationDate = restorePointInfo.Value.dateCreated
 
-                        Functions.eventLogFunctions.writeToSystemEventLog(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", restorePointInfo.Value.strName, restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
+                        Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", restorePointInfo.Value.strName, restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
                     End If
 
                     intOldNumberOfRestorePoints -= 1
@@ -1922,9 +1922,9 @@ Public Class Form1
 
             If toolStripLogRestorePointDeletions.Checked Then
                 If maxAgeInput = 1 Then
-                    Functions.eventLogFunctions.writeToSystemEventLog(String.Format("The user {0}\{1} began batch processing and deletion of System Restore Points older than 1 day.", Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
+                    Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("The user {0}\{1} began batch processing and deletion of System Restore Points older than 1 day.", Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
                 Else
-                    Functions.eventLogFunctions.writeToSystemEventLog(String.Format("The user {0}\{1} began batch processing and deletion of System Restore Points older than {2} days.", Environment.MachineName, Environment.UserName, maxAgeInput), EventLogEntryType.Information)
+                    Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("The user {0}\{1} began batch processing and deletion of System Restore Points older than {2} days.", Environment.MachineName, Environment.UserName, maxAgeInput), EventLogEntryType.Information)
                 End If
             End If
 
@@ -1940,7 +1940,7 @@ Public Class Form1
 
                         If toolStripLogRestorePointDeletions.Checked Then
                             numberOfOldRestorePointsDeleted += 1
-                            Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Deleted Restore Point named ""{0}"" which was created on {1} at {2}.", systemRestorePoint("Description"), systemRestorePointCreationDate.ToLongDateString, systemRestorePointCreationDate.ToShortTimeString), EventLogEntryType.Information)
+                            Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Deleted Restore Point named ""{0}"" which was created on {1} at {2}.", systemRestorePoint("Description"), systemRestorePointCreationDate.ToLongDateString, systemRestorePointCreationDate.ToShortTimeString), EventLogEntryType.Information)
                         End If
                     End If
 
@@ -1955,11 +1955,11 @@ Public Class Form1
 
             If toolStripLogRestorePointDeletions.Checked Then
                 If numberOfOldRestorePointsDeleted = 0 Then
-                    Functions.eventLogFunctions.writeToSystemEventLog("End of processing old System Restore Points. No old System Restore Point were deleted.", EventLogEntryType.Information)
+                    Functions.eventLogFunctions.writeToApplicationLogFile("End of processing old System Restore Points. No old System Restore Point were deleted.", EventLogEntryType.Information)
                 ElseIf numberOfOldRestorePointsDeleted = 1 Then
-                    Functions.eventLogFunctions.writeToSystemEventLog("End of processing old System Restore Points. 1 old System Restore Point was deleted.", EventLogEntryType.Information)
+                    Functions.eventLogFunctions.writeToApplicationLogFile("End of processing old System Restore Points. 1 old System Restore Point was deleted.", EventLogEntryType.Information)
                 Else
-                    Functions.eventLogFunctions.writeToSystemEventLog(String.Format("End of processing old System Restore Points. {0} old System Restore Points were deleted.", numberOfOldRestorePointsDeleted), EventLogEntryType.Information)
+                    Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("End of processing old System Restore Points. {0} old System Restore Points were deleted.", numberOfOldRestorePointsDeleted), EventLogEntryType.Information)
                 End If
             End If
 
@@ -2111,7 +2111,7 @@ Public Class Form1
         My.Settings.mainWindowPosition = Me.Location
         saveRestorePointListColumnOrder()
 
-        If globalVariables.boolLogLoadsAndExits = True Then Functions.eventLogFunctions.writeToSystemEventLog("The user " & Environment.UserName & " closed the program.", EventLogEntryType.Information)
+        If globalVariables.boolLogLoadsAndExits = True Then Functions.eventLogFunctions.writeToApplicationLogFile("The user " & Environment.UserName & " closed the program.", EventLogEntryType.Information)
     End Sub
 
     Private Sub Form1_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
@@ -2222,7 +2222,7 @@ Public Class Form1
         End If
 
         Try
-            If globalVariables.boolLogLoadsAndExits = True Then Functions.eventLogFunctions.writeToSystemEventLog("The user " & Environment.UserName & " started the program.", EventLogEntryType.Information)
+            If globalVariables.boolLogLoadsAndExits = True Then Functions.eventLogFunctions.writeToApplicationLogFile("The user " & Environment.UserName & " started the program.", EventLogEntryType.Information)
 
             If IO.File.Exists("updater.exe") = True Then Threading.ThreadPool.QueueUserWorkItem(AddressOf updaterDeleterThreadSub)
 
@@ -2281,7 +2281,7 @@ Public Class Form1
                 Try
                     RemoveSafeModeBootOptionToolStripMenuItem.Font = New Font("Segoe UI", 9.0!, FontStyle.Bold, GraphicsUnit.Point, CType(0, Byte))
                 Catch ex As Exception
-                    Functions.eventLogFunctions.writeToSystemEventLog("There was an error setting the font size to Bold.", EventLogEntryType.Warning)
+                    Functions.eventLogFunctions.writeToApplicationLogFile("There was an error setting the font size to Bold.", EventLogEntryType.Warning)
                     Functions.eventLogFunctions.writeCrashToEventLog(ex, EventLogEntryType.Warning)
                 End Try
             Else
@@ -2323,7 +2323,7 @@ Public Class Form1
 
     Private Sub handleConfigFileAccessViolation(ex As IO.IOException)
         If ex.Message.caseInsensitiveContains("user.config") Then
-            Functions.eventLogFunctions.writeToSystemEventLog("Unable to open application settings file, it appears to be locked by another process.", EventLogEntryType.Error)
+            Functions.eventLogFunctions.writeToApplicationLogFile("Unable to open application settings file, it appears to be locked by another process.", EventLogEntryType.Error)
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
             MsgBox("Unable to open application settings file, it appears to be locked by another process." & vbCrLf & vbCrLf & "The program will now close.", MsgBoxStyle.Critical, "Restore Point Creator")
 
@@ -2403,7 +2403,7 @@ Public Class Form1
 
     Private Sub ManuallyFixSystemRestoreToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ManuallyFixSystemRestoreToolStripMenuItem.Click
         If MsgBox("You are about to forcefully fix System Restore on your system by enabling System Restore on the system drive. Use this tool only if you have received errors from the program such as Error 1058." & vbCrLf & vbCrLf & "WARNING! This tool may have unintended consequences such as lost restore points. By using this tool you agree that the developer of System Restore Point Creator is not liable for any lost restore points." & vbCrLf & vbCrLf & "Are you sure you want to do this?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, strMessageBoxTitle) = MsgBoxResult.Yes Then
-            Functions.eventLogFunctions.writeToSystemEventLog("The Manual System Restore Fix Tool has been engaged.", EventLogEntryType.Information)
+            Functions.eventLogFunctions.writeToApplicationLogFile("The Manual System Restore Fix Tool has been engaged.", EventLogEntryType.Information)
 
             Functions.vss.checkVSSServiceStatus()
 
@@ -2414,7 +2414,7 @@ Public Class Form1
             Functions.vss.setShadowStorageSize(globalVariables.systemDriveLetter, newSize)
             Functions.vss.enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
 
-            Functions.eventLogFunctions.writeToSystemEventLog("The Manual System Restore Fix Tool completed it's work. The system will now reboot.", EventLogEntryType.Information)
+            Functions.eventLogFunctions.writeToApplicationLogFile("The Manual System Restore Fix Tool completed it's work. The system will now reboot.", EventLogEntryType.Information)
 
             If MsgBox("The Manual System Restore Fix Tool completed it's work. Your system needs to be rebooted." & vbCrLf & vbCrLf & "Do you want to reboot your computer now?", MsgBoxStyle.Information + MsgBoxStyle.YesNo, strMessageBoxTitle) = MsgBoxResult.Yes Then
                 Functions.support.rebootSystem()
@@ -2557,7 +2557,7 @@ Public Class Form1
                     Functions.importExportSettings.importSettingsFromLegacyBackupFile(importBackupDialog.FileName, strMessageBoxTitle)
                 End If
 
-                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("A configuration backup has been restored from {0}{1}{0} by user {0}{2}{0}.", Chr(34), importBackupDialog.FileName, Environment.UserName), EventLogEntryType.Information)
+                Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("A configuration backup has been restored from {0}{1}{0} by user {0}{2}{0}.", Chr(34), importBackupDialog.FileName, Environment.UserName), EventLogEntryType.Information)
 
                 loadPreferences()
                 loadRestorePointListColumnOrder()

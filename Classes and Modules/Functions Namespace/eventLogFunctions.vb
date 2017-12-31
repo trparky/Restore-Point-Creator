@@ -63,7 +63,7 @@ Namespace Functions.eventLogFunctions
                 Return True
             Catch ex As Exception
                 writeCrashToEventLog(ex)
-                writeToSystemEventLog("There was an error while attempting to export the program's event log entries.", EventLogEntryType.Error)
+                writeToApplicationLogFile("There was an error while attempting to export the program's event log entries.", EventLogEntryType.Error)
 
                 Return False
             End Try
@@ -98,7 +98,7 @@ Namespace Functions.eventLogFunctions
         Public Sub getOldLogsFromWindowsEventLog()
             Try
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
-                writeToSystemEventLog("Starting log conversion process.", EventLogEntryType.Information)
+                writeToApplicationLogFile("Starting log conversion process.", EventLogEntryType.Information)
 
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
                 Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
@@ -133,14 +133,14 @@ Namespace Functions.eventLogFunctions
 
                 Dim longNumberOfImportedLogs As Long = applicationLog.Count - longOldLogCount
 
-                writeToSystemEventLog("Log conversion process complete.", EventLogEntryType.Information)
+                writeToApplicationLogFile("Log conversion process complete.", EventLogEntryType.Information)
 
                 If longNumberOfImportedLogs = 1 Then
-                    writeToSystemEventLog(String.Format("Converted log data to new log file format in {0}ms. 1 log entry was imported.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information)
+                    writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. 1 log entry was imported.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information)
                 ElseIf longNumberOfImportedLogs > 1 Then
-                    writeToSystemEventLog(String.Format("Converted log data to new log file format in {0}ms. {1} log entries were imported.", stopwatch.ElapsedMilliseconds.ToString, longNumberOfImportedLogs.ToString("N0")), EventLogEntryType.Information)
+                    writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. {1} log entries were imported.", stopwatch.ElapsedMilliseconds.ToString, longNumberOfImportedLogs.ToString("N0")), EventLogEntryType.Information)
                 Else
-                    writeToSystemEventLog(String.Format("Converted log data to new log file format in {0}ms. No old log entries were detected.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information)
+                    writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. No old log entries were detected.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information)
                 End If
             Catch ex As Exception
                 writeCrashToEventLog(ex)
@@ -300,7 +300,7 @@ Namespace Functions.eventLogFunctions
         ''' <param name="logMessage">The text you want to have in your new System Event Log entry.</param>
         ''' <param name="eventLogType">The type of log that you want your entry to be. The three major options are Error, Information, and Warning.</param>
         ''' <example>functions.eventLogFunctions.writeToSystemEventLog("My Event Log Entry", EventLogEntryType.Information)</example>
-        Public Sub writeToSystemEventLog(logMessage As String, Optional eventLogType As EventLogEntryType = EventLogEntryType.Information)
+        Public Sub writeToApplicationLogFile(logMessage As String, Optional eventLogType As EventLogEntryType = EventLogEntryType.Information)
             Try
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
                 Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
@@ -443,7 +443,7 @@ Namespace Functions.eventLogFunctions
         ''' <example>functions.eventLogFunctions.writeCrashToEventLog(ex)</example>
         Public Sub writeCrashToEventLog(exceptionObject As Exception, Optional errorType As EventLogEntryType = EventLogEntryType.Error)
             Try
-                writeToSystemEventLog(assembleCrashData(exceptionObject, errorType), errorType)
+                writeToApplicationLogFile(assembleCrashData(exceptionObject, errorType), errorType)
             Catch ex2 As Exception
                 oldEventLogFunctions.writeCrashToEventLog(ex2)
             End Try

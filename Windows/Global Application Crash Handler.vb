@@ -33,7 +33,7 @@ Public Class frmCrash
                 End If
             End If
         Catch ex As Exception
-            Functions.eventLogFunctions.writeToSystemEventLog("A crash occurred in the FormClosing event of the Global Application Crash Handler.", EventLogEntryType.Error)
+            Functions.eventLogFunctions.writeToApplicationLogFile("A crash occurred in the FormClosing event of the Global Application Crash Handler.", EventLogEntryType.Error)
             Functions.eventLogFunctions.writeCrashToEventLog(ex)
         End Try
 
@@ -51,7 +51,7 @@ Public Class frmCrash
 
         Dim strCrashData As String = Functions.eventLogFunctions.assembleCrashData(rawExceptionObject, EventLogEntryType.Error)
         txtStackTrace.Text = strCrashData
-        Functions.eventLogFunctions.writeToSystemEventLog(strCrashData, EventLogEntryType.Error)
+        Functions.eventLogFunctions.writeToApplicationLogFile(strCrashData, EventLogEntryType.Error)
 
         Dim stopBitmapIcon As New Bitmap(My.Resources.removeSmall)
         Dim stopIcon As Icon = Icon.FromHandle(stopBitmapIcon.GetHicon())

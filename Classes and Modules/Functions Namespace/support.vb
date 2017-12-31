@@ -166,13 +166,13 @@ Namespace Functions.support
                     Return True ' And now we return a True value indicating that there is a new version to download and install.
                 End If
             Catch ex As XPath.XPathException
-                eventLogFunctions.writeToSystemEventLog("There was an error while parsing the XML document. The contents of the XML document are below..." & vbCrLf & vbCrLf & xmlData, EventLogEntryType.Error)
+                eventLogFunctions.writeToApplicationLogFile("There was an error while parsing the XML document. The contents of the XML document are below..." & vbCrLf & vbCrLf & xmlData, EventLogEntryType.Error)
                 eventLogFunctions.writeCrashToEventLog(ex)
 
                 ' Something went wrong so we return a False value.
                 Return False
             Catch ex As XmlException
-                eventLogFunctions.writeToSystemEventLog("There was an error while parsing the XML document. The contents of the XML document are below..." & vbCrLf & vbCrLf & xmlData, EventLogEntryType.Error)
+                eventLogFunctions.writeToApplicationLogFile("There was an error while parsing the XML document. The contents of the XML document are below..." & vbCrLf & vbCrLf & xmlData, EventLogEntryType.Error)
                 eventLogFunctions.writeCrashToEventLog(ex)
 
                 ' Something went wrong so we return a False value.
@@ -417,7 +417,7 @@ Namespace Functions.support
                 Dim extractionTargetFileInfo As New IO.FileInfo(extractionTarget)
 
                 If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                    eventLogFunctions.writeToSystemEventLog(String.Format("Beginning extraction of {0}{1}{0} to {0}{2}{0}.", Chr(34), fileToExtract, extractionTargetFileInfo.Name), EventLogEntryType.Information)
+                    eventLogFunctions.writeToApplicationLogFile(String.Format("Beginning extraction of {0}{1}{0} to {0}{2}{0}.", Chr(34), fileToExtract, extractionTargetFileInfo.Name), EventLogEntryType.Information)
                 End If
 
                 ' This gets the ZipEntry Object for the file we are trying to extract from the ZIP file.
@@ -425,13 +425,13 @@ Namespace Functions.support
 
                 ' This checks to see if the file that we're trying to extract from the ZIP file exists in the ZIP file.
                 If zipFileEntryObject Is Nothing Then
-                    eventLogFunctions.writeToSystemEventLog(String.Format("Unable to find {0}{1}{0} to extract from ZIP file.", Chr(34), fileToExtract), EventLogEntryType.Error)
+                    eventLogFunctions.writeToApplicationLogFile(String.Format("Unable to find {0}{1}{0} to extract from ZIP file.", Chr(34), fileToExtract), EventLogEntryType.Error)
                     Return False ' Nope, the file doesn't exist in the ZIP file so we exit out of the routine by returning a False value for the function.
                 Else
                     ' This checks to see if the file we are trying to extract to from the ZIP file exists or not.
                     If IO.File.Exists(extractionTarget) = True Then
                         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                            eventLogFunctions.writeToSystemEventLog(String.Format("The file named {0}{1}{0} already exists, attempting to delete it.", Chr(34), fileToExtract), EventLogEntryType.Information)
+                            eventLogFunctions.writeToApplicationLogFile(String.Format("The file named {0}{1}{0} already exists, attempting to delete it.", Chr(34), fileToExtract), EventLogEntryType.Information)
                         End If
                         ' OK, so it does exist, let's do something about it.
 
@@ -440,7 +440,7 @@ Namespace Functions.support
                             If extractionTargetFileInfo.Extension.Equals(".exe", StringComparison.OrdinalIgnoreCase) Then
                                 ' If the file is an EXE file, let's try and kill any parent processes first.
                                 If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                                    eventLogFunctions.writeToSystemEventLog(String.Format("Since this file is an EXE file we need to check for any processes that have this file as the parent executable file.{2}{2}Killing any possible processes that have a parent executable of {0}{1}{0}.", Chr(34), extractionTargetFileInfo.FullName, vbCrLf), EventLogEntryType.Information)
+                                    eventLogFunctions.writeToApplicationLogFile(String.Format("Since this file is an EXE file we need to check for any processes that have this file as the parent executable file.{2}{2}Killing any possible processes that have a parent executable of {0}{1}{0}.", Chr(34), extractionTargetFileInfo.FullName, vbCrLf), EventLogEntryType.Information)
                                 End If
 
                                 searchForProcessAndKillIt(extractionTargetFileInfo.FullName, True)
@@ -450,10 +450,10 @@ Namespace Functions.support
                                 IO.File.Delete(extractionTarget) ' And now let's try and delete the file.
 
                                 If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                                    eventLogFunctions.writeToSystemEventLog(String.Format("The file named {0}{1}{0} has been successfully deleted.", Chr(34), extractionTargetFileInfo.FullName), EventLogEntryType.Information)
+                                    eventLogFunctions.writeToApplicationLogFile(String.Format("The file named {0}{1}{0} has been successfully deleted.", Chr(34), extractionTargetFileInfo.FullName), EventLogEntryType.Information)
                                 End If
                             Catch ex As Exception
-                                eventLogFunctions.writeToSystemEventLog(String.Format("Unable to delete {0}{1}{0}.", Chr(34), extractionTargetFileInfo.Name), EventLogEntryType.Error)
+                                eventLogFunctions.writeToApplicationLogFile(String.Format("Unable to delete {0}{1}{0}.", Chr(34), extractionTargetFileInfo.Name), EventLogEntryType.Error)
                                 ' Something went wrong while trying to delete the file so we return a False value for the function.
                                 Return False
                             End Try
@@ -463,49 +463,49 @@ Namespace Functions.support
                         End If
                     Else
                         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                            eventLogFunctions.writeToSystemEventLog(String.Format("The file named {0}{1}{0} does not exist, this is a good thing; we can continue with the update process.", Chr(34), extractionTargetFileInfo.Name), EventLogEntryType.Information)
+                            eventLogFunctions.writeToApplicationLogFile(String.Format("The file named {0}{1}{0} does not exist, this is a good thing; we can continue with the update process.", Chr(34), extractionTargetFileInfo.Name), EventLogEntryType.Information)
                         End If
                     End If
 
                     If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                        eventLogFunctions.writeToSystemEventLog(String.Format("Creating new IO.FileStream to write {0}{1}{0} as {0}{2}{0} to disk.", Chr(34), fileToExtract, extractionTargetFileInfo.Name), EventLogEntryType.Information)
+                        eventLogFunctions.writeToApplicationLogFile(String.Format("Creating new IO.FileStream to write {0}{1}{0} as {0}{2}{0} to disk.", Chr(34), fileToExtract, extractionTargetFileInfo.Name), EventLogEntryType.Information)
                     End If
 
                     ' Create a new FileStream Object to write out our extracted file.
                     Dim fileStream As New IO.FileStream(extractionTarget, IO.FileMode.Create)
 
                     If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                        eventLogFunctions.writeToSystemEventLog(String.Format("IO.FileStream created successfully. Commencing the process of writing file {0}{1}{0} as {0}{2}{0} to disk.", Chr(34), fileToExtract, extractionTargetFileInfo.Name), EventLogEntryType.Information)
-                        eventLogFunctions.writeToSystemEventLog("Opening IO.Stream from ZIP File Object.", EventLogEntryType.Information)
+                        eventLogFunctions.writeToApplicationLogFile(String.Format("IO.FileStream created successfully. Commencing the process of writing file {0}{1}{0} as {0}{2}{0} to disk.", Chr(34), fileToExtract, extractionTargetFileInfo.Name), EventLogEntryType.Information)
+                        eventLogFunctions.writeToApplicationLogFile("Opening IO.Stream from ZIP File Object.", EventLogEntryType.Information)
                     End If
 
                     ' This copies the data out of the ZIP File Data Stream to our FileStream Object that was created above.
                     Using zipFileEntryObjectIOStream As IO.Stream = zipFileEntryObject.Open()
                         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                            eventLogFunctions.writeToSystemEventLog("ZIP File Object IO.Stream opened. Copying data from ZIP File Object IO.Stream to IO.FileStream.", EventLogEntryType.Information)
+                            eventLogFunctions.writeToApplicationLogFile("ZIP File Object IO.Stream opened. Copying data from ZIP File Object IO.Stream to IO.FileStream.", EventLogEntryType.Information)
                         End If
 
                         zipFileEntryObjectIOStream.CopyTo(fileStream)
 
                         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                            eventLogFunctions.writeToSystemEventLog("Data copying complete. Closing out ZIP File Object IO.Stream.", EventLogEntryType.Information)
+                            eventLogFunctions.writeToApplicationLogFile("Data copying complete. Closing out ZIP File Object IO.Stream.", EventLogEntryType.Information)
                         End If
                     End Using
 
                     If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                        eventLogFunctions.writeToSystemEventLog("File write operation complete. Closing out file and disposing of the IO.FileStream.", EventLogEntryType.Information)
+                        eventLogFunctions.writeToApplicationLogFile("File write operation complete. Closing out file and disposing of the IO.FileStream.", EventLogEntryType.Information)
                     End If
 
                     fileStream.Close() ' This closes our FileStream Object.
 
                     If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                        eventLogFunctions.writeToSystemEventLog(String.Format("Extraction of {0}{1}{0} was successful.", Chr(34), fileToExtract), EventLogEntryType.Information)
+                        eventLogFunctions.writeToApplicationLogFile(String.Format("Extraction of {0}{1}{0} was successful.", Chr(34), fileToExtract), EventLogEntryType.Information)
                     End If
 
                     extractionTargetFileInfo = Nothing
 
                     If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                        eventLogFunctions.writeToSystemEventLog("Returning a True value for the extractUpdatedFileFromZIPPackage() function.", EventLogEntryType.Information)
+                        eventLogFunctions.writeToApplicationLogFile("Returning a True value for the extractUpdatedFileFromZIPPackage() function.", EventLogEntryType.Information)
                     End If
 
                     Return True ' Yes, the file did exist in the ZIP file and we were able to successfully extract it so we return a True value for the function.
@@ -513,7 +513,7 @@ Namespace Functions.support
             Catch ex As Exception
                 ' Something went wrong so we write out our crash stack trace data to the application event log.
                 eventLogFunctions.writeCrashToEventLog(ex)
-                eventLogFunctions.writeToSystemEventLog("Returning a False value for the extractUpdatedFileFromZIPPackage() function.", EventLogEntryType.Error)
+                eventLogFunctions.writeToApplicationLogFile("Returning a False value for the extractUpdatedFileFromZIPPackage() function.", EventLogEntryType.Error)
                 Return False ' And we return a False value for the function.
             End Try
         End Function
@@ -640,10 +640,10 @@ Namespace Functions.support
                 bcdEditor.dispose()
                 bcdEditor = Nothing
 
-                eventLogFunctions.writeToSystemEventLog("Successfully set Safe Mode Boot flag.", EventLogEntryType.Information)
+                eventLogFunctions.writeToApplicationLogFile("Successfully set Safe Mode Boot flag.", EventLogEntryType.Information)
             Catch ex As Exception
                 eventLogFunctions.writeCrashToEventLog(ex)
-                eventLogFunctions.writeToSystemEventLog("Unable to set Safe Mode Boot flag.", EventLogEntryType.Error)
+                eventLogFunctions.writeToApplicationLogFile("Unable to set Safe Mode Boot flag.", EventLogEntryType.Error)
             End Try
         End Sub
 
@@ -653,14 +653,14 @@ Namespace Functions.support
 
                 If bcdEditor.getSafeModeBootStatus() Then
                     bcdEditor.removeSafeModeBootFlag()
-                    eventLogFunctions.writeToSystemEventLog("Successfully removed Safe Mode Boot flag.", EventLogEntryType.Information)
+                    eventLogFunctions.writeToApplicationLogFile("Successfully removed Safe Mode Boot flag.", EventLogEntryType.Information)
                 End If
 
                 bcdEditor.dispose()
                 bcdEditor = Nothing
             Catch ex As Exception
                 eventLogFunctions.writeCrashToEventLog(ex)
-                eventLogFunctions.writeToSystemEventLog("Unable to remove Safe Mode Boot flag.", EventLogEntryType.Error)
+                eventLogFunctions.writeToApplicationLogFile("Unable to remove Safe Mode Boot flag.", EventLogEntryType.Error)
             End Try
         End Sub
 
@@ -811,7 +811,7 @@ Namespace Functions.support
 
         Public Sub killProcess(processID As Integer, Optional boolLogToEventLog As Boolean = False)
             If boolLogToEventLog = True Then
-                eventLogFunctions.writeToSystemEventLog("Killing process with PID of " & processID & ".", EventLogEntryType.Information)
+                eventLogFunctions.writeToApplicationLogFile("Killing process with PID of " & processID & ".", EventLogEntryType.Information)
             End If
 
             Dim processObject As Process = Nothing

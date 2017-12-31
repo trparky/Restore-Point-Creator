@@ -48,7 +48,7 @@ Namespace Functions.taskStuff
                     If taskObject.Enabled = False Then
                         taskObject.Definition.Settings.Enabled = True
                         taskObject.RegisterChanges()
-                        eventLogFunctions.writeToSystemEventLog("Enabled built-in Windows System Restore Task.", EventLogEntryType.Information)
+                        eventLogFunctions.writeToApplicationLogFile("Enabled built-in Windows System Restore Task.", EventLogEntryType.Information)
                     End If
 
                     taskObject.Dispose()
@@ -56,7 +56,7 @@ Namespace Functions.taskStuff
 
                 taskService.Dispose()
             Catch ex As Exception
-                eventLogFunctions.writeToSystemEventLog("Unable to disable built-in Windows System Restore Task.", EventLogEntryType.Error)
+                eventLogFunctions.writeToApplicationLogFile("Unable to disable built-in Windows System Restore Task.", EventLogEntryType.Error)
                 eventLogFunctions.writeCrashToEventLog(ex)
             End Try
         End Sub
@@ -71,7 +71,7 @@ Namespace Functions.taskStuff
                     If taskObject.Enabled = True Then
                         taskObject.Definition.Settings.Enabled = False
                         taskObject.RegisterChanges()
-                        eventLogFunctions.writeToSystemEventLog("Disabled built-in Windows System Restore Task.", EventLogEntryType.Information)
+                        eventLogFunctions.writeToApplicationLogFile("Disabled built-in Windows System Restore Task.", EventLogEntryType.Information)
                     End If
 
                     taskObject.Dispose()
@@ -79,7 +79,7 @@ Namespace Functions.taskStuff
 
                 taskService.Dispose()
             Catch ex As Exception
-                eventLogFunctions.writeToSystemEventLog("Unable to disable built-in Windows System Restore Task.", EventLogEntryType.Error)
+                eventLogFunctions.writeToApplicationLogFile("Unable to disable built-in Windows System Restore Task.", EventLogEntryType.Error)
                 eventLogFunctions.writeCrashToEventLog(ex)
             End Try
         End Sub
@@ -141,14 +141,14 @@ Namespace Functions.taskStuff
                     newTask.Dispose()
                     taskService.Dispose()
 
-                    eventLogFunctions.writeToSystemEventLog("There was an error while validating the task definition settings.", EventLogEntryType.Error)
+                    eventLogFunctions.writeToApplicationLogFile("There was an error while validating the task definition settings.", EventLogEntryType.Error)
                     eventLogFunctions.writeCrashToEventLog(ex)
 
                     Exit Sub
                 End Try
 
                 Dim taskFolderObject As TaskScheduler.TaskFolder = getOurTaskFolder(taskService)
-                eventLogFunctions.writeToSystemEventLog(String.Format("Creating task ""{0}"" in ""{1}"".", taskName, taskFolderObject.Name))
+                eventLogFunctions.writeToApplicationLogFile(String.Format("Creating task ""{0}"" in ""{1}"".", taskName, taskFolderObject.Name))
                 taskFolderObject.RegisterTaskDefinition(taskName, newTask)
 
                 taskFolderObject.Dispose()
@@ -227,7 +227,7 @@ Namespace Functions.taskStuff
                                     Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Every", False) ' Deletes the Every setting from the Registry.
 
                                     ' Add an Event Log Entry stating the scheduled task was upgraded successfully.
-                                    eventLogFunctions.writeToSystemEventLog("The upgrade of the scheduled task was successful.", EventLogEntryType.Information)
+                                    eventLogFunctions.writeToApplicationLogFile("The upgrade of the scheduled task was successful.", EventLogEntryType.Information)
                                 End If
                             End If
 
@@ -243,7 +243,7 @@ Namespace Functions.taskStuff
                 registryStuff.setBooleanValueInRegistry("Updated Scheduled Tasks with Every Setting", True)
             Catch ex As Exception
                 ' OK, we have some errors so lets add them to the Event Log.
-                eventLogFunctions.writeToSystemEventLog("An error occurred while upgrading scheduled task.", EventLogEntryType.Error)
+                eventLogFunctions.writeToApplicationLogFile("An error occurred while upgrading scheduled task.", EventLogEntryType.Error)
                 eventLogFunctions.writeCrashToEventLog(ex)
             End Try
         End Sub
@@ -279,7 +279,7 @@ Namespace Functions.taskStuff
                     task.Definition.Settings.Priority = ProcessPriorityClass.Normal
                     task.RegisterChanges()
 
-                    eventLogFunctions.writeToSystemEventLog("Setting priority settings for the task named """ & task.Name & """.", EventLogEntryType.Information)
+                    eventLogFunctions.writeToApplicationLogFile("Setting priority settings for the task named """ & task.Name & """.", EventLogEntryType.Information)
                     task.Dispose()
                 End If
             Catch ex As Exception
@@ -320,7 +320,7 @@ Namespace Functions.taskStuff
                     task.Definition.Settings.MultipleInstances = TaskScheduler.TaskInstancesPolicy.Parallel
                     task.RegisterChanges()
                     task.Dispose()
-                    eventLogFunctions.writeToSystemEventLog("Modified RunTime Task with MultiRun mode enabled.", EventLogEntryType.Information)
+                    eventLogFunctions.writeToApplicationLogFile("Modified RunTime Task with MultiRun mode enabled.", EventLogEntryType.Information)
                 End If
             End If
 

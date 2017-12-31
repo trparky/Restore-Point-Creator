@@ -49,13 +49,13 @@ Namespace Functions.registryStuff
                         installerRegistryPath.SetValue("Build", globalVariables.version.versionInfo(enums.versionPieces.build), RegistryValueKind.DWord)
                         installerRegistryPath.SetValue("InstallDate", support.getDateInShortForm())
 
-                        eventLogFunctions.writeToSystemEventLog("Updated uninstall information in system Registry.", EventLogEntryType.Information)
+                        eventLogFunctions.writeToApplicationLogFile("Updated uninstall information in system Registry.", EventLogEntryType.Information)
                     End If
 
                     installerRegistryPath.Close()
                 End If
             Catch ex As Exception
-                eventLogFunctions.writeToSystemEventLog("Unable to update uninstall information in system Registry.", EventLogEntryType.Error)
+                eventLogFunctions.writeToApplicationLogFile("Unable to update uninstall information in system Registry.", EventLogEntryType.Error)
                 eventLogFunctions.writeCrashToEventLog(ex)
             End Try
         End Sub

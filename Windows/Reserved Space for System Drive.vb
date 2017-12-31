@@ -21,13 +21,13 @@
             Dim deviceID As String = Functions.wmi.getDeviceIDFromDriveLetter(globalVariables.systemDriveLetter, boolResult)
 
             If boolResult = True Then
-                If My.Settings.debug Then Functions.eventLogFunctions.writeToSystemEventLog(String.Format("EXTENDED DEBUG MESSAGE{0}DeviceID for boot drive has been detected as {1}.", vbCrLf, deviceID), EventLogEntryType.Information)
+                If My.Settings.debug Then Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("EXTENDED DEBUG MESSAGE{0}DeviceID for boot drive has been detected as {1}.", vbCrLf, deviceID), EventLogEntryType.Information)
 
                 Dim totalDriveSize As ULong = getTotalDriveSize(globalVariables.systemDriveLetter)
                 Dim oldShadowStorageSize As ULong = Functions.vss.getMaxSize(globalVariables.systemDriveLetter)
                 Dim newShadowStorageSize As ULong
 
-                If My.Settings.debug Then Functions.eventLogFunctions.writeToSystemEventLog(String.Format("EXTENDED DEBUG MESSAGE{0}Total system drive size was detected as {1} and the old reserved space was detected as {2}.", vbCrLf, Functions.support.bytesToHumanSize(totalDriveSize), Functions.support.bytesToHumanSize(oldShadowStorageSize)), EventLogEntryType.Information)
+                If My.Settings.debug Then Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("EXTENDED DEBUG MESSAGE{0}Total system drive size was detected as {1} and the old reserved space was detected as {2}.", vbCrLf, Functions.support.bytesToHumanSize(totalDriveSize), Functions.support.bytesToHumanSize(oldShadowStorageSize)), EventLogEntryType.Information)
 
                 If (oldShadowStorageSize + (gigabytesInBytes * 20)) < totalDriveSize Then
                     newShadowStorageSize = oldShadowStorageSize + (gigabytesInBytes * 20)

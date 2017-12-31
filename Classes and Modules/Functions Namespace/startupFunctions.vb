@@ -178,7 +178,7 @@ Namespace Functions.startupFunctions
                 Dim boolLogDeletedRestorePoints As Boolean = registryStuff.getBooleanValueFromRegistry(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey), "Log Restore Point Deletions", True)
 
                 If boolLogDeletedRestorePoints Then
-                    eventLogFunctions.writeToSystemEventLog("Began processing of old System Restore Points.", EventLogEntryType.Information)
+                    eventLogFunctions.writeToApplicationLogFile("Began processing of old System Restore Points.", EventLogEntryType.Information)
                 End If
 
                 ' Loops through systemRestorePoints.
@@ -195,7 +195,7 @@ Namespace Functions.startupFunctions
                                 numberOfOldRestorePointsDeleted += 1
 
                                 If boolLogDeletedRestorePoints = True Then
-                                    eventLogFunctions.writeToSystemEventLog(String.Format("Deleted Restore Point named ""{0}"" which was created on {1} at {2}.", systemRestorePoint("Description"), systemRestorePointCreationDate.ToLongDateString, systemRestorePointCreationDate.ToShortTimeString), EventLogEntryType.Information)
+                                    eventLogFunctions.writeToApplicationLogFile(String.Format("Deleted Restore Point named ""{0}"" which was created on {1} at {2}.", systemRestorePoint("Description"), systemRestorePointCreationDate.ToLongDateString, systemRestorePointCreationDate.ToShortTimeString), EventLogEntryType.Information)
                                 End If
                             End If
                         End If
@@ -209,11 +209,11 @@ Namespace Functions.startupFunctions
 
                 If boolLogDeletedRestorePoints = True Then
                     If numberOfOldRestorePointsDeleted = 0 Then
-                        eventLogFunctions.writeToSystemEventLog("End of processing old System Restore Points.  No old System Restore Point were deleted.", EventLogEntryType.Information)
+                        eventLogFunctions.writeToApplicationLogFile("End of processing old System Restore Points.  No old System Restore Point were deleted.", EventLogEntryType.Information)
                     ElseIf numberOfOldRestorePointsDeleted = 1 Then
-                        eventLogFunctions.writeToSystemEventLog("End of processing old System Restore Points.  1 old System Restore Point was deleted.", EventLogEntryType.Information)
+                        eventLogFunctions.writeToApplicationLogFile("End of processing old System Restore Points.  1 old System Restore Point was deleted.", EventLogEntryType.Information)
                     Else
-                        eventLogFunctions.writeToSystemEventLog(String.Format("End of processing old System Restore Points.  {0} old System Restore Points were deleted.", numberOfOldRestorePointsDeleted), EventLogEntryType.Information)
+                        eventLogFunctions.writeToApplicationLogFile(String.Format("End of processing old System Restore Points.  {0} old System Restore Points were deleted.", numberOfOldRestorePointsDeleted), EventLogEntryType.Information)
                     End If
                 End If
 
@@ -260,12 +260,12 @@ Namespace Functions.startupFunctions
         End Sub
 
         Public Sub giveMessageToUserAboutNotBeingAbleToCreateRegistrySubKey()
-            eventLogFunctions.writeToSystemEventLog("Unable to create Registry Key for program in HKEY_LOCAL_MACHINE\SOFTWARE. Restore Point Creator can't continue. Please check with your System Administrator to see if you have access rights to HKEY_LOCAL_MACHINE.", EventLogEntryType.Error)
+            eventLogFunctions.writeToApplicationLogFile("Unable to create Registry Key for program in HKEY_LOCAL_MACHINE\SOFTWARE. Restore Point Creator can't continue. Please check with your System Administrator to see if you have access rights to HKEY_LOCAL_MACHINE.", EventLogEntryType.Error)
             MsgBox("Unable to create Registry Key for program in HKEY_LOCAL_MACHINE\SOFTWARE. Restore Point Creator can't continue. Please check with your System Administrator to see if you have access rights to HKEY_LOCAL_MACHINE.", MsgBoxStyle.Critical, "Restore Point Creator")
         End Sub
 
         Private Sub handleLockedSettingsFile(ex As Exception)
-            eventLogFunctions.writeToSystemEventLog("Unable to open application settings file, it appears to be locked by another process.", EventLogEntryType.Error)
+            eventLogFunctions.writeToApplicationLogFile("Unable to open application settings file, it appears to be locked by another process.", EventLogEntryType.Error)
             eventLogFunctions.writeCrashToEventLog(ex)
             MsgBox("Unable to open application settings file, it appears to be locked by another process." & vbCrLf & vbCrLf & "The program will now close.", MsgBoxStyle.Critical, "Restore Point Creator")
             Process.GetCurrentProcess.Kill()
@@ -331,7 +331,7 @@ Namespace Functions.startupFunctions
                 wait.createPleaseWaitWindow("Updating Restore Point Creator... Please Wait.", True, enums.howToCenterWindow.screen, True, True)
 
                 If boolExtendedLoggingForUpdating = True Then
-                    eventLogFunctions.writeToSystemEventLog("Update thread sleeping for 5 seconds for processes to close out before continuing with update procedure.", EventLogEntryType.Information)
+                    eventLogFunctions.writeToApplicationLogFile("Update thread sleeping for 5 seconds for processes to close out before continuing with update procedure.", EventLogEntryType.Information)
                 End If
 
                 Threading.Thread.Sleep(5000)
@@ -340,12 +340,12 @@ Namespace Functions.startupFunctions
                 Dim currentProcessFileName As String = New FileInfo(Application.ExecutablePath).Name
 
                 If boolExtendedLoggingForUpdating = True Then
-                    eventLogFunctions.writeToSystemEventLog("Beginning second phase of application update process. Verifying environment for updating.", EventLogEntryType.Information)
+                    eventLogFunctions.writeToApplicationLogFile("Beginning second phase of application update process. Verifying environment for updating.", EventLogEntryType.Information)
                 End If
 
                 If currentProcessFileName.caseInsensitiveContains(".new.exe") Then
                     If boolExtendedLoggingForUpdating = True Then
-                        eventLogFunctions.writeToSystemEventLog("The environment is ready for updating.", EventLogEntryType.Information)
+                        eventLogFunctions.writeToApplicationLogFile("The environment is ready for updating.", EventLogEntryType.Information)
                     End If
 
                     Dim restorePointCreatorMainEXEName As String = currentProcessFileName.caseInsensitiveReplace(".new.exe", "")
@@ -354,17 +354,17 @@ Namespace Functions.startupFunctions
                         registryStuff.updateRestorePointCreatorUninstallationInfo()
 
                         If globalVariables.version.boolBeta = True Then
-                            eventLogFunctions.writeToSystemEventLog(String.Format("Updated program to version {0} Public Beta {1}.", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion), EventLogEntryType.Information)
+                            eventLogFunctions.writeToApplicationLogFile(String.Format("Updated program to version {0} Public Beta {1}.", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion), EventLogEntryType.Information)
                         ElseIf globalVariables.version.boolReleaseCandidate = True Then
-                            eventLogFunctions.writeToSystemEventLog(String.Format("Updated program to version {0} Release Candidate {1}.", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion), EventLogEntryType.Information)
+                            eventLogFunctions.writeToApplicationLogFile(String.Format("Updated program to version {0} Release Candidate {1}.", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion), EventLogEntryType.Information)
                         Else
-                            eventLogFunctions.writeToSystemEventLog(String.Format("Updated program to version {0}.", globalVariables.version.strFullVersionString), EventLogEntryType.Information)
+                            eventLogFunctions.writeToApplicationLogFile(String.Format("Updated program to version {0}.", globalVariables.version.strFullVersionString), EventLogEntryType.Information)
                         End If
                     End If
 
                     If File.Exists(globalVariables.pdbFileNameInZIP & ".new") = True Then
                         If boolExtendedLoggingForUpdating = True Then
-                            eventLogFunctions.writeToSystemEventLog("PDB file found. Starting the updating of the PDF file.", EventLogEntryType.Information)
+                            eventLogFunctions.writeToApplicationLogFile("PDB file found. Starting the updating of the PDF file.", EventLogEntryType.Information)
                         End If
 
                         Try
@@ -378,7 +378,7 @@ Namespace Functions.startupFunctions
                             deleteAtReboot = Nothing
 
                             If boolExtendedLoggingForUpdating = True Then
-                                eventLogFunctions.writeToSystemEventLog("Update of the PDB file complete.", EventLogEntryType.Information)
+                                eventLogFunctions.writeToApplicationLogFile("Update of the PDB file complete.", EventLogEntryType.Information)
                             End If
                         Catch ex As Exception
                             Dim pdbFullPath As String = New FileInfo(globalVariables.pdbFileNameInZIP).FullName
@@ -391,22 +391,22 @@ Namespace Functions.startupFunctions
 
                             boolNeedsReboot = True
 
-                            eventLogFunctions.writeToSystemEventLog("Something went wrong with the updating of the PDB file, scheduling it for update at system reboot.", EventLogEntryType.Error)
+                            eventLogFunctions.writeToApplicationLogFile("Something went wrong with the updating of the PDB file, scheduling it for update at system reboot.", EventLogEntryType.Error)
                         End Try
                     Else
                         If boolExtendedLoggingForUpdating = True Then
-                            eventLogFunctions.writeToSystemEventLog("No PDB file found, skipping PDB file update.", EventLogEntryType.Information)
+                            eventLogFunctions.writeToApplicationLogFile("No PDB file found, skipping PDB file update.", EventLogEntryType.Information)
                         End If
                     End If
 
                     If boolExtendedLoggingForUpdating = True Then
-                        eventLogFunctions.writeToSystemEventLog(String.Format("Killing process with parent executable of {0}{1}{0}.", Chr(34), restorePointCreatorMainEXEName), EventLogEntryType.Information)
+                        eventLogFunctions.writeToApplicationLogFile(String.Format("Killing process with parent executable of {0}{1}{0}.", Chr(34), restorePointCreatorMainEXEName), EventLogEntryType.Information)
                     End If
 
                     support.searchForProcessAndKillIt(restorePointCreatorMainEXEName, False)
 
                     If boolExtendedLoggingForUpdating = True Then
-                        eventLogFunctions.writeToSystemEventLog("Starting the updating of the core executable file.", EventLogEntryType.Information)
+                        eventLogFunctions.writeToApplicationLogFile("Starting the updating of the core executable file.", EventLogEntryType.Information)
                     End If
 
                     Try
@@ -420,7 +420,7 @@ Namespace Functions.startupFunctions
                         deleteAtReboot = Nothing
 
                         If boolExtendedLoggingForUpdating = True Then
-                            eventLogFunctions.writeToSystemEventLog("Update of the core executable file complete.", EventLogEntryType.Information)
+                            eventLogFunctions.writeToApplicationLogFile("Update of the core executable file complete.", EventLogEntryType.Information)
                         End If
                     Catch ex As Exception
                         Dim deleteAtReboot As New deleteAtReboot()
@@ -431,7 +431,7 @@ Namespace Functions.startupFunctions
 
                         boolNeedsReboot = True
 
-                        eventLogFunctions.writeToSystemEventLog("Something went wrong with the updating of the core executable file, scheduling it for update at system reboot.", EventLogEntryType.Error)
+                        eventLogFunctions.writeToApplicationLogFile("Something went wrong with the updating of the core executable file, scheduling it for update at system reboot.", EventLogEntryType.Error)
                     End Try
 
                     If boolNeedsReboot = True Then
@@ -442,29 +442,29 @@ Namespace Functions.startupFunctions
 
                         If msgBoxResult = MsgBoxResult.Yes Then
                             If boolExtendedLoggingForUpdating = True Then
-                                eventLogFunctions.writeToSystemEventLog("Rebooting system.", EventLogEntryType.Information)
+                                eventLogFunctions.writeToApplicationLogFile("Rebooting system.", EventLogEntryType.Information)
                             End If
 
                             support.rebootSystem()
                             Process.GetCurrentProcess.Kill()
                         Else
                             If boolExtendedLoggingForUpdating = True Then
-                                eventLogFunctions.writeToSystemEventLog("User chose not to reboot the system. Application updating is scheduled for the next system reboot.", EventLogEntryType.Information)
+                                eventLogFunctions.writeToApplicationLogFile("User chose not to reboot the system. Application updating is scheduled for the next system reboot.", EventLogEntryType.Information)
                             End If
 
                             MsgBox("System Restore Point Creator will not function properly until your system is rebooted.", MsgBoxStyle.Information, "System Restore Point Creator -- Application Update")
                         End If
                     Else
                         If boolExtendedLoggingForUpdating = True Then
-                            eventLogFunctions.writeToSystemEventLog("Starting the third and final phase of application update procedure; verification of update.", EventLogEntryType.Information)
+                            eventLogFunctions.writeToApplicationLogFile("Starting the third and final phase of application update procedure; verification of update.", EventLogEntryType.Information)
                         End If
 
                         If File.Exists(restorePointCreatorMainEXEName) = True Then
                             If boolExtendedLoggingForUpdating = True Then
-                                eventLogFunctions.writeToSystemEventLog("Final verification of update complete, things all look good. Starting newly updated program.", EventLogEntryType.Information)
+                                eventLogFunctions.writeToApplicationLogFile("Final verification of update complete, things all look good. Starting newly updated program.", EventLogEntryType.Information)
                             End If
 
-                            eventLogFunctions.writeToSystemEventLog("Application Update Procedure Complete.", EventLogEntryType.Information)
+                            eventLogFunctions.writeToApplicationLogFile("Application Update Procedure Complete.", EventLogEntryType.Information)
 
                             Process.Start(New ProcessStartInfo With {.FileName = restorePointCreatorMainEXEName, .Verb = "runas", .Arguments = "-noparentprocesscheck"})
                         Else

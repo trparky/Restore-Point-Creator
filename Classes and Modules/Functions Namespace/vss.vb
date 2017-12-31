@@ -5,29 +5,29 @@
                 Dim strResult As String = wmi.getServiceStartType("VSS")
 
                 If String.IsNullOrEmpty(strResult) Then
-                    eventLogFunctions.writeToSystemEventLog("The WMI system returned an invalid response for the Startup type parameter.", EventLogEntryType.Error)
+                    eventLogFunctions.writeToApplicationLogFile("The WMI system returned an invalid response for the Startup type parameter.", EventLogEntryType.Error)
                 Else
-                    eventLogFunctions.writeToSystemEventLog(String.Format("VSS System Service Startup Type is set to {0}{1}{0}.", Chr(34), strResult), EventLogEntryType.Information)
+                    eventLogFunctions.writeToApplicationLogFile(String.Format("VSS System Service Startup Type is set to {0}{1}{0}.", Chr(34), strResult), EventLogEntryType.Information)
 
                     If Not strResult.Equals("manual", StringComparison.OrdinalIgnoreCase) Then
-                        eventLogFunctions.writeToSystemEventLog("The VSS System Service Startup Type was detected to be not setup correctly, this has been corrected.", EventLogEntryType.Warning)
+                        eventLogFunctions.writeToApplicationLogFile("The VSS System Service Startup Type was detected to be not setup correctly, this has been corrected.", EventLogEntryType.Warning)
                         wmi.setServiceStartMode("VSS")
                     End If
 
-                    eventLogFunctions.writeToSystemEventLog("Attempting to start the VSS System Service.", EventLogEntryType.Information)
+                    eventLogFunctions.writeToApplicationLogFile("Attempting to start the VSS System Service.", EventLogEntryType.Information)
 
                     Try
                         Using systemServiceController As New ServiceProcess.ServiceController("VSS")
                             systemServiceController.Start()
-                            eventLogFunctions.writeToSystemEventLog("The VSS System Service has been successfully started.", EventLogEntryType.Information)
+                            eventLogFunctions.writeToApplicationLogFile("The VSS System Service has been successfully started.", EventLogEntryType.Information)
                         End Using
                     Catch ex As Exception
-                        eventLogFunctions.writeToSystemEventLog("The VSS System Service has failed to start.", EventLogEntryType.Error)
+                        eventLogFunctions.writeToApplicationLogFile("The VSS System Service has failed to start.", EventLogEntryType.Error)
                         eventLogFunctions.writeCrashToEventLog(ex, EventLogEntryType.Error)
                     End Try
                 End If
             Catch ex As Exception
-                eventLogFunctions.writeToSystemEventLog("Unable to find the VSS System Service.", EventLogEntryType.Error)
+                eventLogFunctions.writeToApplicationLogFile("Unable to find the VSS System Service.", EventLogEntryType.Error)
             End Try
         End Sub
 
@@ -148,12 +148,12 @@
                     Dim runningProcess As Process = Process.Start(startInfo)
                     runningProcess.WaitForExit()
 
-                    eventLogFunctions.writeToSystemEventLog("No system restore point storage space was assigned for the system drive, this issue has been corrected.", EventLogEntryType.Information)
+                    eventLogFunctions.writeToApplicationLogFile("No system restore point storage space was assigned for the system drive, this issue has been corrected.", EventLogEntryType.Information)
                 Else
                     MsgBox("Unable to find the VSSAdmin utility.", MsgBoxStyle.Critical, "Restore Point Creator")
                 End If
             Catch ex2 As ComponentModel.Win32Exception
-                eventLogFunctions.writeToSystemEventLog("An issue came up while attempting to run the vssadmin.exe command, perhaps due to Group Policy Restrictions. Falling back to WMI mode.", EventLogEntryType.Error)
+                eventLogFunctions.writeToApplicationLogFile("An issue came up while attempting to run the vssadmin.exe command, perhaps due to Group Policy Restrictions. Falling back to WMI mode.", EventLogEntryType.Error)
 
                 Dim uLongDriveCapacity As ULong = wmi.getDriveSize(driveLetter)
                 Dim newSize As Long = uLongDriveCapacity * 0.2
@@ -206,7 +206,7 @@
 
                 Dim oOutParams As Management.ManagementBaseObject = managementClassObject.InvokeMethod("Enable", managementBaseObjectParameters, Nothing)
 
-                eventLogFunctions.writeToSystemEventLog("Enabled System Restore on drive " & driveLetter.Substring(0, 1).ToUpper & ".", EventLogEntryType.Information)
+                eventLogFunctions.writeToApplicationLogFile("Enabled System Restore on drive " & driveLetter.Substring(0, 1).ToUpper & ".", EventLogEntryType.Information)
 
                 Return oOutParams("ReturnValue")
             Catch ex3 As Runtime.InteropServices.COMException
@@ -219,7 +219,7 @@
 
         ' driveLetter is just that, "C:"
         Public Sub setShadowStorageSize(driveLetter As String, size As Long)
-            eventLogFunctions.writeToSystemEventLog(String.Format("Setting reserved system restore space for drive {0} to {1}.", driveLetter, support.bytesToHumanSize(size)), EventLogEntryType.Information)
+            eventLogFunctions.writeToApplicationLogFile(String.Format("Setting reserved system restore space for drive {0} to {1}.", driveLetter, support.bytesToHumanSize(size)), EventLogEntryType.Information)
 
             Try
                 driveLetter = driveLetter.ToUpper

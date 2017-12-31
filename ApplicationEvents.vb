@@ -312,7 +312,7 @@ Namespace My
                         commandLineArgument = My.Application.CommandLineArgs(0)
 
                         If commandLineArgument.Equals("-createtasks", StringComparison.OrdinalIgnoreCase) Then
-                            Functions.eventLogFunctions.writeToSystemEventLog("The program was called with an obsolete command line argument, specifically ""-createtasks"". The program has ignored the command and exited.", EventLogEntryType.Information)
+                            Functions.eventLogFunctions.writeToApplicationLogFile("The program was called with an obsolete command line argument, specifically ""-createtasks"". The program has ignored the command and exited.", EventLogEntryType.Information)
                             Process.GetCurrentProcess.Kill()
                         ElseIf commandLineArgument.Equals("-fixruntimetasks", StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.repairRuntimeTasks()
@@ -362,7 +362,7 @@ Namespace My
 
                         If commandLineArgument.Equals(globalVariables.commandLineSwitches.createRestorePoint, StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.giveSafeModeErrorMessage(boolAreWeInSafeMode)
-                            Functions.eventLogFunctions.writeToSystemEventLog("Activated JumpList Task.", EventLogEntryType.Information)
+                            Functions.eventLogFunctions.writeToApplicationLogFile("Activated JumpList Task.", EventLogEntryType.Information)
 
                             Dim strRestorePointName As String = "System Checkpoint made by System Restore Point Creator"
 
@@ -391,7 +391,7 @@ Namespace My
                             Exit Sub
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.createCustomRestorePoint, StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.giveSafeModeErrorMessage(boolAreWeInSafeMode)
-                            Functions.eventLogFunctions.writeToSystemEventLog("Activated JumpList Task.", EventLogEntryType.Information)
+                            Functions.eventLogFunctions.writeToApplicationLogFile("Activated JumpList Task.", EventLogEntryType.Information)
 
                             Dim Custom_Named_Restore_Point_Instance As Custom_Named_Restore_Point
                             Custom_Named_Restore_Point_Instance = New Custom_Named_Restore_Point
@@ -420,7 +420,7 @@ Namespace My
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.testlogwrite, StringComparison.OrdinalIgnoreCase) Then
-                            Functions.eventLogFunctions.writeToSystemEventLog("Written to application log file successfully.", EventLogEntryType.Information)
+                            Functions.eventLogFunctions.writeToApplicationLogFile("Written to application log file successfully.", EventLogEntryType.Information)
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.scheduledRestorePoint, StringComparison.OrdinalIgnoreCase) Then
@@ -443,9 +443,9 @@ Namespace My
                             End If
 
                             If boolExtendedLoggingForScheduledTasks = True Then
-                                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Starting scheduled restore point job. Task running as user {0}. There are currently {1} system restore point(s) on this system.", Environment.UserName, Functions.wmi.getNumberOfRestorePoints()), EventLogEntryType.Information)
+                                Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Starting scheduled restore point job. Task running as user {0}. There are currently {1} system restore point(s) on this system.", Environment.UserName, Functions.wmi.getNumberOfRestorePoints()), EventLogEntryType.Information)
                             Else
-                                Functions.eventLogFunctions.writeToSystemEventLog(String.Format("Starting scheduled restore point job. Task running As user {0}.", Environment.UserName), EventLogEntryType.Information)
+                                Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Starting scheduled restore point job. Task running As user {0}.", Environment.UserName), EventLogEntryType.Information)
                             End If
 
                             Functions.startupFunctions.writeLastRunFile()
@@ -472,7 +472,7 @@ Namespace My
                                 Functions.wmi.doDeletingOfXNumberOfRestorePoints(globalVariables.KeepXAmountofRestorePointsValue)
                             End If
 
-                            Functions.eventLogFunctions.writeToSystemEventLog("Scheduled restore point job complete.", EventLogEntryType.Information)
+                            Functions.eventLogFunctions.writeToApplicationLogFile("Scheduled restore point job complete.", EventLogEntryType.Information)
 
                             e.Cancel = True
                             Exit Sub
