@@ -13,6 +13,7 @@
 
         ''' <summary>Opens and returns a IO.FileStream.</summary>
         ''' <param name="strFileToOpen">Path to the file you want to open.</param>
+        ''' <param name="strLockFile">Path to the lock file that indicates that the file declared using the "strFileToOpen" variable is in use.</param>
         ''' <param name="accessMethod">The way you want to access the file.</param>
         ''' <param name="fileMode">The way you want to access the file.</param>
         ''' <returns>A IO.FileStream Object.</returns>
