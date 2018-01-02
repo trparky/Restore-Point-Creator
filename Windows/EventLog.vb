@@ -34,11 +34,15 @@
     End Function
 
     Private Function convertLineFeeds(input As String) As String
-        ' Checks to see if the file is in Windows linefeed format or UNIX linefeed format.
-        If input.Contains(vbCrLf) Then
-            Return input ' It's in Windows linefeed format so we return the output as is.
+        If String.IsNullOrEmpty(input) Then
+            Return ""
         Else
-            Return input.Replace(vbLf, vbCrLf) ' It's in UNIX linefeed format so we have to convert it to Windows before we return the output.
+            ' Checks to see if the file is in Windows linefeed format or UNIX linefeed format.
+            If input.Contains(vbCrLf) Then
+                Return input ' It's in Windows linefeed format so we return the output as is.
+            Else
+                Return input.Replace(vbLf, vbCrLf) ' It's in UNIX linefeed format so we have to convert it to Windows before we return the output.
+            End If
         End If
     End Function
 
