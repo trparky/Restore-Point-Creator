@@ -1,7 +1,4 @@
-﻿Imports System.Runtime.InteropServices
-Imports Microsoft.Win32
-
-Namespace Functions.eventLogFunctions
+﻿Namespace Functions.eventLogFunctions
     Module eventLogFunctions
         Private Const strSystemRestorePointCreator As String = "System Restore Point Creator"
         Private Const strRegistryApplicationPath As String = "SYSTEM\CurrentControlSet\services\eventlog\Application"
