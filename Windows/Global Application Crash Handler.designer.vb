@@ -48,7 +48,7 @@ Partial Class frmCrash
         Me.pleaseWaitPanel = New System.Windows.Forms.Panel()
         Me.pleaseWaitBorderText = New System.Windows.Forms.Label()
         Me.pleaseWaitlblLabel = New System.Windows.Forms.Label()
-        Me.pleaseWaitProgressBar = New Tom.SmoothProgressBar()
+        Me.pleaseWaitProgressBar = New SmoothProgressBar()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.pleaseWaitPanel.SuspendLayout()
@@ -339,5 +339,5 @@ Partial Class frmCrash
     Friend WithEvents pleaseWaitPanel As Panel
     Friend WithEvents pleaseWaitBorderText As Label
     Friend WithEvents pleaseWaitlblLabel As Label
-    Friend WithEvents pleaseWaitProgressBar As Tom.SmoothProgressBar
+    Friend WithEvents pleaseWaitProgressBar As SmoothProgressBar
 End Class

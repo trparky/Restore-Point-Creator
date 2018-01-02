@@ -31,7 +31,7 @@ Partial Class Change_Log
         Me.pleaseWaitPanel = New System.Windows.Forms.Panel()
         Me.pleaseWaitBorderText = New System.Windows.Forms.Label()
         Me.pleaseWaitlblLabel = New System.Windows.Forms.Label()
-        Me.pleaseWaitProgressBar = New Tom.SmoothProgressBar()
+        Me.pleaseWaitProgressBar = New SmoothProgressBar()
         Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
         Me.ContextMenuStrip1.SuspendLayout()
         Me.pleaseWaitPanel.SuspendLayout()
@@ -149,6 +149,6 @@ Partial Class Change_Log
     Friend WithEvents pleaseWaitPanel As Panel
     Friend WithEvents pleaseWaitBorderText As Label
     Friend WithEvents pleaseWaitlblLabel As Label
-    Friend WithEvents pleaseWaitProgressBar As Tom.SmoothProgressBar
+    Friend WithEvents pleaseWaitProgressBar As SmoothProgressBar
     Friend WithEvents pleaseWaitMessageChanger As Timer
 End Class

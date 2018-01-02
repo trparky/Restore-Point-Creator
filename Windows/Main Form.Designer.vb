@@ -141,7 +141,7 @@ Partial Class Form1
         Me.pleaseWaitPanel = New System.Windows.Forms.Panel()
         Me.pleaseWaitBorderText = New System.Windows.Forms.Label()
         Me.pleaseWaitlblLabel = New System.Windows.Forms.Label()
-        Me.pleaseWaitProgressBar = New Tom.SmoothProgressBar()
+        Me.pleaseWaitProgressBar = New SmoothProgressBar()
         Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
         Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
         Me.restorePointListContextMenu.SuspendLayout()
@@ -1199,7 +1199,7 @@ Partial Class Form1
     Friend WithEvents pleaseWaitProgressBarChanger As Timer
     Friend WithEvents pleaseWaitBorderText As Label
     Friend WithEvents pleaseWaitlblLabel As Label
-    Friend WithEvents pleaseWaitProgressBar As Tom.SmoothProgressBar
+    Friend WithEvents pleaseWaitProgressBar As SmoothProgressBar
     Friend WithEvents pleaseWaitMessageChanger As Timer
     Friend WithEvents SetPleaseWaitBorderColorToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents barBelowColorSettings As ToolStripSeparator

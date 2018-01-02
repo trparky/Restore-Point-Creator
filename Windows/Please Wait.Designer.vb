@@ -27,7 +27,7 @@ Partial Class Please_Wait
         Me.pleaseWaitlblLabel = New System.Windows.Forms.Label()
         Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
         Me.autoWindowCloser = New System.Windows.Forms.Timer(Me.components)
-        Me.SmoothProgressBar1 = New Tom.SmoothProgressBar()
+        Me.SmoothProgressBar1 = New SmoothProgressBar()
         Me.SuspendLayout()
         '
         'progressBarChanger
@@ -84,5 +84,5 @@ Partial Class Please_Wait
     Friend WithEvents pleaseWaitlblLabel As System.Windows.Forms.Label
     Friend WithEvents pleaseWaitMessageChanger As System.Windows.Forms.Timer
     Friend WithEvents autoWindowCloser As System.Windows.Forms.Timer
-    Friend WithEvents SmoothProgressBar1 As Tom.SmoothProgressBar
+    Friend WithEvents SmoothProgressBar1 As SmoothProgressBar
 End Class

@@ -41,7 +41,7 @@ Partial Class frmManuallySubmitCrashData
         Me.pleaseWaitPanel = New System.Windows.Forms.Panel()
         Me.pleaseWaitBorderText = New System.Windows.Forms.Label()
         Me.pleaseWaitlblLabel = New System.Windows.Forms.Label()
-        Me.pleaseWaitProgressBar = New Tom.SmoothProgressBar()
+        Me.pleaseWaitProgressBar = New SmoothProgressBar()
         Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
         Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
         Me.TableLayoutPanel1.SuspendLayout()
@@ -276,7 +276,7 @@ Partial Class frmManuallySubmitCrashData
     Friend WithEvents pleaseWaitPanel As Panel
     Friend WithEvents pleaseWaitBorderText As Label
     Friend WithEvents pleaseWaitlblLabel As Label
-    Friend WithEvents pleaseWaitProgressBar As Tom.SmoothProgressBar
+    Friend WithEvents pleaseWaitProgressBar As SmoothProgressBar
     Friend WithEvents pleaseWaitMessageChanger As Timer
     Friend WithEvents pleaseWaitProgressBarChanger As Timer
 End Class

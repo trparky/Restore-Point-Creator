@@ -39,7 +39,7 @@ Partial Class Official_Contact_Form
         Me.btnClear = New System.Windows.Forms.Button()
         Me.btnDeleteAttachment = New System.Windows.Forms.Button()
         Me.btnAttachEventLogs = New System.Windows.Forms.Button()
-        Me.maxSize = New Tom.SmoothProgressBar()
+        Me.maxSize = New SmoothProgressBar()
         Me.lblTotalFileSize = New System.Windows.Forms.Label()
         Me.listAttachedFiles = New System.Windows.Forms.ListView()
         Me.ColumnHeader1 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
@@ -47,7 +47,7 @@ Partial Class Official_Contact_Form
         Me.pleaseWaitPanel = New System.Windows.Forms.Panel()
         Me.pleaseWaitBorderText = New System.Windows.Forms.Label()
         Me.pleaseWaitlblLabel = New System.Windows.Forms.Label()
-        Me.pleaseWaitProgressBar = New Tom.SmoothProgressBar()
+        Me.pleaseWaitProgressBar = New SmoothProgressBar()
         Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
         Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
         Me.TableLayoutPanel1.SuspendLayout()
@@ -349,7 +349,7 @@ Partial Class Official_Contact_Form
     Friend WithEvents btnClear As Button
     Friend WithEvents btnDeleteAttachment As Button
     Friend WithEvents btnAttachEventLogs As Button
-    Friend WithEvents maxSize As Tom.SmoothProgressBar
+    Friend WithEvents maxSize As SmoothProgressBar
     Friend WithEvents lblTotalFileSize As Label
     Friend WithEvents listAttachedFiles As ListView
     Friend WithEvents ColumnHeader1 As ColumnHeader
@@ -357,7 +357,7 @@ Partial Class Official_Contact_Form
     Friend WithEvents pleaseWaitPanel As Panel
     Friend WithEvents pleaseWaitBorderText As Label
     Friend WithEvents pleaseWaitlblLabel As Label
-    Friend WithEvents pleaseWaitProgressBar As Tom.SmoothProgressBar
+    Friend WithEvents pleaseWaitProgressBar As SmoothProgressBar
     Friend WithEvents pleaseWaitMessageChanger As Timer
     Friend WithEvents pleaseWaitProgressBarChanger As Timer
 End Class

@@ -80,10 +80,6 @@
       <HintPath>DLLs\Microsoft.Win32.TaskScheduler.dll</HintPath>
     </Reference>
     <Reference Include="PresentationFramework" />
-    <Reference Include="SmoothProgressBar, Version=1.0.5617.18178, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>DLLs\SmoothProgressBar.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
@@ -161,6 +157,12 @@
     <Compile Include="Classes and Modules\Functions Namespace\miniDump.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\startupFunctions.vb" />
     <Compile Include="Classes and Modules\Functions Namespace\power.vb" />
+    <Compile Include="Classes and Modules\SmoothProgressBar.designer.vb">
+      <DependentUpon>SmoothProgressBar.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Classes and Modules\SmoothProgressBar.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="GlobalSuppressions.vb" />
     <Compile Include="Windows\Command Line Arguments.Designer.vb">
       <DependentUpon>Command Line Arguments.vb</DependentUpon>
@@ -355,6 +357,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Classes and Modules\SmoothProgressBar.resx">
+      <DependentUpon>SmoothProgressBar.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>

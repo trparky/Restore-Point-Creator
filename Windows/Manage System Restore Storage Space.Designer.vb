@@ -26,7 +26,7 @@ Partial Class frmManageSystemRestoreStorageSpace
         Me.Label1 = New System.Windows.Forms.Label()
         Me.lblDriveSize = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
-        Me.percentageIndicator = New Tom.SmoothProgressBar()
+        Me.percentageIndicator = New SmoothProgressBar()
         Me.txtSize = New System.Windows.Forms.TextBox()
         Me.lblDriveLabel = New System.Windows.Forms.Label()
         Me.listSizeType = New System.Windows.Forms.ComboBox()
@@ -201,7 +201,7 @@ Partial Class frmManageSystemRestoreStorageSpace
     Friend WithEvents lblDriveSize As Label
     Friend WithEvents chkConfirmNewSmallerSize As CheckBox
     Friend WithEvents Label2 As Label
-    Friend WithEvents percentageIndicator As Tom.SmoothProgressBar
+    Friend WithEvents percentageIndicator As SmoothProgressBar
     Friend WithEvents txtSize As TextBox
     Friend WithEvents lblDriveLabel As Label
     Friend WithEvents listSizeType As ComboBox

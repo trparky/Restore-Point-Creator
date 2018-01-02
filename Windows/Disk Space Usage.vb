@@ -1,6 +1,4 @@
-﻿Imports Tom
-
-Public Class Disk_Space_Usage
+﻿Public Class Disk_Space_Usage
     Private pleaseWaitInstance As Please_Wait
     Private formLoadDiskDataAttempts As Short = 0
     Private boldFont As New Font("Microsoft Sans Serif", 8.25, FontStyle.Bold)
