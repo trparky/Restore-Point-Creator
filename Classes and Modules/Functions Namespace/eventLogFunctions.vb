@@ -6,10 +6,12 @@ Namespace Functions.eventLogFunctions
         Private Const strSystemRestorePointCreator As String = "System Restore Point Creator"
         Private Const strRegistryApplicationPath As String = "SYSTEM\CurrentControlSet\services\eventlog\Application"
 
-        Public strLogFile As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Restore Point Creator.log")
-        Public strLogLockFile As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Restore Point Creator.log.lock")
-        Public strCorruptedLockFile As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "corruptedlog.lock")
-        Private boolCachedCanIWriteThereResults As Boolean = privilegeChecks.canIWriteThere(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData))
+        Public strProgramDataDirectory As String = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)
+        Public strLogFile As String = IO.Path.Combine(strProgramDataDirectory, "Restore Point Creator.log")
+        Public strLogLockFile As String = IO.Path.Combine(strProgramDataDirectory, "Restore Point Creator.log.lock")
+        Public strCorruptedLockFile As String = IO.Path.Combine(strProgramDataDirectory, "corruptedlog.lock")
+
+        Private boolCachedCanIWriteThereResults As Boolean = privilegeChecks.canIWriteThere(strProgramDataDirectory)
         Private spinLockThread As Threading.Thread
 
         ''' <summary>Opens and returns a IO.FileStream.</summary>
