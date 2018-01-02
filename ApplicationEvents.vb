@@ -64,6 +64,9 @@ Namespace My
         End Function
 
         Private Sub MyApplication_Startup(sender As Object, e As ApplicationServices.StartupEventArgs) Handles Me.Startup
+            Functions.eventLogFunctions.deleteLockFile(Functions.eventLogFunctions.strLogLockFile)
+            Functions.eventLogFunctions.deleteLockFile(Functions.eventLogFunctions.strCorruptedLockFile)
+
             If Functions.osVersionInfo.isThisWindowsXP() Then
                 MsgBox("System Restore Point Creator does not support Windows XP. This program will now terminate.", MsgBoxStyle.Critical, "System Restore Point Creator")
                 Process.GetCurrentProcess.Kill()

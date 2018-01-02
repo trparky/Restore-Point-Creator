@@ -7,8 +7,10 @@ Namespace Functions.eventLogFunctions
         Private Const strRegistryApplicationPath As String = "SYSTEM\CurrentControlSet\services\eventlog\Application"
 
         Public strLogFile As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Restore Point Creator.log")
+        Public strLogLockFile As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Restore Point Creator.log.lock")
+        Public strCorruptedLockFile As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "corruptedlog.lock")
         Private boolCachedCanIWriteThereResults As Boolean = privilegeChecks.canIWriteThere(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData))
-        Private shortNumberOfRecalledGetFileStreamFunction As Short = 0
+        Private spinLockThread As Threading.Thread
 
         ''' <summary>Opens and returns a IO.FileStream.</summary>
         ''' <param name="strFileToOpen">Path to the file you want to open.</param>
@@ -16,22 +18,39 @@ Namespace Functions.eventLogFunctions
         ''' <param name="fileMode">The way you want to access the file.</param>
         ''' <returns>A IO.FileStream Object.</returns>
         ''' <exception cref="myExceptions.unableToGetLockOnLogFile"></exception>
-        Private Function getFileStreamWithWaiting(strFileToOpen As String, accessMethod As IO.FileAccess, Optional fileMode As IO.FileMode = IO.FileMode.Open) As IO.FileStream
+        Private Function getLogFileIOFileStream(strFileToOpen As String, strLockFile As String, accessMethod As IO.FileAccess, Optional fileMode As IO.FileMode = IO.FileMode.Open) As IO.FileStream
+            If IO.File.Exists(strLockFile) Then
+                spinLockThread = New Threading.Thread(Sub()
+                                                          Threading.Thread.Sleep(5000) ' Sleeps for 5 seconds.
+                                                          deleteLockFile(strLockFile)
+                                                          spinLockThread = Nothing
+                                                      End Sub)
+                spinLockThread.Name = "Log File Lock File Watcher"
+                spinLockThread.Priority = Threading.ThreadPriority.Normal
+                spinLockThread.IsBackground = True
+                spinLockThread.Start()
+            End If
+
+            While IO.File.Exists(strLockFile)
+                ' Spin locks.
+            End While
+
+            IO.File.Create(strLockFile).Dispose()
+
             Try
                 Return New IO.FileStream(strFileToOpen, fileMode, accessMethod, IO.FileShare.None)
-            Catch ex As StackOverflowException
-                Throw New myExceptions.unableToGetLockOnLogFile() With {.innerIOException = ex}
             Catch ex As IO.IOException
-                If shortNumberOfRecalledGetFileStreamFunction.Equals(20) Then
-                    Throw New myExceptions.unableToGetLockOnLogFile() With {.innerIOException = ex}
-                End If
-
-                Debug.WriteLine("File is locked, waiting 100ms to get a lock on the file.")
-                Threading.Thread.Sleep(100)
-                shortNumberOfRecalledGetFileStreamFunction += 1
-                Return getFileStreamWithWaiting(strFileToOpen, accessMethod)
+                Throw New myExceptions.unableToGetLockOnLogFile() With {.innerIOException = ex}
             End Try
         End Function
+
+        Public Sub deleteLockFile(strLockFile As String)
+            Try
+                If IO.File.Exists(strLockFile) Then IO.File.Delete(strLockFile)
+            Catch ex As Exception
+                ' Does nothing.
+            End Try
+        End Sub
 
         ''' <summary>Exports the application logs to a file.</summary>
         ''' <param name="strFileToBeExportedTo">The path to the file we will be exporting the data to.</param>
@@ -74,21 +93,32 @@ Namespace Functions.eventLogFunctions
 
             If IO.File.Exists(strLogFile) Then
                 Try
-                    shortNumberOfRecalledGetFileStreamFunction = 0
-                    Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.Read)
+                    Dim boolDidWeHaveACorruptedLogFile As Boolean = False
+
+                    Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Read)
                         Using streamReader As New IO.StreamReader(fileStream)
                             Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(internalApplicationLog.GetType)
 
                             Try
                                 internalApplicationLog = xmlSerializerObject.Deserialize(streamReader)
                             Catch ex As Exception
+                                boolDidWeHaveACorruptedLogFile = True
                                 handleCorruptedXMLLogFile(internalApplicationLog, fileStream)
                             End Try
                         End Using
                     End Using
+
+                    If boolDidWeHaveACorruptedLogFile Then
+                        Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Write, IO.FileMode.Create)
+                            Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(internalApplicationLog.GetType)
+                            xmlSerializerObject.Serialize(fileStream, internalApplicationLog)
+                        End Using
+                    End If
                 Catch ex As myExceptions.unableToGetLockOnLogFile
                     oldEventLogFunctions.boolShowErrorMessage = True
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
+                Finally
+                    deleteLockFile(strLogLockFile)
                 End Try
             End If
 
@@ -106,8 +136,7 @@ Namespace Functions.eventLogFunctions
                 Dim stopwatch As Stopwatch = Stopwatch.StartNew
 
                 Try
-                    shortNumberOfRecalledGetFileStreamFunction = 0
-                    Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.ReadWrite)
+                    Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.ReadWrite)
                         Dim streamReader As New IO.StreamReader(fileStream)
                         applicationLog = xmlSerializerObject.Deserialize(streamReader)
 
@@ -126,9 +155,12 @@ Namespace Functions.eventLogFunctions
                         streamReader.Dispose()
                     End Using
                 Catch ex As myExceptions.unableToGetLockOnLogFile
+                    deleteLockFile(strLogLockFile)
                     oldEventLogFunctions.boolShowErrorMessage = True
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
                     Exit Sub
+                Finally
+                    deleteLockFile(strLogLockFile)
                 End Try
 
                 Dim longNumberOfImportedLogs As Long = applicationLog.Count - longOldLogCount
@@ -162,15 +194,17 @@ Namespace Functions.eventLogFunctions
                 })
 
                 Try
-                    shortNumberOfRecalledGetFileStreamFunction = 0
-                    Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.Write, IO.FileMode.Create)
+                    Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Write, IO.FileMode.Create)
                         Using streamWriter As New IO.StreamWriter(fileStream)
                             xmlSerializerObject.Serialize(streamWriter, applicationLog)
                         End Using
                     End Using
                 Catch ex As myExceptions.unableToGetLockOnLogFile
+                    deleteLockFile(strLogLockFile)
                     oldEventLogFunctions.boolShowErrorMessage = True
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
+                Finally
+                    deleteLockFile(strLogLockFile)
                 End Try
             Catch ex As Exception
                 MsgBox(ex.Message)
@@ -209,8 +243,7 @@ Namespace Functions.eventLogFunctions
 
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
 
-                shortNumberOfRecalledGetFileStreamFunction = 0
-                Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.ReadWrite)
+                Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.ReadWrite)
                     Dim streamReader As New IO.StreamReader(fileStream)
                     applicationLog = xmlSerializerObject.Deserialize(streamReader)
 
@@ -232,7 +265,9 @@ Namespace Functions.eventLogFunctions
                 oldEventLogFunctions.boolShowErrorMessage = True
                 oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
             Catch ex As Exception
-                ' Does nothing
+                ' Does nothing.
+            Finally
+                deleteLockFile(strLogLockFile)
             End Try
         End Sub
 
@@ -244,8 +279,7 @@ Namespace Functions.eventLogFunctions
 
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
 
-                shortNumberOfRecalledGetFileStreamFunction = 0
-                Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.ReadWrite)
+                Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.ReadWrite)
                     Dim streamReader As New IO.StreamReader(fileStream)
                     applicationLog = xmlSerializerObject.Deserialize(streamReader)
 
@@ -264,7 +298,9 @@ Namespace Functions.eventLogFunctions
                 oldEventLogFunctions.boolShowErrorMessage = True
                 oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
             Catch ex As Exception
-                ' Does nothing
+                ' Does nothing.
+            Finally
+                deleteLockFile(strLogLockFile)
             End Try
         End Sub
 
@@ -281,10 +317,13 @@ Namespace Functions.eventLogFunctions
         End Function
 
         Private Sub handleCorruptedXMLLogFile(ByRef applicationLog As List(Of restorePointCreatorExportedLog), ByRef fileStream As IO.FileStream)
-            Using newCorruptedLogFileStream As IO.FileStream = getFileStreamWithWaiting(incrementFileName(strLogFile & ".corrupted"), IO.FileAccess.Write, IO.FileMode.CreateNew)
+            Using newCorruptedLogFileStream As IO.FileStream = getLogFileIOFileStream(incrementFileName(strLogFile & ".corrupted"), strCorruptedLockFile, IO.FileAccess.Write, IO.FileMode.CreateNew)
                 fileStream.Position = 0
                 fileStream.CopyTo(newCorruptedLogFileStream)
             End Using
+
+            deleteLockFile(strLogLockFile)
+            deleteLockFile(strCorruptedLockFile)
 
             applicationLog.Add(New restorePointCreatorExportedLog With {
                 .logData = "A corrupted XML log file was detected, the corrupted log file was backed up and a new log file has been created.",
@@ -307,8 +346,7 @@ Namespace Functions.eventLogFunctions
 
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
 
-                shortNumberOfRecalledGetFileStreamFunction = 0
-                Using fileStream As IO.FileStream = getFileStreamWithWaiting(strLogFile, IO.FileAccess.ReadWrite)
+                Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.ReadWrite)
                     Dim streamReader As New IO.StreamReader(fileStream)
 
                     Try
@@ -340,6 +378,8 @@ Namespace Functions.eventLogFunctions
                 oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
             Catch ex As Exception
                 oldEventLogFunctions.writeCrashToEventLog(ex)
+            Finally
+                deleteLockFile(strLogLockFile)
             End Try
         End Sub
 
