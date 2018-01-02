@@ -64,9 +64,6 @@ Namespace My
         End Function
 
         Private Sub MyApplication_Startup(sender As Object, e As ApplicationServices.StartupEventArgs) Handles Me.Startup
-            Functions.eventLogFunctions.deleteLockFile(Functions.eventLogFunctions.strLogLockFile)
-            Functions.eventLogFunctions.deleteLockFile(Functions.eventLogFunctions.strCorruptedLockFile)
-
             If Functions.osVersionInfo.isThisWindowsXP() Then
                 MsgBox("System Restore Point Creator does not support Windows XP. This program will now terminate.", MsgBoxStyle.Critical, "System Restore Point Creator")
                 Process.GetCurrentProcess.Kill()
@@ -103,6 +100,12 @@ Namespace My
 
             ' We're going to store the result of the Functions.areWeAnAdministrator() call in this Boolean variable for later use in this code block.
             Dim boolAreWeAnAdministrator As Boolean = Functions.privilegeChecks.areWeAnAdministrator()
+
+            If boolAreWeAnAdministrator Then
+                ' This is needed to make sure that no residual log lock files exist when starting the program.
+                Functions.eventLogFunctions.deleteLockFile(Functions.eventLogFunctions.strLogLockFile)
+                Functions.eventLogFunctions.deleteLockFile(Functions.eventLogFunctions.strCorruptedLockFile)
+            End If
 
             ' We're going to store the result of the Functions.support.areWeInSafeMode() call in this Boolean variable for later use in this code block.
             Dim boolAreWeInSafeMode As Boolean = Functions.support.areWeInSafeMode()
