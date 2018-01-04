@@ -246,23 +246,25 @@ Namespace Functions.importExportSettings
                 If item.settingType = settingType.registry Then
                     registryKeyWeAreWorkingWith.SetValue(item.strName, item.value.ToString, RegistryValueKind.String)
                 ElseIf item.settingType = settingType.settings Then
-                    type = parseTypeString(item.type, boolParseSuccessful)
+                    If doesThisApplicationSettingExist(item.strName) Then
+                        type = parseTypeString(item.type, boolParseSuccessful)
 
-                    If boolParseSuccessful Then
-                        If type = GetType(Color) Then
-                            If doesThisApplicationSettingExist(item.strName) Then My.Settings(item.strName) = Color.FromArgb(item.value)
-                        ElseIf type = GetType(Point) Then
-                            splitArray = item.value.split("|")
-                            If doesThisApplicationSettingExist(item.strName) Then My.Settings(item.strName) = New Point() With {.X = splitArray(0), .Y = splitArray(1)}
-                            splitArray = Nothing
-                        ElseIf type = GetType(Size) Then
-                            splitArray = item.value.split("|")
-                            If doesThisApplicationSettingExist(item.strName) Then My.Settings(item.strName) = New Size() With {.Height = splitArray(0), .Width = splitArray(1)}
-                            splitArray = Nothing
-                        ElseIf type = GetType(Date) Then
-                            If doesThisApplicationSettingExist(item.strName) Then My.Settings(item.strName) = DirectCast(item.value, Date).ToLocalTime
-                        Else
-                            If doesThisApplicationSettingExist(item.strName) Then My.Settings(item.strName) = item.value
+                        If boolParseSuccessful Then
+                            If type = GetType(Color) Then
+                                My.Settings(item.strName) = Color.FromArgb(item.value)
+                            ElseIf type = GetType(Point) Then
+                                splitArray = item.value.split("|")
+                                My.Settings(item.strName) = New Point() With {.X = splitArray(0), .Y = splitArray(1)}
+                                splitArray = Nothing
+                            ElseIf type = GetType(Size) Then
+                                splitArray = item.value.split("|")
+                                My.Settings(item.strName) = New Size() With {.Height = splitArray(0), .Width = splitArray(1)}
+                                splitArray = Nothing
+                            ElseIf type = GetType(Date) Then
+                                My.Settings(item.strName) = DirectCast(item.value, Date).ToLocalTime
+                            Else
+                                My.Settings(item.strName) = item.value
+                            End If
                         End If
                     End If
                 End If
