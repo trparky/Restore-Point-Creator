@@ -283,7 +283,7 @@ Namespace Functions.taskStuff
                     task.Dispose()
                 End If
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToEventLog(ex, EventLogEntryType.Warning)
             End Try
         End Sub
 
