@@ -201,6 +201,14 @@ Namespace Functions.importExportSettings
             End Try
         End Sub
 
+        Private Function doesThisApplicationSettingExist(strSettingName As String) As Boolean
+            If My.Settings.Properties.Cast(Of Configuration.SettingsProperty).ToList().Where(Function(setting As Configuration.SettingsProperty) setting.Name.Equals(strSettingName, StringComparison.OrdinalIgnoreCase)).Count > 0 Then
+                Return True
+            Else
+                Return False
+            End If
+        End Function
+
         Public Sub importSettingsFromXMLFile(strPathToFile As String, strMessageBoxTitle As String)
             Dim xmlSerializerObject As Serialization.XmlSerializer
             Dim bytes() As Byte
@@ -242,19 +250,19 @@ Namespace Functions.importExportSettings
 
                     If boolParseSuccessful Then
                         If type = GetType(Color) Then
-                            My.Settings(item.strName) = Color.FromArgb(item.value)
+                            If doesThisApplicationSettingExist(item.strName) Then My.Settings(item.strName) = Color.FromArgb(item.value)
                         ElseIf type = GetType(Point) Then
                             splitArray = item.value.split("|")
-                            My.Settings(item.strName) = New Point() With {.X = splitArray(0), .Y = splitArray(1)}
+                            If doesThisApplicationSettingExist(item.strName) Then My.Settings(item.strName) = New Point() With {.X = splitArray(0), .Y = splitArray(1)}
                             splitArray = Nothing
                         ElseIf type = GetType(Size) Then
                             splitArray = item.value.split("|")
-                            My.Settings(item.strName) = New Size() With {.Height = splitArray(0), .Width = splitArray(1)}
+                            If doesThisApplicationSettingExist(item.strName) Then My.Settings(item.strName) = New Size() With {.Height = splitArray(0), .Width = splitArray(1)}
                             splitArray = Nothing
                         ElseIf type = GetType(Date) Then
-                            My.Settings(item.strName) = DirectCast(item.value, Date).ToLocalTime
+                            If doesThisApplicationSettingExist(item.strName) Then My.Settings(item.strName) = DirectCast(item.value, Date).ToLocalTime
                         Else
-                            My.Settings(item.strName) = item.value
+                            If doesThisApplicationSettingExist(item.strName) Then My.Settings(item.strName) = item.value
                         End If
                     End If
                 End If
