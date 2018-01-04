@@ -23,6 +23,7 @@
                 spinLockThread = New Threading.Thread(Sub()
                                                           Threading.Thread.Sleep(5000) ' Sleeps for 5 seconds.
                                                           deleteLockFile(strLockFile)
+                                                          Debug.WriteLine("Forcefully removed log lock file.")
                                                           spinLockThread = Nothing
                                                       End Sub)
                 spinLockThread.Name = "Log File Lock File Watcher"
