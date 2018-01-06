@@ -22,7 +22,7 @@
             If IO.File.Exists(strLockFile) Then
                 spinLockThread = New Threading.Thread(Sub()
                                                           Threading.Thread.Sleep(5000) ' Sleeps for 5 seconds.
-                                                          deleteLockFile(strLockFile)
+                                                          support.deleteFileWithNoException(strLockFile)
                                                           Debug.WriteLine("Forcefully removed log lock file.")
                                                           spinLockThread = Nothing
                                                       End Sub)
@@ -44,14 +44,6 @@
                 Throw New myExceptions.unableToGetLockOnLogFile() With {.innerIOException = ex}
             End Try
         End Function
-
-        Public Sub deleteLockFile(strLockFile As String)
-            Try
-                If IO.File.Exists(strLockFile) Then IO.File.Delete(strLockFile)
-            Catch ex As Exception
-                ' Does nothing.
-            End Try
-        End Sub
 
         ''' <summary>Exports the application logs to a file.</summary>
         ''' <param name="strFileToBeExportedTo">The path to the file we will be exporting the data to.</param>
@@ -119,7 +111,7 @@
                     oldEventLogFunctions.boolShowErrorMessage = True
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
                 Finally
-                    deleteLockFile(strLogLockFile)
+                    support.deleteFileWithNoException(strLogLockFile)
                 End Try
             End If
 
@@ -156,12 +148,12 @@
                         streamReader.Dispose()
                     End Using
                 Catch ex As myExceptions.unableToGetLockOnLogFile
-                    deleteLockFile(strLogLockFile)
+                    support.deleteFileWithNoException(strLogLockFile)
                     oldEventLogFunctions.boolShowErrorMessage = True
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
                     Exit Sub
                 Finally
-                    deleteLockFile(strLogLockFile)
+                    support.deleteFileWithNoException(strLogLockFile)
                 End Try
 
                 Dim longNumberOfImportedLogs As Long = applicationLog.Count - longOldLogCount
@@ -201,11 +193,11 @@
                         End Using
                     End Using
                 Catch ex As myExceptions.unableToGetLockOnLogFile
-                    deleteLockFile(strLogLockFile)
+                    support.deleteFileWithNoException(strLogLockFile)
                     oldEventLogFunctions.boolShowErrorMessage = True
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
                 Finally
-                    deleteLockFile(strLogLockFile)
+                    support.deleteFileWithNoException(strLogLockFile)
                 End Try
             Catch ex As Exception
                 MsgBox(ex.Message)
@@ -268,7 +260,7 @@
             Catch ex As Exception
                 ' Does nothing.
             Finally
-                deleteLockFile(strLogLockFile)
+                support.deleteFileWithNoException(strLogLockFile)
             End Try
         End Sub
 
@@ -301,7 +293,7 @@
             Catch ex As Exception
                 ' Does nothing.
             Finally
-                deleteLockFile(strLogLockFile)
+                support.deleteFileWithNoException(strLogLockFile)
             End Try
         End Sub
 
@@ -323,8 +315,8 @@
                 fileStream.CopyTo(newCorruptedLogFileStream)
             End Using
 
-            deleteLockFile(strLogLockFile)
-            deleteLockFile(strCorruptedLockFile)
+            support.deleteFileWithNoException(strLogLockFile)
+            support.deleteFileWithNoException(strCorruptedLockFile)
 
             applicationLog.Add(New restorePointCreatorExportedLog With {
                 .logData = "A corrupted XML log file was detected, the corrupted log file was backed up and a new log file has been created.",
@@ -380,7 +372,7 @@
             Catch ex As Exception
                 oldEventLogFunctions.writeCrashToEventLog(ex)
             Finally
-                deleteLockFile(strLogLockFile)
+                support.deleteFileWithNoException(strLogLockFile)
             End Try
         End Sub
 
