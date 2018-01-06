@@ -102,9 +102,15 @@ Namespace My
             Dim boolAreWeAnAdministrator As Boolean = Functions.privilegeChecks.areWeAnAdministrator()
 
             If boolAreWeAnAdministrator Then
-                ' This is needed to make sure that no residual log lock files exist when starting the program.
-                Functions.eventLogFunctions.deleteLockFile(Functions.eventLogFunctions.strLogLockFile)
-                Functions.eventLogFunctions.deleteLockFile(Functions.eventLogFunctions.strCorruptedLockFile)
+                Threading.ThreadPool.QueueUserWorkItem(Sub()
+                                                           ' First we need to make sure that there are no other instances of this program running since we don't want
+                                                           ' to delete the lock files while there's another instance that's possibly working on the log file.
+                                                           If Not Functions.startupFunctions.isThereOtherInstancesOfMeRunning() Then
+                                                               ' This is needed to make sure that no residual log lock files exist when starting the program.
+                                                               Functions.eventLogFunctions.deleteLockFile(Functions.eventLogFunctions.strLogLockFile)
+                                                               Functions.eventLogFunctions.deleteLockFile(Functions.eventLogFunctions.strCorruptedLockFile)
+                                                           End If
+                                                       End Sub)
             End If
 
             ' We're going to store the result of the Functions.support.areWeInSafeMode() call in this Boolean variable for later use in this code block.

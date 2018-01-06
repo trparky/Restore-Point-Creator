@@ -9,6 +9,32 @@ Namespace Functions.startupFunctions
         Public isMyRestoreThreadRunning As Boolean = False
         Public preSelectedRestorePointID As Integer
 
+        Public Function isThereOtherInstancesOfMeRunning() As Boolean
+            Dim searcher As New ManagementObjectSearcher("root\CIMV2", "SELECT * FROM Win32_Process")
+            Dim intProcessID As Integer
+
+            If searcher IsNot Nothing Then
+                Dim count As Integer = searcher.Get().Cast(Of ManagementObject).ToList.Where(Function(managementObject As ManagementObject)
+                                                                                                 If managementObject IsNot Nothing AndAlso managementObject("ExecutablePath") IsNot Nothing AndAlso managementObject("ProcessId") IsNot Nothing Then
+                                                                                                     If Integer.TryParse(managementObject("ProcessId").ToString(), intProcessID) Then
+                                                                                                         If (New FileInfo(managementObject("ExecutablePath").ToString())).Name.Equals("Restore Point Creator.exe", StringComparison.OrdinalIgnoreCase) And intProcessID <> Process.GetCurrentProcess.Id Then
+                                                                                                             Return True
+                                                                                                         Else
+                                                                                                             Return False
+                                                                                                         End If
+                                                                                                     Else
+                                                                                                         Return False
+                                                                                                     End If
+                                                                                                 Else
+                                                                                                     Return False
+                                                                                                 End If
+                                                                                             End Function).Count
+                Return (count > 0)
+            Else
+                Return False
+            End If
+        End Function
+
         Public Sub repairRuntimeTasks()
             Dim task As Task = Nothing
 
