@@ -11,7 +11,7 @@ Namespace Functions.startupFunctions
 
         Public Function isThereOtherInstancesOfMeRunning() As Boolean
             Try
-                Using searcher As New ManagementObjectSearcher("root\CIMV2", String.Format("SELECT * FROM Win32_Process WHERE ExecutablePath LIKE '%{0}%' AND ProcessID != {1}", (New FileInfo(Application.ExecutablePath)).Name, Process.GetCurrentProcess.Id))
+                Using searcher As New ManagementObjectSearcher("root\CIMV2", String.Format("SELECT * FROM Win32_Process WHERE Name = '{0}' AND ProcessID != {1}", (New FileInfo(Application.ExecutablePath)).Name, Process.GetCurrentProcess.Id))
                     Return If(searcher IsNot Nothing, (searcher.Get().Count() > 0), False)
                 End Using
             Catch ex As Exception
