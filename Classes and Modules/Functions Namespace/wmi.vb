@@ -8,19 +8,20 @@ Namespace Functions.wmi
         ''' <exception cref="ArgumentException">If this function returns an ArgumentException exception it means that the program could not find the system service that you passed to it.</exception>
         Public Function getServiceStartType(strServiceName As String) As String
             Dim startMode As String = ""
-            Dim managementObjectSearcher As Management.ManagementObjectSearcher = New Management.ManagementObjectSearcher(String.Format("SELECT StartMode FROM Win32_Service WHERE Name = '{0}'", strServiceName))
 
-            If managementObjectSearcher Is Nothing Then
-                Throw New ArgumentException("Unable to find the System Service named " & strServiceName & ".")
-            Else
-                Try
-                    Dim managementObject As Management.ManagementObject = managementObjectSearcher.Get()(0)
-                    startMode = managementObject.GetPropertyValue("StartMode").ToString()
-                Catch ex As Exception
-                    eventLogFunctions.writeCrashToEventLog(ex)
-                    eventLogFunctions.writeToApplicationLogFile("Unable to get Startup Type for the " & strServiceName & " System Service.", EventLogEntryType.Error)
-                End Try
-            End If
+            Using managementObjectSearcher As Management.ManagementObjectSearcher = New Management.ManagementObjectSearcher(String.Format("SELECT StartMode FROM Win32_Service WHERE Name = '{0}'", strServiceName))
+                If managementObjectSearcher Is Nothing Then
+                    Throw New ArgumentException("Unable to find the System Service named " & strServiceName & ".")
+                Else
+                    Try
+                        Dim managementObject As Management.ManagementObject = managementObjectSearcher.Get()(0)
+                        startMode = managementObject.GetPropertyValue("StartMode").ToString()
+                    Catch ex As Exception
+                        eventLogFunctions.writeCrashToEventLog(ex)
+                        eventLogFunctions.writeToApplicationLogFile("Unable to get Startup Type for the " & strServiceName & " System Service.", EventLogEntryType.Error)
+                    End Try
+                End If
+            End Using
 
             Return startMode
         End Function
