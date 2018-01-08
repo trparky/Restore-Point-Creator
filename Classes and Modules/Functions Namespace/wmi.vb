@@ -14,8 +14,10 @@ Namespace Functions.wmi
                     Throw New ArgumentException("Unable to find the System Service named " & strServiceName & ".")
                 Else
                     Try
-                        Dim managementObject As Management.ManagementObject = managementObjectSearcher.Get()(0)
-                        startMode = managementObject.GetPropertyValue("StartMode").ToString()
+                        If managementObjectSearcher.Get() IsNot Nothing AndAlso managementObjectSearcher.Get().Count <> 0 Then
+                            Dim managementObject As Management.ManagementObject = managementObjectSearcher.Get()(0)
+                            startMode = managementObject.GetPropertyValue("StartMode").ToString()
+                        End If
                     Catch ex As Exception
                         eventLogFunctions.writeCrashToEventLog(ex)
                         eventLogFunctions.writeToApplicationLogFile("Unable to get Startup Type for the " & strServiceName & " System Service.", EventLogEntryType.Error)
