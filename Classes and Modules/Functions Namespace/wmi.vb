@@ -30,10 +30,12 @@ Namespace Functions.wmi
 
         Public Sub setServiceStartMode(strServiceName As String, Optional strStartType As String = "Manual")
             Try
-                Dim managementObject As New Management.ManagementObject("root\CIMV2", "Win32_Service.Name='" & strServiceName & "'", Nothing)
-                Dim managementParameters As Management.ManagementBaseObject = managementObject.GetMethodParameters("ChangeStartMode")
-                managementParameters("StartMode") = strStartType
-                managementObject.InvokeMethod("ChangeStartMode", managementParameters, Nothing)
+                Using managementObject As New Management.ManagementObject("root\CIMV2", "Win32_Service.Name='" & strServiceName & "'", Nothing)
+                    Using managementParameters As Management.ManagementBaseObject = managementObject.GetMethodParameters("ChangeStartMode")
+                        managementParameters("StartMode") = strStartType
+                        managementObject.InvokeMethod("ChangeStartMode", managementParameters, Nothing)
+                    End Using
+                End Using
             Catch ex As Exception
                 eventLogFunctions.writeCrashToEventLog(ex)
                 eventLogFunctions.writeToApplicationLogFile("Unable to set Startup Type for the " & strServiceName & " System Service.", EventLogEntryType.Error)
