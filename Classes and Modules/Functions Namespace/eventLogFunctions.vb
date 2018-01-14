@@ -18,25 +18,27 @@
         ''' <param name="fileMode">The way you want to access the file.</param>
         ''' <returns>A IO.FileStream Object.</returns>
         ''' <exception cref="myExceptions.unableToGetLockOnLogFile"></exception>
-        Private Function getLogFileIOFileStream(strFileToOpen As String, strLockFile As String, accessMethod As IO.FileAccess, Optional fileMode As IO.FileMode = IO.FileMode.Open) As IO.FileStream
-            If IO.File.Exists(strLockFile) Then
-                spinLockThread = New Threading.Thread(Sub()
-                                                          Threading.Thread.Sleep(5000) ' Sleeps for 5 seconds.
-                                                          support.deleteFileWithNoException(strLockFile)
-                                                          Debug.WriteLine("Forcefully removed log lock file.")
-                                                          spinLockThread = Nothing
-                                                      End Sub)
-                spinLockThread.Name = "Log File Lock File Watcher"
-                spinLockThread.Priority = Threading.ThreadPriority.Normal
-                spinLockThread.IsBackground = True
-                spinLockThread.Start()
+        Private Function getLogFileIOFileStream(strFileToOpen As String, strLockFile As String, accessMethod As IO.FileAccess, Optional fileMode As IO.FileMode = IO.FileMode.Open, Optional boolUseLockFile As Boolean = True) As IO.FileStream
+            If boolUseLockFile Then
+                If IO.File.Exists(strLockFile) Then
+                    spinLockThread = New Threading.Thread(Sub()
+                                                              Threading.Thread.Sleep(5000) ' Sleeps for 5 seconds.
+                                                              support.deleteFileWithNoException(strLockFile)
+                                                              Debug.WriteLine("Forcefully removed log lock file.")
+                                                              spinLockThread = Nothing
+                                                          End Sub)
+                    spinLockThread.Name = "Log File Lock File Watcher"
+                    spinLockThread.Priority = Threading.ThreadPriority.Normal
+                    spinLockThread.IsBackground = True
+                    spinLockThread.Start()
+                End If
+
+                While IO.File.Exists(strLockFile)
+                    ' Spin locks.
+                End While
+
+                IO.File.Create(strLockFile).Dispose()
             End If
-
-            While IO.File.Exists(strLockFile)
-                ' Spin locks.
-            End While
-
-            IO.File.Create(strLockFile).Dispose()
 
             Try
                 Return New IO.FileStream(strFileToOpen, fileMode, accessMethod, IO.FileShare.None)
@@ -92,17 +94,30 @@
                         Using streamReader As New IO.StreamReader(fileStream)
                             Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(internalApplicationLog.GetType)
 
-                            Try
-                                internalApplicationLog = xmlSerializerObject.Deserialize(streamReader)
-                            Catch ex As Exception
+                            If (New IO.FileInfo(strLogFile)).Length = 0 Then
+                                internalApplicationLog.Add(New restorePointCreatorExportedLog With {
+                                    .logData = "The log file was found to be empty.",
+                                    .logType = EventLogEntryType.Error,
+                                    .unixTime = 0,
+                                    .logSource = "Restore Point Creator",
+                                    .logID = internalApplicationLog.Count,
+                                    .dateObject = Now.ToUniversalTime
+                                })
+
                                 boolDidWeHaveACorruptedLogFile = True
-                                handleCorruptedXMLLogFile(internalApplicationLog, fileStream)
-                            End Try
+                            Else
+                                Try
+                                    internalApplicationLog = xmlSerializerObject.Deserialize(streamReader)
+                                Catch ex As Exception
+                                    boolDidWeHaveACorruptedLogFile = True
+                                    handleCorruptedXMLLogFile(internalApplicationLog, fileStream)
+                                End Try
+                            End If
                         End Using
                     End Using
 
                     If boolDidWeHaveACorruptedLogFile Then
-                        Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Write, IO.FileMode.Create)
+                        Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Write, IO.FileMode.Create, False)
                             Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(internalApplicationLog.GetType)
                             xmlSerializerObject.Serialize(fileStream, internalApplicationLog)
                         End Using
@@ -342,11 +357,22 @@
                 Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.ReadWrite)
                     Dim streamReader As New IO.StreamReader(fileStream)
 
-                    Try
-                        applicationLog = xmlSerializerObject.Deserialize(streamReader)
-                    Catch ex As InvalidOperationException
-                        handleCorruptedXMLLogFile(applicationLog, fileStream)
-                    End Try
+                    If (New IO.FileInfo(strLogFile)).Length = 0 Then
+                        applicationLog.Add(New restorePointCreatorExportedLog With {
+                            .logData = "The log file was found to be empty.",
+                            .logType = EventLogEntryType.Error,
+                            .unixTime = 0,
+                            .logSource = "Restore Point Creator",
+                            .logID = applicationLog.Count,
+                            .dateObject = Now.ToUniversalTime
+                        })
+                    Else
+                        Try
+                            applicationLog = xmlSerializerObject.Deserialize(streamReader)
+                        Catch ex As InvalidOperationException
+                            handleCorruptedXMLLogFile(applicationLog, fileStream)
+                        End Try
+                    End If
 
                     applicationLog.Add(New restorePointCreatorExportedLog With {
                         .logData = logMessage,
