@@ -630,6 +630,10 @@
         btnDeleteIndividualLogEntry.PerformClick()
     End Sub
 
+    Private Sub eventLogList_Leave(sender As Object, e As EventArgs) Handles eventLogList.Leave
+        btnDeleteIndividualLogEntry.Enabled = False
+    End Sub
+
 #Region "--== Please Wait Panel Code ==--"
     Private strPleaseWaitLabelText As String
 
