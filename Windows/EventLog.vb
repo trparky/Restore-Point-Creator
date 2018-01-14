@@ -610,6 +610,22 @@
         End If
     End Sub
 
+    Private Sub RefreshToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RefreshToolStripMenuItem.Click
+        btnRefreshEvents.PerformClick()
+    End Sub
+
+    Private Sub ContextMenuStrip1_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip1.Opening
+        If eventLogList.SelectedItems.Count = 0 Then
+            DeleteSelectedLogEntryToolStripMenuItem.Visible = False
+        Else
+            DeleteSelectedLogEntryToolStripMenuItem.Enabled = True
+        End If
+    End Sub
+
+    Private Sub DeleteSelectedLogEntryToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DeleteSelectedLogEntryToolStripMenuItem.Click
+        btnDeleteIndividualLogEntry.PerformClick()
+    End Sub
+
 #Region "--== Please Wait Panel Code ==--"
     Private strPleaseWaitLabelText As String
 
