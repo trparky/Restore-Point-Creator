@@ -554,6 +554,10 @@
 
         If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
             If Not boolAreWeLoadingTheEventLogData Then
+                While IO.File.Exists(Functions.eventLogFunctions.strLogLockFile)
+                    ' Spin locks.
+                End While
+
                 Dim logFileInfo As New IO.FileInfo(Functions.eventLogFunctions.strLogFile)
                 lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(logFileInfo.Length)
                 lblLastModified.Text = "Last Modified: " & logFileInfo.LastWriteTimeUtc.ToLocalTime.ToString()
