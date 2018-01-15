@@ -133,6 +133,9 @@
     End Sub
 
     Private Sub eventLogForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        eventLogContents.Clear()
+        eventLogContents = Nothing
+
         If workingThread IsNot Nothing Then workingThread.Abort()
 
         My.Settings.eventLogFormWindowLocation = Me.Location
