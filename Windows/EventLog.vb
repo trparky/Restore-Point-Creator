@@ -136,6 +136,9 @@
         eventLogContents.Clear()
         eventLogContents = Nothing
 
+        imageList.Images.Clear()
+        imageList.Dispose()
+
         If workingThread IsNot Nothing Then workingThread.Abort()
 
         My.Settings.eventLogFormWindowLocation = Me.Location
