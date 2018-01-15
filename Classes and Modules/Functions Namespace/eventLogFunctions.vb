@@ -11,6 +11,8 @@
         Private boolCachedCanIWriteThereResults As Boolean = privilegeChecks.canIWriteThere(strProgramDataDirectory)
         Private spinLockThread As Threading.Thread
 
+        Private ReadOnly xmlSerializerObject As New Xml.Serialization.XmlSerializer((New List(Of restorePointCreatorExportedLog)).GetType)
+
         ''' <summary>Opens and returns a IO.FileStream.</summary>
         ''' <param name="strFileToOpen">Path to the file you want to open.</param>
         ''' <param name="strLockFile">Path to the lock file that indicates that the file declared using the "strFileToOpen" variable is in use.</param>
@@ -67,7 +69,6 @@
 
                 Try
                     Using streamWriter As New IO.StreamWriter(strFileToBeExportedTo)
-                        Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(logObject.GetType)
                         xmlSerializerObject.Serialize(streamWriter, logObject)
                     End Using
                 Catch ex As Exception
@@ -92,7 +93,6 @@
 
                     Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Read)
                         Using streamReader As New IO.StreamReader(fileStream)
-                            Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(internalApplicationLog.GetType)
 
                             If (New IO.FileInfo(strLogFile)).Length = 0 Then
                                 internalApplicationLog.Add(New restorePointCreatorExportedLog With {
@@ -118,7 +118,6 @@
 
                     If boolDidWeHaveACorruptedLogFile Then
                         Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Write, IO.FileMode.Create, False)
-                            Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(internalApplicationLog.GetType)
                             xmlSerializerObject.Serialize(fileStream, internalApplicationLog)
                         End Using
                     End If
@@ -139,7 +138,6 @@
                 writeToApplicationLogFile("Starting log conversion process.", EventLogEntryType.Information)
 
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
-                Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
                 Dim logCount, longOldLogCount As Long
                 Dim stopwatch As Stopwatch = Stopwatch.StartNew
 
@@ -190,7 +188,6 @@
         Private Sub createLogFile()
             Try
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
-                Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
 
                 applicationLog.Add(New restorePointCreatorExportedLog With {
                     .logData = "Log file initialized.",
@@ -247,7 +244,6 @@
         Public Sub deleteEntryFromLog(idsOfLogsToBeDeleted As List(Of Long))
             Try
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
-                Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
 
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
 
@@ -283,7 +279,6 @@
         Public Sub deleteEntryFromLog(longIDToBeDeleted As Long)
             Try
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
-                Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
 
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
 
@@ -349,7 +344,6 @@
         Public Sub writeToApplicationLogFile(logMessage As String, Optional eventLogType As EventLogEntryType = EventLogEntryType.Information)
             Try
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
-                Dim xmlSerializerObject As New Xml.Serialization.XmlSerializer(applicationLog.GetType)
 
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
 
