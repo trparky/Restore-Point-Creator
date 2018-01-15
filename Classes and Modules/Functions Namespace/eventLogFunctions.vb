@@ -330,7 +330,6 @@
                 fileStream.CopyTo(newCorruptedLogFileStream)
             End Using
 
-            support.deleteFileWithNoException(strLogLockFile)
             support.deleteFileWithNoException(strCorruptedLockFile)
 
             applicationLog.Add(New restorePointCreatorExportedLog With {
