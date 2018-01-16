@@ -128,7 +128,7 @@ Partial Class eventLogForm
         Me.btnRefreshEvents.Name = "btnRefreshEvents"
         Me.btnRefreshEvents.Size = New System.Drawing.Size(203, 23)
         Me.btnRefreshEvents.TabIndex = 2
-        Me.btnRefreshEvents.Text = "Refresh Events (F5)"
+        Me.btnRefreshEvents.Text = "Reload Log File (F5)"
         Me.btnRefreshEvents.UseVisualStyleBackColor = True
         '
         'StatusStrip1
@@ -359,7 +359,7 @@ Partial Class eventLogForm
         Me.RefreshToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.refresh
         Me.RefreshToolStripMenuItem.Name = "RefreshToolStripMenuItem"
         Me.RefreshToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
-        Me.RefreshToolStripMenuItem.Text = "Refresh"
+        Me.RefreshToolStripMenuItem.Text = "Reload Log File (F5)"
         '
         'pleaseWaitProgressBar
         '
