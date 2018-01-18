@@ -199,7 +199,7 @@
                 })
 
                 Try
-                    Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Write, IO.FileMode.Create)
+                    Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Write, IO.FileMode.Create)
                         Using streamWriter As New IO.StreamWriter(fileStream)
                             xmlSerializerObject.Serialize(streamWriter, applicationLog)
                         End Using
