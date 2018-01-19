@@ -534,6 +534,40 @@ Public Class Form1
 #End Region
 
 #Region "--== Functions and Sub-Routines ==--"
+    Private Sub toolStripMyComputerDeleteSub(ByRef registryRootKeyWeAreWorkingWith As RegistryKey, ByVal strName As String)
+        If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\" & strName, False) IsNot Nothing Then
+            registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree(strName, False)
+        End If
+    End Sub
+
+    Private Sub toolStripMyComputerAddSub(ByRef registryRootKeyWeAreWorkingWith As RegistryKey, ByVal boolIsThisVistaOrNewer As Boolean, ByVal strName As String, Optional ByVal strCommandLineArg As String = Nothing)
+        Dim registryKey As RegistryKey
+
+        ' Checks if an existing entry exists and deletes it.
+        If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\" & strName) IsNot Nothing Then
+            registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree(strName)
+        End If
+
+        registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).CreateSubKey(strName)
+        registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\" & strName, True).CreateSubKey("Command")
+
+        registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\" & strName, True)
+        If boolIsThisVistaOrNewer Then registryKey.SetValue("HasLUAShield", "", RegistryValueKind.String)
+        registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
+        registryKey.SetValue("SuppressionPolicy", 1073741884, RegistryValueKind.DWord)
+        registryKey.Close()
+
+        registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\" & strName & "\Command", True)
+
+        If String.IsNullOrEmpty(strCommandLineArg) Then
+            registryKey.SetValue(vbNullString, String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
+        Else
+            registryKey.SetValue(vbNullString, String.Format("{0}{1}{0} {2}", Chr(34), Application.ExecutablePath, strCommandLineArg))
+        End If
+
+        registryKey.Close()
+    End Sub
+
     Private Sub startCheckForUpdatesThread()
         Threading.ThreadPool.QueueUserWorkItem(AddressOf userInitiatedCheckForUpdates)
         toolStripCheckForUpdates.Enabled = False
@@ -2866,79 +2900,9 @@ Public Class Form1
             End If
 
             Try
-                Dim registryKey As RegistryKey
-
-                ' =======================================================
-                ' == Makes the "Create System Restore Checkpoint" Item ==
-                ' =======================================================
-
-                ' Checks if an existing entry exists and deletes it.
-                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint") IsNot Nothing Then
-                    registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Create System Restore Checkpoint")
-                End If
-
-                registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).CreateSubKey("Create System Restore Checkpoint")
-                registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint", True).CreateSubKey("Command")
-
-                registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint", True)
-                If boolIsThisVistaOrNewer = True Then
-                    registryKey.SetValue("HasLUAShield", "", RegistryValueKind.String)
-                End If
-                registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
-                registryKey.SetValue("SuppressionPolicy", 1073741884, RegistryValueKind.DWord)
-                registryKey.Close()
-
-                registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint\Command", True)
-                registryKey.SetValue(vbNullString, String.Format("{0}{1}{0} -createrestorepoint", Chr(34), Application.ExecutablePath))
-                registryKey.Close()
-
-                ' ===============================================================
-                ' == Makes the "Create Custom Named System Restore Point" Item ==
-                ' ===============================================================
-
-                ' Checks if an existing entry exists and deletes it.
-                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point") IsNot Nothing Then
-                    registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Create Custom Named System Restore Point")
-                End If
-
-                registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).CreateSubKey("Create Custom Named System Restore Point")
-                registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point", True).CreateSubKey("Command")
-
-                registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point", True)
-                If boolIsThisVistaOrNewer = True Then
-                    registryKey.SetValue("HasLUAShield", "", RegistryValueKind.String)
-                End If
-                registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
-                registryKey.SetValue("SuppressionPolicy", 1073741884, RegistryValueKind.DWord)
-                registryKey.Close()
-
-                registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point\Command", True)
-                registryKey.SetValue(vbNullString, String.Format("{0}{1}{0} -createrestorepointcustomname", Chr(34), Application.ExecutablePath))
-                registryKey.Close()
-
-                ' ===================================================
-                ' == Makes the "Launch Restore Point Creator" Item ==
-                ' ===================================================
-
-                ' Checks if an existing entry exists and deletes it.
-                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator") IsNot Nothing Then
-                    registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Launch Restore Point Creator")
-                End If
-
-                registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).CreateSubKey("Launch Restore Point Creator")
-                registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator", True).CreateSubKey("Command")
-
-                registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator", True)
-                If boolIsThisVistaOrNewer = True Then
-                    registryKey.SetValue("HasLUAShield", "", RegistryValueKind.String)
-                End If
-                registryKey.SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath), RegistryValueKind.String)
-                registryKey.SetValue("SuppressionPolicy", 1073741884, RegistryValueKind.DWord)
-                registryKey.Close()
-
-                registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator\Command", True)
-                registryKey.SetValue(vbNullString, String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
-                registryKey.Close()
+                toolStripMyComputerAddSub(registryRootKeyWeAreWorkingWith, boolIsThisVistaOrNewer, "Create System Restore Checkpoint", "-createrestorepoint")
+                toolStripMyComputerAddSub(registryRootKeyWeAreWorkingWith, boolIsThisVistaOrNewer, "Create Custom Named System Restore Point", "-createrestorepointcustomname")
+                toolStripMyComputerAddSub(registryRootKeyWeAreWorkingWith, boolIsThisVistaOrNewer, "Launch Restore Point Creator")
             Catch ex As Security.SecurityException
                 toolStripMyComputer.Checked = False
                 Functions.eventLogFunctions.writeCrashToEventLog(ex)
@@ -2947,24 +2911,10 @@ Public Class Form1
         Else
             Try
                 ' This code removes the options from the "My Computer" right-click context menu.
-
-                ' All of this prevents a rare Null Reference Exception.
-                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint", False) IsNot Nothing Then
-                    registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Create System Restore Checkpoint")
-                End If
-
-                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore", False) IsNot Nothing Then
-                    registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Create Custom Named System Restore")
-                End If
-
-                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point", False) IsNot Nothing Then
-                    registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Create Custom Named System Restore Point")
-                End If
-
-                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator", False) IsNot Nothing Then
-                    registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell", True).DeleteSubKeyTree("Launch Restore Point Creator")
-                End If
-                ' All of this prevents a rare Null Reference Exception.
+                toolStripMyComputerDeleteSub(registryRootKeyWeAreWorkingWith, "Create System Restore Checkpoint")
+                toolStripMyComputerDeleteSub(registryRootKeyWeAreWorkingWith, "Create Custom Named System Restore")
+                toolStripMyComputerDeleteSub(registryRootKeyWeAreWorkingWith, "Create Custom Named System Restore Point")
+                toolStripMyComputerDeleteSub(registryRootKeyWeAreWorkingWith, "Launch Restore Point Creator")
             Catch ex As Security.SecurityException
                 Functions.eventLogFunctions.writeCrashToEventLog(ex)
                 MsgBox("Unable to modify the My Computer right-click context menu. A security violation has occurred. Please contact your system administrator for assistance.", MsgBoxStyle.Critical, strMessageBoxTitle)
