@@ -2872,6 +2872,12 @@ Public Class Form1
             registryRootKeyWeAreWorkingWith = Registry.ClassesRoot
         End If
 
+        If registryRootKeyWeAreWorkingWith Is Nothing Then
+            MsgBox("There was an error accessing a required Registry Key.", MsgBoxStyle.Critical, strMessageBoxTitle)
+            toolStripMyComputer.Checked = False
+            Exit Sub
+        End If
+
         If toolStripMyComputer.Checked Then
             Try
                 ' Attempts to fix something that should never have been broken to begin with.  Why this would be broken, who the fuck knows.
@@ -2883,7 +2889,7 @@ Public Class Form1
                 ' Does nothing
             End Try
 
-            If Application.ExecutablePath.caseInsensitiveContains("program files") = False Then
+            If Not Application.ExecutablePath.caseInsensitiveContains("program files") Then
                 If Environment.Is64BitOperatingSystem Then
                     MsgBox("It is HIGHLY recommended to place this program's executable in C:\Program Files (x86)." & vbCrLf & vbCrLf & "The reason why is that this portion of the program creates a My Computer right-click option so if Windows can't find the executable in the specified path, the right-click option will be invalid.", MsgBoxStyle.Information, strMessageBoxTitle)
                 Else
@@ -2895,9 +2901,7 @@ Public Class Form1
             End If
 
             Dim boolIsThisVistaOrNewer As Boolean = False
-            If Environment.OSVersion.Version.Major >= 6 Then
-                boolIsThisVistaOrNewer = True
-            End If
+            If Environment.OSVersion.Version.Major >= 6 Then boolIsThisVistaOrNewer = True
 
             Try
                 toolStripMyComputerAddSub(registryRootKeyWeAreWorkingWith, boolIsThisVistaOrNewer, "Create System Restore Checkpoint", "-createrestorepoint")
