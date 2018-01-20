@@ -313,16 +313,20 @@ Namespace Functions.taskStuff
         End Sub
 
         Public Sub setMultiRunForTask()
-            Dim task As TaskScheduler.Task = Nothing
+            Try
+                Dim task As TaskScheduler.Task = Nothing
 
-            If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC", task) = True Then
-                If task.Definition.Settings.MultipleInstances <> TaskScheduler.TaskInstancesPolicy.Parallel Then
-                    task.Definition.Settings.MultipleInstances = TaskScheduler.TaskInstancesPolicy.Parallel
-                    task.RegisterChanges()
-                    task.Dispose()
-                    eventLogFunctions.writeToApplicationLogFile("Modified RunTime Task with MultiRun mode enabled.", EventLogEntryType.Information)
+                If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC", task) Then
+                    If task.Definition.Settings.MultipleInstances <> TaskScheduler.TaskInstancesPolicy.Parallel Then
+                        task.Definition.Settings.MultipleInstances = TaskScheduler.TaskInstancesPolicy.Parallel
+                        task.RegisterChanges()
+                        task.Dispose()
+                        eventLogFunctions.writeToApplicationLogFile("Modified RunTime Task with MultiRun mode enabled.", EventLogEntryType.Information)
+                    End If
                 End If
-            End If
+            Catch ex As Exception
+                eventLogFunctions.writeCrashToEventLog(ex, EventLogEntryType.Warning)
+            End Try
 
             registryStuff.setBooleanValueInRegistry("Added MultiRun For Runtime Task", True)
         End Sub
