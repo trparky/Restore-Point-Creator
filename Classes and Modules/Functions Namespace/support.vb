@@ -886,8 +886,10 @@ Namespace Functions.support
         End Sub
 
         Public Function removeSourceCodePathInfo(strInput As String) As String
-            If strInput.regExSearch("(?:Google Drive|OneDrive)") = True Then
-                Return Regex.Replace(strInput, "C:\\Users\\Tom\\(?:Google Drive|OneDrive)\\My Visual Studio Projects\\Projects\\", "", RegexOptions.IgnoreCase)
+            If strInput.regExSearch("(?:Google Drive|OneDrive|AppData)") Then
+                strInput = Regex.Replace(strInput, "C:\\Users\\Tom\\(?:Google Drive|OneDrive)\\My Visual Studio Projects\\Projects\\", "", RegexOptions.IgnoreCase)
+                strInput = strInput.caseInsensitiveReplace("C:\Users\Tom\AppData\Local\Temp\", "")
+                Return strInput
             Else
                 Return strInput
             End If
