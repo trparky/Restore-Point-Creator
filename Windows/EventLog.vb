@@ -350,7 +350,7 @@
         End If
 
         Try
-            If boolDoneLoading = True Then My.Settings.eventLogSplitDistance = SplitContainer1.SplitterDistance
+            If boolDoneLoading Then My.Settings.eventLogSplitDistance = SplitContainer1.SplitterDistance
         Catch ex As Exception
         End Try
     End Sub
@@ -491,13 +491,7 @@
             btnClear.Enabled = True
 
             If eventLogList.Items.Count <> 0 Then
-                Dim strEntriesFound As String
-                If eventLogList.Items.Count = 1 Then
-                    strEntriesFound = "1 log entry was found."
-                Else
-                    strEntriesFound = eventLogList.Items.Count.ToString & " log entries were found."
-                End If
-
+                Dim strEntriesFound As String = If(eventLogList.Items.Count = 1, "1 log entry was found.", eventLogList.Items.Count.ToString & " log entries were found.")
                 MsgBox("Search complete. " & strEntriesFound, MsgBoxStyle.Information, Me.Text)
             Else
                 MsgBox("Search complete. No results found.", MsgBoxStyle.Information, Me.Text)
