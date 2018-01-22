@@ -399,7 +399,10 @@
     Private Sub eventLogList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles eventLogList.SelectedIndexChanged
         Try
             If eventLogList.SelectedItems.Count <> 0 Then
-                If areWeAnAdministrator Then btnDeleteIndividualLogEntry.Enabled = True
+                If areWeAnAdministrator Then
+                    btnDeleteIndividualLogEntry.Text = If(eventLogList.SelectedItems.Count = 1, "Delete Individual Log Entry", "Delete Individual Log Entries")
+                    btnDeleteIndividualLogEntry.Enabled = True
+                End If
 
                 Dim selectedItem As myListViewItemTypes.eventLogListEntry = DirectCast(eventLogList.SelectedItems(0), myListViewItemTypes.eventLogListEntry)
                 eventLogText.Text = selectedItem.strEventLogText
@@ -614,6 +617,7 @@
 
     Private Sub chkMultiSelectMode_Click(sender As Object, e As EventArgs) Handles chkMultiSelectMode.Click
         eventLogList.MultiSelect = chkMultiSelectMode.Checked
+        chkToolMultiSelectMode.Checked = chkMultiSelectMode.Checked
     End Sub
 
     Private Sub eventLogList_KeyUp(sender As Object, e As KeyEventArgs) Handles eventLogList.KeyUp
@@ -629,10 +633,15 @@
     End Sub
 
     Private Sub ContextMenuStrip1_Opening(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles ContextMenuStrip1.Opening
-        If eventLogList.SelectedItems.Count = 0 Then
-            DeleteSelectedLogEntryToolStripMenuItem.Visible = False
-        Else
-            DeleteSelectedLogEntryToolStripMenuItem.Enabled = True
+        chkToolMultiSelectMode.Checked = chkMultiSelectMode.Checked
+
+        If areWeAnAdministrator Then
+            If eventLogList.SelectedItems.Count = 0 Then
+                DeleteSelectedLogEntryToolStripMenuItem.Visible = False
+            Else
+                DeleteSelectedLogEntryToolStripMenuItem.Text = If(eventLogList.SelectedItems.Count = 1, "Delete Selected Log Entry", "Delete Selected Log Entries")
+                DeleteSelectedLogEntryToolStripMenuItem.Visible = True
+            End If
         End If
     End Sub
 
@@ -642,6 +651,11 @@
 
     Private Sub eventLogList_Leave(sender As Object, e As EventArgs) Handles eventLogList.Leave
         btnDeleteIndividualLogEntry.Enabled = False
+    End Sub
+
+    Private Sub chkToolMultiSelectMode_Click(sender As Object, e As EventArgs) Handles chkToolMultiSelectMode.Click
+        chkMultiSelectMode.Checked = chkToolMultiSelectMode.Checked
+        eventLogList.MultiSelect = chkToolMultiSelectMode.Checked
     End Sub
 
 #Region "--== Please Wait Panel Code ==--"

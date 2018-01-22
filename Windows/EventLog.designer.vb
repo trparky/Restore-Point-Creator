@@ -27,6 +27,9 @@ Partial Class eventLogForm
         Me.ColumnHeader1 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ColumnHeader2 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ColumnHeader3 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
+        Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.RefreshToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DeleteSelectedLogEntryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.imageList = New System.Windows.Forms.ImageList(Me.components)
         Me.eventLogText = New System.Windows.Forms.TextBox()
         Me.btnRefreshEvents = New System.Windows.Forms.Button()
@@ -49,12 +52,11 @@ Partial Class eventLogForm
         Me.pleaseWaitPanel = New System.Windows.Forms.Panel()
         Me.pleaseWaitBorderText = New System.Windows.Forms.Label()
         Me.pleaseWaitlblLabel = New System.Windows.Forms.Label()
+        Me.pleaseWaitProgressBar = New Restore_Point_Creator.SmoothProgressBar()
         Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
         Me.logFileWatcher = New System.IO.FileSystemWatcher()
-        Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.RefreshToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.pleaseWaitProgressBar = New Restore_Point_Creator.SmoothProgressBar()
-        Me.DeleteSelectedLogEntryToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.chkToolMultiSelectMode = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ContextMenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
@@ -63,7 +65,6 @@ Partial Class eventLogForm
         Me.TableLayoutPanel2.SuspendLayout()
         Me.pleaseWaitPanel.SuspendLayout()
         CType(Me.logFileWatcher, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.ContextMenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'eventLogList
@@ -97,6 +98,26 @@ Partial Class eventLogForm
         '
         Me.ColumnHeader3.Text = "Event ID"
         Me.ColumnHeader3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'ContextMenuStrip1
+        '
+        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RefreshToolStripMenuItem, Me.DeleteSelectedLogEntryToolStripMenuItem, Me.chkToolMultiSelectMode})
+        Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(208, 70)
+        '
+        'RefreshToolStripMenuItem
+        '
+        Me.RefreshToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.refresh
+        Me.RefreshToolStripMenuItem.Name = "RefreshToolStripMenuItem"
+        Me.RefreshToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.RefreshToolStripMenuItem.Text = "Reload Log File (F5)"
+        '
+        'DeleteSelectedLogEntryToolStripMenuItem
+        '
+        Me.DeleteSelectedLogEntryToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.delete
+        Me.DeleteSelectedLogEntryToolStripMenuItem.Name = "DeleteSelectedLogEntryToolStripMenuItem"
+        Me.DeleteSelectedLogEntryToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
+        Me.DeleteSelectedLogEntryToolStripMenuItem.Text = "Delete Selected Log Entry"
         '
         'imageList
         '
@@ -339,28 +360,6 @@ Partial Class eventLogForm
         Me.pleaseWaitlblLabel.TabIndex = 3
         Me.pleaseWaitlblLabel.Text = "Label1"
         '
-        'pleaseWaitMessageChanger
-        '
-        Me.pleaseWaitMessageChanger.Interval = 250
-        '
-        'logFileWatcher
-        '
-        Me.logFileWatcher.EnableRaisingEvents = True
-        Me.logFileWatcher.SynchronizingObject = Me
-        '
-        'ContextMenuStrip1
-        '
-        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RefreshToolStripMenuItem, Me.DeleteSelectedLogEntryToolStripMenuItem})
-        Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(208, 70)
-        '
-        'RefreshToolStripMenuItem
-        '
-        Me.RefreshToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.refresh
-        Me.RefreshToolStripMenuItem.Name = "RefreshToolStripMenuItem"
-        Me.RefreshToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
-        Me.RefreshToolStripMenuItem.Text = "Reload Log File (F5)"
-        '
         'pleaseWaitProgressBar
         '
         Me.pleaseWaitProgressBar.Location = New System.Drawing.Point(6, 56)
@@ -372,12 +371,21 @@ Partial Class eventLogForm
         Me.pleaseWaitProgressBar.TabIndex = 2
         Me.pleaseWaitProgressBar.Value = 0
         '
-        'DeleteSelectedLogEntryToolStripMenuItem
+        'pleaseWaitMessageChanger
         '
-        Me.DeleteSelectedLogEntryToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.delete
-        Me.DeleteSelectedLogEntryToolStripMenuItem.Name = "DeleteSelectedLogEntryToolStripMenuItem"
-        Me.DeleteSelectedLogEntryToolStripMenuItem.Size = New System.Drawing.Size(207, 22)
-        Me.DeleteSelectedLogEntryToolStripMenuItem.Text = "Delete Selected Log Entry"
+        Me.pleaseWaitMessageChanger.Interval = 250
+        '
+        'logFileWatcher
+        '
+        Me.logFileWatcher.EnableRaisingEvents = True
+        Me.logFileWatcher.SynchronizingObject = Me
+        '
+        'chkToolMultiSelectMode
+        '
+        Me.chkToolMultiSelectMode.CheckOnClick = True
+        Me.chkToolMultiSelectMode.Name = "chkToolMultiSelectMode"
+        Me.chkToolMultiSelectMode.Size = New System.Drawing.Size(207, 22)
+        Me.chkToolMultiSelectMode.Text = "Multi-Select Mode"
         '
         'eventLogForm
         '
@@ -393,6 +401,7 @@ Partial Class eventLogForm
         Me.MinimumSize = New System.Drawing.Size(876, 371)
         Me.Name = "eventLogForm"
         Me.Text = "Restore Point Creator Application Event Log"
+        Me.ContextMenuStrip1.ResumeLayout(False)
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()
         Me.SplitContainer1.Panel1.ResumeLayout(False)
@@ -405,7 +414,6 @@ Partial Class eventLogForm
         Me.pleaseWaitPanel.ResumeLayout(False)
         Me.pleaseWaitPanel.PerformLayout()
         CType(Me.logFileWatcher, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.ContextMenuStrip1.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -442,4 +450,5 @@ Partial Class eventLogForm
     Friend WithEvents ContextMenuStrip1 As ContextMenuStrip
     Friend WithEvents RefreshToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents DeleteSelectedLogEntryToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents chkToolMultiSelectMode As ToolStripMenuItem
 End Class
