@@ -192,10 +192,7 @@ Public Class Official_Contact_Form
         If listAttachedFiles.SelectedItems.Count > 0 Then
             For Each item As myListViewItemTypes.contactFormFileListItem In listAttachedFiles.SelectedItems
                 If item.strFileName.EndsWith(".reslog", StringComparison.OrdinalIgnoreCase) Or item.strFileName.EndsWith(".reslogx", StringComparison.OrdinalIgnoreCase) Then
-                    Try
-                        IO.File.Delete(item.strFileName)
-                    Catch ex As Exception
-                    End Try
+                    Functions.support.deleteFileWithNoException(item.strFileName)
                 End If
                 item.Remove()
             Next
