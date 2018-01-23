@@ -39,12 +39,10 @@
     End Sub
 
     Private Sub Round_Restore_Point_Age_in_Days_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        If boolButtonPushed = False Then dialogResponse = userResponse.cancel
+        If Not boolButtonPushed Then dialogResponse = userResponse.cancel
     End Sub
 
     Private Sub txtRound_KeyUp(sender As Object, e As KeyEventArgs) Handles txtRound.KeyUp
-        If e.KeyCode = Keys.Enter Then
-            btnOK.PerformClick()
-        End If
+        If e.KeyCode = Keys.Enter Then btnOK.PerformClick()
     End Sub
 End Class

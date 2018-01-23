@@ -6,9 +6,7 @@
 
     Function getTotalDriveSize(drive As String) As ULong
         For Each currentDrive As IO.DriveInfo In My.Computer.FileSystem.Drives
-            If currentDrive.RootDirectory.ToString.Replace("\", "") = drive Then
-                Return currentDrive.TotalSize
-            End If
+            If currentDrive.RootDirectory.ToString.Replace("\", "").Equals(drive, StringComparison.OrdinalIgnoreCase) Then Return currentDrive.TotalSize
         Next
 
         Return 0
