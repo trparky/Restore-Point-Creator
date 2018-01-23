@@ -336,27 +336,13 @@ Public Class frmTaskScheduler
             ElseIf radWeekly.Checked Then
                 Dim daysOfWeekSetting As DaysOfTheWeek
 
-                If chkSunday.Checked Then
-                    daysOfWeekSetting += DaysOfTheWeek.Sunday
-                End If
-                If chkMonday.Checked Then
-                    daysOfWeekSetting += DaysOfTheWeek.Monday
-                End If
-                If chkTuesday.Checked Then
-                    daysOfWeekSetting += DaysOfTheWeek.Tuesday
-                End If
-                If chkWednesday.Checked Then
-                    daysOfWeekSetting += DaysOfTheWeek.Wednesday
-                End If
-                If chkThursday.Checked Then
-                    daysOfWeekSetting += DaysOfTheWeek.Thursday
-                End If
-                If chkFriday.Checked Then
-                    daysOfWeekSetting += DaysOfTheWeek.Friday
-                End If
-                If chkSaturday.Checked Then
-                    daysOfWeekSetting += DaysOfTheWeek.Saturday
-                End If
+                If chkSunday.Checked Then daysOfWeekSetting += DaysOfTheWeek.Sunday
+                If chkMonday.Checked Then daysOfWeekSetting += DaysOfTheWeek.Monday
+                If chkTuesday.Checked Then daysOfWeekSetting += DaysOfTheWeek.Tuesday
+                If chkWednesday.Checked Then daysOfWeekSetting += DaysOfTheWeek.Wednesday
+                If chkThursday.Checked Then daysOfWeekSetting += DaysOfTheWeek.Thursday
+                If chkFriday.Checked Then daysOfWeekSetting += DaysOfTheWeek.Friday
+                If chkSaturday.Checked Then daysOfWeekSetting += DaysOfTheWeek.Saturday
 
                 newTask.Triggers.Add(New WeeklyTrigger() With {.StartBoundary = timePicker.Value, .DaysOfWeek = daysOfWeekSetting})
             End If
@@ -562,27 +548,13 @@ Public Class frmTaskScheduler
                 ElseIf radWeeklyDelete.Checked Then
                     Dim daysOfWeekSetting As DaysOfTheWeek
 
-                    If chkSundayDelete.Checked Then
-                        daysOfWeekSetting += DaysOfTheWeek.Sunday
-                    End If
-                    If chkMondayDelete.Checked Then
-                        daysOfWeekSetting += DaysOfTheWeek.Monday
-                    End If
-                    If chkTuesdayDelete.Checked Then
-                        daysOfWeekSetting += DaysOfTheWeek.Tuesday
-                    End If
-                    If chkWednesdayDelete.Checked Then
-                        daysOfWeekSetting += DaysOfTheWeek.Wednesday
-                    End If
-                    If chkThursdayDelete.Checked Then
-                        daysOfWeekSetting += DaysOfTheWeek.Thursday
-                    End If
-                    If chkFridayDelete.Checked Then
-                        daysOfWeekSetting += DaysOfTheWeek.Friday
-                    End If
-                    If chkSaturdayDelete.Checked Then
-                        daysOfWeekSetting += DaysOfTheWeek.Saturday
-                    End If
+                    If chkSundayDelete.Checked Then daysOfWeekSetting += DaysOfTheWeek.Sunday
+                    If chkMondayDelete.Checked Then daysOfWeekSetting += DaysOfTheWeek.Monday
+                    If chkTuesdayDelete.Checked Then daysOfWeekSetting += DaysOfTheWeek.Tuesday
+                    If chkWednesdayDelete.Checked Then daysOfWeekSetting += DaysOfTheWeek.Wednesday
+                    If chkThursdayDelete.Checked Then daysOfWeekSetting += DaysOfTheWeek.Thursday
+                    If chkFridayDelete.Checked Then daysOfWeekSetting += DaysOfTheWeek.Friday
+                    If chkSaturdayDelete.Checked Then daysOfWeekSetting += DaysOfTheWeek.Saturday
 
                     newTask.Triggers.Add(New WeeklyTrigger() With {.StartBoundary = timePickerDelete.Value, .DaysOfWeek = daysOfWeekSetting})
                 End If
