@@ -252,11 +252,11 @@ Public Class Form1
             Next
         Catch ex3 As COMException
             taskService.RootFolder.DeleteTask(task.Name)
-            Functions.eventLogFunctions.writeCrashToEventLog(ex3)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex3)
             Functions.eventLogFunctions.writeToApplicationLogFile("Invalid XML data has been detected as part of the task validation routine. The task named """ & task.Name & """ has been deleted.", EventLogEntryType.Error)
             MsgBox("One or more of your scheduled Restore Point Creator tasks have been found to be corrupted. Please check your scheduled tasks to see if any of them have been deleted.", MsgBoxStyle.Information, strMessageBoxTitle)
         Catch ex2 As IO.FileNotFoundException
-            Functions.eventLogFunctions.writeCrashToEventLog(ex2)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex2)
         Catch ex As Exception
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
@@ -283,7 +283,7 @@ Public Class Form1
             taskService.Dispose()
             taskService = Nothing
         Catch ex As IO.FileNotFoundException
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
         Catch ex As Exception
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
@@ -732,7 +732,7 @@ Public Class Form1
                 regKey.Close()
             End If
         Catch ex As Exception
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
         End Try
     End Sub
 
@@ -754,7 +754,7 @@ Public Class Form1
                 regKey.Close()
             End If
         Catch ex As Exception
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
         End Try
     End Sub
 
@@ -884,7 +884,7 @@ Public Class Form1
                 End If
             End If
         Catch ex As Exception
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
         End Try
     End Sub
 
@@ -924,7 +924,7 @@ Public Class Form1
                     Me.Invoke(Sub() closePleaseWaitPanel())
                     MsgBox("An existing new program executable file has been found, we tried to delete it but we couldn't. Please see the Application Event Log for more details.", MsgBoxStyle.Critical, strMessageBoxTitle)
                     Functions.eventLogFunctions.writeToApplicationLogFile("An existing new program executable file has been found, we tried to delete it but we couldn't.", EventLogEntryType.Error)
-                    Functions.eventLogFunctions.writeCrashToEventLog(ex)
+                    Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
                     Exit Sub
                 End Try
             End If
@@ -997,7 +997,7 @@ Public Class Form1
             My.Settings.restorePointListColumnOrder2 = (New Web.Script.Serialization.JavaScriptSerializer).Serialize(columnIndexes)
         Catch ex As Exception
             Functions.eventLogFunctions.writeToApplicationLogFile("Error saving restore point list column ordering.", EventLogEntryType.Error)
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
         End Try
     End Sub
 
@@ -1015,7 +1015,7 @@ Public Class Form1
         Catch ex As Exception
             My.Settings.restorePointListColumnOrder2 = Nothing
             Functions.eventLogFunctions.writeToApplicationLogFile("Error loading saved restore point list column ordering.", EventLogEntryType.Error)
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
         End Try
     End Sub
 
@@ -1444,7 +1444,7 @@ Public Class Form1
                 Me.Invoke(Sub() closePleaseWaitPanel())
                 MsgBox("An existing new program executable file has been found, we tried to delete it but we couldn't. Please see the Application Event Log for more details.", MsgBoxStyle.Critical, strMessageBoxTitle)
                 Functions.eventLogFunctions.writeToApplicationLogFile("An existing new program executable file has been found, we tried to delete it but we couldn't.", EventLogEntryType.Error)
-                Functions.eventLogFunctions.writeCrashToEventLog(ex)
+                Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 Exit Sub
             End Try
         End If
@@ -1528,7 +1528,7 @@ Public Class Form1
                 Process.GetCurrentProcess.Kill()
             Catch ex As ComponentModel.Win32Exception
                 Me.Invoke(Sub() closePleaseWaitPanel())
-                Functions.eventLogFunctions.writeCrashToEventLog(ex)
+                Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 Functions.eventLogFunctions.writeToApplicationLogFile("Something went wrong while attempting to launch the new program binary in update mode.", EventLogEntryType.Error)
                 MsgBox("Something went wrong while attempting to launch the new program binary in update mode, update process aborted.", MsgBoxStyle.Critical, strMessageBoxTitle)
             End Try
@@ -1570,7 +1570,7 @@ Public Class Form1
             Try
                 checkForUpdatesSubRoutine()
             Catch ex As Exception
-                Functions.eventLogFunctions.writeCrashToEventLog(ex) ' If anything goes wrong during this routine, handle it as an exception.
+                Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex) ' If anything goes wrong during this routine, handle it as an exception.
             Finally
                 toolStripCheckForUpdates.Enabled = True
             End Try
@@ -1692,7 +1692,7 @@ Public Class Form1
                     Try
                         checkForUpdatesSubRoutine()
                     Catch ex As Exception
-                        Functions.eventLogFunctions.writeCrashToEventLog(ex) ' If anything goes wrong during this routine, handle it as an exception.
+                        Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex) ' If anything goes wrong during this routine, handle it as an exception.
                     End Try
                 End If
             Else
@@ -1819,18 +1819,18 @@ Public Class Form1
             MsgBox("There has been an error while trying to load the System Restore Points on your system." & vbCrLf & vbCrLf & "Please go to System Restore Point Utilities and click on Manually Fix System Restore and follow the prompts. It will ask you reboot your computer so please save all work before you do so.", MsgBoxStyle.Critical, strMessageBoxTitle)
         Catch ex7 As Functions.myExceptions.integerTryParseException
             closePleaseWaitPanel()
-            Functions.eventLogFunctions.writeCrashToEventLog(ex7)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex7)
             MsgBox("There was a serious error while loading the restore points on your system. The restore point IDs appear to have been mangled and can't be parsed into an Integer like it should be. The loading of restore points has been halted." & vbCrLf & vbCrLf & "The value that was returned by the system was... " & ex7.strThatCouldNotBeParsedIntoAnInteger, MsgBoxStyle.Critical, strMessageBoxTitle)
         Catch ex6 As ObjectDisposedException
-            Functions.eventLogFunctions.writeCrashToEventLog(ex6)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex6)
 
             closePleaseWaitPanel()
 
             Exit Sub
         Catch ex5 As UnauthorizedAccessException
-            Functions.eventLogFunctions.writeCrashToEventLog(ex5)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex5)
         Catch ex4 As ManagementException
-            Functions.eventLogFunctions.writeCrashToEventLog(ex4)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex4)
         Catch ex As Threading.ThreadAbortException
             ' Does nothing
         Catch ex3 As COMException
@@ -1930,7 +1930,7 @@ Public Class Form1
         Catch ex1 As Threading.ThreadAbortException
             Invoke(Sub() MsgBox("System Restore Point Deletion Process Aborted.", MsgBoxStyle.Information, strMessageBoxTitle))
         Catch ex2 As ArgumentOutOfRangeException
-            Functions.eventLogFunctions.writeCrashToEventLog(ex2)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex2)
         Catch ex3 As Exception
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex3, ex3.Message, ex3.StackTrace, ex3.GetType)
@@ -2272,7 +2272,7 @@ Public Class Form1
                     createJumpListTaskItems()
                 End If
             Catch ex As Exception
-                Functions.eventLogFunctions.writeCrashToEventLog(ex)
+                Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
             End Try
 
             If Functions.osVersionInfo.isThisWindows10() = True Then
@@ -2316,7 +2316,7 @@ Public Class Form1
                     RemoveSafeModeBootOptionToolStripMenuItem.Font = New Font("Segoe UI", 9.0!, FontStyle.Bold, GraphicsUnit.Point, CType(0, Byte))
                 Catch ex As Exception
                     Functions.eventLogFunctions.writeToApplicationLogFile("There was an error setting the font size to Bold.", EventLogEntryType.Warning)
-                    Functions.eventLogFunctions.writeCrashToEventLog(ex, EventLogEntryType.Warning)
+                    Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex, EventLogEntryType.Warning)
                 End Try
             Else
                 RemoveSafeModeBootOptionToolStripMenuItem.Visible = False
@@ -2358,7 +2358,7 @@ Public Class Form1
     Private Sub handleConfigFileAccessViolation(ex As IO.IOException)
         If ex.Message.caseInsensitiveContains("user.config") Then
             Functions.eventLogFunctions.writeToApplicationLogFile("Unable to open application settings file, it appears to be locked by another process.", EventLogEntryType.Error)
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
             MsgBox("Unable to open application settings file, it appears to be locked by another process." & vbCrLf & vbCrLf & "The program will now close.", MsgBoxStyle.Critical, "Restore Point Creator")
 
             Process.GetCurrentProcess.Kill()
@@ -2909,7 +2909,7 @@ Public Class Form1
                 toolStripMyComputerAddSub(registryRootKeyWeAreWorkingWith, boolIsThisVistaOrNewer, "Launch Restore Point Creator")
             Catch ex As Security.SecurityException
                 toolStripMyComputer.Checked = False
-                Functions.eventLogFunctions.writeCrashToEventLog(ex)
+                Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 MsgBox("Unable to modify the My Computer right-click context menu. A security violation has occurred. Please contact your system administrator for assistance.", MsgBoxStyle.Critical, strMessageBoxTitle)
             End Try
         Else
@@ -2920,7 +2920,7 @@ Public Class Form1
                 toolStripMyComputerDeleteSub(registryRootKeyWeAreWorkingWith, "Create Custom Named System Restore Point")
                 toolStripMyComputerDeleteSub(registryRootKeyWeAreWorkingWith, "Launch Restore Point Creator")
             Catch ex As Security.SecurityException
-                Functions.eventLogFunctions.writeCrashToEventLog(ex)
+                Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 MsgBox("Unable to modify the My Computer right-click context menu. A security violation has occurred. Please contact your system administrator for assistance.", MsgBoxStyle.Critical, strMessageBoxTitle)
             End Try
         End If

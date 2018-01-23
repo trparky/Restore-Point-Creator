@@ -56,7 +56,7 @@ Namespace Functions.registryStuff
                 End If
             Catch ex As Exception
                 eventLogFunctions.writeToApplicationLogFile("Unable to update uninstall information in system Registry.", EventLogEntryType.Error)
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
             End Try
         End Sub
 

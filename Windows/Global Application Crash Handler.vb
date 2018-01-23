@@ -34,7 +34,7 @@ Public Class frmCrash
             End If
         Catch ex As Exception
             Functions.eventLogFunctions.writeToApplicationLogFile("A crash occurred in the FormClosing event of the Global Application Crash Handler.", EventLogEntryType.Error)
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
         End Try
 
         Process.GetCurrentProcess.Kill()
@@ -216,7 +216,7 @@ Public Class frmCrash
         Catch ex As Exception
             If boolDoWeHaveAttachments = True Then closePleaseWaitPanel()
             deleteTempFiles()
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
         End Try
     End Sub
 
@@ -343,13 +343,13 @@ Namespace exceptionHandler
                 MsgBox("Your system appears to have run out of operating memory. Please reboot your computer and try again." & vbCrLf & vbCrLf & "This program will now close.", MsgBoxStyle.Information, "System Restore Point Creator")
                 Process.GetCurrentProcess.Kill()
             ElseIf exceptionType = GetType(UnauthorizedAccessException) Then
-                Functions.eventLogFunctions.writeCrashToEventLog(exceptionObject)
+                Functions.eventLogFunctions.writeCrashToApplicationLogFile(exceptionObject)
 
                 MsgBox("It appears that you don't have the necessary user permissions to do what you are attempting to do. Please contact your system administrator for guidance.", MsgBoxStyle.Exclamation, "System Restore Point Creator")
 
                 Return False
             ElseIf exceptionType = GetType(BadImageFormatException) Then
-                Functions.eventLogFunctions.writeCrashToEventLog(exceptionObject)
+                Functions.eventLogFunctions.writeCrashToApplicationLogFile(exceptionObject)
 
                 MsgBox("There was an error while loading a required system library. Please check the Event Log Viewer for more information.", MsgBoxStyle.Exclamation, "System Restore Point Creator")
 
@@ -357,17 +357,17 @@ Namespace exceptionHandler
             ElseIf exceptionType = GetType(ObjectDisposedException) And exceptionMessage.regExSearch("(?:Please_Wait|SmoothProgressBar|pleaseWaitlblLabel)") = True Then
                 ' This is to hopefully catch an annoying crash that I've not been able to track down
                 ' so we're going to simply handle it silently with no notification to the user.
-                Functions.eventLogFunctions.writeCrashToEventLog(exceptionObject)
+                Functions.eventLogFunctions.writeCrashToApplicationLogFile(exceptionObject)
                 Return False
             ElseIf exceptionType = GetType(Runtime.InteropServices.COMException) Then
-                Functions.eventLogFunctions.writeCrashToEventLog(exceptionObject)
+                Functions.eventLogFunctions.writeCrashToApplicationLogFile(exceptionObject)
 
                 MsgBox("System-level APIs and functions that this program requires to operate appear to be damaged or disabled on your system. Your web browser will be opened to a web page with information on how to repair your system." & vbCrLf & vbCrLf & "This program will now close.", MsgBoxStyle.Information, "System Restore Point Creator")
 
                 Functions.support.launchURLInWebBrowser(globalVariables.webURLs.webPages.strCOMExceptionCrash)
                 Process.GetCurrentProcess.Kill()
             ElseIf exceptionType = GetType(Management.ManagementException) Then
-                Functions.eventLogFunctions.writeCrashToEventLog(exceptionObject)
+                Functions.eventLogFunctions.writeCrashToApplicationLogFile(exceptionObject)
 
                 MsgBox("System-level APIs and functions that this program requires to operate appear to be damaged or disabled on your system. Your web browser will be opened to a web page with information on how to repair your system." & vbCrLf & vbCrLf & "This program will now close.", MsgBoxStyle.Information, "System Restore Point Creator")
 
@@ -441,7 +441,7 @@ Friend Class ThreadExceptionHandler
 
     Private Sub writeCrashToEventLogAndGiveErrorMessage(exceptionObject As Exception)
         Try
-            Functions.eventLogFunctions.writeCrashToEventLog(exceptionObject)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(exceptionObject)
             MsgBox("A fatal error occurred and the program will now close. Please check the application event log for more details.", MsgBoxStyle.Critical, "Restore Point Creator Fatal Program Crash")
             Process.GetCurrentProcess.Kill()
         Catch ex As Exception

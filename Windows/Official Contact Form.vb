@@ -44,7 +44,7 @@ Public Class Official_Contact_Form
                 End Using
             Catch ex As Exception
                 enableFormElements()
-                Functions.eventLogFunctions.writeCrashToEventLog(ex)
+                Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 closePleaseWaitPanel()
                 MsgBox("There was an error while preparing your file attachments for submission. Please see the Event Log for more details.", MsgBoxStyle.Critical, Me.Text)
                 Exit Sub
@@ -237,7 +237,7 @@ Public Class Official_Contact_Form
                 MsgBox("There was an error while attempting to export the program's event log entries.", MsgBoxStyle.Critical, Me.Text)
             End If
         Catch ex As Exception
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
             Functions.eventLogFunctions.writeToApplicationLogFile("There was an error while attempting to export the program's event log entries.", EventLogEntryType.Error)
 
             MsgBox("There was an error while exporting the log data. Please see the Event Log for more details.", MsgBoxStyle.Critical, Me.Text)

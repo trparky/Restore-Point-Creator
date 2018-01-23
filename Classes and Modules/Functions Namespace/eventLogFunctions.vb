@@ -72,12 +72,12 @@
                         xmlSerializerObject.Serialize(streamWriter, logObject)
                     End Using
                 Catch ex As Exception
-                    writeCrashToEventLog(ex)
+                    writeCrashToApplicationLogFile(ex)
                 End Try
 
                 Return True
             Catch ex As Exception
-                writeCrashToEventLog(ex)
+                writeCrashToApplicationLogFile(ex)
                 writeToApplicationLogFile("There was an error while attempting to export the program's event log entries.", EventLogEntryType.Error)
 
                 Return False
@@ -181,7 +181,7 @@
                     writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. No old log entries were detected.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information)
                 End If
             Catch ex As Exception
-                writeCrashToEventLog(ex)
+                writeCrashToApplicationLogFile(ex)
             End Try
         End Sub
 
@@ -493,7 +493,7 @@
         ''' <param name="exceptionObject">The exception object.</param>
         ''' <param name="errorType">The type of Event Log you want the Exception Event to be recorded to the Application Event Log as.</param>
         ''' <example>functions.eventLogFunctions.writeCrashToEventLog(ex)</example>
-        Public Sub writeCrashToEventLog(exceptionObject As Exception, Optional errorType As EventLogEntryType = EventLogEntryType.Error)
+        Public Sub writeCrashToApplicationLogFile(exceptionObject As Exception, Optional errorType As EventLogEntryType = EventLogEntryType.Error)
             Try
                 writeToApplicationLogFile(assembleCrashData(exceptionObject, errorType), errorType)
             Catch ex2 As Exception

@@ -122,7 +122,7 @@ Namespace Functions.startupFunctions
 
                 If boolKillProcessAfterRun = True Then Process.GetCurrentProcess.Kill()
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
             End Try
         End Sub
 
@@ -230,7 +230,7 @@ Namespace Functions.startupFunctions
                 systemRestorePoints.Dispose()
                 systemRestorePoints = Nothing
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
             End Try
         End Sub
 
@@ -264,7 +264,7 @@ Namespace Functions.startupFunctions
                     fileStream.Write(Now.ToString)
                 End Using
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex, EventLogEntryType.Warning)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex, EventLogEntryType.Warning)
                 ' Does nothing.
             End Try
         End Sub
@@ -276,7 +276,7 @@ Namespace Functions.startupFunctions
 
         Private Sub handleLockedSettingsFile(ex As Exception)
             eventLogFunctions.writeToApplicationLogFile("Unable to open application settings file, it appears to be locked by another process.", EventLogEntryType.Error)
-            eventLogFunctions.writeCrashToEventLog(ex)
+            eventLogFunctions.writeCrashToApplicationLogFile(ex)
             MsgBox("Unable to open application settings file, it appears to be locked by another process." & vbCrLf & vbCrLf & "The program will now close.", MsgBoxStyle.Critical, "Restore Point Creator")
             Process.GetCurrentProcess.Kill()
         End Sub
@@ -489,7 +489,7 @@ Namespace Functions.startupFunctions
                     Process.GetCurrentProcess.Kill()
                 End If
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 MsgBox("Something went wrong during the application update procedure, please see the Application Event Log for more details.", MsgBoxStyle.Critical, "Restore Point Creator -- Error")
                 Process.GetCurrentProcess.Kill()
             End Try

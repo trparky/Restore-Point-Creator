@@ -59,7 +59,7 @@ Namespace Functions.checksum
                     Return False
                 End If
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
 
                 If boolGiveUserAnErrorMessage = True Then
                     MsgBox("There was an error downloading the checksum verification file. Update process aborted.", MsgBoxStyle.Critical, "Restore Point Creator")
@@ -108,7 +108,7 @@ Namespace Functions.checksum
                     Return False
                 End If
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
 
                 If boolGiveUserAnErrorMessage = True Then
                     MsgBox("There was an error downloading the checksum verification file. Update process aborted.", MsgBoxStyle.Critical, "Restore Point Creator")

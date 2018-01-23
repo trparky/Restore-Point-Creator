@@ -203,7 +203,7 @@ Public Class frmTaskScheduler
                 btnDeleteTaskDelete.Enabled = True
             End If
         Catch ex As FormatException
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
             Functions.eventLogFunctions.writeToApplicationLogFile("There was an error loading the saved schedule time from the """ & strDeleteTaskName & """ task.", EventLogEntryType.Error)
         End Try
 
@@ -263,7 +263,7 @@ Public Class frmTaskScheduler
                 btnDeleteTask.Enabled = True
             End If
         Catch ex As FormatException
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
             Functions.eventLogFunctions.writeToApplicationLogFile("There was an error loading the saved schedule time from the """ & strCheckPointTaskName & """ task.", EventLogEntryType.Error)
         End Try
 

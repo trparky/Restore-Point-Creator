@@ -58,7 +58,7 @@ Namespace Functions.support
                 End If
             Catch ex As Exception
                 ' This is if something goes wrong while trying to parse what Windows gave us as the window's border color.
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 Return My.Settings.pleaseWaitBorderColor
             End Try
         End Function
@@ -167,13 +167,13 @@ Namespace Functions.support
                 End If
             Catch ex As XPath.XPathException
                 eventLogFunctions.writeToApplicationLogFile("There was an error while parsing the XML document. The contents of the XML document are below..." & vbCrLf & vbCrLf & xmlData, EventLogEntryType.Error)
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
 
                 ' Something went wrong so we return a False value.
                 Return False
             Catch ex As XmlException
                 eventLogFunctions.writeToApplicationLogFile("There was an error while parsing the XML document. The contents of the XML document are below..." & vbCrLf & vbCrLf & xmlData, EventLogEntryType.Error)
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
 
                 ' Something went wrong so we return a False value.
                 Return False
@@ -512,7 +512,7 @@ Namespace Functions.support
                 End If
             Catch ex As Exception
                 ' Something went wrong so we write out our crash stack trace data to the application event log.
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 eventLogFunctions.writeToApplicationLogFile("Returning a False value for the extractUpdatedFileFromZIPPackage() function.", EventLogEntryType.Error)
                 Return False ' And we return a False value for the function.
             End Try
@@ -544,7 +544,7 @@ Namespace Functions.support
 
                 Return True
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 Return False
             End Try
         End Function
@@ -563,7 +563,7 @@ Namespace Functions.support
 
                 Return True
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 Return False
             End Try
         End Function
@@ -642,7 +642,7 @@ Namespace Functions.support
 
                 eventLogFunctions.writeToApplicationLogFile("Successfully set Safe Mode Boot flag.", EventLogEntryType.Information)
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 eventLogFunctions.writeToApplicationLogFile("Unable to set Safe Mode Boot flag.", EventLogEntryType.Error)
             End Try
         End Sub
@@ -659,7 +659,7 @@ Namespace Functions.support
                 bcdEditor.dispose()
                 bcdEditor = Nothing
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 eventLogFunctions.writeToApplicationLogFile("Unable to remove Safe Mode Boot flag.", EventLogEntryType.Error)
             End Try
         End Sub
@@ -774,7 +774,7 @@ Namespace Functions.support
                 Process.Start(startInfo)
                 Process.GetCurrentProcess.Kill()
             Catch ex As ComponentModel.Win32Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 MsgBox("There was an error while attempting to elevate the process, please make sure that when the Windows UAC prompt appears asking you to run the program with elevated privileges that you say ""Yes"" to the UAC prompt." & vbCrLf & vbCrLf & "The program will now terminate.", MsgBoxStyle.Critical, globalVariables.programName)
                 Process.GetCurrentProcess.Kill()
             End Try
@@ -795,7 +795,7 @@ Namespace Functions.support
                 Process.Start(startInfo)
                 Process.GetCurrentProcess.Kill()
             Catch ex As ComponentModel.Win32Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 MsgBox("There was an error while attempting to elevate the process, please make sure that when the Windows UAC prompt appears asking you to run the program with elevated privileges that you say ""Yes"" to the UAC prompt." & vbCrLf & vbCrLf & "The program will now terminate.", MsgBoxStyle.Critical + MsgBoxStyle.SystemModal, globalVariables.programName)
                 Process.GetCurrentProcess.Kill()
             End Try
@@ -877,7 +877,7 @@ Namespace Functions.support
                     End If
                 End If
             Catch ex2 As ComponentModel.Win32Exception
-                eventLogFunctions.writeCrashToEventLog(ex2)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex2)
                 MsgBox("There was an error attempting to launch your web browser. Perhaps rebooting your system will correct this issue.", MsgBoxStyle.Information, "Restore Point Creator")
             Catch ex As Exception
                 copyTextToWindowsClipboard(url)

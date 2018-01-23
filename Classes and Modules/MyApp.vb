@@ -24,7 +24,7 @@ Module keepThisVeryImportantStuff
 
             jumpList.JumpItems.Add(jumpTask)
         Catch ex As Exception
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
         End Try
     End Sub
 
@@ -41,7 +41,7 @@ Module keepThisVeryImportantStuff
 
             Windows.Shell.JumpList.SetJumpList(Windows.Application.Current, jumpList)
         Catch ex As Exception
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
         End Try
     End Sub
 End Module

@@ -73,7 +73,7 @@ Public Class Mount_Volume_Shadow_Copy
             Process.Start(IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe"), globalVariables.shadowCopyMountFolder)
             btnUnmount.Enabled = True
         Catch ex As NullReferenceException
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
             Functions.eventLogFunctions.writeToApplicationLogFile("Something went wrong, unable to find entry in shadowCopyCache Object.", EventLogEntryType.Error)
 
             MsgBox("Something went wrong, unable to find entry in shadowCopyCache Object.", MsgBoxStyle.Critical, Me.Text)

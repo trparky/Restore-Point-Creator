@@ -207,7 +207,7 @@ Public Class Create_Restore_Point_at_User_Logon
             taskService.Dispose()
 
             Functions.eventLogFunctions.writeToApplicationLogFile("There was an error while validating the task definition settings.", EventLogEntryType.Error)
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
 
             MsgBox("There was an error while validating the task definition settings. Please see the Application Event Log for more details.", MsgBoxStyle.Critical, Me.Text)
             Exit Sub

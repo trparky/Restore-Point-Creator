@@ -19,7 +19,7 @@ Namespace Functions.wmi
                             startMode = managementObject.GetPropertyValue("StartMode").ToString()
                         End If
                     Catch ex As Exception
-                        eventLogFunctions.writeCrashToEventLog(ex)
+                        eventLogFunctions.writeCrashToApplicationLogFile(ex)
                         eventLogFunctions.writeToApplicationLogFile("Unable to get Startup Type for the " & strServiceName & " System Service.", EventLogEntryType.Error)
                     End Try
                 End If
@@ -37,7 +37,7 @@ Namespace Functions.wmi
                     End Using
                 End Using
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 eventLogFunctions.writeToApplicationLogFile("Unable to set Startup Type for the " & strServiceName & " System Service.", EventLogEntryType.Error)
             End Try
         End Sub
@@ -121,7 +121,7 @@ Namespace Functions.wmi
                 End If
             Catch ex As Management.ManagementException
                 eventLogFunctions.writeToApplicationLogFile("Unable to retrieve volumeID from WMI for system drive " & driveLetter & ".", EventLogEntryType.Error)
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 MsgBox("Unable to retrieve volumeID from WMI for system drive " & driveLetter & "." & vbCrLf & vbCrLf & "The program will now terminate.", MsgBoxStyle.Critical, "Restore Point Creator")
                 Process.GetCurrentProcess.Kill()
 
@@ -180,7 +180,7 @@ Namespace Functions.wmi
                     End If
                 End If
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
             End Try
         End Sub
 
@@ -231,26 +231,26 @@ Namespace Functions.wmi
 
                 Return oOutParams("ReturnValue")
             Catch ex4 As UnauthorizedAccessException
-                eventLogFunctions.writeCrashToEventLog(ex4)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex4)
                 eventLogFunctions.writeToApplicationLogFile("Falling back to core Windows APIs to create restore point.", EventLogEntryType.Warning)
 
                 Try
                     Return APIs.systemRestore.StartRestore(restorePointName, restorePointType, restorePointID)
                 Catch ex6 As Exception
                     eventLogFunctions.writeToApplicationLogFile("Unable to create system restore point. System permissions seem to not allow it.", EventLogEntryType.Error)
-                    eventLogFunctions.writeCrashToEventLog(ex6)
+                    eventLogFunctions.writeCrashToApplicationLogFile(ex6)
                     MsgBox("Unable to create system restore point. System permissions seem to not allow it.", MsgBoxStyle.Critical, "Error Creating System Restore Point")
 
                     Return APIs.errorCodes.ERROR_ACCESS_DENIED
                 End Try
             Catch ex3 As Runtime.InteropServices.COMException
-                eventLogFunctions.writeCrashToEventLog(ex3)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex3)
                 eventLogFunctions.writeToApplicationLogFile("Falling back to core Windows APIs to create restore point.", EventLogEntryType.Warning)
 
                 Try
                     Return APIs.systemRestore.StartRestore(restorePointName, restorePointType, restorePointID)
                 Catch ex5 As Exception
-                    eventLogFunctions.writeCrashToEventLog(ex5)
+                    eventLogFunctions.writeCrashToApplicationLogFile(ex5)
                     giveComExceptionCrashMessage()
 
                     Return APIs.errorCodes.ERROR_INTERNAL_ERROR
@@ -262,7 +262,7 @@ Namespace Functions.wmi
                     exceptionHandler.manuallyLoadCrashWindow(ex)
                 End If
 
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
 
                 Return APIs.errorCodes.ERROR_INTERNAL_ERROR
             End Try
@@ -291,12 +291,12 @@ Namespace Functions.wmi
                     MsgBox("Unable to retrieve restore point name from system, System Restore Restoration Process halted.", MsgBoxStyle.Critical, "Restore Point Creator")
                 End If
             Catch ex4 As ArgumentException
-                eventLogFunctions.writeCrashToEventLog(ex4)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex4)
                 MsgBox("Unable to restore system to selected restore point, a COM Exception has occurred. Restore process aborted.", MsgBoxStyle.Critical, "Restore Point Creator")
             Catch ex3 As Runtime.InteropServices.COMException
                 giveComExceptionCrashMessage()
             Catch ex2 As IO.FileLoadException
-                eventLogFunctions.writeCrashToEventLog(ex2)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex2)
                 MsgBox("Unable to load required system assemblies to perform system operation. Please refer to the Application Event Log for more details and to submit the crash event to me." & vbCrLf & vbCrLf & "This program will now close.", MsgBoxStyle.Critical, "Restore Point Creator FileLoadException Handler")
                 Process.GetCurrentProcess.Kill()
             Catch ex As Exception

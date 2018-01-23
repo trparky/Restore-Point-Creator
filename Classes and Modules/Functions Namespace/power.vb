@@ -106,7 +106,7 @@ Namespace Functions.power
                     MsgBox("This system doesn't appear to have a valid active power plan in place.", MsgBoxStyle.Critical, "System Restore Point Creator")
                 End If
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
             End Try
         End Sub
 
@@ -144,7 +144,7 @@ Namespace Functions.power
                     MsgBox("This system doesn't appear to have a valid active power plan in place.", MsgBoxStyle.Critical, "System Restore Point Creator")
                 End If
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
             End Try
         End Sub
     End Module

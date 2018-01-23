@@ -57,7 +57,7 @@ Namespace Functions.taskStuff
                 taskService.Dispose()
             Catch ex As Exception
                 eventLogFunctions.writeToApplicationLogFile("Unable to disable built-in Windows System Restore Task.", EventLogEntryType.Error)
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
             End Try
         End Sub
 
@@ -80,7 +80,7 @@ Namespace Functions.taskStuff
                 taskService.Dispose()
             Catch ex As Exception
                 eventLogFunctions.writeToApplicationLogFile("Unable to disable built-in Windows System Restore Task.", EventLogEntryType.Error)
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
             End Try
         End Sub
 
@@ -142,7 +142,7 @@ Namespace Functions.taskStuff
                     taskService.Dispose()
 
                     eventLogFunctions.writeToApplicationLogFile("There was an error while validating the task definition settings.", EventLogEntryType.Error)
-                    eventLogFunctions.writeCrashToEventLog(ex)
+                    eventLogFunctions.writeCrashToApplicationLogFile(ex)
 
                     Exit Sub
                 End Try
@@ -159,7 +159,7 @@ Namespace Functions.taskStuff
                 newTask = Nothing
                 taskService = Nothing
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
             End Try
         End Sub
 
@@ -191,7 +191,7 @@ Namespace Functions.taskStuff
                 End If
                 '"Restore Point Creator -- Run with no UAC (Keep X Number of Restore Points)"
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 ' Silently handle the exception.
             End Try
         End Sub
@@ -244,7 +244,7 @@ Namespace Functions.taskStuff
             Catch ex As Exception
                 ' OK, we have some errors so lets add them to the Event Log.
                 eventLogFunctions.writeToApplicationLogFile("An error occurred while upgrading scheduled task.", EventLogEntryType.Error)
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
             End Try
         End Sub
 
@@ -283,7 +283,7 @@ Namespace Functions.taskStuff
                     task.Dispose()
                 End If
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex, EventLogEntryType.Warning)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex, EventLogEntryType.Warning)
             End Try
         End Sub
 
@@ -325,7 +325,7 @@ Namespace Functions.taskStuff
                     End If
                 End If
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex, EventLogEntryType.Warning)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex, EventLogEntryType.Warning)
             End Try
 
             registryStuff.setBooleanValueInRegistry("Added MultiRun For Runtime Task", True)
@@ -516,7 +516,7 @@ Namespace Functions.taskStuff
                     End If
                 End If
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 ' Something went very wrong, so let's just try and re-launch this program with standard Administrator privileges with a UAC prompt.
                 If boolAreWeRunningAsAdministrator = False Then support.reRunWithAdminUserRights()
             End Try

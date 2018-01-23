@@ -20,7 +20,7 @@
             Try
                 Dim httpHelper As httpHelper = createNewHTTPHelperObject()
                 Dim downloadResult As Boolean = httpHelper.downloadFile(urlToDownloadFrom, memStream, False)
-                If Not downloadResult Then eventLogFunctions.writeCrashToEventLog(httpHelper.getLastException)
+                If Not downloadResult Then eventLogFunctions.writeCrashToApplicationLogFile(httpHelper.getLastException)
                 Return downloadResult
             Catch ex As Exception
                 Return False
@@ -28,7 +28,7 @@
         End Function
 
         Private Sub customHTTPHelperErrorHandler(ex As Exception, classInstance As httpHelper)
-            eventLogFunctions.writeCrashToEventLog(ex, EventLogEntryType.Warning)
+            eventLogFunctions.writeCrashToApplicationLogFile(ex, EventLogEntryType.Warning)
             Dim lastAccessedURL As String = classInstance.getLastAccessedURL()
 
             If TypeOf ex Is Net.WebException Then

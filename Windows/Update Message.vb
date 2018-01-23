@@ -78,7 +78,7 @@
             Catch ex As Exception
             End Try
         Catch ex As Exception
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
         End Try
     End Sub
 

@@ -91,7 +91,7 @@
         Catch ex As Threading.ThreadAbortException
         Catch ex As Exception
             MsgBox(ex.Message)
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
         End Try
     End Sub
 
@@ -517,7 +517,7 @@
                 MsgBox(String.Format("{0} log entries have been successfully exported.{1}{1}Application Event Log exported in {2}ms ({3} seconds).", logCount, vbCrLf, timeStamp.ElapsedMilliseconds, Math.Round(timeStamp.Elapsed.TotalSeconds, 3)), MsgBoxStyle.Information, Me.Text)
             End If
         Catch ex As Exception
-            Functions.eventLogFunctions.writeCrashToEventLog(ex)
+            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
             Functions.eventLogFunctions.writeToApplicationLogFile("There was an error while attempting to export the program's event log entries.", EventLogEntryType.Error)
 
             MsgBox("There was an error while exporting the log data.", MsgBoxStyle.Critical, Me.Text)

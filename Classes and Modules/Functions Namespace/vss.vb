@@ -23,7 +23,7 @@
                         End Using
                     Catch ex As Exception
                         eventLogFunctions.writeToApplicationLogFile("The VSS System Service has failed to start.", EventLogEntryType.Error)
-                        eventLogFunctions.writeCrashToEventLog(ex, EventLogEntryType.Error)
+                        eventLogFunctions.writeCrashToApplicationLogFile(ex, EventLogEntryType.Error)
                     End Try
                 End If
             Catch ex As Exception
@@ -160,7 +160,7 @@
 
                 setShadowStorageSize(driveLetter, newSize)
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
             End Try
         End Sub
 
@@ -244,7 +244,7 @@
                     searcher = Nothing
                 End If
             Catch ex2 As Management.ManagementException
-                eventLogFunctions.writeCrashToEventLog(ex2)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex2)
 
                 Dim msgBoxResult As MsgBoxResult = MsgBox("There was an error attempting to apply your drive space settings. Would you like to try again?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Restore Point Creator")
 
@@ -254,7 +254,7 @@
                 End If
             Catch ex As Exception
                 If ex.Message.caseInsensitiveContains("provider failure") = True Then
-                    eventLogFunctions.writeCrashToEventLog(ex)
+                    eventLogFunctions.writeCrashToApplicationLogFile(ex)
                     giveMessageAboutShadowCopyServiceBeingBroken()
                 Else
                     Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")

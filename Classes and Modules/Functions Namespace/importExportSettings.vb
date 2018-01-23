@@ -196,7 +196,7 @@ Namespace Functions.importExportSettings
                 xmlSerializerObject.Serialize(streamWriter, exportedSettingsFile)
                 streamWriter.Close()
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
             End Try
         End Sub
