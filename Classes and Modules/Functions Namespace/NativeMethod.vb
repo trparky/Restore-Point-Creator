@@ -1,7 +1,7 @@
 ﻿Imports System.Runtime.InteropServices
 
 Namespace Functions.NativeMethod
-    Friend Class NativeMethod
+    Friend Class NativeMethods
         Public Const SWP_NOMOVE = 2
         Public Const SWP_NOSIZE = 1
         Public Const HWND_TOPMOST = -1

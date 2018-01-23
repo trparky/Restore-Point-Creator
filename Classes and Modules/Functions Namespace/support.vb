@@ -44,7 +44,7 @@ Namespace Functions.support
                 If osVersionInfo.isThisWindows8x() Or osVersionInfo.isThisWindows10() Then
                     ' Yep, we're on Windows 8 or Windows 10 so lets go ahead and use that special API.
                     Dim color As UInteger, blend As Boolean
-                    NativeMethod.NativeMethod.DwmGetColorizationColor(color, blend)
+                    NativeMethod.NativeMethods.DwmGetColorizationColor(color, blend)
                     Dim strHexColor As String = color.ToString("x")
                     ' Converts from Hexidecimal (Base 16 Math) to Base 10 Math.
                     Dim a As Integer = Convert.ToInt32(strHexColor.Substring(0, 2), 16)

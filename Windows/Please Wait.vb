@@ -22,7 +22,7 @@ Public Class Please_Wait
         End If
 
         If systemModal Then
-            NativeMethod.SetWindowPos(Me.Handle, NativeMethod.HWND_TOPMOST, 0, 0, 0, 0, NativeMethod.TOPMOST_FLAGS)
+            NativeMethods.SetWindowPos(Me.Handle, NativeMethods.HWND_TOPMOST, 0, 0, 0, 0, NativeMethods.TOPMOST_FLAGS)
         End If
 
         Control.CheckForIllegalCrossThreadCalls = False
