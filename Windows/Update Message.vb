@@ -189,12 +189,7 @@
         Else
             shortCountDown -= 1
             lblCountdown.Text = shortCountDown
-
-            If shortCountDown = 1 Then
-                ToolTip1.SetToolTip(lblCountdown, "1 second until automatic Yes to update. Click to disable countdown.")
-            Else
-                ToolTip1.SetToolTip(lblCountdown, shortCountDown & " seconds until automatic Yes to update. Click to disable countdown.")
-            End If
+            ToolTip1.SetToolTip(lblCountdown, If(shortCountDown = 1, "1 second until automatic Yes to update. Click to disable countdown.", shortCountDown & " seconds until automatic Yes to update. Click to disable countdown."))
         End If
     End Sub
 
