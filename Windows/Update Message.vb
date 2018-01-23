@@ -91,9 +91,9 @@
         If My.Settings.useSSL Then
             ToolTip1.SetToolTip(btnYes, "Download Secured by SSL.")
             imgSSL.Visible = True
-            lblTheUpdateWillDownload.Location = New Point(33, 238)
+            lblTheUpdateWillDownload.Location = New Point(33, lblTheUpdateWillDownload.Location.Y)
         Else
-            lblTheUpdateWillDownload.Location = New Point(9, 238)
+            lblTheUpdateWillDownload.Location = New Point(9, lblTheUpdateWillDownload.Location.Y)
         End If
 
         If versionUpdate = versionUpdateType.betaVersionUpdate Or versionUpdate = versionUpdateType.releaseCandidateVersionUpdate Then
