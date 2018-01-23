@@ -459,7 +459,7 @@ Namespace My
                                 Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Starting scheduled restore point job. Task running As user {0}.", Environment.UserName), EventLogEntryType.Information)
                             End If
 
-                            Functions.startupFunctions.writeLastRunFile()
+                            If boolAreWeAnAdministrator Then Functions.startupFunctions.writeLastRunFile()
 
                             If boolExtendedLoggingForScheduledTasks = True Then oldNewestRestorePointID = Functions.wmi.getNewestSystemRestorePointID()
 

@@ -260,11 +260,11 @@ Namespace Functions.startupFunctions
 
         Public Sub writeLastRunFile()
             Try
-                Dim fileStream As New StreamWriter("lastrun.txt")
-                fileStream.Write(Now.ToString)
-                fileStream.Close()
+                Using fileStream As New StreamWriter("lastrun.txt")
+                    fileStream.Write(Now.ToString)
+                End Using
             Catch ex As Exception
-                eventLogFunctions.writeCrashToEventLog(ex)
+                eventLogFunctions.writeCrashToEventLog(ex, EventLogEntryType.Warning)
                 ' Does nothing.
             End Try
         End Sub
