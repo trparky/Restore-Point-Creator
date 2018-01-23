@@ -157,11 +157,11 @@ Public Class Official_Contact_Form
         End If
     End Sub
 
-    Private Sub addFileToList(strFileName As String)
+    Private Sub addFileToList(strInputFileName As String)
         Dim listViewItem As New myListViewItemTypes.contactFormFileListItem With {
-            .Text = strFileName,
-            .strFileName = strFileName,
-            .longFileSize = New IO.FileInfo(strFileName).Length
+            .Text = strInputFileName,
+            .strFileName = strInputFileName,
+            .longFileSize = New IO.FileInfo(strInputFileName).Length
         }
         listViewItem.SubItems.Add(Functions.support.bytesToHumanSize(listViewItem.longFileSize))
         listAttachedFiles.Items.Add(listViewItem)
