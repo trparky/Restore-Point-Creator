@@ -8,6 +8,57 @@ Namespace Functions.NativeMethod
         Public Const HWND_NOTOPMOST = -2
         Public Const TOPMOST_FLAGS = SWP_NOMOVE Or SWP_NOSIZE
 
+        Public Enum PROCESS_INFORMATION_CLASS As Integer
+            ProcessBasicInformation = 0
+            ProcessQuotaLimits
+            ProcessIoCounters
+            ProcessVmCounters
+            ProcessTimes
+            ProcessBasePriority
+            ProcessRaisePriority
+            ProcessDebugPort
+            ProcessExceptionPort
+            ProcessAccessToken
+            ProcessLdtInformation
+            ProcessLdtSize
+            ProcessDefaultHardErrorMode
+            ProcessIoPortHandlers
+            ProcessPooledUsageAndLimits
+            ProcessWorkingSetWatch
+            ProcessUserModeIOPL
+            ProcessEnableAlignmentFaultFixup
+            ProcessPriorityClass
+            ProcessWx86Information
+            ProcessHandleCount
+            ProcessAffinityMask
+            ProcessPriorityBoost
+            ProcessDeviceMap
+            ProcessSessionInformation
+            ProcessForegroundInformation
+            ProcessWow64Information
+            ProcessImageFileName
+            ProcessLUIDDeviceMapsEnabled
+            ProcessBreakOnTermination
+            ProcessDebugObjectHandle
+            ProcessDebugFlags
+            ProcessHandleTracing
+            ProcessIoPriority
+            ProcessExecuteFlags
+            ProcessResourceManagement
+            ProcessCookie
+            ProcessImageInformation
+            ProcessCycleTime
+            ProcessPagePriority
+            ProcessInstrumentationCallback
+            ProcessThreadStackAllocation
+            ProcessWorkingSetWatchEx
+            ProcessImageFileNameWin32
+            ProcessImageFileMapping
+            ProcessAffinityUpdateMode
+            ProcessMemoryAllocationMode
+            MaxProcessInfoClass
+        End Enum
+
         <Flags>
         Public Enum SetWindowPosFlags As UInteger
             ' ReSharper disable InconsistentNaming
@@ -97,5 +148,13 @@ Namespace Functions.NativeMethod
         <DllImport("dwmapi.dll")>
         Public Shared Sub DwmGetColorizationColor(ByRef ColorizationColor As UInteger, ByRef ColorizationOpaqueBlend As Boolean)
         End Sub
+
+        <DllImport("kernel32.dll", SetLastError:=True)>
+        Public Shared Function GetCurrentProcess() As IntPtr
+        End Function
+
+        <DllImport("ntdll.dll", SetLastError:=True)>
+        Public Shared Function NtSetInformationProcess(processHandle As IntPtr, processInformationClass As PROCESS_INFORMATION_CLASS, ByRef processInformation As IntPtr, processInformationLength As UInteger) As Integer
+        End Function
     End Class
 End Namespace
