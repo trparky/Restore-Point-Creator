@@ -83,7 +83,7 @@
             Else
                 httpHelper.useSystemProxy = False
 
-                If String.IsNullOrEmpty(My.Settings.proxyUser) Then
+                If String.IsNullOrEmpty(My.Settings.proxyUser) Or String.IsNullOrEmpty(My.Settings.proxyPass) Then
                     httpHelper.setProxy(My.Settings.proxyAddress, My.Settings.proxyPort, True)
                 Else
                     httpHelper.setProxy(My.Settings.proxyAddress, My.Settings.proxyPort, My.Settings.proxyUser, support.convertFromBase64(My.Settings.proxyPass), True)
