@@ -90,20 +90,14 @@
                 End If
             End If
 
-            If IO.File.Exists("tom") = True Then
-                httpHelper.addPOSTData("dontcount", "True")
-            End If
+            If IO.File.Exists("tom") Then httpHelper.addPOSTData("dontcount", "True")
 
             httpHelper.setURLPreProcessor = Function(ByVal strURLInput As String) As String
                                                 Try
                                                     If strURLInput.Trim.StartsWith("http", StringComparison.OrdinalIgnoreCase) Then
                                                         Return strURLInput
                                                     Else
-                                                        If My.Settings.useSSL Then
-                                                            Return "https://" & strURLInput
-                                                        Else
-                                                            Return "http://" & strURLInput
-                                                        End If
+                                                        Return If(My.Settings.useSSL, "https://" & strURLInput, "http://" & strURLInput)
                                                     End If
                                                 Catch ex As Exception
                                                     Return strURLInput
