@@ -287,7 +287,7 @@
     Sub formLoadDiskData()
         Try
             If Me.IsHandleCreated = True Then
-                If GroupBox1.IsHandleCreated = True Then
+                If GroupBox1.IsHandleCreated Then
                     openPleaseWaitPanel("Loading Disk Space Usage Information... Please Wait.")
 
                     workingThread = New Threading.Thread(AddressOf loadDiskSpaceUsageData)
@@ -298,9 +298,7 @@
             Else
                 Threading.Thread.Sleep(100)
 
-                If formLoadDiskDataAttempts = 5 Then
-                    Exit Sub
-                End If
+                If formLoadDiskDataAttempts = 5 Then Exit Sub
 
                 formLoadDiskDataAttempts += 1
                 formLoadDiskData()
@@ -329,19 +327,11 @@
 
     Sub doTheResizingOfTheBars()
         If GroupBox1 IsNot Nothing Then
-            If GroupBox1.VerticalScroll.Visible Then
-                For Each controlObject As Control In GroupBox1.Controls
-                    If controlObject IsNot Nothing AndAlso controlObject.GetType = GetType(SmoothProgressBar) Then
-                        DirectCast(controlObject, SmoothProgressBar).Width = GroupBox1.Width - 48
-                    End If
-                Next
-            Else
-                For Each controlObject As Control In GroupBox1.Controls
-                    If controlObject IsNot Nothing AndAlso controlObject.GetType = GetType(SmoothProgressBar) Then
-                        DirectCast(controlObject, SmoothProgressBar).Width = GroupBox1.Width - 30
-                    End If
-                Next
-            End If
+        	For Each controlObject As Control In GroupBox1.Controls
+            	If controlObject IsNot Nothing AndAlso controlObject.GetType = GetType(SmoothProgressBar) Then
+            		DirectCast(controlObject, SmoothProgressBar).Width = If(GroupBox1.VerticalScroll.Visible, GroupBox1.Width - 48, GroupBox1.Width - 30)
+                End If
+        	Next
         End If
     End Sub
 
@@ -363,6 +353,17 @@
         End If
     End Sub
 
+    Private Sub setBarColors()
+        Dim smoothProgressBarObject As SmoothProgressBar
+
+        For Each control As Control In GroupBox1.Controls
+            If control.GetType.Equals(GetType(SmoothProgressBar)) Then
+                smoothProgressBarObject = DirectCast(control, SmoothProgressBar)
+                smoothProgressBarObject.ProgressBarColor = If(smoothProgressBarObject.Value > globalVariables.warningPercentage And My.Settings.ShowFullDisksAsRed, Color.Red, My.Settings.barColor)
+            End If
+        Next
+    End Sub
+
     Private Sub btnSetBarColor_Click(sender As Object, e As EventArgs) Handles btnSetBarColor.Click
         Try
             ColorDialog.CustomColors = Functions.support.loadCustomColors()
@@ -372,20 +373,7 @@
             My.Settings.barColor = ColorDialog.Color
 
             Functions.support.saveCustomColors(ColorDialog.CustomColors)
-
-            Dim smoothProgressBarObject As SmoothProgressBar
-
-            For Each control As Control In GroupBox1.Controls
-                If control.GetType = GetType(SmoothProgressBar) Then
-                    smoothProgressBarObject = DirectCast(control, SmoothProgressBar)
-
-                    If smoothProgressBarObject.Value > globalVariables.warningPercentage And My.Settings.ShowFullDisksAsRed = True Then
-                        smoothProgressBarObject.ProgressBarColor = Color.Red
-                    Else
-                        smoothProgressBarObject.ProgressBarColor = My.Settings.barColor
-                    End If
-                End If
-            Next
+            setBarColors()
         Catch ex As Exception
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
             exceptionHandler.manuallyLoadCrashWindow(ex, ex.Message, ex.StackTrace, ex.GetType)
@@ -409,20 +397,7 @@
 
     Private Sub chkShowFullDisksAsRed_Click(sender As Object, e As EventArgs) Handles chkShowFullDisksAsRed.Click
         My.Settings.ShowFullDisksAsRed = chkShowFullDisksAsRed.Checked
-
-        Dim smoothProgressBarObject As SmoothProgressBar
-
-        For Each control As Control In GroupBox1.Controls
-            If control.GetType = GetType(SmoothProgressBar) Then
-                smoothProgressBarObject = DirectCast(control, SmoothProgressBar)
-
-                If smoothProgressBarObject.Value > globalVariables.warningPercentage And My.Settings.ShowFullDisksAsRed = True Then
-                    smoothProgressBarObject.ProgressBarColor = Color.Red
-                Else
-                    smoothProgressBarObject.ProgressBarColor = My.Settings.barColor
-                End If
-            End If
-        Next
+        setBarColors()
     End Sub
 
     Private Sub Disk_Space_Usage_Load(sender As Object, e As EventArgs) Handles MyBase.Load
