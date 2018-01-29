@@ -54,7 +54,7 @@
     End Sub
 
     Private Sub txtSearchTerms_TextChanged(sender As Object, e As EventArgs) Handles txtSearchTerms.TextChanged
-        If String.IsNullOrEmpty(txtSearchTerms.Text) Then
+        If String.IsNullOrWhiteSpace(txtSearchTerms.Text) Then
             btnSearch.Enabled = False
             btnClear.Enabled = False
         Else

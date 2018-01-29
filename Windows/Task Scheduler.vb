@@ -293,7 +293,7 @@ Public Class frmTaskScheduler
         lblEvery.Visible = True
         txtEveryDay.Visible = True
 
-        If String.IsNullOrEmpty(txtEveryDay.Text.Trim) Then
+        If String.IsNullOrWhiteSpace(txtEveryDay.Text.Trim) Then
             txtEveryDay.Text = 2
         End If
     End Sub

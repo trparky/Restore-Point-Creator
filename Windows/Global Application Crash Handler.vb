@@ -101,7 +101,7 @@ Public Class frmCrash
 
         httpHelper.addPOSTData("crashdata", txtStackTrace.Text)
 
-        If Not String.IsNullOrEmpty(txtDoing.Text.Trim) Then
+        If Not String.IsNullOrWhiteSpace(txtDoing.Text.Trim) Then
             httpHelper.addPOSTData("doing", txtDoing.Text)
         End If
 
@@ -221,7 +221,7 @@ Public Class frmCrash
     End Sub
 
     Private Sub btnSubmitData_Click(sender As Object, e As EventArgs) Handles btnSubmitData.Click
-        If String.IsNullOrEmpty(txtEmail.Text.Trim) Then
+        If String.IsNullOrWhiteSpace(txtEmail.Text.Trim) Then
             MsgBox("You must provide your email address.", MsgBoxStyle.Critical, Me.Text)
             Exit Sub
         End If

@@ -3,7 +3,7 @@
     Public createRestorePoint As Boolean
 
     Private Sub btnOK_Click(sender As Object, e As EventArgs) Handles btnOK.Click
-        If String.IsNullOrEmpty(txtRestorePointName.Text.Trim) Then
+        If String.IsNullOrWhiteSpace(txtRestorePointName.Text.Trim) Then
             MsgBox("You did not input a name for your Restore Point.", MsgBoxStyle.Information, "Restore Point Creator")
         Else
             restorePointName = txtRestorePointName.Text.Trim

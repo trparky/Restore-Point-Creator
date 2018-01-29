@@ -309,7 +309,7 @@ Public Class Form1
                 defaultCustomRestorePointName = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey).GetValue("Default Custom Restore Point Name", "").ToString.Trim
             End If
 
-            If String.IsNullOrEmpty(defaultCustomRestorePointName.Trim) = False And Functions.support.areWeInSafeMode() = False Then btnCreateRestorePointNameWithDefaultName.Visible = True
+            If String.IsNullOrWhiteSpace(defaultCustomRestorePointName.Trim) = False And Functions.support.areWeInSafeMode() = False Then btnCreateRestorePointNameWithDefaultName.Visible = True
 
             If My.Settings.updateChannel.Equals(globalVariables.updateChannels.stable, StringComparison.OrdinalIgnoreCase) Then
                 toolStripStableChannel.Checked = True
@@ -1179,7 +1179,7 @@ Public Class Form1
 
     Private Sub unifiedCreateSystemRestorePoint(Optional ByVal stringRestorePointName As String = "System Checkpoint made by System Restore Point Creator")
         Try
-            If String.IsNullOrEmpty(stringRestorePointName.Trim) Then
+            If String.IsNullOrWhiteSpace(stringRestorePointName.Trim) Then
                 MsgBox("You must enter a description for your System Restore Point.", MsgBoxStyle.Critical, strMessageBoxTitle)
                 Exit Sub
             End If
@@ -3253,7 +3253,7 @@ Public Class Form1
             Exit Sub
         End If
 
-        If String.IsNullOrEmpty(txtRestorePointDescription.Text) Then Exit Sub
+        If String.IsNullOrWhiteSpace(txtRestorePointDescription.Text) Then Exit Sub
 
         txtRestorePointDescription.Text = txtRestorePointDescription.Text.Trim
 

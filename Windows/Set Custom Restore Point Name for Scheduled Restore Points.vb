@@ -1,6 +1,6 @@
 ﻿Public Class Set_Custom_Restore_Point_Name_for_Scheduled_Restore_Points
     Private Sub btnOK_Click(sender As Object, e As EventArgs) Handles btnOK.Click
-        If String.IsNullOrEmpty(txtRestorePointName.Text.Trim) = False Then
+        If String.IsNullOrWhiteSpace(txtRestorePointName.Text.Trim) = False Then
             Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue("Custom Name for Scheduled Restore Points", txtRestorePointName.Text, Microsoft.Win32.RegistryValueKind.String)
         End If
 
