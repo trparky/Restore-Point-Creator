@@ -37,71 +37,46 @@
         Public Function getData(ByVal volumeID As String, ByRef boolResult As Boolean) As supportClasses.ShadowStorageData ' Accepts both a Volume ID and a drive letter such as "C:".
             Dim boolDeviceIDRetrievalResult As Boolean = True
 
-            If volumeID.Length = 2 Then
-                volumeID = wmi.getDeviceIDFromDriveLetter(volumeID, boolDeviceIDRetrievalResult)
-            End If
+            If volumeID.Length = 2 Then volumeID = wmi.getDeviceIDFromDriveLetter(volumeID, boolDeviceIDRetrievalResult)
 
             Try
-                If boolDeviceIDRetrievalResult = True Then
+                If boolDeviceIDRetrievalResult Then
                     Dim wmiQuery As String = String.Format("SELECT * FROM Win32_ShadowStorage WHERE Volume='Win32_Volume.DeviceID=\'{0}\''", volumeID.addSlashes())
-                    Dim searcher As New Management.ManagementObjectSearcher("root\CIMV2", wmiQuery)
 
-                    If searcher.Get.Count <> 0 Then
-                        Dim queryObj As Management.ManagementObject = searcher.Get(0)
-                        Dim shadowStorageDataClassInstance As New supportClasses.ShadowStorageData
+                    Using searcher As New Management.ManagementObjectSearcher("root\CIMV2", wmiQuery)
+                        If searcher.Get.Count <> 0 Then
+                            Using queryObj As Management.ManagementObject = searcher.Get(0)
+                                Dim shadowStorageDataClassInstance As New supportClasses.ShadowStorageData
 
-                        ' This is all in an effort to try and prevent Null Reference Exceptions.
-                        If queryObj("AllocatedSpace") Is Nothing Then
-                            shadowStorageDataClassInstance.AllocatedSpace = 0
-                        Else
-                            If ULong.TryParse(queryObj("AllocatedSpace").ToString, shadowStorageDataClassInstance.AllocatedSpace) = False Then
-                                shadowStorageDataClassInstance.AllocatedSpace = 0
-                            End If
+                                ' This is all in an effort to try and prevent Null Reference Exceptions.
+                                If queryObj("AllocatedSpace") Is Nothing Then
+                                    shadowStorageDataClassInstance.AllocatedSpace = 0
+                                Else
+                                    If Not ULong.TryParse(queryObj("AllocatedSpace").ToString, shadowStorageDataClassInstance.AllocatedSpace) Then shadowStorageDataClassInstance.AllocatedSpace = 0
+                                End If
+
+                                ' This is all in an effort to try and prevent Null Reference Exceptions.
+                                If queryObj("MaxSpace") Is Nothing Then
+                                    shadowStorageDataClassInstance.MaxSpace = 0
+                                Else
+                                    If Not ULong.TryParse(queryObj("MaxSpace").ToString, shadowStorageDataClassInstance.MaxSpace) Then shadowStorageDataClassInstance.MaxSpace = 0
+                                End If
+
+                                ' This is all in an effort to try and prevent Null Reference Exceptions.
+                                If queryObj("UsedSpace") Is Nothing Then : shadowStorageDataClassInstance.UsedSpace = 0
+                                Else
+                                    If Not ULong.TryParse(queryObj("UsedSpace").ToString, shadowStorageDataClassInstance.UsedSpace) Then shadowStorageDataClassInstance.UsedSpace = 0
+                                End If
+
+                                ' This is all in an effort to try and prevent Null Reference Exceptions.
+                                shadowStorageDataClassInstance.DiffVolume = queryObj("DiffVolume")?.ToString
+                                shadowStorageDataClassInstance.Volume = queryObj("Volume")?.ToString
+
+                                boolResult = True
+                                Return shadowStorageDataClassInstance
+                            End Using
                         End If
-
-                        ' This is all in an effort to try and prevent Null Reference Exceptions.
-                        If queryObj("MaxSpace") Is Nothing Then
-                            shadowStorageDataClassInstance.MaxSpace = 0
-                        Else
-                            If ULong.TryParse(queryObj("MaxSpace").ToString, shadowStorageDataClassInstance.MaxSpace) = False Then
-                                shadowStorageDataClassInstance.MaxSpace = 0
-                            End If
-                        End If
-
-                        ' This is all in an effort to try and prevent Null Reference Exceptions.
-                        If queryObj("UsedSpace") Is Nothing Then
-                            shadowStorageDataClassInstance.UsedSpace = 0
-                        Else
-                            If ULong.TryParse(queryObj("UsedSpace").ToString, shadowStorageDataClassInstance.UsedSpace) = False Then
-                                shadowStorageDataClassInstance.UsedSpace = 0
-                            End If
-                        End If
-
-                        ' This is all in an effort to try and prevent Null Reference Exceptions.
-                        If queryObj("DiffVolume") Is Nothing Then
-                            shadowStorageDataClassInstance.DiffVolume = Nothing
-                        Else
-                            shadowStorageDataClassInstance.DiffVolume = queryObj("DiffVolume").ToString
-                        End If
-
-                        ' This is all in an effort to try and prevent Null Reference Exceptions.
-                        If queryObj("Volume") Is Nothing Then
-                            shadowStorageDataClassInstance.Volume = Nothing
-                        Else
-                            shadowStorageDataClassInstance.Volume = queryObj("Volume").ToString
-                        End If
-
-                        searcher.Dispose()
-                        queryObj.Dispose()
-                        searcher = Nothing
-                        queryObj = Nothing
-
-                        boolResult = True
-                        Return shadowStorageDataClassInstance
-                    End If
-
-                    searcher.Dispose()
-                    searcher = Nothing
+                    End Using
 
                     boolResult = False
                     Return Nothing
@@ -121,12 +96,7 @@
         Public Function getMaxSize(ByVal driveLetter As String) As ULong
             Dim boolResult As Boolean
             Dim vssData As supportClasses.ShadowStorageData = getData(driveLetter, boolResult)
-
-            If boolResult = True Then
-                Return vssData.MaxSpace
-            Else
-                Return 0
-            End If
+            Return If(boolResult, vssData.MaxSpace, 0)
         End Function
 
         Private Sub giveMessageAboutShadowCopyServiceBeingBroken()
@@ -137,7 +107,7 @@
 
         Public Sub executeVSSAdminCommand(driveLetter As String)
             Try
-                If IO.File.Exists(IO.Path.Combine(globalVariables.strPathToSystemFolder, "vssadmin.exe")) = True Then
+                If IO.File.Exists(IO.Path.Combine(globalVariables.strPathToSystemFolder, "vssadmin.exe")) Then
                     Dim startInfo As New ProcessStartInfo
                     startInfo.FileName = IO.Path.Combine(globalVariables.strPathToSystemFolder, "vssadmin.exe")
                     startInfo.Arguments = String.Format("Resize ShadowStorage /For={0} /On={0} /MaxSize=20%", driveLetter)
@@ -170,7 +140,7 @@
                 Dim shadowStorageStatistics As supportClasses.ShadowStorageData = getData(globalVariables.systemDriveLetter, boolGetVSSDataResult)
                 Dim shadowStorageUsePercentage As Double
 
-                If shadowStorageStatistics IsNot Nothing And boolGetVSSDataResult = True Then
+                If shadowStorageStatistics IsNot Nothing And boolGetVSSDataResult Then
                     If Not shadowStorageStatistics.UsedSpace.Equals(Nothing) And Not shadowStorageStatistics.MaxSpace.Equals(Nothing) Then
                         shadowStorageUsePercentage = support.calculatePercentageValue(shadowStorageStatistics.UsedSpace, shadowStorageStatistics.MaxSpace)
 
@@ -198,17 +168,19 @@
                 Dim managementScopeObject As New Management.ManagementScope("\\localhost\root\default")
                 Dim managementPathObject As New Management.ManagementPath("SystemRestore")
                 Dim managementObjectOptions As New Management.ObjectGetOptions()
-                Dim managementClassObject As New Management.ManagementClass(managementScopeObject, managementPathObject, managementObjectOptions)
 
-                Dim managementBaseObjectParameters As Management.ManagementBaseObject = managementClassObject.GetMethodParameters("Enable")
-                managementBaseObjectParameters("Drive") = driveLetter
-                managementBaseObjectParameters("WaitTillEnabled") = True
+                Using managementClassObject As New Management.ManagementClass(managementScopeObject, managementPathObject, managementObjectOptions)
+                    Using managementBaseObjectParameters As Management.ManagementBaseObject = managementClassObject.GetMethodParameters("Enable")
+                        managementBaseObjectParameters("Drive") = driveLetter
+                        managementBaseObjectParameters("WaitTillEnabled") = True
 
-                Dim oOutParams As Management.ManagementBaseObject = managementClassObject.InvokeMethod("Enable", managementBaseObjectParameters, Nothing)
+                        Dim oOutParams As Management.ManagementBaseObject = managementClassObject.InvokeMethod("Enable", managementBaseObjectParameters, Nothing)
 
-                eventLogFunctions.writeToApplicationLogFile("Enabled System Restore on drive " & driveLetter.Substring(0, 1).ToUpper & ".", EventLogEntryType.Information)
+                        eventLogFunctions.writeToApplicationLogFile("Enabled System Restore on drive " & driveLetter.Substring(0, 1).ToUpper & ".", EventLogEntryType.Information)
 
-                Return oOutParams("ReturnValue")
+                        Return oOutParams("ReturnValue")
+                    End Using
+                End Using
             Catch ex3 As Runtime.InteropServices.COMException
                 wmi.giveComExceptionCrashMessage()
                 Return 1
@@ -227,21 +199,17 @@
                 Dim boolResult As Boolean
                 Dim volumeID As String = wmi.getDeviceIDFromDriveLetter(driveLetter, boolResult)
 
-                If boolResult = True Then
+                If boolResult Then
                     Dim wmiQuery As String = String.Format("SELECT * FROM Win32_ShadowStorage WHERE Volume='Win32_Volume.DeviceID=\'{0}\''", volumeID.addSlashes())
-                    Dim searcher As New Management.ManagementObjectSearcher("root\CIMV2", wmiQuery)
 
-                    If searcher.Get.Count <> 0 Then
-                        Dim queryObj As Management.ManagementObject = searcher.Get(0)
-
-                        queryObj("MaxSpace") = size
-                        queryObj.Put()
-                        queryObj.Dispose()
-                        queryObj = Nothing
-                    End If
-
-                    searcher.Dispose()
-                    searcher = Nothing
+                    Using searcher As New Management.ManagementObjectSearcher("root\CIMV2", wmiQuery)
+                        If searcher.Get.Count <> 0 Then
+                            Using queryObj As Management.ManagementObject = searcher.Get(0)
+                                queryObj("MaxSpace") = size
+                                queryObj.Put()
+                            End Using
+                        End If
+                    End Using
                 End If
             Catch ex2 As Management.ManagementException
                 eventLogFunctions.writeCrashToApplicationLogFile(ex2)
@@ -253,7 +221,7 @@
                     setShadowStorageSize(driveLetter, size)
                 End If
             Catch ex As Exception
-                If ex.Message.caseInsensitiveContains("provider failure") = True Then
+                If ex.Message.caseInsensitiveContains("provider failure") Then
                     eventLogFunctions.writeCrashToApplicationLogFile(ex)
                     giveMessageAboutShadowCopyServiceBeingBroken()
                 Else
