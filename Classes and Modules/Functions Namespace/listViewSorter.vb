@@ -25,17 +25,8 @@
             Dim lvSecondListViewType As Type = lvSecondListView.GetType
 
             ' Get the sub-item values.
-            If lvFirstListView.SubItems.Count <= intColumnNumber Then
-                strFirstString = ""
-            Else
-                strFirstString = lvFirstListView.SubItems(intColumnNumber).Text
-            End If
-
-            If lvSecondListView.SubItems.Count <= intColumnNumber Then
-                strSecondString = ""
-            Else
-                strSecondString = lvSecondListView.SubItems(intColumnNumber).Text
-            End If
+            strFirstString = If(lvFirstListView.SubItems.Count <= intColumnNumber, "", lvFirstListView.SubItems(intColumnNumber).Text)
+            strSecondString = If(lvSecondListView.SubItems.Count <= intColumnNumber, "", lvSecondListView.SubItems(intColumnNumber).Text)
 
             ' Compare them.
             If soSortOrder = SortOrder.Ascending Then
