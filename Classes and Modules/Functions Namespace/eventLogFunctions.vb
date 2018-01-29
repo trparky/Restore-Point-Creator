@@ -3,15 +3,21 @@
         Private Const strSystemRestorePointCreator As String = "System Restore Point Creator"
         Private Const strRegistryApplicationPath As String = "SYSTEM\CurrentControlSet\services\eventlog\Application"
 
-        Public ReadOnly strProgramDataDirectory As String = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)
-        Public ReadOnly strLogFile As String = IO.Path.Combine(strProgramDataDirectory, "Restore Point Creator.log")
-        Public ReadOnly strLogLockFile As String = IO.Path.Combine(strProgramDataDirectory, "Restore Point Creator.log.lock")
-        Public ReadOnly strCorruptedLockFile As String = IO.Path.Combine(strProgramDataDirectory, "corruptedlog.lock")
-
-        Private ReadOnly boolCachedCanIWriteThereResults As Boolean = privilegeChecks.canIWriteThere(strProgramDataDirectory)
+        Public ReadOnly strProgramDataDirectory, strLogFile, strLogLockFile, strCorruptedLockFile As String
+        Private ReadOnly boolCachedCanIWriteThereResults As Boolean
+        Private ReadOnly xmlSerializerObject As Xml.Serialization.XmlSerializer
         Private spinLockThread As Threading.Thread
 
-        Private ReadOnly xmlSerializerObject As New Xml.Serialization.XmlSerializer((New List(Of restorePointCreatorExportedLog)).GetType)
+        Sub New()
+            strProgramDataDirectory = If(globalVariables.boolPortableMode, (New IO.FileInfo(Application.ExecutablePath)).DirectoryName, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData))
+            boolCachedCanIWriteThereResults = privilegeChecks.canIWriteThere(strProgramDataDirectory)
+
+            strLogFile = IO.Path.Combine(strProgramDataDirectory, "Restore Point Creator.log")
+            strLogLockFile = IO.Path.Combine(strProgramDataDirectory, "Restore Point Creator.log.lock")
+            strCorruptedLockFile = IO.Path.Combine(strProgramDataDirectory, "corruptedlog.lock")
+
+            xmlSerializerObject = New Xml.Serialization.XmlSerializer((New List(Of restorePointCreatorExportedLog)).GetType)
+        End Sub
 
         ''' <summary>Opens and returns a IO.FileStream.</summary>
         ''' <param name="strFileToOpen">Path to the file you want to open.</param>
