@@ -101,7 +101,8 @@
                                     .unixTime = 0,
                                     .logSource = "Restore Point Creator",
                                     .logID = internalApplicationLog.Count,
-                                    .dateObject = Now.ToUniversalTime
+                                    .dateObject = Now.ToUniversalTime,
+                                    .boolException = False
                                 })
 
                                 boolDidWeHaveACorruptedLogFile = True
@@ -195,7 +196,8 @@
                     .unixTime = 0,
                     .logSource = "Restore Point Creator",
                     .logID = applicationLog.Count,
-                    .dateObject = Now.ToUniversalTime
+                    .dateObject = Now.ToUniversalTime,
+                    .boolException = False
                 })
 
                 Try
@@ -333,7 +335,8 @@
                 .unixTime = 0,
                 .logSource = "Restore Point Creator",
                 .logID = applicationLog.Count,
-                .dateObject = Now.ToUniversalTime
+                .dateObject = Now.ToUniversalTime,
+                .boolException = False
             })
         End Sub
 
@@ -341,7 +344,7 @@
         ''' <param name="logMessage">The text you want to have in your new System Event Log entry.</param>
         ''' <param name="eventLogType">The type of log that you want your entry to be. The three major options are Error, Information, and Warning.</param>
         ''' <example>functions.eventLogFunctions.writeToSystemEventLog("My Event Log Entry", EventLogEntryType.Information)</example>
-        Public Sub writeToApplicationLogFile(logMessage As String, Optional eventLogType As EventLogEntryType = EventLogEntryType.Information)
+        Public Sub writeToApplicationLogFile(logMessage As String, Optional eventLogType As EventLogEntryType = EventLogEntryType.Information, Optional boolExceptionInput As Boolean = False)
             Try
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
@@ -357,7 +360,8 @@
                             .unixTime = 0,
                             .logSource = "Restore Point Creator",
                             .logID = applicationLog.Count,
-                            .dateObject = Now.ToUniversalTime
+                            .dateObject = Now.ToUniversalTime,
+                            .boolException = boolExceptionInput
                         })
                     Else
                         Try
@@ -373,7 +377,8 @@
                         .unixTime = 0,
                         .logSource = "Restore Point Creator",
                         .logID = applicationLog.Count,
-                        .dateObject = Now.ToUniversalTime
+                        .dateObject = Now.ToUniversalTime,
+                        .boolException = boolExceptionInput
                     })
 
                     fileStream.Position = 0
@@ -495,7 +500,7 @@
         ''' <example>functions.eventLogFunctions.writeCrashToEventLog(ex)</example>
         Public Sub writeCrashToApplicationLogFile(exceptionObject As Exception, Optional errorType As EventLogEntryType = EventLogEntryType.Error)
             Try
-                writeToApplicationLogFile(assembleCrashData(exceptionObject, errorType), errorType)
+                writeToApplicationLogFile(assembleCrashData(exceptionObject, errorType), errorType, True)
             Catch ex2 As Exception
                 oldEventLogFunctions.writeCrashToEventLog(ex2)
             End Try
@@ -525,7 +530,8 @@
                                 .logType = eventInstance.Level,
                                 .logSource = strEventLog,
                                 .logID = logCount,
-                                .dateObject = eventInstance.TimeCreated.Value.ToUniversalTime
+                                .dateObject = eventInstance.TimeCreated.Value.ToUniversalTime,
+                                .boolException = False
                             }
 
                             logCount += 1
@@ -549,7 +555,8 @@
                     .unixTime = 0,
                     .logSource = "Restore Point Creator",
                     .logID = logEntries.Count,
-                    .dateObject = Now.ToUniversalTime
+                    .dateObject = Now.ToUniversalTime,
+                    .boolException = True
                 })
             End Try
         End Sub

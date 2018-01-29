@@ -29,11 +29,21 @@
         Inherits ListViewItem
         Private _longEventLogEntryID As Long, _strEventLogSource, _strEventLogText, _strLevel As String, _shortLevelType As Short
         Private _logDate As Date, _eventLogType As EventLogEntryType
+        Private _boolException As Boolean
 
         Public Sub New(strInput As String)
             Me.Text = strInput
             Me.strEventLogLevel = strInput
         End Sub
+
+        Public Property boolException() As Boolean
+            Get
+                Return _boolException
+            End Get
+            Set(value As Boolean)
+                _boolException = value
+            End Set
+        End Property
 
         Public Property eventLogType() As EventLogEntryType
             Get

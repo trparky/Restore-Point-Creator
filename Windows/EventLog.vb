@@ -83,6 +83,7 @@
                     .strEventLogSource = logEntry.logSource
                     .shortLevelType = logEntry.logType
                     .eventLogType = eventLogType
+                    .boolException = logEntry.boolException
                 End With
 
                 eventLogContents.Add(itemAdd)
@@ -407,7 +408,7 @@
                 Dim selectedItem As myListViewItemTypes.eventLogListEntry = DirectCast(eventLogList.SelectedItems(0), myListViewItemTypes.eventLogListEntry)
                 eventLogText.Text = selectedItem.strEventLogText
 
-                If selectedItem.eventLogType = EventLogEntryType.Error And eventLogText.Text.caseInsensitiveContains("exception") And chkAskMeToSubmitIfViewingAnExceptionEntry.Checked And selectedIndex <> eventLogList.SelectedIndices(0) Then
+                If selectedItem.eventLogType = EventLogEntryType.Error And (selectedItem.boolException OrElse eventLogText.Text.caseInsensitiveContains("exception")) And chkAskMeToSubmitIfViewingAnExceptionEntry.Checked And selectedIndex <> eventLogList.SelectedIndices(0) Then
                     If MsgBox("The log entry that you're looking at appears to be a program exception and stack trace. Would you like to submit it?", MsgBoxStyle.Question + MsgBoxStyle.YesNo + MsgBoxStyle.DefaultButton2, Me.Text) = MsgBoxResult.Yes Then
                         If (globalVariables.windows.frmManuallySubmitCrashDataInstance Is Nothing) Then
                             globalVariables.windows.frmManuallySubmitCrashDataInstance = New frmManuallySubmitCrashData

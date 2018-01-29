@@ -4,6 +4,7 @@
     Public unixTime As ULong
     Public logData, logSource As String
     Public dateObject As Date
+    Public boolException As Boolean
 End Class
 
 Public Class exportedLogFile
