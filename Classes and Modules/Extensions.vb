@@ -57,11 +57,8 @@ Module StringExtensions
     ''' <return>Returns a String value.</return>
     <Extension()>
     Public Function caseInsensitiveReplace(source As String, replace As String, replaceWith As String, Optional boolEscape As Boolean = True) As String
-        If boolEscape Then
-            Return Regex.Replace(source, Regex.Escape(replace), replaceWith, RegexOptions.IgnoreCase)
-        Else
-            Return Regex.Replace(source, replace, replaceWith, RegexOptions.IgnoreCase)
-        End If
+        If boolEscape Then replace = Regex.Escape(replace)
+        Return Regex.Replace(source, replace, replaceWith, RegexOptions.IgnoreCase)
     End Function
 
     ' PHP like addSlashes and stripSlashes. Call using String.addSlashes() and String.stripSlashes().
@@ -92,7 +89,7 @@ Module StringExtensions
     <Extension()>
     Public Function regExSearch(haystack As String, needle As String, Optional boolDoEscaping As Boolean = False) As Boolean
         Try
-            If boolDoEscaping = True Then needle = Regex.Escape(needle)
+            If boolDoEscaping Then needle = Regex.Escape(needle)
             Return Regex.IsMatch(haystack, needle, RegexOptions.IgnoreCase)
         Catch ex As Exception
             Return False
