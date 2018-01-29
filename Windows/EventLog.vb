@@ -215,11 +215,7 @@
 
         ' Display the new sort order.
         m_SortingColumn = new_sorting_column
-        If sort_order = SortOrder.Ascending Then
-            m_SortingColumn.Text = "> " & m_SortingColumn.Text
-        Else
-            m_SortingColumn.Text = "< " & m_SortingColumn.Text
-        End If
+        m_SortingColumn.Text = If(sort_order = SortOrder.Ascending, "> " & m_SortingColumn.Text, "< " & m_SortingColumn.Text)
 
         ' Create a comparer.
         eventLogList.ListViewItemSorter = New Functions.listViewSorter.ListViewComparer(My.Settings.eventLogSortingColumn, sort_order)
@@ -294,11 +290,7 @@
 
         ' Display the new sort order.
         m_SortingColumn = new_sorting_column
-        If sort_order = SortOrder.Ascending Then
-            m_SortingColumn.Text = "> " & m_SortingColumn.Text
-        Else
-            m_SortingColumn.Text = "< " & m_SortingColumn.Text
-        End If
+        m_SortingColumn.Text = If(sort_order = SortOrder.Ascending, "> " & m_SortingColumn.Text, "< " & m_SortingColumn.Text)
 
         ' Create a comparer.
         eventLogList.ListViewItemSorter = New Functions.listViewSorter.ListViewComparer(e.Column, sort_order)
