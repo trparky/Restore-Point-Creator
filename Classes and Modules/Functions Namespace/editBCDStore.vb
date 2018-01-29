@@ -159,7 +159,12 @@ Namespace Functions.BCD
 
                     ' The returned value is an Object but we know that it's really a Short (or 16-bit Integer) so we convert it to a Short then
                     ' DirectCast it to a BcdLibrary_SafeBoot Type to get the Safe Mode Boot Flag value (Minimal or with Networking).
-                    safeModeBootType = DirectCast(Convert.ToInt16(getElementInvokationResults.Properties("ReturnValue").Value), BcdLibrary_SafeBoot)
+                    Dim shortReturnValue As Short
+                    If Short.TryParse(getElementInvokationResults.Properties("ReturnValue").Value.ToString, shortReturnValue) Then
+                        safeModeBootType = DirectCast(shortReturnValue, BcdLibrary_SafeBoot)
+                    Else
+                        boolResult = False
+                    End If
                 End If
 
                 ' We then finally return the value of the Boolean value that was created above.
