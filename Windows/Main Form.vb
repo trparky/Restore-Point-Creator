@@ -390,12 +390,7 @@ Public Class Form1
                     toolStripCheckEveryTwoWeeks.Checked = True
                 Else
                     toolStripCheckCustom.Checked = True
-
-                    If My.Settings.checkForUpdatesEveryInDays = 1 Then
-                        toolStripCheckCustom.Text = "Custom Time Interval (Check for updates every day)"
-                    Else
-                        toolStripCheckCustom.Text = "Custom Time Interval (Check for updates every " & My.Settings.checkForUpdatesEveryInDays & " days)"
-                    End If
+                    toolStripCheckCustom.Text = If(My.Settings.checkForUpdatesEveryInDays = 1, "Custom Time Interval (Check for updates every day)", "Custom Time Interval (Check for updates every " & My.Settings.checkForUpdatesEveryInDays & " days)")
                 End If
             Else
                 ConfigureAutomaticUpdatesToolStripMenuItem.Visible = False
@@ -429,11 +424,7 @@ Public Class Form1
             End If
 
             If My.Settings.maxDaysManualDelete = -1 = False Then
-                If My.Settings.maxDaysManualDelete = 1 Then
-                    toolStripDeleteOldRestorePoints.Text = "Delete Restore Points older than 1 Day"
-                Else
-                    toolStripDeleteOldRestorePoints.Text = "Delete Restore Points older than " & My.Settings.maxDaysManualDelete & " Days"
-                End If
+                toolStripDeleteOldRestorePoints.Text = If(My.Settings.maxDaysManualDelete = 1, "Delete Restore Points older than 1 Day", "Delete Restore Points older than " & My.Settings.maxDaysManualDelete & " Days")
             End If
 
             toolStripConfirmDeletions.Checked = My.Settings.confirmRestorePointDeletions
@@ -648,11 +639,7 @@ Public Class Form1
 
         ' Display the new sort order.
         m_SortingColumn = new_sorting_column
-        If sort_order = SortOrder.Ascending Then
-            m_SortingColumn.Text = "> " & m_SortingColumn.Text
-        Else
-            m_SortingColumn.Text = "< " & m_SortingColumn.Text
-        End If
+        m_SortingColumn.Text = If(sort_order = SortOrder.Ascending, "> " & m_SortingColumn.Text, "< " & m_SortingColumn.Text)
 
         ' Create a comparer.
         systemRestorePointsList.ListViewItemSorter = New Functions.listViewSorter.ListViewComparer(My.Settings.sortingColumn, sort_order)
@@ -2103,7 +2090,6 @@ Public Class Form1
             stripDelete.Text = "&Delete Selected Restore Point"
         Else
             btnDeleteRestorePoint.Text = "Delete Selected Restore Points"
-
             stripDelete.Text = "&Delete Selected Restore Points"
         End If
 
@@ -2399,11 +2385,7 @@ Public Class Form1
 
         ' Display the new sort order.
         m_SortingColumn = new_sorting_column
-        If sort_order = SortOrder.Ascending Then
-            m_SortingColumn.Text = "> " & m_SortingColumn.Text
-        Else
-            m_SortingColumn.Text = "< " & m_SortingColumn.Text
-        End If
+        m_SortingColumn.Text = If(sort_order = SortOrder.Ascending, "> " & m_SortingColumn.Text, "< " & m_SortingColumn.Text)
 
         ' Create a comparer.
         systemRestorePointsList.ListViewItemSorter = New Functions.listViewSorter.ListViewComparer(e.Column, sort_order)
