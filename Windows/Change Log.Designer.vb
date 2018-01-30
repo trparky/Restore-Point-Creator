@@ -115,7 +115,7 @@ Partial Class Change_Log
         Me.pleaseWaitProgressBar.Minimum = 0
         Me.pleaseWaitProgressBar.Name = "pleaseWaitProgressBar"
         Me.pleaseWaitProgressBar.ProgressBarColor = System.Drawing.Color.Blue
-        Me.pleaseWaitProgressBar.Size = New System.Drawing.Size(268, 19)
+        Me.pleaseWaitProgressBar.Size = New System.Drawing.Size(280, 19)
         Me.pleaseWaitProgressBar.TabIndex = 2
         Me.pleaseWaitProgressBar.Value = 0
         '
