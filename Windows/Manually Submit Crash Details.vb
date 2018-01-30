@@ -232,11 +232,7 @@
     End Sub
 
     Private Sub pleaseWaitProgressBarChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitProgressBarChanger.Tick
-        If pleaseWaitProgressBar.Value < 100 Then
-            pleaseWaitProgressBar.Value += 1
-        Else
-            pleaseWaitProgressBar.Value = 0
-        End If
+        pleaseWaitProgressBar.Value = If(pleaseWaitProgressBar.Value < 100, pleaseWaitProgressBar.Value + 1, 0)
     End Sub
 
     Private Sub pleaseWaitMessageChanger_Tick(sender As Object, e As EventArgs) Handles pleaseWaitMessageChanger.Tick
