@@ -230,12 +230,12 @@ Public Class downloadStatusDetails
 End Class
 
 Class credentials
-    Public strUser, strPassword As String
+    Public strUser, strPasswordInput As String
 End Class
 
 ''' <summary>Allows you to easily POST and upload files to a remote HTTP server without you, the programmer, knowing anything about how it all works. This class does it all for you. It handles adding a User Agent String, additional HTTP Request Headers, string data to your HTTP POST data, and files to be uploaded in the HTTP POST data.</summary>
 Public Class httpHelper
-    Private Const classVersion As String = "1.303"
+    Private Const classVersion As String = "1.304"
 
     Private strUserAgentString As String = Nothing
     Private boolUseProxy As Boolean = False
@@ -243,7 +243,7 @@ Public Class httpHelper
     Private customProxy As Net.IWebProxy = Nothing
     Private httpResponseHeaders As Net.WebHeaderCollection = Nothing
     Private httpDownloadProgressPercentage As Short = 0
-    Private remoteFileSize, currentFileSize As ULong
+    Private remoteFileSizeInput, currentFileSize As ULong
     Private httpTimeOut As Long = 5000
     Private boolUseHTTPCompression As Boolean = True
     Private lastAccessedURL As String = Nothing
@@ -297,12 +297,12 @@ Public Class httpHelper
     End Property
 
     ''' <summary>Adds HTTP Authentication headers to your HTTP Request in this HTTPHelper instance.</summary>
-    ''' <param name="strUsername">The username you want to pass to the server.</param>
+    ''' <param name="strUsernameInput">The username you want to pass to the server.</param>
     ''' <param name="strPassword">The password you want to pass to the server.</param>
     ''' <param name="throwExceptionIfAlreadySet">A Boolean value. This tells the function if it should throw an exception if HTTP Authentication settings have already been set.</param>
-    Public Sub setHTTPCredentials(strUsername As String, strPassword As String, Optional throwExceptionIfAlreadySet As Boolean = True)
+    Public Sub setHTTPCredentials(strUsernameInput As String, strPassword As String, Optional throwExceptionIfAlreadySet As Boolean = True)
         If credentials Is Nothing Then
-            credentials = New credentials() With {.strUser = strUsername, .strPassword = strPassword}
+            credentials = New credentials() With {.strUser = strUsernameInput, .strPasswordInput = strPassword}
         Else
             If throwExceptionIfAlreadySet Then Throw New credentialsAlreadySet("HTTP Authentication Credentials have already been set for this HTTPHelper Class Instance.")
         End If
@@ -408,7 +408,7 @@ Public Class httpHelper
         postData.Clear()
         getData.Clear()
 
-        remoteFileSize = 0
+        remoteFileSizeInput = 0
         currentFileSize = 0
 
         sslCertificate = Nothing
@@ -479,7 +479,7 @@ Public Class httpHelper
             stringBuilder.AppendLine("HTTP Authentication Enabled: False")
         Else
             stringBuilder.AppendLine("HTTP Authentication Enabled: True")
-            stringBuilder.AppendLine("HTTP Authentication Details: " & credentials.strUser & "|" & credentials.strPassword)
+            stringBuilder.AppendLine("HTTP Authentication Details: " & credentials.strUser & "|" & credentials.strPasswordInput)
         End If
 
         If lastException IsNot Nothing Then
@@ -487,7 +487,7 @@ Public Class httpHelper
             stringBuilder.AppendLine("--== Raw Exception Data ==--")
             stringBuilder.AppendLine(lastException.ToString)
 
-            If TypeOf lastException Is Net.WebException Then
+            If lastException.GetType.Equals(GetType(Net.WebException)) Then
                 stringBuilder.AppendLine("Raw Exception Status Code: " & DirectCast(lastException, Net.WebException).Status.ToString)
             End If
         End If
@@ -499,11 +499,7 @@ Public Class httpHelper
     ''' <param name="boolHumanReadable">Optional setting, normally set to True. Tells the function if it should transform the Integer representing the file size into a human readable format.</param>
     ''' <returns>Either a String or a Long containing the remote file size.</returns>
     Public Function getHTTPDownloadRemoteFileSize(Optional boolHumanReadable As Boolean = True) As Object
-        If boolHumanReadable Then
-            Return fileSizeToHumanReadableFormat(remoteFileSize)
-        Else
-            Return remoteFileSize
-        End If
+        Return If(boolHumanReadable, fileSizeToHumanReadableFormat(remoteFileSizeInput), remoteFileSizeInput)
     End Function
 
     ''' <summary>This returns the SSL certificate details for the last HTTP request made by this Class instance.</summary>
@@ -632,11 +628,7 @@ Public Class httpHelper
     ''' <exception cref="dataAlreadyExistsException">If this function throws an dataAlreadyExistsException, it means that this Class instance already has an Additional HTTP Header of that name in the Class instance.</exception>
     Public Sub addHTTPHeader(strHeaderName As String, strHeaderContents As String, Optional urlEncodeHeaderContent As Boolean = False)
         If Not doesAdditionalHeaderExist(strHeaderName) Then
-            If urlEncodeHeaderContent Then
-                additionalHTTPHeaders.Add(strHeaderName.ToLower, Web.HttpUtility.UrlEncode(strHeaderContents))
-            Else
-                additionalHTTPHeaders.Add(strHeaderName.ToLower, strHeaderContents)
-            End If
+            additionalHTTPHeaders.Add(strHeaderName.ToLower, If(urlEncodeHeaderContent, Web.HttpUtility.UrlEncode(strHeaderContents), strHeaderContents))
         Else
             lastException = New dataAlreadyExistsException(String.Format("The additional HTTP Header named {0}{1}{0} already exists in the Additional HTTP Headers settings for this Class instance.", Chr(34), strHeaderName))
             Throw lastException
@@ -653,13 +645,7 @@ Public Class httpHelper
     Public Sub addHTTPCookie(strCookieName As String, strCookieValue As String, strDomainDomain As String, strCookiePath As String, Optional urlEncodeHeaderContent As Boolean = False)
         If Not doesCookieExist(strCookieName) Then
             Dim cookieDetails As New cookieDetails() With {.cookieDomain = strDomainDomain, .cookiePath = strCookiePath}
-
-            If urlEncodeHeaderContent Then
-                cookieDetails.cookieData = Web.HttpUtility.UrlEncode(strCookieValue)
-            Else
-                cookieDetails.cookieData = strCookieValue
-            End If
-
+            cookieDetails.cookieData = If(urlEncodeHeaderContent, Web.HttpUtility.UrlEncode(strCookieValue), strCookieValue)
             httpCookies.Add(strCookieName.ToLower, cookieDetails)
         Else
             lastException = New dataAlreadyExistsException(String.Format("The HTTP Cookie named {0}{1}{0} already exists in the settings for this Class instance.", Chr(34), strCookieName))
@@ -676,13 +662,7 @@ Public Class httpHelper
     Public Sub addHTTPCookie(strCookieName As String, strCookieValue As String, strCookieDomain As String, Optional urlEncodeHeaderContent As Boolean = False)
         If Not doesCookieExist(strCookieName) Then
             Dim cookieDetails As New cookieDetails() With {.cookieDomain = strCookieDomain, .cookiePath = "/"}
-
-            If urlEncodeHeaderContent Then
-                cookieDetails.cookieData = Web.HttpUtility.UrlEncode(strCookieValue)
-            Else
-                cookieDetails.cookieData = strCookieValue
-            End If
-
+            cookieDetails.cookieData = If(urlEncodeHeaderContent, Web.HttpUtility.UrlEncode(strCookieValue), strCookieValue)
             httpCookies.Add(strCookieName.ToLower, cookieDetails)
         Else
             lastException = New dataAlreadyExistsException(String.Format("The HTTP Cookie named {0}{1}{0} already exists in the settings for this Class instance.", Chr(34), strCookieName))
@@ -831,7 +811,7 @@ beginAgain:
 
     ''' <summary>This subroutine is used by the downloadFile function to update the download status of the file that's being downloaded by the class instance.</summary>
     Private Sub downloadStatusUpdateInvoker()
-        downloadStatusDetails = New downloadStatusDetails With {.remoteFileSize = remoteFileSize, .percentageDownloaded = httpDownloadProgressPercentage, .localFileSize = currentFileSize} ' Update the downloadStatusDetails.
+        downloadStatusDetails = New downloadStatusDetails With {.remoteFileSize = remoteFileSizeInput, .percentageDownloaded = httpDownloadProgressPercentage, .localFileSize = currentFileSize} ' Update the downloadStatusDetails.
 
         ' Checks to see if we have a status update routine to invoke.
         If downloadStatusUpdater IsNot Nothing Then
@@ -879,9 +859,7 @@ beginAgain:
         Dim amountDownloaded As Double
 
         Try
-            If urlPreProcessor IsNot Nothing Then
-                fileDownloadURL = urlPreProcessor(fileDownloadURL)
-            End If
+            If urlPreProcessor IsNot Nothing Then fileDownloadURL = urlPreProcessor(fileDownloadURL)
             lastAccessedURL = fileDownloadURL
 
             ' We create a new data buffer to hold the stream of data from the web server.
@@ -896,7 +874,7 @@ beginAgain:
             captureSSLInfo(fileDownloadURL, httpWebRequest)
 
             ' Gets the size of the remote file on the web server.
-            remoteFileSize = CType(webResponse.ContentLength, ULong)
+            remoteFileSizeInput = CType(webResponse.ContentLength, ULong)
 
             Dim responseStream As Stream = webResponse.GetResponseStream() ' Gets the response stream.
 
@@ -910,7 +888,7 @@ beginAgain:
 
                 memStream.Write(dataBuffer, 0, lngBytesReadFromInternet) ' Writes the data directly to disk.
 
-                amountDownloaded = (currentFileSize / remoteFileSize) * 100
+                amountDownloaded = (currentFileSize / remoteFileSizeInput) * 100
                 httpDownloadProgressPercentage = CType(Math.Round(amountDownloaded, 0), Short) ' Update the download percentage value.
                 downloadStatusUpdateInvoker()
 
@@ -954,7 +932,7 @@ beginAgain:
                 Return False
             End If
 
-            If TypeOf ex Is Net.WebException Then
+            If ex.GetType.Equals(GetType(Net.WebException)) Then
                 Dim ex2 As Net.WebException = DirectCast(ex, Net.WebException)
 
                 If ex2.Status = Net.WebExceptionStatus.ProtocolError Then
@@ -998,9 +976,7 @@ beginAgain:
         Dim amountDownloaded As Double
 
         Try
-            If urlPreProcessor IsNot Nothing Then
-                fileDownloadURL = urlPreProcessor(fileDownloadURL)
-            End If
+            If urlPreProcessor IsNot Nothing Then fileDownloadURL = urlPreProcessor(fileDownloadURL)
             lastAccessedURL = fileDownloadURL
 
             If File.Exists(localFileName) Then
@@ -1024,7 +1000,7 @@ beginAgain:
             captureSSLInfo(fileDownloadURL, httpWebRequest)
 
             ' Gets the size of the remote file on the web server.
-            remoteFileSize = CType(webResponse.ContentLength, ULong)
+            remoteFileSizeInput = CType(webResponse.ContentLength, ULong)
 
             Dim responseStream As Stream = webResponse.GetResponseStream() ' Gets the response stream.
             fileWriteStream = New FileStream(localFileName, FileMode.Create) ' Creates a file write stream.
@@ -1039,7 +1015,7 @@ beginAgain:
 
                 fileWriteStream.Write(dataBuffer, 0, lngBytesReadFromInternet) ' Writes the data directly to disk.
 
-                amountDownloaded = (currentFileSize / remoteFileSize) * 100
+                amountDownloaded = (currentFileSize / remoteFileSizeInput) * 100
                 httpDownloadProgressPercentage = CType(Math.Round(amountDownloaded, 0), Short) ' Update the download percentage value.
                 downloadStatusUpdateInvoker()
 
@@ -1085,7 +1061,7 @@ beginAgain:
                 Return False
             End If
 
-            If TypeOf ex Is Net.WebException Then
+            If ex.GetType.Equals(GetType(Net.WebException)) Then
                 Dim ex2 As Net.WebException = DirectCast(ex, Net.WebException)
 
                 If ex2.Status = Net.WebExceptionStatus.ProtocolError Then
@@ -1128,12 +1104,10 @@ beginAgain:
         Dim httpWebRequest As Net.HttpWebRequest = Nothing
 
         Try
-            If urlPreProcessor IsNot Nothing Then
-                url = urlPreProcessor(url)
-            End If
+            If urlPreProcessor IsNot Nothing Then url = urlPreProcessor(url)
             lastAccessedURL = url
 
-            If getData.Count <> 0 Then url &= "?" & Me.getGETDataString
+            If getData.Count <> 0 Then url &= "?" & getGETDataString()
 
             httpWebRequest = DirectCast(Net.WebRequest.Create(url), Net.HttpWebRequest)
             httpWebRequest.AddRange(shortRangeFrom, shortRangeTo)
@@ -1161,7 +1135,7 @@ beginAgain:
 
             Return True
         Catch ex As Exception
-            If TypeOf ex Is Threading.ThreadAbortException Then
+            If ex.GetType.Equals(GetType(Threading.ThreadAbortException)) Then
                 If httpWebRequest IsNot Nothing Then httpWebRequest.Abort()
                 Return False
             End If
@@ -1175,7 +1149,7 @@ beginAgain:
                 Return False
             End If
 
-            If TypeOf ex Is Net.WebException Then
+            If ex.GetType.Equals(GetType(Net.WebException)) Then
                 Dim ex2 As Net.WebException = DirectCast(ex, Net.WebException)
 
                 If ex2.Status = Net.WebExceptionStatus.ProtocolError Then
@@ -1218,9 +1192,7 @@ beginAgain:
         Dim httpWebRequest As Net.HttpWebRequest = Nothing
 
         Try
-            If urlPreProcessor IsNot Nothing Then
-                url = urlPreProcessor(url)
-            End If
+            If urlPreProcessor IsNot Nothing Then url = urlPreProcessor(url)
             lastAccessedURL = url
 
             If getData.Count <> 0 Then url &= "?" & getGETDataString()
@@ -1250,7 +1222,7 @@ beginAgain:
 
             Return True
         Catch ex As Exception
-            If TypeOf ex Is Threading.ThreadAbortException Then
+            If ex.GetType.Equals(GetType(Threading.ThreadAbortException)) Then
                 If httpWebRequest IsNot Nothing Then httpWebRequest.Abort()
                 Return False
             End If
@@ -1264,7 +1236,7 @@ beginAgain:
                 Return False
             End If
 
-            If TypeOf ex Is Net.WebException Then
+            If ex.GetType.Equals(GetType(Net.WebException)) Then
                 Dim ex2 As Net.WebException = DirectCast(ex, Net.WebException)
 
                 If ex2.Status = Net.WebExceptionStatus.ProtocolError Then
@@ -1308,16 +1280,14 @@ beginAgain:
         Dim httpWebRequest As Net.HttpWebRequest = Nothing
 
         Try
-            If urlPreProcessor IsNot Nothing Then
-                url = urlPreProcessor(url)
-            End If
+            If urlPreProcessor IsNot Nothing Then url = urlPreProcessor(url)
             lastAccessedURL = url
 
             If postData.Count = 0 Then
                 lastException = New dataMissingException("Your HTTP Request contains no POST data. Please add some data to POST before calling this function.")
                 Throw lastException
             End If
-            If getData.Count <> 0 Then url &= "?" & Me.getGETDataString()
+            If getData.Count <> 0 Then url &= "?" & getGETDataString()
 
             Dim boundary As String = "---------------------------" & Now.Ticks.ToString("x")
             Dim boundaryBytes As Byte() = Text.Encoding.ASCII.GetBytes((Convert.ToString(vbCr & vbLf & "--") & boundary) & vbCr & vbLf)
@@ -1339,7 +1309,7 @@ beginAgain:
                 For Each entry As KeyValuePair(Of String, Object) In postData
                     httpRequestWriter.Write(boundaryBytes, 0, boundaryBytes.Length)
 
-                    If TypeOf entry.Value Is FormFile Then
+                    If entry.Value.GetType.Equals(GetType(FormFile)) Then
                         formFileObjectInstance = DirectCast(entry.Value, FormFile)
 
                         If String.IsNullOrEmpty(formFileObjectInstance.remoteFileName) Then
@@ -1396,7 +1366,7 @@ beginAgain:
 
             Return True
         Catch ex As Exception
-            If TypeOf ex Is Threading.ThreadAbortException Then
+            If ex.GetType.Equals(GetType(Threading.ThreadAbortException)) Then
                 If httpWebRequest IsNot Nothing Then httpWebRequest.Abort()
             End If
 
@@ -1409,7 +1379,7 @@ beginAgain:
                 Return False
             End If
 
-            If TypeOf ex Is Net.WebException Then
+            If ex.GetType.Equals(GetType(Net.WebException)) Then
                 Dim ex2 As Net.WebException = DirectCast(ex, Net.WebException)
 
                 If ex2.Status = Net.WebExceptionStatus.ProtocolError Then
@@ -1438,11 +1408,7 @@ beginAgain:
     End Function
 
     Private Sub captureSSLInfo(ByVal url As String, ByRef httpWebRequest As Net.HttpWebRequest)
-        If url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) Then
-            sslCertificate = New X509Certificates.X509Certificate2(httpWebRequest.ServicePoint.Certificate)
-        Else
-            sslCertificate = Nothing
-        End If
+        sslCertificate = If(url.StartsWith("https://", StringComparison.OrdinalIgnoreCase), New X509Certificates.X509Certificate2(httpWebRequest.ServicePoint.Certificate), Nothing)
     End Sub
 
     Private Sub addPostDataToWebRequest(ByRef httpWebRequest As Net.HttpWebRequest)
@@ -1465,7 +1431,7 @@ beginAgain:
     Private Sub addParametersToWebRequest(ByRef httpWebRequest As Net.HttpWebRequest)
         If credentials IsNot Nothing Then
             httpWebRequest.PreAuthenticate = True
-            addHTTPHeader("Authorization", "Basic " & Convert.ToBase64String(Text.Encoding.Default.GetBytes(credentials.strUser & ":" & credentials.strPassword)))
+            addHTTPHeader("Authorization", "Basic " & Convert.ToBase64String(Text.Encoding.Default.GetBytes(credentials.strUser & ":" & credentials.strPasswordInput)))
         End If
 
         If strUserAgentString IsNot Nothing Then httpWebRequest.UserAgent = strUserAgentString
@@ -1502,11 +1468,7 @@ beginAgain:
             If boolUseSystemProxy Then
                 httpWebRequest.Proxy = Net.WebRequest.GetSystemWebProxy()
             Else
-                If customProxy Is Nothing Then
-                    httpWebRequest.Proxy = Net.WebRequest.GetSystemWebProxy()
-                Else
-                    httpWebRequest.Proxy = customProxy
-                End If
+                httpWebRequest.Proxy = If(customProxy, Net.WebRequest.GetSystemWebProxy())
             End If
         End If
     End Sub
@@ -1528,9 +1490,7 @@ beginAgain:
             End If
         Next
 
-        If postDataString.EndsWith("&") Then
-            postDataString = postDataString.Substring(0, postDataString.Length - 1)
-        End If
+        If postDataString.EndsWith("&") Then postDataString = postDataString.Substring(0, postDataString.Length - 1)
 
         Return postDataString
     End Function
@@ -1541,9 +1501,7 @@ beginAgain:
             getDataString &= entry.Key.Trim & "=" & Web.HttpUtility.UrlEncode(entry.Value.Trim) & "&"
         Next
 
-        If getDataString.EndsWith("&") Then
-            getDataString = getDataString.Substring(0, getDataString.Length - 1)
-        End If
+        If getDataString.EndsWith("&") Then getDataString = getDataString.Substring(0, getDataString.Length - 1)
 
         Return getDataString
     End Function
@@ -1598,12 +1556,7 @@ beginAgain:
     Private Function doWeHaveAnInternetConnection() As Boolean
         Try
             Dim ping As New Net.NetworkInformation.Ping()
-
-            If ping.Send("8.8.8.8").Status = Net.NetworkInformation.IPStatus.Success Then
-                Return True
-            Else
-                Return False
-            End If
+            Return If(ping.Send("8.8.8.8").Status = Net.NetworkInformation.IPStatus.Success, True, False)
         Catch ex As Exception
             Return False
         End Try
