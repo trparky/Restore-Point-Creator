@@ -69,7 +69,8 @@
 
                 Try
                     Using streamWriter As New IO.StreamWriter(strFileToBeExportedTo)
-                        xmlSerializerObject.Serialize(streamWriter, logObject)
+                        Dim resLogXSerializer As New Xml.Serialization.XmlSerializer(logObject.GetType)
+                        resLogXSerializer.Serialize(streamWriter, logObject)
                     End Using
                 Catch ex As Exception
                     writeCrashToEventLog(ex)
