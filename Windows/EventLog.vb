@@ -594,23 +594,24 @@
             End Try
 
             logsToBeDeleted = Nothing
-            btnClear.Enabled = False
+        End If
 
-            If boolSuccessfulDelete Then
-                Dim logFileInfo As New IO.FileInfo(Functions.eventLogFunctions.strLogFile)
-                lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(logFileInfo.Length)
-                lblLastModified.Text = "Last Modified: " & logFileInfo.LastWriteTimeUtc.ToLocalTime.ToString()
-                logFileInfo = Nothing
+        btnClear.Enabled = False
 
-                openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
+        If boolSuccessfulDelete Then
+            Dim logFileInfo As New IO.FileInfo(Functions.eventLogFunctions.strLogFile)
+            lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(logFileInfo.Length)
+            lblLastModified.Text = "Last Modified: " & logFileInfo.LastWriteTimeUtc.ToLocalTime.ToString()
+            logFileInfo = Nothing
 
-                workingThread = New Threading.Thread(AddressOf loadEventLog)
-                workingThread.Name = "Event Log Data Loading Thread"
-                workingThread.IsBackground = True
-                workingThread.Start()
-            Else
-                MsgBox("There was an error writing the new log file to disk.", MsgBoxStyle.Critical, Me.Text)
-            End If
+            openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
+
+            workingThread = New Threading.Thread(AddressOf loadEventLog)
+            workingThread.Name = "Event Log Data Loading Thread"
+            workingThread.IsBackground = True
+            workingThread.Start()
+        Else
+            MsgBox("There was an error writing the new log file to disk.", MsgBoxStyle.Critical, Me.Text)
         End If
     End Sub
 
