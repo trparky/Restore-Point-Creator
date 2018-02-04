@@ -141,6 +141,11 @@
             Return internalApplicationLog
         End Function
 
+        Private Function verifyDataOnDisk(ByRef memoryStream As IO.MemoryStream, ByVal strPathOfFileToVerify As String) As Boolean
+            Dim tempFileByteArray As Byte() = IO.File.ReadAllBytes(strPathOfFileToVerify)
+            Return If(tempFileByteArray.Length = memoryStream.Length AndAlso tempFileByteArray.SequenceEqual(memoryStream.ToArray), True, False)
+        End Function
+
         ''' <exception cref="myExceptions.logFileWriteToDiskFailureException" />
         Public Sub getOldLogsFromWindowsEventLog()
             Try
@@ -170,7 +175,7 @@
                         xmlSerializerObject.Serialize(streamWriter, applicationLog)
 
                         IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
-                        If IO.File.ReadAllBytes(strLogFile & ".temp").Length = memoryStream.Length Then boolSuccessfulWriteToDisk = True
+                        boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
                     End Using
 
                     If boolSuccessfulWriteToDisk Then
@@ -287,7 +292,7 @@
                     xmlSerializerObject.Serialize(streamWriter, applicationLog)
 
                     IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
-                    If IO.File.ReadAllBytes(strLogFile & ".temp").Length = memoryStream.Length Then boolSuccessfulWriteToDisk = True
+                    boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
                 End Using
 
                 If boolSuccessfulWriteToDisk Then
@@ -330,7 +335,7 @@
                     xmlSerializerObject.Serialize(streamWriter, applicationLog)
 
                     IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
-                    If IO.File.ReadAllBytes(strLogFile & ".temp").Length = memoryStream.Length Then boolSuccessfulWriteToDisk = True
+                    boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
                 End Using
 
                 If boolSuccessfulWriteToDisk Then
@@ -430,7 +435,7 @@
                     xmlSerializerObject.Serialize(streamWriter, applicationLog)
 
                     IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
-                    If IO.File.ReadAllBytes(strLogFile & ".temp").Length = memoryStream.Length Then boolSuccessfulWriteToDisk = True
+                    boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
                 End Using
 
                 If boolSuccessfulWriteToDisk Then
