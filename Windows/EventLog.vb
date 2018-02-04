@@ -582,8 +582,6 @@
                 boolSuccessfulDelete = False
             End Try
         Else
-            logFileWatcher.EnableRaisingEvents = False
-
             Dim logsToBeDeleted As New List(Of Long)
             For Each item As myListViewItemTypes.eventLogListEntry In eventLogList.SelectedItems
                 logsToBeDeleted.Add(item.longEventLogEntryID)
@@ -596,8 +594,6 @@
             End Try
 
             logsToBeDeleted = Nothing
-
-            logFileWatcher.EnableRaisingEvents = True
             btnClear.Enabled = False
 
             If boolSuccessfulDelete Then
