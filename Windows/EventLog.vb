@@ -573,8 +573,14 @@
     End Sub
 
     Private Sub btnDeleteIndividualLogEntry_Click(sender As Object, e As EventArgs) Handles btnDeleteIndividualLogEntry.Click
+        Dim boolSuccessfulDelete As Boolean = True
+
         If eventLogList.SelectedItems.Count = 1 Then
-            Functions.eventLogFunctions.deleteEntryFromLog(DirectCast(eventLogList.SelectedItems(0), myListViewItemTypes.eventLogListEntry).longEventLogEntryID)
+            Try
+                Functions.eventLogFunctions.deleteEntryFromLog(DirectCast(eventLogList.SelectedItems(0), myListViewItemTypes.eventLogListEntry).longEventLogEntryID)
+            Catch ex As Functions.myExceptions.logFileWriteToDiskFailureException
+                boolSuccessfulDelete = False
+            End Try
         Else
             logFileWatcher.EnableRaisingEvents = False
 
@@ -582,23 +588,33 @@
             For Each item As myListViewItemTypes.eventLogListEntry In eventLogList.SelectedItems
                 logsToBeDeleted.Add(item.longEventLogEntryID)
             Next
-            Functions.eventLogFunctions.deleteEntryFromLog(logsToBeDeleted)
+
+            Try
+                Functions.eventLogFunctions.deleteEntryFromLog(logsToBeDeleted)
+            Catch ex As Functions.myExceptions.logFileWriteToDiskFailureException
+                boolSuccessfulDelete = False
+            End Try
+
             logsToBeDeleted = Nothing
 
             logFileWatcher.EnableRaisingEvents = True
             btnClear.Enabled = False
 
-            Dim logFileInfo As New IO.FileInfo(Functions.eventLogFunctions.strLogFile)
-            lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(logFileInfo.Length)
-            lblLastModified.Text = "Last Modified: " & logFileInfo.LastWriteTimeUtc.ToLocalTime.ToString()
-            logFileInfo = Nothing
+            If boolSuccessfulDelete Then
+                Dim logFileInfo As New IO.FileInfo(Functions.eventLogFunctions.strLogFile)
+                lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(logFileInfo.Length)
+                lblLastModified.Text = "Last Modified: " & logFileInfo.LastWriteTimeUtc.ToLocalTime.ToString()
+                logFileInfo = Nothing
 
-            openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
+                openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
 
-            workingThread = New Threading.Thread(AddressOf loadEventLog)
-            workingThread.Name = "Event Log Data Loading Thread"
-            workingThread.IsBackground = True
-            workingThread.Start()
+                workingThread = New Threading.Thread(AddressOf loadEventLog)
+                workingThread.Name = "Event Log Data Loading Thread"
+                workingThread.IsBackground = True
+                workingThread.Start()
+            Else
+                MsgBox("There was an error writing the new log file to disk.", MsgBoxStyle.Critical, Me.Text)
+            End If
         End If
     End Sub
 

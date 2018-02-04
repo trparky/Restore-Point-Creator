@@ -72,7 +72,7 @@
                 }
                 logCount = logObject.logsEntries.Count
 
-                If IO.File.Exists(strFileToBeExportedTo) Then IO.File.Delete(strFileToBeExportedTo)
+                If IO.File.Exists(strFileToBeExportedTo) Then support.deleteFileWithNoException(strFileToBeExportedTo)
 
                 Try
                     Using streamWriter As New IO.StreamWriter(strFileToBeExportedTo)
@@ -141,6 +141,7 @@
             Return internalApplicationLog
         End Function
 
+        ''' <exception cref="myExceptions.logFileWriteToDiskFailureException" />
         Public Sub getOldLogsFromWindowsEventLog()
             Try
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
@@ -151,24 +152,34 @@
                 Dim stopwatch As Stopwatch = Stopwatch.StartNew
 
                 Try
-                    Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.ReadWrite)
+                    Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Read)
                         Dim streamReader As New IO.StreamReader(fileStream)
                         applicationLog = xmlSerializerObject.Deserialize(streamReader)
+                    End Using
 
-                        logCount = applicationLog.Count
-                        longOldLogCount = logCount
+                    logCount = applicationLog.Count
+                    longOldLogCount = logCount
 
-                        exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strApplication, applicationLog, logCount)
-                        exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strSystemRestorePointCreator, applicationLog, logCount)
+                    exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strApplication, applicationLog, logCount)
+                    exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strSystemRestorePointCreator, applicationLog, logCount)
 
-                        fileStream.Position = 0
-                        fileStream.SetLength(0)
+                    Dim boolSuccessfulWriteToDisk As Boolean = False
 
-                        Dim streamWriter As New IO.StreamWriter(fileStream)
+                    Using memoryStream As New IO.MemoryStream()
+                        Dim streamWriter As New IO.StreamWriter(memoryStream)
                         xmlSerializerObject.Serialize(streamWriter, applicationLog)
 
-                        streamReader.Dispose()
+                        IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
+                        If IO.File.ReadAllBytes(strLogFile & ".temp").Length = memoryStream.Length Then boolSuccessfulWriteToDisk = True
                     End Using
+
+                    If boolSuccessfulWriteToDisk Then
+                        support.deleteFileWithNoException(strLogFile)
+                        IO.File.Move(strLogFile & ".temp", strLogFile)
+                    Else
+                        support.deleteFileWithNoException(strLogFile & ".temp")
+                        Throw New myExceptions.logFileWriteToDiskFailureException()
+                    End If
                 Catch ex As myExceptions.unableToGetLockOnLogFile
                     support.deleteFileWithNoException(strLogLockFile)
                     oldEventLogFunctions.boolShowErrorMessage = True
@@ -251,30 +262,41 @@
         End Sub
 
         ''' <summary>Deletes a list of individual log entries from the log.</summary>
+        ''' <exception cref="myExceptions.logFileWriteToDiskFailureException" />
         Public Sub deleteEntryFromLog(idsOfLogsToBeDeleted As List(Of Long))
             Try
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
 
-                Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.ReadWrite)
+                Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Read)
                     Dim streamReader As New IO.StreamReader(fileStream)
                     applicationLog = xmlSerializerObject.Deserialize(streamReader)
+                End Using
 
-                    For Each longIDToBeDeleted As Long In idsOfLogsToBeDeleted
-                        deleteEntryFromLogSubRoutine(applicationLog, longIDToBeDeleted)
-                    Next
+                For Each longIDToBeDeleted As Long In idsOfLogsToBeDeleted
+                    deleteEntryFromLogSubRoutine(applicationLog, longIDToBeDeleted)
+                Next
 
-                    applicationLog = reIDTheLogEntries(applicationLog)
+                applicationLog = reIDTheLogEntries(applicationLog)
 
-                    fileStream.Position = 0
-                    fileStream.SetLength(0)
+                Dim boolSuccessfulWriteToDisk As Boolean = False
 
-                    Dim streamWriter As New IO.StreamWriter(fileStream)
+                Using memoryStream As New IO.MemoryStream()
+                    Dim streamWriter As New IO.StreamWriter(memoryStream)
                     xmlSerializerObject.Serialize(streamWriter, applicationLog)
 
-                    streamReader.Dispose()
+                    IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
+                    If IO.File.ReadAllBytes(strLogFile & ".temp").Length = memoryStream.Length Then boolSuccessfulWriteToDisk = True
                 End Using
+
+                If boolSuccessfulWriteToDisk Then
+                    support.deleteFileWithNoException(strLogFile)
+                    IO.File.Move(strLogFile & ".temp", strLogFile)
+                Else
+                    support.deleteFileWithNoException(strLogFile & ".temp")
+                    Throw New myExceptions.logFileWriteToDiskFailureException()
+                End If
             Catch ex As myExceptions.unableToGetLockOnLogFile
                 oldEventLogFunctions.boolShowErrorMessage = True
                 oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
@@ -286,27 +308,38 @@
         End Sub
 
         ''' <summary>Deletes an individual log entry from the log.</summary>
+        ''' <exception cref="myExceptions.logFileWriteToDiskFailureException" />
         Public Sub deleteEntryFromLog(longIDToBeDeleted As Long)
             Try
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
 
-                Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.ReadWrite)
+                Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Read)
                     Dim streamReader As New IO.StreamReader(fileStream)
                     applicationLog = xmlSerializerObject.Deserialize(streamReader)
+                End Using
 
-                    deleteEntryFromLogSubRoutine(applicationLog, longIDToBeDeleted)
-                    applicationLog = reIDTheLogEntries(applicationLog)
+                deleteEntryFromLogSubRoutine(applicationLog, longIDToBeDeleted)
+                applicationLog = reIDTheLogEntries(applicationLog)
 
-                    fileStream.Position = 0
-                    fileStream.SetLength(0)
+                Dim boolSuccessfulWriteToDisk As Boolean = False
 
-                    Dim streamWriter As New IO.StreamWriter(fileStream)
+                Using memoryStream As New IO.MemoryStream()
+                    Dim streamWriter As New IO.StreamWriter(memoryStream)
                     xmlSerializerObject.Serialize(streamWriter, applicationLog)
 
-                    streamReader.Dispose()
+                    IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
+                    If IO.File.ReadAllBytes(strLogFile & ".temp").Length = memoryStream.Length Then boolSuccessfulWriteToDisk = True
                 End Using
+
+                If boolSuccessfulWriteToDisk Then
+                    support.deleteFileWithNoException(strLogFile)
+                    IO.File.Move(strLogFile & ".temp", strLogFile)
+                Else
+                    support.deleteFileWithNoException(strLogFile & ".temp")
+                    Throw New myExceptions.logFileWriteToDiskFailureException()
+                End If
             Catch ex As myExceptions.unableToGetLockOnLogFile
                 oldEventLogFunctions.boolShowErrorMessage = True
                 oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
@@ -358,7 +391,7 @@
 
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
 
-                Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.ReadWrite)
+                Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Read)
                     Dim streamReader As New IO.StreamReader(fileStream)
 
                     If (New IO.FileInfo(strLogFile)).Length = 0 Then
@@ -378,25 +411,34 @@
                             handleCorruptedXMLLogFile(applicationLog, fileStream)
                         End Try
                     End If
+                End Using
 
-                    applicationLog.Add(New restorePointCreatorExportedLog With {
-                        .logData = logMessage,
-                        .logType = eventLogType,
-                        .unixTime = 0,
-                        .logSource = "Restore Point Creator",
-                        .logID = applicationLog.Count,
-                        .dateObject = Now.ToUniversalTime,
-                        .boolException = boolExceptionInput
-                    })
+                applicationLog.Add(New restorePointCreatorExportedLog With {
+                    .logData = logMessage,
+                    .logType = eventLogType,
+                    .unixTime = 0,
+                    .logSource = "Restore Point Creator",
+                    .logID = applicationLog.Count,
+                    .dateObject = Now.ToUniversalTime,
+                    .boolException = boolExceptionInput
+                })
 
-                    fileStream.Position = 0
-                    fileStream.SetLength(0)
+                Dim boolSuccessfulWriteToDisk As Boolean = False
 
-                    Dim streamWriter As New IO.StreamWriter(fileStream)
+                Using memoryStream As New IO.MemoryStream()
+                    Dim streamWriter As New IO.StreamWriter(memoryStream)
                     xmlSerializerObject.Serialize(streamWriter, applicationLog)
 
-                    streamReader.Dispose()
+                    IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
+                    If IO.File.ReadAllBytes(strLogFile & ".temp").Length = memoryStream.Length Then boolSuccessfulWriteToDisk = True
                 End Using
+
+                If boolSuccessfulWriteToDisk Then
+                    support.deleteFileWithNoException(strLogFile)
+                    IO.File.Move(strLogFile & ".temp", strLogFile)
+                Else
+                    support.deleteFileWithNoException(strLogFile & ".temp")
+                End If
             Catch ex As myExceptions.unableToGetLockOnLogFile
                 oldEventLogFunctions.writeToSystemEventLog(logMessage, eventLogType)
                 oldEventLogFunctions.boolShowErrorMessage = True

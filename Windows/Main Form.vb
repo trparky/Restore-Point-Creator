@@ -2199,8 +2199,12 @@ Public Class Form1
                 ' Start a background thread to do the work.
                 Threading.ThreadPool.QueueUserWorkItem(Sub()
                                                            ' This calls the function that converts the logs.
-                                                           Functions.eventLogFunctions.getOldLogsFromWindowsEventLog()
-                                                           Functions.registryStuff.setBooleanValueInRegistry("Exported Old Logs", True)
+                                                           Try
+                                                               Functions.eventLogFunctions.getOldLogsFromWindowsEventLog()
+                                                               Functions.registryStuff.setBooleanValueInRegistry("Exported Old Logs", True)
+                                                           Catch ex As Functions.myExceptions.logFileWriteToDiskFailureException
+                                                               Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
+                                                           End Try
 
                                                            ' Now we need to do some work on the main thread.
                                                            Me.Invoke(Sub()

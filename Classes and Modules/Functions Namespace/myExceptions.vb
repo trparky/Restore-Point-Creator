@@ -14,6 +14,21 @@
             End Sub
         End Class
 
+        Public Class logFileWriteToDiskFailureException
+            Inherits Exception
+
+            Public Sub New()
+            End Sub
+
+            Public Sub New(message As String)
+                MyBase.New(message)
+            End Sub
+
+            Public Sub New(message As String, inner As Exception)
+                MyBase.New(message, inner)
+            End Sub
+        End Class
+
         Public Class unableToGetLockOnLogFile
             Inherits Exception
             Private _innerIOException As Exception
