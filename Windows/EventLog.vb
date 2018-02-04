@@ -227,7 +227,7 @@
     Private Sub eventLog_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Dim logFileInfo As New IO.FileInfo(Functions.eventLogFunctions.strLogFile)
         logFileWatcher.Path = logFileInfo.DirectoryName
-        logFileWatcher.Filter = logFileInfo.Name
+        logFileWatcher.Filter = "*" & logFileInfo.Name & "*"
 
         If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
             lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(logFileInfo.Length)
