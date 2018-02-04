@@ -8,6 +8,7 @@
         Private ReadOnly xmlSerializerObject As Xml.Serialization.XmlSerializer
         Private spinLockThread As Threading.Thread
 
+        ' This is the sub-routine that loads first when this module of code is called in the program. We can initialize variables in this sub-routine.
         Sub New()
             strProgramDataDirectory = If(globalVariables.boolPortableMode, (New IO.FileInfo(Application.ExecutablePath)).DirectoryName, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData))
             boolCachedCanIWriteThereResults = privilegeChecks.canIWriteThere(strProgramDataDirectory)
