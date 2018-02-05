@@ -8,6 +8,24 @@
         Private ReadOnly xmlSerializerObject As Xml.Serialization.XmlSerializer
         Private spinLockThread As Threading.Thread
 
+        ' All operations on the log file are done using atomic file transactions. This means that until we have verified that
+        ' all data has been written to disk after changing the log file the original file remains intact because the original
+        ' log file isn't the actual file that has been operated on; only a temporary file has been worked on.
+        '
+        ' These are the steps that the program executes when updating or writing the log file.
+        ' 1. Read the data in from the log file and de-serialize it.
+        ' 2. Add to or modify the resulting log object in memory.
+        ' 3. Serialize the log object and write the new data to a MemoryStream.
+        ' 4. Write all data that's in the MemoryStream to a temporary file on disk.
+        ' 5. Verify that all data has been written to disk by comparing what's in the MemoryStream to what's been written to disk.
+        ' 6. Once we have verified that all data has been successfully written to disk we then delete the original log file
+        '    and rename the temporary file to same name of the original file.
+        ' 7. And now our atomic file transaction is complete.
+        '
+        ' Yes, this process requires more code and time to complete but it ensures that the integrity of the log file is maintained
+        ' at all times and as much as humanly possible. All of this is to ensure that if the program crashes during a log file
+        ' write operation the log file will maintain its integrity.
+
         ' This is the sub-routine that loads first when this module of code is called in the program. We can initialize variables in this sub-routine.
         Sub New()
             strProgramDataDirectory = If(globalVariables.boolPortableMode, (New IO.FileInfo(Application.ExecutablePath)).DirectoryName, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData))
@@ -175,12 +193,17 @@
                             xmlSerializerObject.Serialize(streamWriter, applicationLog)
 
                             IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
+
+                            ' This validates the data that has been written to disk in the form of a temporary file.
                             boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
                         End Using
                     End Using
 
                     If boolSuccessfulWriteToDisk Then
                         support.deleteFileWithNoException(strLogFile)
+
+                        ' And now our atomic file transaction is complete. The data that has been written to disk
+                        ' has been validated so we can move the new log file into place of the old log file.
                         IO.File.Move(strLogFile & ".temp", strLogFile)
                     Else
                         support.deleteFileWithNoException(strLogFile & ".temp")
@@ -294,12 +317,17 @@
                         xmlSerializerObject.Serialize(streamWriter, applicationLog)
 
                         IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
+
+                        ' This validates the data that has been written to disk in the form of a temporary file.
                         boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
                     End Using
                 End Using
 
                 If boolSuccessfulWriteToDisk Then
                     support.deleteFileWithNoException(strLogFile)
+
+                    ' And now our atomic file transaction is complete. The data that has been written to disk
+                    ' has been validated so we can move the new log file into place of the old log file.
                     IO.File.Move(strLogFile & ".temp", strLogFile)
                 Else
                     support.deleteFileWithNoException(strLogFile & ".temp")
@@ -339,12 +367,17 @@
                         xmlSerializerObject.Serialize(streamWriter, applicationLog)
 
                         IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
+
+                        ' This validates the data that has been written to disk in the form of a temporary file.
                         boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
                     End Using
                 End Using
 
                 If boolSuccessfulWriteToDisk Then
                     support.deleteFileWithNoException(strLogFile)
+
+                    ' And now our atomic file transaction is complete. The data that has been written to disk
+                    ' has been validated so we can move the new log file into place of the old log file.
                     IO.File.Move(strLogFile & ".temp", strLogFile)
                 Else
                     support.deleteFileWithNoException(strLogFile & ".temp")
@@ -440,12 +473,17 @@
                         xmlSerializerObject.Serialize(streamWriter, applicationLog)
 
                         IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
+
+                        ' This validates the data that has been written to disk in the form of a temporary file.
                         boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
                     End Using
                 End Using
 
                 If boolSuccessfulWriteToDisk Then
                     support.deleteFileWithNoException(strLogFile)
+
+                    ' And now our atomic file transaction is complete. The data that has been written to disk
+                    ' has been validated so we can move the new log file into place of the old log file.
                     IO.File.Move(strLogFile & ".temp", strLogFile)
                 Else
                     support.deleteFileWithNoException(strLogFile & ".temp")
