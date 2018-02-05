@@ -108,6 +108,7 @@ Namespace My
                 If Not Functions.startupFunctions.isThereOtherInstancesOfMeRunning() Then
                     ' This is needed to make sure that no residual log lock files exist when starting the program.
                     Functions.support.deleteFileWithNoException(Functions.eventLogFunctions.strLogLockFile)
+                    Functions.support.deleteFileWithNoException(Functions.eventLogFunctions.strLogFile & ".temp")
                     Functions.support.deleteFileWithNoException(Functions.eventLogFunctions.strCorruptedLockFile)
                 End If
             End If
