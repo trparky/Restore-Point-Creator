@@ -101,7 +101,6 @@
 
                     Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Read)
                         Using streamReader As New IO.StreamReader(fileStream)
-
                             If (New IO.FileInfo(strLogFile)).Length = 0 Then
                                 internalApplicationLog.Add(New restorePointCreatorExportedLog With {
                                     .logData = "The log file was found to be empty.",
@@ -397,25 +396,25 @@
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
 
                 Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Read)
-                    Dim streamReader As New IO.StreamReader(fileStream)
-
-                    If (New IO.FileInfo(strLogFile)).Length = 0 Then
-                        applicationLog.Add(New restorePointCreatorExportedLog With {
-                            .logData = "The log file was found to be empty.",
-                            .logType = EventLogEntryType.Error,
-                            .unixTime = 0,
-                            .logSource = "Restore Point Creator",
-                            .logID = applicationLog.Count,
-                            .dateObject = Now.ToUniversalTime,
-                            .boolException = boolExceptionInput
-                        })
-                    Else
-                        Try
-                            applicationLog = xmlSerializerObject.Deserialize(streamReader)
-                        Catch ex As InvalidOperationException
-                            handleCorruptedXMLLogFile(applicationLog, fileStream)
-                        End Try
-                    End If
+                    Using streamReader As New IO.StreamReader(fileStream)
+                        If (New IO.FileInfo(strLogFile)).Length = 0 Then
+                            applicationLog.Add(New restorePointCreatorExportedLog With {
+                                .logData = "The log file was found to be empty.",
+                                .logType = EventLogEntryType.Error,
+                                .unixTime = 0,
+                                .logSource = "Restore Point Creator",
+                                .logID = applicationLog.Count,
+                                .dateObject = Now.ToUniversalTime,
+                                .boolException = boolExceptionInput
+                            })
+                        Else
+                            Try
+                                applicationLog = xmlSerializerObject.Deserialize(streamReader)
+                            Catch ex As InvalidOperationException
+                                handleCorruptedXMLLogFile(applicationLog, fileStream)
+                            End Try
+                        End If
+                    End Using
                 End Using
 
                 applicationLog.Add(New restorePointCreatorExportedLog With {
