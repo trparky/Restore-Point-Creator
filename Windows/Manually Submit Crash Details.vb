@@ -2,9 +2,16 @@
     Private boolSubmitted As Boolean = False
     Private boolDoWeHaveAttachments As Boolean = False
     Public crashData As String
+    Private _logID As Long
 
     Private strLogFile As String = IO.Path.Combine(IO.Path.GetTempPath(), "event log entries.reslogx")
     Private strZIPFile As String = IO.Path.Combine(IO.Path.GetTempPath(), "attachments.zip")
+
+    Public WriteOnly Property logID As Long
+        Set(value As Long)
+            _logID = value
+        End Set
+    End Property
 
     Private Sub Manually_Submit_Crash_Details_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Location = Functions.support.verifyWindowLocation(My.Settings.ManuallySubmitCrashDataInstanceLocation)
@@ -107,6 +114,7 @@
 
                 If strHTTPResponse.Equals("ok", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = True
+                    Functions.eventLogFunctions.markLogEntryAsSubmitted(_logID)
                     MsgBox("Crash data has been submitted. This window will now close.", MsgBoxStyle.Information, "Restore Point Creator Crash Reporter")
                     Me.Close()
                 ElseIf strHTTPResponse.Equals("error", StringComparison.OrdinalIgnoreCase) Then

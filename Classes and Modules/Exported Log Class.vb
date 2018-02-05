@@ -5,6 +5,7 @@
     Public logData, logSource As String
     Public dateObject As Date
     Public boolException As Boolean
+    Public boolSubmitted As Boolean
 End Class
 
 Public Class exportedLogFile

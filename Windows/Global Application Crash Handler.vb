@@ -51,7 +51,7 @@ Public Class frmCrash
 
         Dim strCrashData As String = Functions.eventLogFunctions.assembleCrashData(rawExceptionObject, EventLogEntryType.Error)
         txtStackTrace.Text = strCrashData
-        Functions.eventLogFunctions.writeToApplicationLogFile(strCrashData, EventLogEntryType.Error)
+        Functions.eventLogFunctions.writeToApplicationLogFile(strCrashData, EventLogEntryType.Error, True)
 
         Dim stopBitmapIcon As New Bitmap(My.Resources.removeSmall)
         Dim stopIcon As Icon = Icon.FromHandle(stopBitmapIcon.GetHicon())
@@ -141,6 +141,7 @@ Public Class frmCrash
 
                 If strHTTPResponse.Equals("ok", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = True
+                    Functions.eventLogFunctions.markLastExceptionLogAsSubmitted()
                     MsgBox("Crash data has been submitted. The program will now close.", MsgBoxStyle.Information, "Restore Point Creator Crash Reporter")
                     Me.Close()
                 ElseIf strHTTPResponse.Equals("error", StringComparison.OrdinalIgnoreCase) Then
