@@ -157,8 +157,9 @@
 
                 Try
                     Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Read)
-                        Dim streamReader As New IO.StreamReader(fileStream)
-                        applicationLog = xmlSerializerObject.Deserialize(streamReader)
+                        Using streamReader As New IO.StreamReader(fileStream)
+                            applicationLog = xmlSerializerObject.Deserialize(streamReader)
+                        End Using
                     End Using
 
                     logCount = applicationLog.Count
@@ -170,11 +171,12 @@
                     Dim boolSuccessfulWriteToDisk As Boolean = False
 
                     Using memoryStream As New IO.MemoryStream()
-                        Dim streamWriter As New IO.StreamWriter(memoryStream)
-                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
+                        Using streamWriter As New IO.StreamWriter(memoryStream)
+                            xmlSerializerObject.Serialize(streamWriter, applicationLog)
 
-                        IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
-                        boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
+                            IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
+                            boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
+                        End Using
                     End Using
 
                     If boolSuccessfulWriteToDisk Then
@@ -274,8 +276,9 @@
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
 
                 Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Read)
-                    Dim streamReader As New IO.StreamReader(fileStream)
-                    applicationLog = xmlSerializerObject.Deserialize(streamReader)
+                    Using streamReader As New IO.StreamReader(fileStream)
+                        applicationLog = xmlSerializerObject.Deserialize(streamReader)
+                    End Using
                 End Using
 
                 For Each longIDToBeDeleted As Long In idsOfLogsToBeDeleted
@@ -287,11 +290,12 @@
                 Dim boolSuccessfulWriteToDisk As Boolean = False
 
                 Using memoryStream As New IO.MemoryStream()
-                    Dim streamWriter As New IO.StreamWriter(memoryStream)
-                    xmlSerializerObject.Serialize(streamWriter, applicationLog)
+                    Using streamWriter As New IO.StreamWriter(memoryStream)
+                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
 
-                    IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
-                    boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
+                        IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
+                        boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
+                    End Using
                 End Using
 
                 If boolSuccessfulWriteToDisk Then
@@ -320,8 +324,9 @@
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
 
                 Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Read)
-                    Dim streamReader As New IO.StreamReader(fileStream)
-                    applicationLog = xmlSerializerObject.Deserialize(streamReader)
+                    Using streamReader As New IO.StreamReader(fileStream)
+                        applicationLog = xmlSerializerObject.Deserialize(streamReader)
+                    End Using
                 End Using
 
                 deleteEntryFromLogSubRoutine(applicationLog, longIDToBeDeleted)
@@ -330,11 +335,12 @@
                 Dim boolSuccessfulWriteToDisk As Boolean = False
 
                 Using memoryStream As New IO.MemoryStream()
-                    Dim streamWriter As New IO.StreamWriter(memoryStream)
-                    xmlSerializerObject.Serialize(streamWriter, applicationLog)
+                    Using streamWriter As New IO.StreamWriter(memoryStream)
+                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
 
-                    IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
-                    boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
+                        IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
+                        boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
+                    End Using
                 End Using
 
                 If boolSuccessfulWriteToDisk Then
@@ -430,11 +436,12 @@
                 Dim boolSuccessfulWriteToDisk As Boolean = False
 
                 Using memoryStream As New IO.MemoryStream()
-                    Dim streamWriter As New IO.StreamWriter(memoryStream)
-                    xmlSerializerObject.Serialize(streamWriter, applicationLog)
+                    Using streamWriter As New IO.StreamWriter(memoryStream)
+                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
 
-                    IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
-                    boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
+                        IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
+                        boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
+                    End Using
                 End Using
 
                 If boolSuccessfulWriteToDisk Then
