@@ -234,8 +234,9 @@ Class credentials
 End Class
 
 ''' <summary>Allows you to easily POST and upload files to a remote HTTP server without you, the programmer, knowing anything about how it all works. This class does it all for you. It handles adding a User Agent String, additional HTTP Request Headers, string data to your HTTP POST data, and files to be uploaded in the HTTP POST data.</summary>
+<CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")>
 Public Class httpHelper
-    Private Const classVersion As String = "1.304"
+    Private Const classVersion As String = "1.305"
 
     Private strUserAgentString As String = Nothing
     Private boolUseProxy As Boolean = False
@@ -906,23 +907,14 @@ beginAgain:
             Return True
         Catch ex As Threading.ThreadAbortException
             abortDownloadStatusUpdaterThread()
-
             If httpWebRequest IsNot Nothing Then httpWebRequest.Abort()
-
-            If memStream IsNot Nothing Then
-                memStream.Close() ' Closes the file stream.
-                memStream.Dispose() ' Disposes the file stream.
-            End If
-
+            If memStream IsNot Nothing Then memStream.Dispose() ' Disposes the file stream.
             Return False
         Catch ex As Exception
             abortDownloadStatusUpdaterThread()
 
             lastException = ex
-            If memStream IsNot Nothing Then
-                memStream.Close() ' Closes the file stream.
-                memStream.Dispose() ' Disposes the file stream.
-            End If
+            If memStream IsNot Nothing Then memStream.Dispose() ' Disposes the file stream.
 
             If Not throwExceptionIfError Then Return False
 
@@ -969,6 +961,7 @@ beginAgain:
     ''' <exception cref="httpProtocolException">This exception is thrown if the server responds with an HTTP Error.</exception>
     ''' <exception cref="sslErrorException">If this function throws an sslErrorException, an error occurred while negotiating an SSL connection.</exception>
     ''' <exception cref="dnsLookupError">If this function throws a dnsLookupError exception it means that the domain name wasn't able to be resolved properly.</exception>
+    <CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")>
     Public Function downloadFile(fileDownloadURL As String, localFileName As String, throwExceptionIfLocalFileExists As Boolean, Optional throwExceptionIfError As Boolean = True) As Boolean
         Dim fileWriteStream As FileStream = Nothing
         Dim httpWebRequest As Net.HttpWebRequest = Nothing
@@ -1022,7 +1015,6 @@ beginAgain:
                 lngBytesReadFromInternet = CType(responseStream.Read(dataBuffer, 0, dataBuffer.Length), ULong) ' Reads more data into our data buffer.
             End While
 
-            fileWriteStream.Close() ' Closes the file stream.
             fileWriteStream.Dispose() ' Disposes the file stream.
 
             If downloadStatusUpdaterThread IsNot Nothing And boolRunDownloadStatusUpdatePluginInSeparateThread Then
@@ -1035,23 +1027,14 @@ beginAgain:
             Return True
         Catch ex As Threading.ThreadAbortException
             abortDownloadStatusUpdaterThread()
-
             If httpWebRequest IsNot Nothing Then httpWebRequest.Abort()
-
-            If fileWriteStream IsNot Nothing Then
-                fileWriteStream.Close() ' Closes the file stream.
-                fileWriteStream.Dispose() ' Disposes the file stream.
-            End If
-
+            If fileWriteStream IsNot Nothing Then fileWriteStream.Dispose() ' Disposes the file stream.
             Return False
         Catch ex As Exception
             abortDownloadStatusUpdaterThread()
 
             lastException = ex
-            If fileWriteStream IsNot Nothing Then
-                fileWriteStream.Close() ' Closes the file stream.
-                fileWriteStream.Dispose() ' Disposes the file stream.
-            End If
+            If fileWriteStream IsNot Nothing Then fileWriteStream.Dispose() ' Disposes the file stream.
 
             If Not throwExceptionIfError Then Return False
 
@@ -1123,10 +1106,9 @@ beginAgain:
             Dim httpTextOutput As String = httpInStream.ReadToEnd.Trim()
             httpResponseHeaders = httpWebResponse.Headers
 
-            httpInStream.Close()
             httpInStream.Dispose()
 
-            httpWebResponse.Close()
+            httpWebResponse.Dispose()
             httpWebResponse = Nothing
             httpWebRequest = Nothing
 
@@ -1210,10 +1192,9 @@ beginAgain:
             Dim httpTextOutput As String = httpInStream.ReadToEnd.Trim()
             httpResponseHeaders = httpWebResponse.Headers
 
-            httpInStream.Close()
             httpInStream.Dispose()
 
-            httpWebResponse.Close()
+            httpWebResponse.Dispose()
             httpWebResponse = Nothing
             httpWebRequest = Nothing
 
@@ -1332,9 +1313,7 @@ beginAgain:
                             httpRequestWriter.Write(buffer, 0, buffer.Length)
                         End While
 
-                        fileStream.Close()
                         fileStream.Dispose()
-                        fileStream = Nothing
                     Else
                         data = String.Format("Content-Disposition: form-data; name={0}{1}{0}{2}{2}{3}", Chr(34), entry.Key, vbCrLf, entry.Value)
                         bytes = Text.Encoding.UTF8.GetBytes(data)
@@ -1344,7 +1323,7 @@ beginAgain:
 
                 Dim trailer As Byte() = Text.Encoding.ASCII.GetBytes(vbCrLf & "--" & boundary & "--" & vbCrLf)
                 httpRequestWriter.Write(trailer, 0, trailer.Length)
-                httpRequestWriter.Close()
+                httpRequestWriter.Dispose()
             End If
 
             Dim httpWebResponse As Net.WebResponse = httpWebRequest.GetResponse()
@@ -1354,10 +1333,9 @@ beginAgain:
             Dim httpTextOutput As String = httpInStream.ReadToEnd.Trim()
             httpResponseHeaders = httpWebResponse.Headers
 
-            httpInStream.Close()
             httpInStream.Dispose()
 
-            httpWebResponse.Close()
+            httpWebResponse.Dispose()
             httpWebResponse = Nothing
             httpWebRequest = Nothing
 
@@ -1422,7 +1400,6 @@ beginAgain:
 
             Dim httpRequestWriter = New StreamWriter(httpWebRequest.GetRequestStream())
             httpRequestWriter.Write(postDataString)
-            httpRequestWriter.Close()
             httpRequestWriter.Dispose()
             httpRequestWriter = Nothing
         End If
