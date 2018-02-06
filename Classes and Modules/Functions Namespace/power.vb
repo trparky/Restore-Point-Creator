@@ -3,7 +3,7 @@ Imports Microsoft.Win32
 
 Namespace Functions.power
     Module power
-        Private strPathToPowerCFG As String = IO.Path.Combine(globalVariables.strPathToSystemFolder, "powercfg.exe")
+        Private ReadOnly strPathToPowerCFG As String = IO.Path.Combine(globalVariables.strPathToSystemFolder, "powercfg.exe")
 
         Private Function getActivePowerPlanGUID(ByRef strResult As String) As Boolean
             Try

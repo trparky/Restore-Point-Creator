@@ -65,15 +65,15 @@ Namespace globalVariables
 
     Namespace version
         Module version
-            Public versionInfo As String() = Application.ProductVersion.Split(".")
+            Public ReadOnly versionInfo As String() = Application.ProductVersion.Split(".")
 
-            Public strFullVersionString As String = String.Format("{0}.{1} Build {2}", versionInfo(enums.versionPieces.major), versionInfo(enums.versionPieces.minor), versionInfo(enums.versionPieces.build))
+            Public ReadOnly strFullVersionString As String = String.Format("{0}.{1} Build {2}", versionInfo(enums.versionPieces.major), versionInfo(enums.versionPieces.minor), versionInfo(enums.versionPieces.build))
 
-            Public shortMajor As Short = Short.Parse(versionInfo(enums.versionPieces.major).Trim)
-            Public shortMinor As Short = Short.Parse(versionInfo(enums.versionPieces.minor).Trim)
-            Public shortBuild As Short = Short.Parse(versionInfo(enums.versionPieces.build).Trim)
+            Public ReadOnly shortMajor As Short = Short.Parse(versionInfo(enums.versionPieces.major).Trim)
+            Public ReadOnly shortMinor As Short = Short.Parse(versionInfo(enums.versionPieces.minor).Trim)
+            Public ReadOnly shortBuild As Short = Short.Parse(versionInfo(enums.versionPieces.build).Trim)
 
-            Public versionStringWithoutBuild As String = String.Format("{0}.{1}", versionInfo(enums.versionPieces.major), versionInfo(enums.versionPieces.minor))
+            Public ReadOnly versionStringWithoutBuild As String = String.Format("{0}.{1}", versionInfo(enums.versionPieces.major), versionInfo(enums.versionPieces.minor))
 
 #If DEBUG Then
             Public Const boolDebugBuild As Boolean = True
@@ -162,18 +162,18 @@ Namespace globalVariables
         Public Const programFileNameInZIP As String = "Restore Point Creator.exe"
         Public Const pdbFileNameInZIP As String = "Restore Point Creator.pdb"
 
-        Public strDumpFilePath As String = IO.Path.Combine(IO.Path.GetTempPath(), "restorePointCreator.dmp")
+        Public ReadOnly strDumpFilePath As String = IO.Path.Combine(IO.Path.GetTempPath(), "restorePointCreator.dmp")
         Public Const updaterFileName As String = "updater.exe"
 
         Public Const programName As String = "Restore Point Creator"
 
-        Public shadowCopyMountFolder As String = Environment.GetFolderPath(Environment.SpecialFolder.Windows).Substring(0, 3) & "shadowcopy"
+        Public ReadOnly shadowCopyMountFolder As String = Environment.GetFolderPath(Environment.SpecialFolder.Windows).Substring(0, 3) & "shadowcopy"
 
         Public Const notificationTypeMessageBox As String = "msg"
         Public Const notificationTypeBalloon As String = "bal"
 
-        Public strPathToSystemFolder As String = Environment.GetFolderPath(Environment.SpecialFolder.System)
-        Public systemDriveLetter As String = Environment.GetFolderPath(Environment.SpecialFolder.System).Substring(0, 2)
+        Public ReadOnly strPathToSystemFolder As String = Environment.GetFolderPath(Environment.SpecialFolder.System)
+        Public ReadOnly systemDriveLetter As String = Environment.GetFolderPath(Environment.SpecialFolder.System).Substring(0, 2)
         Public boolExtendedLoggingDuringUpdating As Boolean
 
         Public Const taskFolder As String = "Restore Point Creator" ' DON'T TOUCH THIS!
@@ -188,7 +188,7 @@ Namespace globalVariables
         Public pleaseWaitPanelFontColor As Color = Functions.support.getGoodTextColorBasedUponBackgroundColor(pleaseWaitPanelColor)
 
         ' Creates the Regular Expression Parser that's used to parse the System Restore Point Creation Date
-        Public regexRestorePointCreationTimeParser As Regex = New Regex("(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})(?<hour>\d{2})(?<minute>\d{2})(?<second>\d{2})\.", RegexOptions.IgnoreCase + RegexOptions.Compiled)
+        Public ReadOnly regexRestorePointCreationTimeParser As Regex = New Regex("(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})(?<hour>\d{2})(?<minute>\d{2})(?<second>\d{2})\.", RegexOptions.IgnoreCase + RegexOptions.Compiled)
 
         Public Const strDefaultNameForScheduledTasks As String = "Scheduled System Checkpoint made by System Restore Point Creator"
 
