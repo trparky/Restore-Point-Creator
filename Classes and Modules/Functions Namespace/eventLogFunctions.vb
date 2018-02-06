@@ -527,7 +527,7 @@
         ''' <param name="logMessage">The text you want to have in your new System Event Log entry.</param>
         ''' <param name="eventLogType">The type of log that you want your entry to be. The three major options are Error, Information, and Warning.</param>
         ''' <example>functions.eventLogFunctions.writeToSystemEventLog("My Event Log Entry", EventLogEntryType.Information)</example>
-        Public Sub writeToApplicationLogFile(logMessage As String, Optional eventLogType As EventLogEntryType = EventLogEntryType.Information, Optional boolExceptionInput As Boolean = False)
+        Public Sub writeToApplicationLogFile(logMessage As String, eventLogType As EventLogEntryType, Optional boolExceptionInput As Boolean = False)
             Try
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 

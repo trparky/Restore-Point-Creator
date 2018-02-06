@@ -367,7 +367,7 @@ Public Class frmTaskScheduler
                 Functions.power.checkIfActivePowerPlanIsSetProperlyForWakingFromSleep()
             End If
 
-            Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Creating scheduled task ""{0}"".", strCheckPointTaskName))
+            Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Creating scheduled task ""{0}"".", strCheckPointTaskName), EventLogEntryType.Information)
             taskService.RootFolder.RegisterTaskDefinition(strCheckPointTaskName, newTask, TaskCreation.CreateOrUpdate, "SYSTEM", vbNullString, TaskLogonType.ServiceAccount)
 
             newTask.Dispose()
@@ -583,7 +583,7 @@ Public Class frmTaskScheduler
                 Functions.power.checkIfActivePowerPlanIsSetProperlyForWakingFromSleep()
             End If
 
-            Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Creating scheduled task ""{0}"".", strDeleteTaskName))
+            Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Creating scheduled task ""{0}"".", strDeleteTaskName), EventLogEntryType.Information)
             taskService.RootFolder.RegisterTaskDefinition(strDeleteTaskName, newTask, TaskCreation.CreateOrUpdate, "SYSTEM", vbNullString, TaskLogonType.ServiceAccount)
 
             newTask.Dispose()

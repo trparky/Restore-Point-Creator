@@ -140,9 +140,9 @@ Namespace Functions.wmi
                                         Exit Sub
                                     Else
                                         If numberOfRestorePointsToBeDeleted = 1 Then
-                                            eventLogFunctions.writeToApplicationLogFile("Preparing to delete 1 restore point.")
+                                            eventLogFunctions.writeToApplicationLogFile("Preparing to delete 1 restore point.", EventLogEntryType.Information)
                                         Else
-                                            eventLogFunctions.writeToApplicationLogFile("Preparing to delete " & numberOfRestorePointsToBeDeleted & " restore points.")
+                                            eventLogFunctions.writeToApplicationLogFile("Preparing to delete " & numberOfRestorePointsToBeDeleted & " restore points.", EventLogEntryType.Information)
                                         End If
 
                                         For Each managementObject As Management.ManagementObject In managementObjectCollection

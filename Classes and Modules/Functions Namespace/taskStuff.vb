@@ -148,7 +148,7 @@ Namespace Functions.taskStuff
                 End Try
 
                 Dim taskFolderObject As TaskScheduler.TaskFolder = getOurTaskFolder(taskService)
-                eventLogFunctions.writeToApplicationLogFile(String.Format("Creating task ""{0}"" in ""{1}"".", taskName, taskFolderObject.Name))
+                eventLogFunctions.writeToApplicationLogFile(String.Format("Creating task ""{0}"" in ""{1}"".", taskName, taskFolderObject.Name), EventLogEntryType.Information)
                 taskFolderObject.RegisterTaskDefinition(taskName, newTask)
 
                 taskFolderObject.Dispose()

@@ -812,20 +812,20 @@ Public Class Form1
         Dim strFoundFile As String = New IO.FileInfo(Application.ExecutablePath & ".new.exe").Name
 
         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-            Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Found file named {0}{1}{0}. Now searching for any processes that have parent executables files of {0}{1}{0}.", Chr(34), strFoundFile))
+            Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Found file named {0}{1}{0}. Now searching for any processes that have parent executables files of {0}{1}{0}.", Chr(34), strFoundFile), EventLogEntryType.Information)
         End If
 
         Functions.support.searchForProcessAndKillIt(Application.ExecutablePath & ".new.exe", True)
 
         If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-            Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Now attempting to delete {0}{1}{0}.", Chr(34), strFoundFile))
+            Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Now attempting to delete {0}{1}{0}.", Chr(34), strFoundFile), EventLogEntryType.Information)
         End If
 
         Try
             IO.File.Delete(Application.ExecutablePath & ".new.exe")
 
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Deletion of {0}{1}{0} was successful.", Chr(34), strFoundFile))
+                Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Deletion of {0}{1}{0} was successful.", Chr(34), strFoundFile), EventLogEntryType.Information)
             End If
         Catch ex As Exception
             Dim deleteAtReboot As New Functions.deleteAtReboot()
@@ -833,7 +833,7 @@ Public Class Form1
             deleteAtReboot.dispose(True)
 
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
-                Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Deletion of {0}{1}{0} was unsuccessful, scheduling it to be deleted at next system reboot.", Chr(34), strFoundFile))
+                Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Deletion of {0}{1}{0} was unsuccessful, scheduling it to be deleted at next system reboot.", Chr(34), strFoundFile), EventLogEntryType.Information)
             End If
         End Try
     End Sub
@@ -1211,7 +1211,7 @@ Public Class Form1
                         Dim gigabytesInBytes As Long = 1073741824
                         Dim newSize As Long = gigabytesInBytes * 20 ' Sets the size to 20 GBs.
 
-                        Functions.eventLogFunctions.writeToApplicationLogFile("The system returned error code 1058 (ERROR_SERVICE_DISABLED). Attempting to correct it by setting up reserved system restore point space and enabling system restore on the system drive.")
+                        Functions.eventLogFunctions.writeToApplicationLogFile("The system returned error code 1058 (ERROR_SERVICE_DISABLED). Attempting to correct it by setting up reserved system restore point space and enabling system restore on the system drive.", EventLogEntryType.Information)
 
                         If MsgBox("The system has returned error code 1058 (ERROR_SERVICE_DISABLED). System Restore Point Creator can go about fixing this issue but it could have unintended consequences." & vbCrLf & vbCrLf & "Do you want System Restore Point Creator to attempt repairs to your system?", MsgBoxStyle.Question + MsgBoxStyle.YesNo + MsgBoxStyle.ApplicationModal, "System Error 1058 (ERROR_SERVICE_DISABLED) -- System Restore Point Creator") = MsgBoxResult.Yes Then
                             Functions.vss.executeVSSAdminCommand(globalVariables.systemDriveLetter)
@@ -1223,7 +1223,7 @@ Public Class Form1
                             Exit Sub
                         End If
 
-                        Functions.eventLogFunctions.writeToApplicationLogFile("Attempting to create the restore point after system configuration corrections.")
+                        Functions.eventLogFunctions.writeToApplicationLogFile("Attempting to create the restore point after system configuration corrections.", EventLogEntryType.Information)
                         unifiedCreateSystemRestorePoint(stringRestorePointName)
                         Exit Sub
                     End If
@@ -1643,10 +1643,10 @@ Public Class Form1
             Exit Sub ' Exit the routine.
         Else
             If updateType = Functions.support.updateType.buildLessThanError Then
-                Functions.eventLogFunctions.writeToApplicationLogFile("A software update check was performed and something weird happened. Your current version is newer than what is listed on the web site.") ' Log it.
+                Functions.eventLogFunctions.writeToApplicationLogFile("A software update check was performed and something weird happened. Your current version is newer than what is listed on the web site.", EventLogEntryType.Information) ' Log it.
                 giveFeedbackToUser("Something weird happened. Your current version is newer than what is listed on the web site.") ' Gives feedback.
             Else
-                Functions.eventLogFunctions.writeToApplicationLogFile("A software update check was performed and it's been determined that you already have the latest version.") ' Log it.
+                Functions.eventLogFunctions.writeToApplicationLogFile("A software update check was performed and it's been determined that you already have the latest version.", EventLogEntryType.Information) ' Log it.
                 giveFeedbackToUser("You already have the latest version.") ' Gives feedback.
             End If
 
