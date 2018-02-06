@@ -40,3 +40,8 @@
 <Assembly: CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Scope:="member", Target:="Restore_Point_Creator.IniFile.#getINIText()")>
 <Assembly: CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Scope:="member", Target:="Restore_Point_Creator.Functions.support.support.#exportSettingsToXMLFile(System.String)")>
 <Assembly: CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Scope:="member", Target:="Restore_Point_Creator.Functions.importExportSettings.importExportSettings.#exportSettingsToXMLFile(System.String)")>
+<Assembly: CodeAnalysis.SuppressMessage("Style", "IDE0037:Use inferred member name")>
+<Assembly: CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable", Scope:="type", Target:="Restore_Point_Creator.myListViewItemTypes.contactFormFileListItem")>
+<Assembly: CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable", Scope:="type", Target:="Restore_Point_Creator.Functions.myExceptions.myExceptions+logFileWriteToDiskFailureException")>
+<Assembly: CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable", Scope:="type", Target:="Restore_Point_Creator.Functions.myExceptions.myExceptions+unableToGetLockOnLogFile")>
+<Assembly: CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable", Scope:="type", Target:="Restore_Point_Creator.Functions.myExceptions.myExceptions+unableToGetParentProcessException")>
