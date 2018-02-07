@@ -80,8 +80,6 @@
         ''' <returns>Returns a Boolean value. If True the logs were successfully exported, if False then something went wrong.</returns>
         Public Function exportLogsToFile(ByVal strFileToBeExportedTo As String, ByRef logCount As Long) As Boolean
             Try
-                Dim jsonEngine As New Web.Script.Serialization.JavaScriptSerializer
-
                 Dim logObject As New exportedLogFile With {
                     .operatingSystem = osVersionInfo.getFullOSVersionString,
                     .programVersion = globalVariables.version.strFullVersionString,
@@ -93,15 +91,31 @@
                 If IO.File.Exists(strFileToBeExportedTo) Then support.deleteFileWithNoException(strFileToBeExportedTo)
 
                 Try
-                    Using streamWriter As New IO.StreamWriter(strFileToBeExportedTo)
+                    ' Create a MemoryStream to temporarily write our serialized data to.
+                    Using memoryStream As New IO.MemoryStream
+                        ' Create an XMLSerializer to write our serialized data to our MemoryStream.
                         Dim resLogXSerializer As New Xml.Serialization.XmlSerializer(logObject.GetType)
-                        resLogXSerializer.Serialize(streamWriter, logObject)
+                        ' And serialize it.
+                        resLogXSerializer.Serialize(memoryStream, logObject)
+
+                        ' Write all data in our MemoryStream to disk.
+                        IO.File.WriteAllBytes(strFileToBeExportedTo, memoryStream.ToArray())
+
+                        ' And now verify it.
+                        If verifyDataOnDisk(memoryStream, strFileToBeExportedTo) Then
+                            ' If the verification passed, return True.
+                            Return True
+                        Else
+                            ' If the verification DIDN'T pass, delete the file.
+                            support.deleteFileWithNoException(strFileToBeExportedTo)
+                            ' And return False.
+                            Return False
+                        End If
                     End Using
                 Catch ex As Exception
                     writeCrashToApplicationLogFile(ex)
+                    Return False
                 End Try
-
-                Return True
             Catch ex As Exception
                 writeCrashToApplicationLogFile(ex)
                 writeToApplicationLogFile("There was an error while attempting to export the program's event log entries.", EventLogEntryType.Error)
