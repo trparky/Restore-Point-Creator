@@ -172,9 +172,46 @@
             Return internalApplicationLog
         End Function
 
+        ''' <summary>Writes the contents of a MemoryStream to disk and verifies the contents of both. It returns a Boolean value indicating the results of the file operation.</summary>
+        ''' <param name="memoryStream">The MemoryStream Object that you want to write to disk.</param>
+        ''' <param name="strPathOfFileToVerify">The path of the file to which you want to write the contents of the MemoryStream to.</param>
+        ''' <returns>A Boolean value indicating the results of the file operation.</returns>
         Private Function verifyDataOnDisk(ByRef memoryStream As IO.MemoryStream, ByVal strPathOfFileToVerify As String) As Boolean
             Dim tempFileByteArray As Byte() = IO.File.ReadAllBytes(strPathOfFileToVerify)
             Return If(tempFileByteArray.Length = memoryStream.Length AndAlso tempFileByteArray.SequenceEqual(memoryStream.ToArray), True, False)
+        End Function
+
+        ''' <summary>Writes the contents of a "List(Of restorePointCreatorExportedLog)" Object to disk and verifies it. It returns a Boolean value indicating the results of the file operation.</summary>
+        ''' <param name="applicationLog">A Log Object.</param>
+        ''' <returns>A Boolean value indicating the results of the file operation.</returns>
+        Private Function writeDataToDiskAndVerifyIt(ByRef applicationLog As List(Of restorePointCreatorExportedLog)) As Boolean
+            Dim boolSuccessfulWriteToDisk As Boolean = False ' Declare a variable to store our results of the write operation.
+
+            ' Create a MemoryStream to temporarily write our serialized data to.
+            Using memoryStream As New IO.MemoryStream()
+                ' Create an XMLSerialized to write our serialized data to our MemoryStream.
+                xmlSerializerObject.Serialize(memoryStream, applicationLog)
+
+                ' Write all data in our MemoryStream to disk.
+                IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
+
+                ' This validates the data that has been written to disk in the form of a temporary file.
+                boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
+            End Using
+
+            If boolSuccessfulWriteToDisk Then
+                ' Delete the current log file.
+                support.deleteFileWithNoException(strLogFile)
+
+                ' And now our atomic file transaction is complete. The data that has been written to disk
+                ' has been validated so we can move the new log file into place of the old log file.
+                IO.File.Move(strLogFile & ".temp", strLogFile)
+
+                Return True ' OK, things went good so we return a True value.
+            Else
+                support.deleteFileWithNoException(strLogFile & ".temp")
+                Return False ' Oops, something went wrong; return a False value.
+            End If
         End Function
 
         ''' <exception cref="myExceptions.logFileWriteToDiskFailureException" />
@@ -200,29 +237,7 @@
                     exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strApplication, applicationLog, logCount)
                     exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strSystemRestorePointCreator, applicationLog, logCount)
 
-                    Dim boolSuccessfulWriteToDisk As Boolean = False
-
-                    Using memoryStream As New IO.MemoryStream()
-                        Using streamWriter As New IO.StreamWriter(memoryStream)
-                            xmlSerializerObject.Serialize(streamWriter, applicationLog)
-
-                            IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
-
-                            ' This validates the data that has been written to disk in the form of a temporary file.
-                            boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
-                        End Using
-                    End Using
-
-                    If boolSuccessfulWriteToDisk Then
-                        support.deleteFileWithNoException(strLogFile)
-
-                        ' And now our atomic file transaction is complete. The data that has been written to disk
-                        ' has been validated so we can move the new log file into place of the old log file.
-                        IO.File.Move(strLogFile & ".temp", strLogFile)
-                    Else
-                        support.deleteFileWithNoException(strLogFile & ".temp")
-                        Throw New myExceptions.logFileWriteToDiskFailureException()
-                    End If
+                    If Not writeDataToDiskAndVerifyIt(applicationLog) Then Throw New myExceptions.logFileWriteToDiskFailureException()
                 Catch ex As myExceptions.unableToGetLockOnLogFile
                     support.deleteFileWithNoException(strLogLockFile)
                     oldEventLogFunctions.boolShowErrorMessage = True
@@ -324,29 +339,7 @@
 
                 applicationLog = reIDTheLogEntries(applicationLog)
 
-                Dim boolSuccessfulWriteToDisk As Boolean = False
-
-                Using memoryStream As New IO.MemoryStream()
-                    Using streamWriter As New IO.StreamWriter(memoryStream)
-                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
-
-                        IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
-
-                        ' This validates the data that has been written to disk in the form of a temporary file.
-                        boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
-                    End Using
-                End Using
-
-                If boolSuccessfulWriteToDisk Then
-                    support.deleteFileWithNoException(strLogFile)
-
-                    ' And now our atomic file transaction is complete. The data that has been written to disk
-                    ' has been validated so we can move the new log file into place of the old log file.
-                    IO.File.Move(strLogFile & ".temp", strLogFile)
-                Else
-                    support.deleteFileWithNoException(strLogFile & ".temp")
-                    Throw New myExceptions.logFileWriteToDiskFailureException()
-                End If
+                If Not writeDataToDiskAndVerifyIt(applicationLog) Then Throw New myExceptions.logFileWriteToDiskFailureException()
             Catch ex As myExceptions.unableToGetLockOnLogFile
                 oldEventLogFunctions.boolShowErrorMessage = True
                 oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
@@ -374,29 +367,7 @@
                 deleteEntryFromLogSubRoutine(applicationLog, longIDToBeDeleted)
                 applicationLog = reIDTheLogEntries(applicationLog)
 
-                Dim boolSuccessfulWriteToDisk As Boolean = False
-
-                Using memoryStream As New IO.MemoryStream()
-                    Using streamWriter As New IO.StreamWriter(memoryStream)
-                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
-
-                        IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
-
-                        ' This validates the data that has been written to disk in the form of a temporary file.
-                        boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
-                    End Using
-                End Using
-
-                If boolSuccessfulWriteToDisk Then
-                    support.deleteFileWithNoException(strLogFile)
-
-                    ' And now our atomic file transaction is complete. The data that has been written to disk
-                    ' has been validated so we can move the new log file into place of the old log file.
-                    IO.File.Move(strLogFile & ".temp", strLogFile)
-                Else
-                    support.deleteFileWithNoException(strLogFile & ".temp")
-                    Throw New myExceptions.logFileWriteToDiskFailureException()
-                End If
+                If Not writeDataToDiskAndVerifyIt(applicationLog) Then Throw New myExceptions.logFileWriteToDiskFailureException()
             Catch ex As myExceptions.unableToGetLockOnLogFile
                 oldEventLogFunctions.boolShowErrorMessage = True
                 oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
@@ -461,28 +432,7 @@
                 ' Sets the "submitted" bit to True.
                 applicationLog.First(Function(logEntryObject As restorePointCreatorExportedLog) logEntryObject.logID = longNewestLogEntry).boolSubmitted = True
 
-                Dim boolSuccessfulWriteToDisk As Boolean = False
-
-                Using memoryStream As New IO.MemoryStream()
-                    Using streamWriter As New IO.StreamWriter(memoryStream)
-                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
-
-                        IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
-
-                        ' This validates the data that has been written to disk in the form of a temporary file.
-                        boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
-                    End Using
-                End Using
-
-                If boolSuccessfulWriteToDisk Then
-                    support.deleteFileWithNoException(strLogFile)
-
-                    ' And now our atomic file transaction is complete. The data that has been written to disk
-                    ' has been validated so we can move the new log file into place of the old log file.
-                    IO.File.Move(strLogFile & ".temp", strLogFile)
-                Else
-                    support.deleteFileWithNoException(strLogFile & ".temp")
-                End If
+                writeDataToDiskAndVerifyIt(applicationLog)
             Catch ex As Exception
             Finally
                 support.deleteFileWithNoException(strLogLockFile)
@@ -509,28 +459,7 @@
                 ' Sets the "submitted" bit to True.
                 applicationLog.First(Function(logEntryObject As restorePointCreatorExportedLog) logEntryObject.logID = inputLogID).boolSubmitted = True
 
-                Dim boolSuccessfulWriteToDisk As Boolean = False
-
-                Using memoryStream As New IO.MemoryStream()
-                    Using streamWriter As New IO.StreamWriter(memoryStream)
-                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
-
-                        IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
-
-                        ' This validates the data that has been written to disk in the form of a temporary file.
-                        boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
-                    End Using
-                End Using
-
-                If boolSuccessfulWriteToDisk Then
-                    support.deleteFileWithNoException(strLogFile)
-
-                    ' And now our atomic file transaction is complete. The data that has been written to disk
-                    ' has been validated so we can move the new log file into place of the old log file.
-                    IO.File.Move(strLogFile & ".temp", strLogFile)
-                Else
-                    support.deleteFileWithNoException(strLogFile & ".temp")
-                End If
+                writeDataToDiskAndVerifyIt(applicationLog)
             Catch ex As Exception
             Finally
                 support.deleteFileWithNoException(strLogLockFile)
@@ -579,28 +508,7 @@
                     .boolException = boolExceptionInput
                 })
 
-                Dim boolSuccessfulWriteToDisk As Boolean = False
-
-                Using memoryStream As New IO.MemoryStream()
-                    Using streamWriter As New IO.StreamWriter(memoryStream)
-                        xmlSerializerObject.Serialize(streamWriter, applicationLog)
-
-                        IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
-
-                        ' This validates the data that has been written to disk in the form of a temporary file.
-                        boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
-                    End Using
-                End Using
-
-                If boolSuccessfulWriteToDisk Then
-                    support.deleteFileWithNoException(strLogFile)
-
-                    ' And now our atomic file transaction is complete. The data that has been written to disk
-                    ' has been validated so we can move the new log file into place of the old log file.
-                    IO.File.Move(strLogFile & ".temp", strLogFile)
-                Else
-                    support.deleteFileWithNoException(strLogFile & ".temp")
-                End If
+                writeDataToDiskAndVerifyIt(applicationLog)
             Catch ex As myExceptions.unableToGetLockOnLogFile
                 oldEventLogFunctions.writeToSystemEventLog(logMessage, eventLogType)
                 oldEventLogFunctions.boolShowErrorMessage = True
