@@ -3,24 +3,27 @@
         Private Const strSystemRestorePointCreator As String = "System Restore Point Creator"
         Private Const strRegistryApplicationPath As String = "SYSTEM\CurrentControlSet\services\eventlog\Application"
 
-        Public ReadOnly strProgramDataDirectory, strLogFile, strLogLockFile, strCorruptedLockFile As String
+        Public ReadOnly strProgramDataDirectory, strLogFile, strCorruptedLockFile As String
         Private ReadOnly boolCachedCanIWriteThereResults As Boolean
         Private ReadOnly xmlSerializerObject As Xml.Serialization.XmlSerializer
-        Private spinLockThread As Threading.Thread
+        Public myLogFileLockingMutex As New Threading.Mutex(False, "restorepointcreatorlogfilemutex")
 
         ' All operations on the log file are done using atomic file transactions. This means that until we have verified that
         ' all data has been written to disk after changing the log file the original file remains intact because the original
         ' log file isn't the actual file that has been operated on; only a temporary file has been worked on.
         '
         ' These are the steps that the program executes when updating or writing the log file.
-        ' 1. Read the data in from the log file and de-serialize it.
-        ' 2. Add to or modify the resulting log object in memory.
-        ' 3. Serialize the log object and write the new data to a MemoryStream.
-        ' 4. Write all data that's in the MemoryStream to a temporary file on disk.
-        ' 5. Verify that all data has been written to disk by comparing what's in the MemoryStream to what's been written to disk.
-        ' 6. Once we have verified that all data has been successfully written to disk we then delete the original log file
+        ' 1. Acquire a mutex lock. If another part of the program or another instance of the program has a mutex lock then
+        '    we wait until the mutex lock has been released and then acquire it after the lock has been released.
+        ' 2. Read the data in from the log file and de-serialize it.
+        ' 3. Add to or modify the resulting log object in memory.
+        ' 4. Serialize the log object and write the new data to a MemoryStream.
+        ' 5. Write all data that's in the MemoryStream to a temporary file on disk.
+        ' 6. Verify that all data has been written to disk by comparing what's in the MemoryStream to what's been written to disk.
+        ' 7. Once we have verified that all data has been successfully written to disk we then delete the original log file
         '    and rename the temporary file to same name of the original file.
-        ' 7. And now our atomic file transaction is complete.
+        ' 8. And now our atomic file transaction is complete.
+        ' 9. Release the mutex lock.
         '
         ' Yes, this process requires more code and time to complete but it ensures that the integrity of the log file is maintained
         ' at all times and as much as humanly possible. All of this is to ensure that if the program crashes during a log file
@@ -32,41 +35,26 @@
             boolCachedCanIWriteThereResults = privilegeChecks.canIWriteThere(strProgramDataDirectory)
 
             strLogFile = IO.Path.Combine(strProgramDataDirectory, "Restore Point Creator.log")
-            strLogLockFile = IO.Path.Combine(strProgramDataDirectory, "Restore Point Creator.log.lock")
             strCorruptedLockFile = IO.Path.Combine(strProgramDataDirectory, "corruptedlog.lock")
 
             xmlSerializerObject = New Xml.Serialization.XmlSerializer((New List(Of restorePointCreatorExportedLog)).GetType)
         End Sub
 
+        Public Sub releaseOurMutexWithoutException()
+            Try
+                myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
+            Catch ex As Exception
+                ' This is going to crash but who cares!
+            End Try
+        End Sub
+
         ''' <summary>Opens and returns a IO.FileStream.</summary>
         ''' <param name="strFileToOpen">Path to the file you want to open.</param>
-        ''' <param name="strLockFile">Path to the lock file that indicates that the file declared using the "strFileToOpen" variable is in use.</param>
         ''' <param name="accessMethod">The way you want to access the file.</param>
         ''' <param name="fileMode">The way you want to access the file.</param>
         ''' <returns>A IO.FileStream Object.</returns>
         ''' <exception cref="myExceptions.unableToGetLockOnLogFile"></exception>
-        Private Function getLogFileIOFileStream(strFileToOpen As String, strLockFile As String, accessMethod As IO.FileAccess, Optional fileMode As IO.FileMode = IO.FileMode.Open, Optional boolUseLockFile As Boolean = True) As IO.FileStream
-            If boolUseLockFile Then
-                If IO.File.Exists(strLockFile) Then
-                    spinLockThread = New Threading.Thread(Sub()
-                                                              Threading.Thread.Sleep(5000) ' Sleeps for 5 seconds.
-                                                              support.deleteFileWithNoException(strLockFile)
-                                                              Debug.WriteLine("Forcefully removed log lock file.")
-                                                              spinLockThread = Nothing
-                                                          End Sub)
-                    spinLockThread.Name = "Log File Lock File Watcher"
-                    spinLockThread.Priority = Threading.ThreadPriority.Normal
-                    spinLockThread.IsBackground = True
-                    spinLockThread.Start()
-                End If
-
-                While IO.File.Exists(strLockFile)
-                    ' Spin locks.
-                End While
-
-                IO.File.Create(strLockFile).Dispose()
-            End If
-
+        Private Function getLogFileIOFileStream(strFileToOpen As String, accessMethod As IO.FileAccess, Optional fileMode As IO.FileMode = IO.FileMode.Open, Optional boolUseLockFile As Boolean = True) As IO.FileStream
             Try
                 Return New IO.FileStream(strFileToOpen, fileMode, accessMethod, IO.FileShare.None)
             Catch ex As IO.IOException
@@ -80,6 +68,8 @@
         ''' <returns>Returns a Boolean value. If True the logs were successfully exported, if False then something went wrong.</returns>
         Public Function exportLogsToFile(ByVal strFileToBeExportedTo As String, ByRef logCount As Long) As Boolean
             Try
+                ' We don't get a mutex lock here because the getLogObject() function has mutex lock code
+                ' in it already. If we get a mutex lock here then we would never get the logObject.
                 Dim logObject As New exportedLogFile With {
                     .operatingSystem = osVersionInfo.getFullOSVersionString,
                     .programVersion = globalVariables.version.strFullVersionString,
@@ -125,13 +115,14 @@
         End Function
 
         Public Function getLogObject() As List(Of restorePointCreatorExportedLog)
+            myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
             Dim internalApplicationLog As New List(Of restorePointCreatorExportedLog)
 
             If IO.File.Exists(strLogFile) Then
                 Try
                     Dim boolDidWeHaveACorruptedLogFile As Boolean = False
 
-                    Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Read)
+                    Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Read)
                         Using streamReader As New IO.StreamReader(fileStream)
                             If (New IO.FileInfo(strLogFile)).Length = 0 Then
                                 internalApplicationLog.Add(New restorePointCreatorExportedLog With {
@@ -157,18 +148,17 @@
                     End Using
 
                     If boolDidWeHaveACorruptedLogFile Then
-                        Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Write, IO.FileMode.Create, False)
+                        Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Write, IO.FileMode.Create, False)
                             xmlSerializerObject.Serialize(fileStream, internalApplicationLog)
                         End Using
                     End If
                 Catch ex As myExceptions.unableToGetLockOnLogFile
                     oldEventLogFunctions.boolShowErrorMessage = True
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
-                Finally
-                    support.deleteFileWithNoException(strLogLockFile)
                 End Try
             End If
 
+            releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
             Return internalApplicationLog
         End Function
 
@@ -220,12 +210,14 @@
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
                 writeToApplicationLogFile("Starting log conversion process.", EventLogEntryType.Information)
 
+                myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
+
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
                 Dim logCount, longOldLogCount As Long
                 Dim stopwatch As Stopwatch = Stopwatch.StartNew
 
                 Try
-                    Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Read)
+                    Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Read)
                         Using streamReader As New IO.StreamReader(fileStream)
                             applicationLog = xmlSerializerObject.Deserialize(streamReader)
                         End Using
@@ -239,15 +231,14 @@
 
                     If Not writeDataToDiskAndVerifyIt(applicationLog) Then Throw New myExceptions.logFileWriteToDiskFailureException()
                 Catch ex As myExceptions.unableToGetLockOnLogFile
-                    support.deleteFileWithNoException(strLogLockFile)
                     oldEventLogFunctions.boolShowErrorMessage = True
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
                     Exit Sub
-                Finally
-                    support.deleteFileWithNoException(strLogLockFile)
                 End Try
 
                 Dim longNumberOfImportedLogs As Long = applicationLog.Count - longOldLogCount
+
+                releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
 
                 writeToApplicationLogFile("Log conversion process complete.", EventLogEntryType.Information)
 
@@ -259,12 +250,14 @@
                     writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. No old log entries were detected.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information)
                 End If
             Catch ex As Exception
+                releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
                 writeCrashToApplicationLogFile(ex)
             End Try
         End Sub
 
         Private Sub createLogFile()
             Try
+                myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
                 applicationLog.Add(New restorePointCreatorExportedLog With {
@@ -278,17 +271,26 @@
                 })
 
                 Try
-                    Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Write, IO.FileMode.Create)
-                        Using streamWriter As New IO.StreamWriter(fileStream)
-                            xmlSerializerObject.Serialize(streamWriter, applicationLog)
-                        End Using
+                    Dim boolSuccessfulWriteToDisk As Boolean = False ' Declare a variable to store our results of the write operation.
+
+                    Using memoryStream As New IO.MemoryStream()
+                        xmlSerializerObject.Serialize(memoryStream, applicationLog)
+                        IO.File.WriteAllBytes(strLogFile & ".temp", memoryStream.ToArray())
+
+                        boolSuccessfulWriteToDisk = verifyDataOnDisk(memoryStream, strLogFile & ".temp")
                     End Using
+
+                    If boolSuccessfulWriteToDisk Then
+                        support.deleteFileWithNoException(strLogFile)
+                        IO.File.Move(strLogFile & ".temp", strLogFile)
+                    Else
+                        support.deleteFileWithNoException(strLogFile & ".temp")
+                    End If
                 Catch ex As myExceptions.unableToGetLockOnLogFile
-                    support.deleteFileWithNoException(strLogLockFile)
                     oldEventLogFunctions.boolShowErrorMessage = True
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
                 Finally
-                    support.deleteFileWithNoException(strLogLockFile)
+                    releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
                 End Try
             Catch ex As Exception
                 MsgBox(ex.Message)
@@ -323,11 +325,10 @@
         ''' <exception cref="myExceptions.logFileWriteToDiskFailureException" />
         Public Sub deleteEntryFromLog(idsOfLogsToBeDeleted As List(Of Long))
             Try
+                myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
-                If Not IO.File.Exists(strLogFile) Then createLogFile()
-
-                Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Read)
+                Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Read)
                     Using streamReader As New IO.StreamReader(fileStream)
                         applicationLog = xmlSerializerObject.Deserialize(streamReader)
                     End Using
@@ -346,7 +347,7 @@
             Catch ex As Exception
                 ' Does nothing.
             Finally
-                support.deleteFileWithNoException(strLogLockFile)
+                releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
             End Try
         End Sub
 
@@ -354,11 +355,10 @@
         ''' <exception cref="myExceptions.logFileWriteToDiskFailureException" />
         Public Sub deleteEntryFromLog(longIDToBeDeleted As Long)
             Try
+                myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
-                If Not IO.File.Exists(strLogFile) Then createLogFile()
-
-                Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Read)
+                Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Read)
                     Using streamReader As New IO.StreamReader(fileStream)
                         applicationLog = xmlSerializerObject.Deserialize(streamReader)
                     End Using
@@ -374,7 +374,7 @@
             Catch ex As Exception
                 ' Does nothing.
             Finally
-                support.deleteFileWithNoException(strLogLockFile)
+                releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
             End Try
         End Sub
 
@@ -411,16 +411,16 @@
 
         Public Sub markLastExceptionLogAsSubmitted()
             Try
+                myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
-                Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Read)
+                Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Read)
                     Using streamReader As New IO.StreamReader(fileStream)
                         Try
                             applicationLog = xmlSerializerObject.Deserialize(streamReader)
                         Catch ex As InvalidOperationException
                             ' OK, at this point we have nothing to mark in the log file so we just exit this sub-routine.
                             handleCorruptedXMLLogFile(applicationLog, fileStream)
-                            support.deleteFileWithNoException(strLogLockFile) ' But not before deleting the lock file.
                             Exit Sub
                         End Try
                     End Using
@@ -435,22 +435,22 @@
                 writeDataToDiskAndVerifyIt(applicationLog)
             Catch ex As Exception
             Finally
-                support.deleteFileWithNoException(strLogLockFile)
+                releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
             End Try
         End Sub
 
         Public Sub markLogEntryAsSubmitted(inputLogID As Long)
             Try
+                myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
-                Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Read)
+                Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Read)
                     Using streamReader As New IO.StreamReader(fileStream)
                         Try
                             applicationLog = xmlSerializerObject.Deserialize(streamReader)
                         Catch ex As InvalidOperationException
                             ' OK, at this point we have nothing to mark in the log file so we just exit this sub-routine.
                             handleCorruptedXMLLogFile(applicationLog, fileStream)
-                            support.deleteFileWithNoException(strLogLockFile) ' But not before deleting the lock file.
                             Exit Sub
                         End Try
                     End Using
@@ -462,7 +462,7 @@
                 writeDataToDiskAndVerifyIt(applicationLog)
             Catch ex As Exception
             Finally
-                support.deleteFileWithNoException(strLogLockFile)
+                releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
             End Try
         End Sub
 
@@ -472,11 +472,12 @@
         ''' <example>functions.eventLogFunctions.writeToSystemEventLog("My Event Log Entry", EventLogEntryType.Information)</example>
         Public Sub writeToApplicationLogFile(logMessage As String, eventLogType As EventLogEntryType, Optional boolExceptionInput As Boolean = False)
             Try
+                myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
 
-                Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, strLogLockFile, IO.FileAccess.Read)
+                Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Read)
                     Using streamReader As New IO.StreamReader(fileStream)
                         If (New IO.FileInfo(strLogFile)).Length = 0 Then
                             applicationLog.Add(New restorePointCreatorExportedLog With {
@@ -516,7 +517,7 @@
             Catch ex As Exception
                 oldEventLogFunctions.writeCrashToEventLog(ex)
             Finally
-                support.deleteFileWithNoException(strLogLockFile)
+                releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
             End Try
         End Sub
 

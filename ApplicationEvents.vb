@@ -107,7 +107,6 @@ Namespace My
                 ' make sure that the log files aren't clobbered by multiple instances trying to write to the log file.
                 If Not Functions.startupFunctions.isThereOtherInstancesOfMeRunning() Then
                     ' This is needed to make sure that no residual log lock files exist when starting the program.
-                    Functions.support.deleteFileWithNoException(Functions.eventLogFunctions.strLogLockFile)
                     Functions.support.deleteFileWithNoException(Functions.eventLogFunctions.strLogFile & ".temp")
                     Functions.support.deleteFileWithNoException(Functions.eventLogFunctions.strCorruptedLockFile)
                 End If
@@ -655,6 +654,7 @@ Namespace My
 
         Private Sub MyApplication_Shutdown(sender As Object, e As EventArgs) Handles Me.Shutdown
             If IO.Directory.Exists(globalVariables.shadowCopyMountFolder) Then IO.Directory.Delete(globalVariables.shadowCopyMountFolder)
+            Functions.eventLogFunctions.releaseOurMutexWithoutException()
         End Sub
     End Class
 End Namespace
