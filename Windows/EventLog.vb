@@ -524,8 +524,6 @@
     End Sub
 
     Private Sub logFileWatcher_Changed(sender As Object, e As IO.FileSystemEventArgs) Handles logFileWatcher.Changed
-        Functions.eventLogFunctions.myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
-
         ' This hack is required because of a bug in the File System Watcher that causes it to fire multiple events one after
         ' another even though there was only one change to the file we are watching. ARG Microsoft! You stupid idiots!
         If (Date.Now.Subtract(dateLastFileSystemWatcherEventRaised).TotalMilliseconds < 500) Then
@@ -539,8 +537,6 @@
             lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
             lblLastModified.Text = "Last Modified: (File Doesn't Exist)"
         End If
-
-        Functions.eventLogFunctions.myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
     End Sub
 
     Private Sub btnDeleteIndividualLogEntry_Click(sender As Object, e As EventArgs) Handles btnDeleteIndividualLogEntry.Click
