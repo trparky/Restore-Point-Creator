@@ -572,7 +572,7 @@
             lblLastModified.Text = "Last Modified: (File Doesn't Exist)"
         End If
 
-        Functions.eventLogFunctions.releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
+        Functions.eventLogFunctions.myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
     End Sub
 
     Private Sub btnDeleteIndividualLogEntry_Click(sender As Object, e As EventArgs) Handles btnDeleteIndividualLogEntry.Click

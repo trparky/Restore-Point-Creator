@@ -40,14 +40,6 @@
             xmlSerializerObject = New Xml.Serialization.XmlSerializer((New List(Of restorePointCreatorExportedLog)).GetType)
         End Sub
 
-        Public Sub releaseOurMutexWithoutException()
-            Try
-                myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
-            Catch ex As Exception
-                ' This is going to crash but who cares!
-            End Try
-        End Sub
-
         ''' <summary>Opens and returns a IO.FileStream.</summary>
         ''' <param name="strFileToOpen">Path to the file you want to open.</param>
         ''' <param name="accessMethod">The way you want to access the file.</param>
@@ -158,7 +150,7 @@
                 End Try
             End If
 
-            releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
+            myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
             Return internalApplicationLog
         End Function
 
@@ -238,7 +230,7 @@
 
                 Dim longNumberOfImportedLogs As Long = applicationLog.Count - longOldLogCount
 
-                releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
+                myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
 
                 writeToApplicationLogFile("Log conversion process complete.", EventLogEntryType.Information, False)
 
@@ -250,7 +242,7 @@
                     writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. No old log entries were detected.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information, False)
                 End If
             Catch ex As Exception
-                releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
+                myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
                 writeCrashToApplicationLogFile(ex)
             End Try
         End Sub
@@ -290,7 +282,7 @@
                     oldEventLogFunctions.boolShowErrorMessage = True
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
                 Finally
-                    releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
+                    myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
                 End Try
             Catch ex As Exception
                 MsgBox(ex.Message)
@@ -347,7 +339,7 @@
             Catch ex As Exception
                 ' Does nothing.
             Finally
-                releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
+                myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
             End Try
         End Sub
 
@@ -374,7 +366,7 @@
             Catch ex As Exception
                 ' Does nothing.
             Finally
-                releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
+                myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
             End Try
         End Sub
 
@@ -435,7 +427,7 @@
                 writeDataToDiskAndVerifyIt(applicationLog)
             Catch ex As Exception
             Finally
-                releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
+                myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
             End Try
         End Sub
 
@@ -462,7 +454,7 @@
                 writeDataToDiskAndVerifyIt(applicationLog)
             Catch ex As Exception
             Finally
-                releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
+                myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
             End Try
         End Sub
 
@@ -517,7 +509,7 @@
             Catch ex As Exception
                 oldEventLogFunctions.writeCrashToEventLog(ex)
             Finally
-                releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
+                myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
             End Try
         End Sub
 

@@ -654,7 +654,11 @@ Namespace My
 
         Private Sub MyApplication_Shutdown(sender As Object, e As EventArgs) Handles Me.Shutdown
             If IO.Directory.Exists(globalVariables.shadowCopyMountFolder) Then IO.Directory.Delete(globalVariables.shadowCopyMountFolder)
-            Functions.eventLogFunctions.releaseOurMutexWithoutException()
+
+            Try
+                Functions.eventLogFunctions.myLogFileLockingMutex.ReleaseMutex()
+            Catch ex As Exception
+            End Try
         End Sub
     End Class
 End Namespace
