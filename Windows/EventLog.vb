@@ -154,17 +154,7 @@
     Private Sub eventLogForm_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
         If e.KeyCode = Keys.F5 And Not boolAreWeLoadingTheEventLogData Then
             If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
-                Dim logFileInfo As New IO.FileInfo(Functions.eventLogFunctions.strLogFile)
-                lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(logFileInfo.Length)
-                lblLastModified.Text = "Last Modified: " & logFileInfo.LastWriteTimeUtc.ToLocalTime.ToString()
-                logFileInfo = Nothing
-
-                openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
-
-                workingThread = New Threading.Thread(AddressOf loadEventLog)
-                workingThread.Name = "Event Log Data Loading Thread"
-                workingThread.IsBackground = True
-                workingThread.Start()
+                getFileDetailsAndActivateDataLoadThread()
             Else
                 lblLogEntryCount.Text = "Entries in Event Log: 0"
                 lblProcessedIn.Text = ""
@@ -312,17 +302,7 @@
     Private Sub btnRefreshEvents_Click(sender As Object, e As EventArgs) Handles btnRefreshEvents.Click
         If Not boolAreWeLoadingTheEventLogData Then
             If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
-                Dim logFileInfo As New IO.FileInfo(Functions.eventLogFunctions.strLogFile)
-                lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(logFileInfo.Length)
-                lblLastModified.Text = "Last Modified: " & logFileInfo.LastWriteTimeUtc.ToLocalTime.ToString()
-                logFileInfo = Nothing
-
-                openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
-
-                workingThread = New Threading.Thread(AddressOf loadEventLog)
-                workingThread.Name = "Event Log Data Loading Thread"
-                workingThread.IsBackground = True
-                workingThread.Start()
+                getFileDetailsAndActivateDataLoadThread()
             Else
                 eventLogList.Items.Clear()
                 lblLogEntryCount.Text = "Entries in Event Log: 0"
@@ -554,19 +534,7 @@
         dateLastFileSystemWatcherEventRaised = Date.Now
 
         If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
-            If Not boolAreWeLoadingTheEventLogData Then
-                Dim logFileInfo As New IO.FileInfo(Functions.eventLogFunctions.strLogFile)
-                lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(logFileInfo.Length)
-                lblLastModified.Text = "Last Modified: " & logFileInfo.LastWriteTimeUtc.ToLocalTime.ToString()
-                logFileInfo = Nothing
-
-                openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
-
-                workingThread = New Threading.Thread(AddressOf loadEventLog)
-                workingThread.Name = "Event Log Data Loading Thread"
-                workingThread.IsBackground = True
-                workingThread.Start()
-            End If
+            If Not boolAreWeLoadingTheEventLogData Then getFileDetailsAndActivateDataLoadThread()
         Else
             lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
             lblLastModified.Text = "Last Modified: (File Doesn't Exist)"
@@ -602,20 +570,24 @@
         btnClear.Enabled = False
 
         If boolSuccessfulDelete Then
-            Dim logFileInfo As New IO.FileInfo(Functions.eventLogFunctions.strLogFile)
-            lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(logFileInfo.Length)
-            lblLastModified.Text = "Last Modified: " & logFileInfo.LastWriteTimeUtc.ToLocalTime.ToString()
-            logFileInfo = Nothing
-
-            openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
-
-            workingThread = New Threading.Thread(AddressOf loadEventLog)
-            workingThread.Name = "Event Log Data Loading Thread"
-            workingThread.IsBackground = True
-            workingThread.Start()
+            getFileDetailsAndActivateDataLoadThread()
         Else
             MsgBox("There was an error writing the new log file to disk.", MsgBoxStyle.Critical, Me.Text)
         End If
+    End Sub
+
+    Private Sub getFileDetailsAndActivateDataLoadThread()
+        Dim logFileInfo As New IO.FileInfo(Functions.eventLogFunctions.strLogFile)
+        lblLogFileSize.Text = "Log File Size: " & Functions.support.bytesToHumanSize(logFileInfo.Length)
+        lblLastModified.Text = "Last Modified: " & logFileInfo.LastWriteTimeUtc.ToLocalTime.ToString()
+        logFileInfo = Nothing
+
+        openPleaseWaitPanel("Loading Event Log Data... Please Wait.")
+
+        workingThread = New Threading.Thread(AddressOf loadEventLog)
+        workingThread.Name = "Event Log Data Loading Thread"
+        workingThread.IsBackground = True
+        workingThread.Start()
     End Sub
 
     Private Sub chkMultiSelectMode_Click(sender As Object, e As EventArgs) Handles chkMultiSelectMode.Click
