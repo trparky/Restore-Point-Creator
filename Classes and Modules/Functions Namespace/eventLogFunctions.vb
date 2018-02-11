@@ -106,8 +106,8 @@
             End Try
         End Function
 
-        Public Function getLogObject() As List(Of restorePointCreatorExportedLog)
-            myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
+        Public Function getLogObject(Optional boolAcquireMutexLock As Boolean = True) As List(Of restorePointCreatorExportedLog)
+            If boolAcquireMutexLock Then myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
             Dim internalApplicationLog As New List(Of restorePointCreatorExportedLog)
 
             If IO.File.Exists(strLogFile) Then
@@ -150,7 +150,7 @@
                 End Try
             End If
 
-            myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
+            If boolAcquireMutexLock Then myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
             Return internalApplicationLog
         End Function
 
@@ -200,9 +200,7 @@
         Public Sub getOldLogsFromWindowsEventLog()
             Try
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
-                writeToApplicationLogFile("Starting log conversion process.", EventLogEntryType.Information, False)
-
-                myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
+                writeToApplicationLogFile("Starting log conversion process.", EventLogEntryType.Information, False, False)
 
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
                 Dim logCount, longOldLogCount As Long
@@ -232,24 +230,23 @@
 
                 myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
 
-                writeToApplicationLogFile("Log conversion process complete.", EventLogEntryType.Information, False)
+                writeToApplicationLogFile("Log conversion process complete.", EventLogEntryType.Information, False, False)
 
                 If longNumberOfImportedLogs = 1 Then
-                    writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. 1 log entry was imported.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information, False)
+                    writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. 1 log entry was imported.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information, False, False)
                 ElseIf longNumberOfImportedLogs > 1 Then
-                    writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. {1} log entries were imported.", stopwatch.ElapsedMilliseconds.ToString, longNumberOfImportedLogs.ToString("N0")), EventLogEntryType.Information, False)
+                    writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. {1} log entries were imported.", stopwatch.ElapsedMilliseconds.ToString, longNumberOfImportedLogs.ToString("N0")), EventLogEntryType.Information, False, False)
                 Else
-                    writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. No old log entries were detected.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information, False)
+                    writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. No old log entries were detected.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information, False, False)
                 End If
             Catch ex As Exception
-                myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
                 writeCrashToApplicationLogFile(ex)
             End Try
         End Sub
 
-        Private Sub createLogFile()
+        Private Sub createLogFile(Optional boolAcquireMutexLock As Boolean = True)
             Try
-                myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
+                If boolAcquireMutexLock Then myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
                 applicationLog.Add(New restorePointCreatorExportedLog With {
@@ -282,7 +279,7 @@
                     oldEventLogFunctions.boolShowErrorMessage = True
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
                 Finally
-                    myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
+                    If boolAcquireMutexLock Then myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
                 End Try
             Catch ex As Exception
                 MsgBox(ex.Message)
@@ -315,9 +312,9 @@
 
         ''' <summary>Deletes a list of individual log entries from the log.</summary>
         ''' <exception cref="myExceptions.logFileWriteToDiskFailureException" />
-        Public Sub deleteEntryFromLog(idsOfLogsToBeDeleted As List(Of Long))
+        Public Sub deleteEntryFromLog(idsOfLogsToBeDeleted As List(Of Long), Optional boolAcquireMutexLock As Boolean = True)
             Try
-                myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
+                If boolAcquireMutexLock Then myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
                 Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Read)
@@ -339,15 +336,15 @@
             Catch ex As Exception
                 ' Does nothing.
             Finally
-                myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
+                If boolAcquireMutexLock Then myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
             End Try
         End Sub
 
         ''' <summary>Deletes an individual log entry from the log.</summary>
         ''' <exception cref="myExceptions.logFileWriteToDiskFailureException" />
-        Public Sub deleteEntryFromLog(longIDToBeDeleted As Long)
+        Public Sub deleteEntryFromLog(longIDToBeDeleted As Long, Optional boolAcquireMutexLock As Boolean = True)
             Try
-                myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
+                If boolAcquireMutexLock Then myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
                 Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Read)
@@ -366,7 +363,7 @@
             Catch ex As Exception
                 ' Does nothing.
             Finally
-                myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
+                If boolAcquireMutexLock Then myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
             End Try
         End Sub
 
@@ -401,9 +398,9 @@
             })
         End Sub
 
-        Public Sub markLastExceptionLogAsSubmitted()
+        Public Sub markLastExceptionLogAsSubmitted(Optional boolAcquireMutexLock As Boolean = True)
             Try
-                myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
+                If boolAcquireMutexLock Then myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
                 Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Read)
@@ -427,13 +424,13 @@
                 writeDataToDiskAndVerifyIt(applicationLog)
             Catch ex As Exception
             Finally
-                myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
+                If boolAcquireMutexLock Then myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
             End Try
         End Sub
 
-        Public Sub markLogEntryAsSubmitted(inputLogID As Long)
+        Public Sub markLogEntryAsSubmitted(inputLogID As Long, Optional boolAcquireMutexLock As Boolean = True)
             Try
-                myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
+                If boolAcquireMutexLock Then myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
                 Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Read)
@@ -454,7 +451,7 @@
                 writeDataToDiskAndVerifyIt(applicationLog)
             Catch ex As Exception
             Finally
-                myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
+                If boolAcquireMutexLock Then myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
             End Try
         End Sub
 
@@ -462,9 +459,9 @@
         ''' <param name="logMessage">The text you want to have in your new System Event Log entry.</param>
         ''' <param name="eventLogType">The type of log that you want your entry to be. The three major options are Error, Information, and Warning.</param>
         ''' <example>functions.eventLogFunctions.writeToSystemEventLog("My Event Log Entry", EventLogEntryType.Information, False)</example>
-        Public Sub writeToApplicationLogFile(logMessage As String, eventLogType As EventLogEntryType, boolExceptionInput As Boolean)
+        Public Sub writeToApplicationLogFile(logMessage As String, eventLogType As EventLogEntryType, boolExceptionInput As Boolean, Optional boolAcquireMutexLock As Boolean = True)
             Try
-                myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
+                If boolAcquireMutexLock Then myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
@@ -509,7 +506,7 @@
             Catch ex As Exception
                 oldEventLogFunctions.writeCrashToEventLog(ex)
             Finally
-                myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
+                If boolAcquireMutexLock Then myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
             End Try
         End Sub
 
@@ -613,7 +610,7 @@
         ''' <example>functions.eventLogFunctions.writeCrashToEventLog(ex)</example>
         Public Sub writeCrashToApplicationLogFile(exceptionObject As Exception, Optional errorType As EventLogEntryType = EventLogEntryType.Error)
             Try
-                writeToApplicationLogFile(assembleCrashData(exceptionObject, errorType), errorType, True)
+                writeToApplicationLogFile(assembleCrashData(exceptionObject, errorType), errorType, True, False)
             Catch ex2 As Exception
                 oldEventLogFunctions.writeCrashToEventLog(ex2)
             End Try
