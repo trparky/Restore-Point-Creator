@@ -20,7 +20,7 @@ Namespace Functions.wmi
                         End If
                     Catch ex As Exception
                         eventLogFunctions.writeCrashToApplicationLogFile(ex)
-                        eventLogFunctions.writeToApplicationLogFile("Unable to get Startup Type for the " & strServiceName & " System Service.", EventLogEntryType.Error)
+                        eventLogFunctions.writeToApplicationLogFile("Unable to get Startup Type for the " & strServiceName & " System Service.", EventLogEntryType.Error, False)
                     End Try
                 End If
             End Using
@@ -38,7 +38,7 @@ Namespace Functions.wmi
                 End Using
             Catch ex As Exception
                 eventLogFunctions.writeCrashToApplicationLogFile(ex)
-                eventLogFunctions.writeToApplicationLogFile("Unable to set Startup Type for the " & strServiceName & " System Service.", EventLogEntryType.Error)
+                eventLogFunctions.writeToApplicationLogFile("Unable to set Startup Type for the " & strServiceName & " System Service.", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -109,7 +109,7 @@ Namespace Functions.wmi
                     End If
                 End Using
             Catch ex As Management.ManagementException
-                eventLogFunctions.writeToApplicationLogFile("Unable to retrieve volumeID from WMI for system drive " & driveLetter & ".", EventLogEntryType.Error)
+                eventLogFunctions.writeToApplicationLogFile("Unable to retrieve volumeID from WMI for system drive " & driveLetter & ".", EventLogEntryType.Error, False)
                 eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 MsgBox("Unable to retrieve volumeID from WMI for system drive " & driveLetter & "." & vbCrLf & vbCrLf & "The program will now terminate.", MsgBoxStyle.Critical, "Restore Point Creator")
                 Process.GetCurrentProcess.Kill()
@@ -140,9 +140,9 @@ Namespace Functions.wmi
                                         Exit Sub
                                     Else
                                         If numberOfRestorePointsToBeDeleted = 1 Then
-                                            eventLogFunctions.writeToApplicationLogFile("Preparing to delete 1 restore point.", EventLogEntryType.Information)
+                                            eventLogFunctions.writeToApplicationLogFile("Preparing to delete 1 restore point.", EventLogEntryType.Information, False)
                                         Else
-                                            eventLogFunctions.writeToApplicationLogFile("Preparing to delete " & numberOfRestorePointsToBeDeleted & " restore points.", EventLogEntryType.Information)
+                                            eventLogFunctions.writeToApplicationLogFile("Preparing to delete " & numberOfRestorePointsToBeDeleted & " restore points.", EventLogEntryType.Information, False)
                                         End If
 
                                         For Each managementObject As Management.ManagementObject In managementObjectCollection
@@ -152,7 +152,7 @@ Namespace Functions.wmi
                                                 numberOfRestorePointsToBeDeleted -= 1
 
                                                 Dim restorePointCreationDate As Date = restorePointStuff.parseSystemRestorePointCreationDate(managementObject("CreationTime").ToString)
-                                                eventLogFunctions.writeToApplicationLogFile(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", managementObject("Description").ToString, restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information)
+                                                eventLogFunctions.writeToApplicationLogFile(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", managementObject("Description").ToString, restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information, False)
 
                                                 APIs.NativeMethods.SRRemoveRestorePoint(Integer.Parse(managementObject("SequenceNumber").ToString))
                                             End If
@@ -201,19 +201,19 @@ Namespace Functions.wmi
 
                         Dim oOutParams As Management.ManagementBaseObject = managementClass.InvokeMethod("CreateRestorePoint", managementParameters, Nothing)
 
-                        eventLogFunctions.writeToApplicationLogFile("Created System Restore Point (" & restorePointName & ").", EventLogEntryType.Information)
+                        eventLogFunctions.writeToApplicationLogFile("Created System Restore Point (" & restorePointName & ").", EventLogEntryType.Information, False)
 
                         Return oOutParams("ReturnValue")
                     End Using
                 End Using
             Catch ex4 As UnauthorizedAccessException
                 eventLogFunctions.writeCrashToApplicationLogFile(ex4)
-                eventLogFunctions.writeToApplicationLogFile("Falling back to core Windows APIs to create restore point.", EventLogEntryType.Warning)
+                eventLogFunctions.writeToApplicationLogFile("Falling back to core Windows APIs to create restore point.", EventLogEntryType.Warning, False)
 
                 Try
                     Return APIs.systemRestore.StartRestore(restorePointName, restorePointType, restorePointID)
                 Catch ex6 As Exception
-                    eventLogFunctions.writeToApplicationLogFile("Unable to create system restore point. System permissions seem to not allow it.", EventLogEntryType.Error)
+                    eventLogFunctions.writeToApplicationLogFile("Unable to create system restore point. System permissions seem to not allow it.", EventLogEntryType.Error, False)
                     eventLogFunctions.writeCrashToApplicationLogFile(ex6)
                     MsgBox("Unable to create system restore point. System permissions seem to not allow it.", MsgBoxStyle.Critical, "Error Creating System Restore Point")
 
@@ -221,7 +221,7 @@ Namespace Functions.wmi
                 End Try
             Catch ex3 As Runtime.InteropServices.COMException
                 eventLogFunctions.writeCrashToApplicationLogFile(ex3)
-                eventLogFunctions.writeToApplicationLogFile("Falling back to core Windows APIs to create restore point.", EventLogEntryType.Warning)
+                eventLogFunctions.writeToApplicationLogFile("Falling back to core Windows APIs to create restore point.", EventLogEntryType.Warning, False)
 
                 Try
                     Return APIs.systemRestore.StartRestore(restorePointName, restorePointType, restorePointID)
@@ -250,7 +250,7 @@ Namespace Functions.wmi
                 Dim strRestorePointName As String = getRestorePointName(point, boolResult)
 
                 If boolResult Then
-                    eventLogFunctions.writeToApplicationLogFile("Restoring system back to System Restore Point ID " & point & " (" & strRestorePointName & ").", EventLogEntryType.Information)
+                    eventLogFunctions.writeToApplicationLogFile("Restoring system back to System Restore Point ID " & point & " (" & strRestorePointName & ").", EventLogEntryType.Information, False)
 
                     Dim managementScope As New Management.ManagementScope("\\localhost\root\default")
                     Dim managementPath As New Management.ManagementPath("SystemRestore")
@@ -290,7 +290,7 @@ Namespace Functions.wmi
                                     boolResult = True
                                     Return managementObjectCollection(0)("Description").ToString
                                 Else
-                                    eventLogFunctions.writeToApplicationLogFile("Unable to find description for restore point ID " & id & ".", EventLogEntryType.Error)
+                                    eventLogFunctions.writeToApplicationLogFile("Unable to find description for restore point ID " & id & ".", EventLogEntryType.Error, False)
                                     boolResult = False
                                     Return "ERROR_NO_DESCRIPTION"
                                 End If
@@ -299,11 +299,11 @@ Namespace Functions.wmi
                     End If
                 End Using
 
-                eventLogFunctions.writeToApplicationLogFile("Unable to find description for restore point ID " & id & ".", EventLogEntryType.Error)
+                eventLogFunctions.writeToApplicationLogFile("Unable to find description for restore point ID " & id & ".", EventLogEntryType.Error, False)
                 boolResult = False
                 Return "ERROR_NO_DESCRIPTION"
             Catch ex As Exception
-                eventLogFunctions.writeToApplicationLogFile("Unable to find description for restore point ID " & id & ".", EventLogEntryType.Error)
+                eventLogFunctions.writeToApplicationLogFile("Unable to find description for restore point ID " & id & ".", EventLogEntryType.Error, False)
                 boolResult = False
                 Return "ERROR_NO_DESCRIPTION"
             End Try

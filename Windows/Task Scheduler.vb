@@ -192,7 +192,7 @@ Public Class frmTaskScheduler
                     Try
                         timePickerDelete.Value = .StartBoundary
                     Catch ex As ArgumentOutOfRangeException
-                        Functions.eventLogFunctions.writeToApplicationLogFile("There was an error loading the scheduled task's start time. The value that was returned was """ & .StartBoundary.ToString & """ which is invalid.", EventLogEntryType.Warning)
+                        Functions.eventLogFunctions.writeToApplicationLogFile("There was an error loading the scheduled task's start time. The value that was returned was """ & .StartBoundary.ToString & """ which is invalid.", EventLogEntryType.Warning, False)
                         timePickerDelete.Value = Now
                     End Try
                 End With
@@ -204,7 +204,7 @@ Public Class frmTaskScheduler
             End If
         Catch ex As FormatException
             Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
-            Functions.eventLogFunctions.writeToApplicationLogFile("There was an error loading the saved schedule time from the """ & strDeleteTaskName & """ task.", EventLogEntryType.Error)
+            Functions.eventLogFunctions.writeToApplicationLogFile("There was an error loading the saved schedule time from the """ & strDeleteTaskName & """ task.", EventLogEntryType.Error, False)
         End Try
 
         Try
@@ -252,7 +252,7 @@ Public Class frmTaskScheduler
                     Try
                         timePicker.Value = .StartBoundary
                     Catch ex As ArgumentOutOfRangeException
-                        Functions.eventLogFunctions.writeToApplicationLogFile("There was an error loading the scheduled task's start time. The value that was returned was """ & .StartBoundary.ToString & """ which is invalid.", EventLogEntryType.Warning)
+                        Functions.eventLogFunctions.writeToApplicationLogFile("There was an error loading the scheduled task's start time. The value that was returned was """ & .StartBoundary.ToString & """ which is invalid.", EventLogEntryType.Warning, False)
                         timePicker.Value = Now
                     End Try
                 End With
@@ -264,7 +264,7 @@ Public Class frmTaskScheduler
             End If
         Catch ex As FormatException
             Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
-            Functions.eventLogFunctions.writeToApplicationLogFile("There was an error loading the saved schedule time from the """ & strCheckPointTaskName & """ task.", EventLogEntryType.Error)
+            Functions.eventLogFunctions.writeToApplicationLogFile("There was an error loading the saved schedule time from the """ & strCheckPointTaskName & """ task.", EventLogEntryType.Error, False)
         End Try
 
         taskService.Dispose()
@@ -367,7 +367,7 @@ Public Class frmTaskScheduler
                 Functions.power.checkIfActivePowerPlanIsSetProperlyForWakingFromSleep()
             End If
 
-            Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Creating scheduled task ""{0}"".", strCheckPointTaskName), EventLogEntryType.Information)
+            Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Creating scheduled task ""{0}"".", strCheckPointTaskName), EventLogEntryType.Information, False)
             taskService.RootFolder.RegisterTaskDefinition(strCheckPointTaskName, newTask, TaskCreation.CreateOrUpdate, "SYSTEM", vbNullString, TaskLogonType.ServiceAccount)
 
             newTask.Dispose()
@@ -583,7 +583,7 @@ Public Class frmTaskScheduler
                 Functions.power.checkIfActivePowerPlanIsSetProperlyForWakingFromSleep()
             End If
 
-            Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Creating scheduled task ""{0}"".", strDeleteTaskName), EventLogEntryType.Information)
+            Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Creating scheduled task ""{0}"".", strDeleteTaskName), EventLogEntryType.Information, False)
             taskService.RootFolder.RegisterTaskDefinition(strDeleteTaskName, newTask, TaskCreation.CreateOrUpdate, "SYSTEM", vbNullString, TaskLogonType.ServiceAccount)
 
             newTask.Dispose()

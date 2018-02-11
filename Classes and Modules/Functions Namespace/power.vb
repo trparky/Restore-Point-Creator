@@ -10,7 +10,7 @@ Namespace Functions.power
                 Dim powerPlanSeacher As New Management.ManagementObjectSearcher("root\CIMV2\power", "SELECT * FROM Win32_PowerPlan WHERE IsActive = True")
 
                 If powerPlanSeacher.Get().Count = 0 Then
-                    eventLogFunctions.writeToApplicationLogFile("WMI returned 0 results from Win32_PowerPlan.", EventLogEntryType.Error)
+                    eventLogFunctions.writeToApplicationLogFile("WMI returned 0 results from Win32_PowerPlan.", EventLogEntryType.Error, False)
                     Return False
                 Else
                     Dim powerPlanDetails As Management.ManagementObject = powerPlanSeacher.Get()(0)
@@ -20,7 +20,7 @@ Namespace Functions.power
                         strResult = Regex.Match(powerGUIDFromWMI, "(\{[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\})", RegexOptions.IgnoreCase).Groups(1).Value.Replace("{", "").Replace("}", "").Trim.ToLower
                         Return True
                     Else
-                        eventLogFunctions.writeToApplicationLogFile("Unable to parse out GUID from WMI output.", EventLogEntryType.Error)
+                        eventLogFunctions.writeToApplicationLogFile("Unable to parse out GUID from WMI output.", EventLogEntryType.Error, False)
                         Return False
                     End If
                 End If
@@ -66,7 +66,7 @@ Namespace Functions.power
                     strResult = Regex.Match(commandLineOutput, "([0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12})", RegexOptions.IgnoreCase).Groups(1).Value.Trim.ToLower
                     Return True
                 Else
-                    eventLogFunctions.writeToApplicationLogFile("Unable to parse out GUID from powercfg.exe output.", EventLogEntryType.Error)
+                    eventLogFunctions.writeToApplicationLogFile("Unable to parse out GUID from powercfg.exe output.", EventLogEntryType.Error, False)
                     Return False
                 End If
             Else
@@ -98,7 +98,7 @@ Namespace Functions.power
                     End If
 
                     If boolDidWeChangeAnything = True Then
-                        eventLogFunctions.writeToApplicationLogFile("System Restore Point Creator has set your Windows Power Plan back to default settings for wake timers.", EventLogEntryType.Information)
+                        eventLogFunctions.writeToApplicationLogFile("System Restore Point Creator has set your Windows Power Plan back to default settings for wake timers.", EventLogEntryType.Information, False)
 
                         MsgBox("System Restore Point Creator has set your Windows Power Plan back to default settings for wake timers. Your system should no longer wake up for scheduled tasks.", MsgBoxStyle.Information, "System Restore Point Creator")
                     End If
@@ -134,7 +134,7 @@ Namespace Functions.power
                     End If
 
                     If boolDidWeChangeAnything = True Then
-                        eventLogFunctions.writeToApplicationLogFile("System Restore Point Creator has set your Windows Power Plan up to properly support waking up from Sleep Mode.", EventLogEntryType.Information)
+                        eventLogFunctions.writeToApplicationLogFile("System Restore Point Creator has set your Windows Power Plan up to properly support waking up from Sleep Mode.", EventLogEntryType.Information, False)
 
                         MsgBox("System Restore Point Creator has set your Windows Power Plan up to properly support waking up from Sleep Mode." & vbCrLf & vbCrLf & "NOTE!" & vbCrLf & "This does not guarantee that your system will wake from sleep, your system's hardware must be able to support this functionality. Support for this functionality depends upon your system's motherboard and system drivers.", MsgBoxStyle.Information, "System Restore Point Creator")
                     Else

@@ -137,7 +137,7 @@ Namespace Functions.restorePointStuff
             systemRestorePointsManagementObjectSearcher = Nothing
 
             restorePoints.AppendLine("=========================")
-            eventLogFunctions.writeToApplicationLogFile(restorePoints.ToString.Trim, EventLogEntryType.Information)
+            eventLogFunctions.writeToApplicationLogFile(restorePoints.ToString.Trim, EventLogEntryType.Information, False)
         End Sub
     End Module
 End Namespace

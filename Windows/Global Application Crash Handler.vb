@@ -33,7 +33,7 @@ Public Class frmCrash
                 End If
             End If
         Catch ex As Exception
-            Functions.eventLogFunctions.writeToApplicationLogFile("A crash occurred in the FormClosing event of the Global Application Crash Handler.", EventLogEntryType.Error)
+            Functions.eventLogFunctions.writeToApplicationLogFile("A crash occurred in the FormClosing event of the Global Application Crash Handler.", EventLogEntryType.Error, False)
             Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
         End Try
 

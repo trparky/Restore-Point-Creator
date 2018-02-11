@@ -108,7 +108,7 @@
                 End Try
             Catch ex As Exception
                 writeCrashToApplicationLogFile(ex)
-                writeToApplicationLogFile("There was an error while attempting to export the program's event log entries.", EventLogEntryType.Error)
+                writeToApplicationLogFile("There was an error while attempting to export the program's event log entries.", EventLogEntryType.Error, False)
 
                 Return False
             End Try
@@ -208,7 +208,7 @@
         Public Sub getOldLogsFromWindowsEventLog()
             Try
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
-                writeToApplicationLogFile("Starting log conversion process.", EventLogEntryType.Information)
+                writeToApplicationLogFile("Starting log conversion process.", EventLogEntryType.Information, False)
 
                 myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
 
@@ -240,14 +240,14 @@
 
                 releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
 
-                writeToApplicationLogFile("Log conversion process complete.", EventLogEntryType.Information)
+                writeToApplicationLogFile("Log conversion process complete.", EventLogEntryType.Information, False)
 
                 If longNumberOfImportedLogs = 1 Then
-                    writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. 1 log entry was imported.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information)
+                    writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. 1 log entry was imported.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information, False)
                 ElseIf longNumberOfImportedLogs > 1 Then
-                    writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. {1} log entries were imported.", stopwatch.ElapsedMilliseconds.ToString, longNumberOfImportedLogs.ToString("N0")), EventLogEntryType.Information)
+                    writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. {1} log entries were imported.", stopwatch.ElapsedMilliseconds.ToString, longNumberOfImportedLogs.ToString("N0")), EventLogEntryType.Information, False)
                 Else
-                    writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. No old log entries were detected.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information)
+                    writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. No old log entries were detected.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information, False)
                 End If
             Catch ex As Exception
                 releaseOurMutexWithoutException() ' Release the mutex so that other code can work with the log file.
@@ -469,8 +469,8 @@
         ''' <summary>Writes a log entry to the System Event Log.</summary>
         ''' <param name="logMessage">The text you want to have in your new System Event Log entry.</param>
         ''' <param name="eventLogType">The type of log that you want your entry to be. The three major options are Error, Information, and Warning.</param>
-        ''' <example>functions.eventLogFunctions.writeToSystemEventLog("My Event Log Entry", EventLogEntryType.Information)</example>
-        Public Sub writeToApplicationLogFile(logMessage As String, eventLogType As EventLogEntryType, Optional boolExceptionInput As Boolean = False)
+        ''' <example>functions.eventLogFunctions.writeToSystemEventLog("My Event Log Entry", EventLogEntryType.Information, False)</example>
+        Public Sub writeToApplicationLogFile(logMessage As String, eventLogType As EventLogEntryType, boolExceptionInput As Boolean)
             Try
                 myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)

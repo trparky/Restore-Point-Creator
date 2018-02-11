@@ -238,7 +238,7 @@ Public Class Official_Contact_Form
             End If
         Catch ex As Exception
             Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
-            Functions.eventLogFunctions.writeToApplicationLogFile("There was an error while attempting to export the program's event log entries.", EventLogEntryType.Error)
+            Functions.eventLogFunctions.writeToApplicationLogFile("There was an error while attempting to export the program's event log entries.", EventLogEntryType.Error, False)
 
             MsgBox("There was an error while exporting the log data. Please see the Event Log for more details.", MsgBoxStyle.Critical, Me.Text)
         End Try
