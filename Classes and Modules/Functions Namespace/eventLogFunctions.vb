@@ -199,6 +199,8 @@
         ''' <exception cref="myExceptions.logFileWriteToDiskFailureException" />
         Public Sub getOldLogsFromWindowsEventLog()
             Try
+                myLogFileLockingMutex.WaitOne()
+
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
                 writeToApplicationLogFile("Starting log conversion process.", EventLogEntryType.Information, False, False)
 
@@ -228,8 +230,6 @@
 
                 Dim longNumberOfImportedLogs As Long = applicationLog.Count - longOldLogCount
 
-                myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
-
                 writeToApplicationLogFile("Log conversion process complete.", EventLogEntryType.Information, False, False)
 
                 If longNumberOfImportedLogs = 1 Then
@@ -241,6 +241,8 @@
                 End If
             Catch ex As Exception
                 writeCrashToApplicationLogFile(ex)
+            Finally
+                myLogFileLockingMutex.ReleaseMutex()
             End Try
         End Sub
 

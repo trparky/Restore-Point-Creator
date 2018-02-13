@@ -2200,9 +2200,7 @@ Public Class Form1
                 Threading.ThreadPool.QueueUserWorkItem(Sub()
                                                            ' This calls the function that converts the logs.
                                                            Try
-                                                               Functions.eventLogFunctions.myLogFileLockingMutex.WaitOne()
                                                                Functions.eventLogFunctions.getOldLogsFromWindowsEventLog()
-                                                               Functions.eventLogFunctions.myLogFileLockingMutex.ReleaseMutex()
                                                                Functions.registryStuff.setBooleanValueInRegistry("Exported Old Logs", True)
                                                            Catch ex As Functions.myExceptions.logFileWriteToDiskFailureException
                                                                Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
