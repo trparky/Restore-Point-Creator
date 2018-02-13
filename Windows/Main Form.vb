@@ -2245,7 +2245,6 @@ Public Class Form1
 
         If IO.File.Exists("tom") Then
             ToolStripMenuItemPrivateForTom.Visible = True
-            btnTomTestLogSystem.Visible = True
         End If
 
         Try
