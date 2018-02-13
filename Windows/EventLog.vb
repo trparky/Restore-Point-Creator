@@ -524,18 +524,25 @@
     End Sub
 
     Private Sub logFileWatcher_Changed(sender As Object, e As IO.FileSystemEventArgs) Handles logFileWatcher.Changed
-        ' This hack is required because of a bug in the File System Watcher that causes it to fire multiple events one after
-        ' another even though there was only one change to the file we are watching. ARG Microsoft! You stupid idiots!
-        If (Date.Now.Subtract(dateLastFileSystemWatcherEventRaised).TotalMilliseconds < 500) Then
-            Exit Sub ' Crap, multiple events have been fired... we need to exit this routine.
-        End If
-        dateLastFileSystemWatcherEventRaised = Date.Now
+        If Functions.eventLogFunctions.myLogFileLockingMutex.WaitOne(1000) Then
+            If e.ChangeType = IO.WatcherChangeTypes.Changed Then
+                ' This hack is required because of a bug in the File System Watcher that causes it to fire multiple events one after
+                ' another even though there was only one change to the file we are watching. ARG Microsoft! You stupid idiots!
+                If (Date.Now.Subtract(dateLastFileSystemWatcherEventRaised).TotalMilliseconds < 500) Then
+                    Functions.eventLogFunctions.myLogFileLockingMutex.ReleaseMutex()
+                    Exit Sub ' Crap, multiple events have been fired... we need to exit this routine.
+                End If
+                dateLastFileSystemWatcherEventRaised = Date.Now
 
-        If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
-            If Not boolAreWeLoadingTheEventLogData Then getFileDetailsAndActivateDataLoadThread()
-        Else
-            lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
-            lblLastModified.Text = "Last Modified: (File Doesn't Exist)"
+                If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
+                    If Not boolAreWeLoadingTheEventLogData Then getFileDetailsAndActivateDataLoadThread()
+                Else
+                    lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
+                    lblLastModified.Text = "Last Modified: (File Doesn't Exist)"
+                End If
+            End If
+
+            Functions.eventLogFunctions.myLogFileLockingMutex.ReleaseMutex()
         End If
     End Sub
 
