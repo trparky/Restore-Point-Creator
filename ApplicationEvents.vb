@@ -13,11 +13,6 @@ Namespace My
     Partial Friend Class MyApplication
         Private pleaseWaitInstance As Please_Wait
 
-        Private Sub giveNoCountGivenError()
-            Console.WriteLine("ERROR: You must include a ""-count=(0-9)"" to your invokation of this program with this command line argument. For instance... ""-count=9"".")
-            Process.GetCurrentProcess.Kill()
-        End Sub
-
         Private Sub setProcessPriorities()
             If Functions.privilegeChecks.areWeAnAdministrator() AndAlso areWeRunningAsATask() Then
                 Try
@@ -218,7 +213,7 @@ Namespace My
 
                             ' OK, let's check to see if the value we pulled from the Registry is null.
                             If String.IsNullOrEmpty(stringlocal_KeepXAmountofRestorePointsValue) Then
-                                giveNoCountGivenError() ' OK, it is so we give the user an error message.
+                                Functions.startupFunctions.giveNoCountGivenError() ' OK, it is so we give the user an error message.
                             Else
                                 ' OK, the value we got from the Registry isn't null so we try to parse it now.
                                 If Short.TryParse(stringlocal_KeepXAmountofRestorePointsValue, local_KeepXAmountofRestorePointsValue) Then
@@ -226,12 +221,12 @@ Namespace My
                                     My.Settings.deleteOldRestorePointCommandLineCount = local_KeepXAmountofRestorePointsValue
                                     My.Settings.Save()
                                 Else
-                                    giveNoCountGivenError() ' We tried to parse it and we failed so we give the user an error message.
+                                    Functions.startupFunctions.giveNoCountGivenError() ' We tried to parse it and we failed so we give the user an error message.
                                 End If
                             End If
                         Else
                             ' OK, the registry key doesn't exist so we give the user an error message.
-                            giveNoCountGivenError()
+                            Functions.startupFunctions.giveNoCountGivenError()
                         End If
                     Else
                         ' OK, the user provided a second command line argument so let's check it out.
@@ -249,7 +244,7 @@ Namespace My
                             End If
                         Else
                             ' No, the second command line argument isn't a "-count" like we are expecting so give the user an error message.
-                            giveNoCountGivenError()
+                            Functions.startupFunctions.giveNoCountGivenError()
                         End If
                     End If
 
@@ -372,62 +367,11 @@ Namespace My
                         commandLineArgument = My.Application.CommandLineArgs(0)
 
                         If commandLineArgument.Equals(globalVariables.commandLineSwitches.createRestorePoint, StringComparison.OrdinalIgnoreCase) Then
-                            Functions.startupFunctions.giveSafeModeErrorMessage(boolAreWeInSafeMode)
-                            Functions.eventLogFunctions.writeToApplicationLogFile("Activated JumpList Task.", EventLogEntryType.Information, False)
-
-                            Dim strRestorePointName As String = "System Checkpoint made by System Restore Point Creator"
-
-                            If My.Application.CommandLineArgs.Count = 2 Then
-                                If My.Application.CommandLineArgs(1).Trim.StartsWith("-name=", StringComparison.OrdinalIgnoreCase) Then
-                                    strRestorePointName = Regex.Replace(My.Application.CommandLineArgs(1).Trim, "-name=", "", RegexOptions.IgnoreCase)
-                                End If
-                            End If
-
-                            If String.IsNullOrEmpty(My.Settings.savedRestorePointFromCommandLine) = False Then
-                                strRestorePointName = My.Settings.savedRestorePointFromCommandLine
-                                My.Settings.savedRestorePointFromCommandLine = Nothing
-                                My.Settings.Save()
-                            End If
-
-                            Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", True, enums.howToCenterWindow.screen, True)
-
-                            ' This is a special way of making a thread in which you can pass parameters to the sub-routine that you're running as a separate thread.
-                            Dim creatingThread As New Threading.Thread(Sub()
-                                                                           Functions.startupFunctions.createSystemRestorePoint(True, strRestorePointName)
-                                                                       End Sub)
-                            creatingThread.Name = "Restore Point Creating Thread"
-                            creatingThread.Start()
-
+                            Functions.startupFunctions.doCreateRestorePointRoutine(boolAreWeInSafeMode)
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.createCustomRestorePoint, StringComparison.OrdinalIgnoreCase) Then
-                            Functions.startupFunctions.giveSafeModeErrorMessage(boolAreWeInSafeMode)
-                            Functions.eventLogFunctions.writeToApplicationLogFile("Activated JumpList Task.", EventLogEntryType.Information, False)
-
-                            Dim Custom_Named_Restore_Point_Instance As Custom_Named_Restore_Point
-                            Custom_Named_Restore_Point_Instance = New Custom_Named_Restore_Point
-                            Custom_Named_Restore_Point_Instance.StartPosition = FormStartPosition.CenterScreen
-                            Custom_Named_Restore_Point_Instance.ShowDialog()
-
-                            Dim restorePointName As String
-
-                            If Custom_Named_Restore_Point_Instance.createRestorePoint = False Then
-                                MsgBox("Restore Point not created.", MsgBoxStyle.Information, "Restore Point Creator") ' Gives the user some feedback.
-                                e.Cancel = True
-                                Exit Sub
-                            Else
-                                restorePointName = Custom_Named_Restore_Point_Instance.restorePointName
-                            End If
-
-                            Functions.wait.createPleaseWaitWindow("Creating Restore Point... Please Wait.", True, enums.howToCenterWindow.screen, True)
-
-                            ' This is a special way of making a thread in which you can pass parameters to the sub-routine that you're running as a separate thread.
-                            Dim creatingThread As New Threading.Thread(Sub()
-                                                                           Functions.startupFunctions.createSystemRestorePoint(True, restorePointName)
-                                                                       End Sub)
-                            creatingThread.Name = "Restore Point Creating Thread"
-                            creatingThread.Start()
-
+                            Functions.startupFunctions.doCreateCustomRestorePointRoutine(boolAreWeInSafeMode)
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.testlogwrite, StringComparison.OrdinalIgnoreCase) Then
@@ -435,185 +379,19 @@ Namespace My
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.scheduledRestorePoint, StringComparison.OrdinalIgnoreCase) Then
-                            Dim restorePointNameForScheduledTasks As String = globalVariables.strDefaultNameForScheduledTasks
-                            Dim boolExtendedLoggingForScheduledTasks As Boolean = True
-                            Dim boolWriteRestorePointListToLog As Boolean = True
-                            Dim oldNewestRestorePointID As Integer
-
-                            registryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
-
-                            If registryKey IsNot Nothing Then
-                                restorePointNameForScheduledTasks = registryKey.GetValue("Custom Name for Scheduled Restore Points", globalVariables.strDefaultNameForScheduledTasks)
-
-                                boolExtendedLoggingForScheduledTasks = Functions.registryStuff.getBooleanValueFromRegistry(registryKey, "Extended Logging For Scheduled Tasks", True)
-                                boolWriteRestorePointListToLog = Functions.registryStuff.getBooleanValueFromRegistry(registryKey, globalVariables.strWriteRestorePointListToApplicationLogRegistryValue, True)
-
-                                registryKey.Close()
-                                registryKey.Dispose()
-                                registryKey = Nothing
-                            End If
-
-                            If boolExtendedLoggingForScheduledTasks = True Then
-                                Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Starting scheduled restore point job. Task running as user {0}. There are currently {1} system restore point(s) on this system.", Environment.UserName, Functions.wmi.getNumberOfRestorePoints()), EventLogEntryType.Information, False)
-                            Else
-                                Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Starting scheduled restore point job. Task running As user {0}.", Environment.UserName), EventLogEntryType.Information, False)
-                            End If
-
-                            If boolAreWeAnAdministrator Then Functions.startupFunctions.writeLastRunFile()
-
-                            If boolExtendedLoggingForScheduledTasks = True Then oldNewestRestorePointID = Functions.wmi.getNewestSystemRestorePointID()
-
-                            Functions.restorePointStuff.createScheduledSystemRestorePoint(restorePointNameForScheduledTasks)
-
-                            If boolExtendedLoggingForScheduledTasks = True Then
-                                ' We wait here with this loop until the system's has the restore point created.
-                                While oldNewestRestorePointID = Functions.wmi.getNewestSystemRestorePointID()
-                                    ' Does nothing, just loops and sleeps for half a second.
-                                    Threading.Thread.Sleep(500)
-                                End While
-                            End If
-
-                            If boolExtendedLoggingForScheduledTasks And boolWriteRestorePointListToLog Then Functions.restorePointStuff.writeSystemRestorePointsToApplicationLogs()
-
-                            If Functions.registryStuff.getBooleanValueFromRegistry(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False), "Delete Old Restore Points", False) Then
-                                Functions.startupFunctions.deleteOldRestorePoints()
-                            End If
-
-                            If globalVariables.KeepXAmountOfRestorePoints = True Then
-                                Functions.wmi.doDeletingOfXNumberOfRestorePoints(globalVariables.KeepXAmountofRestorePointsValue)
-                            End If
-
-                            Functions.eventLogFunctions.writeToApplicationLogFile("Scheduled restore point job complete.", EventLogEntryType.Information, False)
-
+                            Functions.startupFunctions.doScheduledRestorePointRoutine(registryKey, boolAreWeAnAdministrator)
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals("-restoretopoint", StringComparison.OrdinalIgnoreCase) Then
-                            ' The first thing we do is disable Safe Mode boot so the user doesn't get trapped in Safe Mode.
-                            Functions.support.removeSafeModeBoot()
-
-                            ' Now let's delete that Registry setting that tells the program that a Safe Mode boot was set up.
-                            If Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey) IsNot Nothing Then
-                                Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Safe Mode Boot Set", False)
-                            End If
-
-                            ' We try and parse the value in the Registry.
-                            If Integer.TryParse(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("Preselected Restore Point For Restore In Safe Mode", 0), Functions.startupFunctions.preSelectedRestorePointID) Then
-                                ' We need to remove the registry keys from the registry, we no longer need them.
-                                Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Preselected Restore Point For Restore In Safe Mode", False)
-                                Registry.LocalMachine.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\RunOnce", True).DeleteValue("*Restore To Restore Point", False)
-
-                                ' OK, what we have is an Interger. Great. Let's do some work with it.
-
-                                If Functions.startupFunctions.preSelectedRestorePointID = 0 Then
-                                    MsgBox("Something went wrong, we don't have a valid restore point to restore to. The program will execute as normal from now on.", MsgBoxStyle.Information, "Restore Point Creator")
-                                Else
-                                    Functions.wait.createPleaseWaitWindow("Beginning the Restore Process... Please Wait.", True, enums.howToCenterWindow.screen, True)
-
-                                    Functions.startupFunctions.isMyRestoreThreadRunning = True
-
-                                    Dim thread As New Threading.Thread(AddressOf Functions.startupFunctions.restoreSystemRestorePoint)
-                                    thread.Name = "Restore System Restore Point Thread"
-                                    thread.Priority = Threading.ThreadPriority.Normal
-                                    thread.Start()
-
-                                    While Functions.startupFunctions.isMyRestoreThreadRunning = True
-                                        Threading.Thread.Sleep(1000)
-                                    End While
-                                End If
-                            Else
-                                ' We need to remove the registry keys from the registry, we no longer need them.
-                                Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Preselected Restore Point for Restore in Safe Mode", False)
-                                Registry.LocalMachine.OpenSubKey("Software\Microsoft\Windows\CurrentVersion\RunOnce", True).DeleteValue("*Restore To Restore Point", False)
-
-                                ' Nope, we don't have an Integer. Let's stop things right here.
-                                MsgBox("Something went wrong, we don't have a valid restore point to restore to. The program will execute as normal from now on.", MsgBoxStyle.Information, "Restore Point Creator")
-                            End If
-
+                            Functions.startupFunctions.doRestoreToPointRoutine()
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.deleteOldRestorePoints, StringComparison.OrdinalIgnoreCase) Then
                             Functions.startupFunctions.deleteOldRestorePoints()
-
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints, StringComparison.OrdinalIgnoreCase) Then
-                            Dim deleteOldRestorePointCommandLineCount As Short
-
-                            ' This checks if the user provided a "-count" argument.
-                            If My.Application.CommandLineArgs.Count <> 2 Then
-                                ' No, the user didn't provide a "-count" command line argument.
-
-                                ' First, let's see if the user provided a setting in an un-elevated execution of this program.
-                                If My.Settings.deleteOldRestorePointCommandLineCount = 0 Then
-                                    ' The user didn't so let's see if there's a setting in the Registry. We open the program's Registry Key here.
-                                    registryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
-
-                                    ' This checks to see if the Registry Key exists by doing a Null check.
-                                    If registryKey IsNot Nothing Then
-                                        ' The key does exist so let's pull our value from the Registry.
-                                        Dim stringlocal_KeepXAmountofRestorePointsValue As String = registryKey.GetValue("Keep X Amount of Restore Points Value", "")
-
-                                        ' And let's close the Registry Object.
-                                        registryKey.Close()
-                                        registryKey.Dispose()
-
-                                        ' OK, let's check to see if the value we pulled from the Registry is null.
-                                        If String.IsNullOrEmpty(stringlocal_KeepXAmountofRestorePointsValue) Then
-                                            giveNoCountGivenError() ' OK, it is so we give the user an error message.
-                                        Else
-                                            ' OK, the value we got from the Registry isn't null so we try to parse it. If it parses then what's inside the IF statement will not execute and this is just fine; things are OK so we can continue as normal.
-                                            If Not Short.TryParse(stringlocal_KeepXAmountofRestorePointsValue, deleteOldRestorePointCommandLineCount) Then
-                                                giveNoCountGivenError() ' We tried to parse it and we failed so we give the user an error message.
-                                            End If
-                                        End If
-                                    Else
-                                        ' OK, the registry key doesn't exist so we give the user an error message.
-                                        giveNoCountGivenError()
-                                    End If
-                                Else
-                                    ' Yes, the user did so let's work with it.
-                                    deleteOldRestorePointCommandLineCount = My.Settings.deleteOldRestorePointCommandLineCount
-
-                                    ' Now let's reset the saved setting back to the default value of 0.
-                                    My.Settings.deleteOldRestorePointCommandLineCount = 0
-                                    My.Settings.Save()
-                                End If
-                            Else
-                                ' OK, the user provided a second command line argument so let's check it out.
-                                If My.Application.CommandLineArgs(1).Trim.StartsWith("-count", StringComparison.OrdinalIgnoreCase) Then
-                                    ' Let's try and parse the value that the user gave us. If it parses then what's inside the IF statement will not execute and this is just fine; things are OK so we can continue as normal.
-                                    If Not Short.TryParse(My.Application.CommandLineArgs(1).Trim.caseInsensitiveReplace("-count=", "").Trim, deleteOldRestorePointCommandLineCount) Then
-                                        ' We tried to parse it and we failed so we give the user an error message.
-                                        Console.WriteLine("ERROR: You have provided an invalid numeric input, please try again.")
-                                        Process.GetCurrentProcess.Kill()
-                                    End If
-                                Else
-                                    ' No, the second command line argument isn't a "-count" like we are expecting so give the user an error message.
-                                    giveNoCountGivenError()
-                                End If
-                            End If
-
-                            ' If all things passed the checks above this code will now execute.
-
-                            If deleteOldRestorePointCommandLineCount <> 0 Then
-                                Dim numberOfRestorePoints As Integer = Functions.wmi.getNumberOfRestorePoints()
-
-                                If deleteOldRestorePointCommandLineCount < numberOfRestorePoints Then
-                                    Functions.restorePointStuff.writeSystemRestorePointsToApplicationLogs()
-
-                                    Functions.wmi.doDeletingOfXNumberOfRestorePoints(deleteOldRestorePointCommandLineCount)
-
-                                    While numberOfRestorePoints = Functions.wmi.getNumberOfRestorePoints()
-                                        Threading.Thread.Sleep(500)
-                                    End While
-
-                                    Functions.restorePointStuff.writeSystemRestorePointsToApplicationLogs()
-                                End If
-                            End If
-
-                            My.Settings.deleteOldRestorePointCommandLineCount = 0
-                            My.Settings.Save()
-
+                            Functions.startupFunctions.doKeepXNumberOfRestorePointsRoutine(registryKey)
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals("-prefscleanup", StringComparison.OrdinalIgnoreCase) Then
