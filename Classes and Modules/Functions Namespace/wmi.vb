@@ -145,7 +145,7 @@ Namespace Functions.wmi
                                             eventLogFunctions.writeToApplicationLogFile("Preparing to delete " & numberOfRestorePointsToBeDeleted & " restore points.", EventLogEntryType.Information)
                                         End If
 
-                                        For Each managementObject As Management.ManagementObject In managementObjectCollection
+                                        For Each managementObject As Management.ManagementObject In managementObjectCollection.Cast(Of Management.ManagementObject).ToList.OrderBy(Function(managementObject2 As Management.ManagementObject) Integer.Parse(managementObject2("SequenceNumber").ToString))
                                             If numberOfRestorePointsToBeDeleted = 0 Then
                                                 Exit For
                                             Else
