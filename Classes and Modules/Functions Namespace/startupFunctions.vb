@@ -129,6 +129,7 @@ Namespace Functions.startupFunctions
                     End While
 
                     restorePointStuff.writeSystemRestorePointsToApplicationLogs()
+                    eventLogFunctions.writeToApplicationLogFile("Deletion of X number of restore points complete.", EventLogEntryType.Information, False, True)
                 End If
             End If
 
