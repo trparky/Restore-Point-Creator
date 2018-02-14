@@ -118,10 +118,10 @@ Public Class frmTaskScheduler
         Using regKey As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
             chkDeleteOldRestorePoints.Checked = Functions.registryStuff.getBooleanValueFromRegistry(regKey, "Delete Old Restore Points", False)
             chkWriteRestorePointListToLog.Checked = Functions.registryStuff.getBooleanValueFromRegistry(regKey, globalVariables.strWriteRestorePointListToApplicationLogRegistryValue, True)
-        End Using
 
-        txtDays.Text = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("MaxDays", 15).ToString
-        txtDaysDelete.Text = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("MaxDays", 15).ToString
+            txtDays.Text = regKey.GetValue("MaxDays", 15).ToString
+            txtDaysDelete.Text = regKey.GetValue("MaxDays", 15).ToString
+        End Using
 
         ' Checks to see if the Registry Value exists.
         If (Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).GetValue("Every", Nothing) IsNot Nothing) Then
@@ -377,14 +377,12 @@ Public Class frmTaskScheduler
 
             If chkDeleteOldRestorePoints.Checked Then
                 ' This checks to see if the user inputted an Integer and not a String.
-                If Functions.support.isNumeric(txtDays.Text.Trim) = False Then
-                    txtDays.Text = 10
-                End If
+                If Not Functions.support.isNumeric(txtDays.Text.Trim) Then txtDays.Text = 10
 
-                Dim regKey As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
-                regKey.SetValue("MaxDays", Short.Parse(txtDays.Text.Trim), Microsoft.Win32.RegistryValueKind.String)
-                regKey.SetValue(strDeleteTaskName, "True", Microsoft.Win32.RegistryValueKind.String)
-                regKey.Close()
+                Using regKey As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
+                    regKey.SetValue("MaxDays", Short.Parse(txtDays.Text.Trim), Microsoft.Win32.RegistryValueKind.String)
+                    regKey.SetValue(strDeleteTaskName, "True", Microsoft.Win32.RegistryValueKind.String)
+                End Using
             Else
                 Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue(strDeleteTaskName, "False", Microsoft.Win32.RegistryValueKind.String)
             End If
@@ -446,9 +444,7 @@ Public Class frmTaskScheduler
                 txtDays.Text = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False).GetValue("MaxDays", 15).ToString
 
                 ' Checks for valid data.
-                If Functions.support.isNumeric(txtDays.Text) = False Then
-                    txtDays.Text = 15 ' Nope, so we replace it with valid data.
-                End If
+                If Not Functions.support.isNumeric(txtDays.Text) Then txtDays.Text = 15 ' Nope, so we replace it with valid data.
 
                 txtDays.Enabled = True
                 btnSet.Enabled = True
@@ -497,9 +493,7 @@ Public Class frmTaskScheduler
 
     Private Sub txtDays_Leave(sender As Object, e As EventArgs) Handles txtDays.Leave
         ' This checks to see if the user inputted an Integer and not a String.
-        If Functions.support.isNumeric(txtDays.Text) = False Then
-            txtDays.Text = 10
-        End If
+        If Not Functions.support.isNumeric(txtDays.Text) Then txtDays.Text = 10
     End Sub
 
     Private Sub btnSet_Click(sender As Object, e As EventArgs) Handles btnSet.Click
@@ -518,9 +512,7 @@ Public Class frmTaskScheduler
 
         Try
             ' This checks to see if the user inputted an Integer and not a String.
-            If Functions.support.isNumeric(txtDaysDelete.Text.Trim) = False Then
-                txtDaysDelete.Text = 10
-            End If
+            If Not Functions.support.isNumeric(txtDaysDelete.Text.Trim) Then txtDaysDelete.Text = 10
 
             If radWeeklyDelete.Checked = True And chkSundayDelete.Checked = False And chkMondayDelete.Checked = False And chkTuesdayDelete.Checked = False And chkWednesdayDelete.Checked = False And chkThursdayDelete.Checked = False And chkFridayDelete.Checked = False And chkSaturdayDelete.Checked = False Then
                 MsgBox("You must select days of the week for your weekly schedule.", MsgBoxStyle.Information, Me.Text)
@@ -538,7 +530,7 @@ Public Class frmTaskScheduler
             newTask.RegistrationInfo.Description = strDeleteTaskName
 
             Dim exePathInfo As New IO.FileInfo(Application.ExecutablePath)
-            newTask.Actions.Add(New ExecAction(Chr(34) & exePathInfo.FullName & Chr(34), "-deleteoldrestorepoints", exePathInfo.DirectoryName))
+            newTask.Actions.Add(New ExecAction(Chr(34) & exePathInfo.FullName & Chr(34), globalVariables.commandLineSwitches.deleteOldRestorePoints, exePathInfo.DirectoryName))
             exePathInfo = Nothing
 
             Try
@@ -590,6 +582,13 @@ Public Class frmTaskScheduler
             newTask = Nothing
 
             btnDeleteTaskDelete.Enabled = True
+
+            ' This checks to see if the user inputted an Integer and not a String.
+            If Not Functions.support.isNumeric(txtDaysDelete.Text.Trim) Then txtDaysDelete.Text = 10
+
+            Using regKey As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
+                regKey.SetValue("MaxDays", Short.Parse(txtDaysDelete.Text.Trim), Microsoft.Win32.RegistryValueKind.String)
+            End Using
 
             boolThingsChanged = False
             MsgBox("Delete Old System Restore Points Task Created.", MsgBoxStyle.Information, Me.Text)

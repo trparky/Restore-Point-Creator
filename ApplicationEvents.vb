@@ -337,16 +337,14 @@ Namespace My
 
             Try
                 ' Ordinarily on Windows Vista and newer this code should not be needed but we have it in there to check if we do indeed have Administrator user rights.
-                If boolAreWeAnAdministrator = False Then
-                    Functions.support.reRunWithAdminUserRights()
-                End If
+                If Not boolAreWeAnAdministrator Then Functions.support.reRunWithAdminUserRights()
 
                 registryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
 
                 If registryKey IsNot Nothing Then
                     globalVariables.KeepXAmountOfRestorePoints = Functions.registryStuff.getBooleanValueFromRegistry(registryKey, "Keep X Amount of Restore Points", False)
 
-                    If globalVariables.KeepXAmountOfRestorePoints = True Then
+                    If globalVariables.KeepXAmountOfRestorePoints Then
                         Short.TryParse(registryKey.GetValue("Keep X Amount of Restore Points Value", "-10"), globalVariables.KeepXAmountofRestorePointsValue)
                     End If
 
@@ -357,7 +355,7 @@ Namespace My
                     registryKey = Nothing
                 End If
 
-                If My.Settings.UpdateRequired = True Then
+                If My.Settings.UpdateRequired Then
                     My.Settings.Upgrade()
                     My.Settings.UpdateRequired = False
                 End If

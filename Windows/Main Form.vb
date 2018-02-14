@@ -3092,12 +3092,10 @@ Public Class Form1
             Keep_X_Amount_of_Restore_PointsInstance.Dispose()
             Keep_X_Amount_of_Restore_PointsInstance = Nothing
         Else
-            Dim registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
-
-            registryKey.SetValue("Keep X Amount of Restore Points", "False", RegistryValueKind.String)
-            registryKey.DeleteValue("Keep X Amount of Restore Points Value", False)
-
-            registryKey.Close()
+            Using registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
+                registryKey.SetValue("Keep X Amount of Restore Points", "False", RegistryValueKind.String)
+                registryKey.DeleteValue("Keep X Amount of Restore Points Value", False)
+            End Using
 
             KeepXAmountOfRestorePointsToolStripMenuItem.Text = "Keep X Amount of Restore Points"
         End If
