@@ -117,18 +117,18 @@ Namespace Functions.startupFunctions
             ' If all things passed the checks above this code will now execute.
 
             If deleteOldRestorePointCommandLineCount <> 0 Then
-                Dim numberOfRestorePoints As Integer = Functions.wmi.getNumberOfRestorePoints()
+                Dim numberOfRestorePoints As Integer = wmi.getNumberOfRestorePoints()
 
                 If deleteOldRestorePointCommandLineCount < numberOfRestorePoints Then
-                    Functions.restorePointStuff.writeSystemRestorePointsToApplicationLogs()
+                    restorePointStuff.writeSystemRestorePointsToApplicationLogs()
 
-                    Functions.wmi.doDeletingOfXNumberOfRestorePoints(deleteOldRestorePointCommandLineCount)
+                    wmi.doDeletingOfXNumberOfRestorePoints(deleteOldRestorePointCommandLineCount)
 
-                    While numberOfRestorePoints = Functions.wmi.getNumberOfRestorePoints()
+                    While numberOfRestorePoints = wmi.getNumberOfRestorePoints()
                         Threading.Thread.Sleep(500)
                     End While
 
-                    Functions.restorePointStuff.writeSystemRestorePointsToApplicationLogs()
+                    restorePointStuff.writeSystemRestorePointsToApplicationLogs()
                 End If
             End If
 
