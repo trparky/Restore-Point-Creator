@@ -2107,6 +2107,10 @@ Public Class Form1
         Threading.Thread.Sleep(750)
 
         doOldLogFileConversionRoutineAndStartLoadingRestorePoints()
+
+        If Functions.eventLogFunctions.isLogFileTooBig() AndAlso MsgBox("The program has detected that the application log file has exceded 1 MB in size, please consider getting rid of old log entries in the application event log." & vbCrLf & vbCrLf & "You can do so by opening the Application Event Log and when the window appears select some logs and press the Delete key on your keyboard (obviously older logs would be preferable)." & vbCrLf & vbCrLf & "Would you like to do that now?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, strMessageBoxTitle) = MsgBoxResult.Yes Then
+            ProgramEventLogToolStripMenuItem.PerformClick()
+        End If
     End Sub
 
     Private Sub doOldLogFileConversionRoutineAndStartLoadingRestorePoints()

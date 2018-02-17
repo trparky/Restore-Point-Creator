@@ -38,6 +38,11 @@
             xmlSerializerObject = New Xml.Serialization.XmlSerializer((New List(Of restorePointCreatorExportedLog)).GetType)
         End Sub
 
+        Public Function isLogFileTooBig() As Boolean
+            ' This checks to see if the log file's size is greater than 1 MB or 1048576 Bytes.
+            Return If((New IO.FileInfo(strLogFile)).Length > 1048576, True, False)
+        End Function
+
         ''' <summary>Opens and returns a IO.FileStream.</summary>
         ''' <param name="strFileToOpen">Path to the file you want to open.</param>
         ''' <param name="strLockFile">Path to the lock file that indicates that the file declared using the "strFileToOpen" variable is in use.</param>
