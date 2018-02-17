@@ -2339,6 +2339,9 @@ Public Class Form1
                 End If
             End If
 
+            EnableAdvancedDebugModeToolStripMenuItem.Visible = globalVariables.version.boolDebugBuild
+            EnableAdvancedDebugModeToolStripMenuItem.Checked = My.Settings.debug
+
             boolDoneLoading = True
             systemRestorePointsList.Select()
         Catch ex2 As IO.IOException
@@ -2421,6 +2424,10 @@ Public Class Form1
 #End Region
 
 #Region "--== ToolStrip Click Events ==--"
+    Private Sub EnableAdvancedDebugModeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EnableAdvancedDebugModeToolStripMenuItem.Click
+        My.Settings.debug = EnableAdvancedDebugModeToolStripMenuItem.Checked
+    End Sub
+
     Private Sub ExtendedDebugToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExtendedDebugToolStripMenuItem.Click
         My.Settings.debug = ExtendedDebugToolStripMenuItem.Checked
     End Sub
