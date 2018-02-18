@@ -9,10 +9,11 @@
         If (globalVariables.windows.frmManageSystemRestoreStorageSpace Is Nothing) Then
             Dim screen As Screen = Screen.FromControl(Me)
 
-            globalVariables.windows.frmManageSystemRestoreStorageSpace = New frmManageSystemRestoreStorageSpace()
-            globalVariables.windows.frmManageSystemRestoreStorageSpace.StartPosition = FormStartPosition.CenterParent
-            globalVariables.windows.frmManageSystemRestoreStorageSpace.strDriveLetterWeAreWorkingWith = drive
-            globalVariables.windows.frmManageSystemRestoreStorageSpace.Location = My.Settings.ManageSystemRestoreStorageSpaceWindowLocation
+            globalVariables.windows.frmManageSystemRestoreStorageSpace = New frmManageSystemRestoreStorageSpace() With {
+                .StartPosition = FormStartPosition.CenterParent,
+                .strDriveLetterWeAreWorkingWith = drive,
+                .Location = My.Settings.ManageSystemRestoreStorageSpaceWindowLocation
+            }
             globalVariables.windows.frmManageSystemRestoreStorageSpace.Show()
         Else
             globalVariables.windows.frmManageSystemRestoreStorageSpace.BringToFront()
@@ -26,55 +27,43 @@
     ''' <param name="boolBold">Obviously.</param>
     ''' <returns>Returns the next xPosition for the next lable to be created at.</returns>
     Function createLabel(ByVal strLabelText As String, ByVal xPosition As Integer, ByVal yPosition As Integer, ByVal boolBold As Boolean) As Integer
-        Dim lblLabel As New Label
-        lblLabel.Location = New Point(xPosition, yPosition)
-        lblLabel.Show()
-        lblLabel.AutoSize = True
-        lblLabel.Text = strLabelText
-        If boolBold = True Then lblLabel.Font = boldFont
+        Dim lblLabel As New Label With {
+            .Location = New Point(xPosition, yPosition),
+            .AutoSize = True,
+            .Text = strLabelText
+        }
+        If boolBold Then lblLabel.Font = boldFont
 
         GroupBox1.Invoke(Sub() GroupBox1.Controls.Add(lblLabel))
-
         xPosition += lblLabel.Width
         lblLabel = Nothing
-
         Return xPosition
     End Function
 
     Sub createLinkLabel(ByVal strLabelText As String, ByVal xPosition As Integer, ByVal yPosition As Integer, ByVal currentDriveLetter As String)
-        Dim lblManageLink As New LinkLabel
-        lblManageLink.Location = New Point(xPosition, yPosition)
-        lblManageLink.Text = strLabelText
-        lblManageLink.AutoSize = True
+        Dim lblManageLink As New LinkLabel With {
+            .Location = New Point(xPosition, yPosition),
+            .Text = strLabelText,
+            .AutoSize = True
+        }
 
         AddHandler lblManageLink.Click, Sub() manualFixSub(currentDriveLetter)
-
         GroupBox1.Invoke(Sub() GroupBox1.Controls.Add(lblManageLink))
-
         lblManageLink = Nothing
     End Sub
 
     Sub createColoredBar(ByVal usedSpacePercentage As Double, ByVal freeSpacePercentage As Double, ByVal xPosition As Integer, ByVal yPosition As Integer)
-        Dim diskUsageBar As New SmoothProgressBar
-
-        If usedSpacePercentage > globalVariables.warningPercentage And My.Settings.ShowFullDisksAsRed = True Then
-            diskUsageBar.ProgressBarColor = Color.Red
-        Else
-            diskUsageBar.ProgressBarColor = My.Settings.barColor
-        End If
-
-        diskUsageBar.Width = Me.GroupBox1.Width - 30
-        diskUsageBar.Location = New Point(xPosition, yPosition)
-
-        diskUsageBar.Height = 20
-        diskUsageBar.Maximum = 100
-        diskUsageBar.Value = usedSpacePercentage
-        diskUsageBar.Show()
+        Dim diskUsageBar As New SmoothProgressBar With {
+            .ProgressBarColor = If(usedSpacePercentage > globalVariables.warningPercentage And My.Settings.ShowFullDisksAsRed, Color.Red, My.Settings.barColor),
+            .Width = Me.GroupBox1.Width - 30,
+            .Location = New Point(xPosition, yPosition),
+            .Height = 20,
+            .Maximum = 100,
+            .Value = usedSpacePercentage
+        }
 
         ToolTip.SetToolTip(diskUsageBar, String.Format("{0}% Used ({1}% Free)", usedSpacePercentage, freeSpacePercentage))
-
         GroupBox1.Invoke(Sub() GroupBox1.Controls.Add(diskUsageBar))
-
         diskUsageBar = Nothing
     End Sub
 
@@ -123,7 +112,7 @@
                         ' Creates the Drive or Mount Point data label.
 
                         ' If the drive has no drive label, why display one?
-                        If currentDrive.VolumeLabel IsNot Nothing Then
+                        If Not String.IsNullOrWhiteSpace(currentDrive.VolumeLabel) Then
                             ' Creates the "Drive Label:" header.
                             xPosition = createLabel("Drive Label:", xPosition + 10, yPosition, True)
 
@@ -290,9 +279,10 @@
                 If GroupBox1.IsHandleCreated Then
                     openPleaseWaitPanel("Loading Disk Space Usage Information... Please Wait.")
 
-                    workingThread = New Threading.Thread(AddressOf loadDiskSpaceUsageData)
-                    workingThread.Name = "Disk Space Usage Data Loading Thread"
-                    workingThread.IsBackground = True
+                    workingThread = New Threading.Thread(AddressOf loadDiskSpaceUsageData) With {
+                        .Name = "Disk Space Usage Data Loading Thread",
+                        .IsBackground = True
+                    }
                     workingThread.Start()
                 End If
             Else
@@ -315,9 +305,10 @@
 
             openPleaseWaitPanel("Loading Disk Space Usage Information... Please Wait.")
 
-            workingThread = New Threading.Thread(AddressOf loadDiskSpaceUsageData)
-            workingThread.Name = "Disk Space Usage Data Loading Thread"
-            workingThread.IsBackground = True
+            workingThread = New Threading.Thread(AddressOf loadDiskSpaceUsageData) With {
+                .Name = "Disk Space Usage Data Loading Thread",
+                .IsBackground = True
+            }
             workingThread.Start()
         Catch ex As Exception
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
