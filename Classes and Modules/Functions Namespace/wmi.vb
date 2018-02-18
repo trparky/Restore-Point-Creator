@@ -191,7 +191,11 @@ Namespace Functions.wmi
             Try
                 Dim boolResult As Boolean = False
                 Dim shadowStorageData As supportClasses.ShadowStorageData = vss.getData(globalVariables.systemDriveLetter, boolResult)
-                If boolResult Then eventLogFunctions.writeToApplicationLogFile(String.Format("There is currently {0} Bytes ({1}) used of the total {2} Bytes ({3}) allocated for system restore points on this system.", shadowStorageData.UsedSpace, shadowStorageData.UsedSpaceHuman, shadowStorageData.MaxSpace, shadowStorageData.MaxSpaceHuman), EventLogEntryType.Information, False)
+
+                If boolResult Then
+                    Dim dblPercentage As Double = Math.Round((shadowStorageData.UsedSpace / shadowStorageData.MaxSpace) * 100, 2)
+                    eventLogFunctions.writeToApplicationLogFile(String.Format("There is currently {0} (or {1}%) used of the total {2} allocated for system restore points on this system.", shadowStorageData.UsedSpaceHuman, dblPercentage.ToString, shadowStorageData.MaxSpaceHuman), If(dblPercentage > globalVariables.warningPercentage, EventLogEntryType.Warning, EventLogEntryType.Information), False)
+                End If
             Catch ex As Exception
                 eventLogFunctions.writeToApplicationLogFile("There was an error retrieving the system restore allocated space.", EventLogEntryType.Warning, False)
             End Try
