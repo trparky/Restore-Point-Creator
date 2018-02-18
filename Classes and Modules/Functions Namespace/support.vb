@@ -857,21 +857,15 @@ Namespace Functions.support
         End Function
 
         Public Sub launchURLInWebBrowser(url As String, Optional errorMessage As String = "An error occurred when trying the URL In your Default browser. The URL has been copied to your Windows Clipboard for you to paste into the address bar in the web browser of your choice.")
-            If url.Trim.StartsWith("http", StringComparison.OrdinalIgnoreCase) = False Then
-                If My.Settings.useSSL = True Then
-                    url = "https://" & url
-                Else
-                    url = "http://" & url
-                End If
-            End If
+            If Not url.Trim.StartsWith("http", StringComparison.OrdinalIgnoreCase) Then url = If(My.Settings.useSSL, "https://" & url, "http://" & url)
 
             Try
                 Dim associatedApplication As String = Nothing
 
-                If registryStuff.getFileAssociation(".html", associatedApplication) = False Then
+                If Not registryStuff.getFileAssociation(".html", associatedApplication) Then
                     Process.Start(url)
                 Else
-                    If IO.File.Exists(associatedApplication) = True Then
+                    If IO.File.Exists(associatedApplication) Then
                         Process.Start(associatedApplication, Chr(34) & url & Chr(34))
                     Else
                         Process.Start(url)
