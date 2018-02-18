@@ -70,6 +70,7 @@ Namespace My
             End If
 
             Functions.startupFunctions.validateSettings()
+            If Not globalVariables.version.boolDebugBuild Then My.Settings.debug = False
             setProcessPriorities()
             exceptionHandler.loadExceptionHandler()
 
