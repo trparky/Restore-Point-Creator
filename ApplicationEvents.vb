@@ -47,12 +47,7 @@ Namespace My
         Private Function boolAreWeInUpdateOrNoParentProcessCheckMode() As Boolean
             If My.Application.CommandLineArgs.Count >= 1 Then
                 Dim commandLineArgument As String = My.Application.CommandLineArgs(0)
-
-                If commandLineArgument.Equals("-update", StringComparison.OrdinalIgnoreCase) Or commandLineArgument.Equals("-updatewithoutuninstallinfoupdate", StringComparison.OrdinalIgnoreCase) Or commandLineArgument.Equals("-noparentprocesscheck", StringComparison.OrdinalIgnoreCase) Then
-                    Return True
-                Else
-                    Return False
-                End If
+                Return If(commandLineArgument.Equals("-update", StringComparison.OrdinalIgnoreCase) Or commandLineArgument.Equals("-updatewithoutuninstallinfoupdate", StringComparison.OrdinalIgnoreCase) Or commandLineArgument.Equals("-noparentprocesscheck", StringComparison.OrdinalIgnoreCase), True, False)
             Else
                 Return False
             End If
