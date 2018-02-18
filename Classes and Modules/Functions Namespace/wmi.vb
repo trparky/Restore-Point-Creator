@@ -187,7 +187,19 @@ Namespace Functions.wmi
             End Try
         End Function
 
+        Private Sub notateSystemRestoreSpaceUsageInApplicationLog()
+            Try
+                Dim boolResult As Boolean = False
+                Dim shadowStorageData As supportClasses.ShadowStorageData = vss.getData(globalVariables.systemDriveLetter, boolResult)
+                If boolResult Then eventLogFunctions.writeToApplicationLogFile(String.Format("There is currently {0} ({1}) used of the total {2} ({3}) allocated for system restore points on this system.", shadowStorageData.UsedSpace, shadowStorageData.UsedSpaceHuman, shadowStorageData.MaxSpace, shadowStorageData.MaxSpaceHuman), EventLogEntryType.Information, False)
+            Catch ex As Exception
+                eventLogFunctions.writeToApplicationLogFile("There was an error retrieving the system restore allocated space.", EventLogEntryType.Warning, False)
+            End Try
+        End Sub
+
         Public Function createRestorePoint(restorePointName As String, restorePointType As restorePointStuff.RestoreType, ByRef restorePointID As Long) As Integer
+            notateSystemRestoreSpaceUsageInApplicationLog()
+
             Try
                 Dim managementScope As New Management.ManagementScope("\\localhost\root\default")
                 Dim managementPath As New Management.ManagementPath("SystemRestore")
