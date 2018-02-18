@@ -64,9 +64,9 @@ Namespace My
                 Process.GetCurrentProcess.Kill()
             End If
 
+            Functions.startupFunctions.validateSettings()
             setProcessPriorities()
             exceptionHandler.loadExceptionHandler()
-            Functions.startupFunctions.validateSettings()
 
             Dim commandLineArgument As String
             Dim registryKey As RegistryKey
