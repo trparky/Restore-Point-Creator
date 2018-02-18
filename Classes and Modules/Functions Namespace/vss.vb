@@ -52,20 +52,35 @@
                                 If queryObj("AllocatedSpace") Is Nothing Then
                                     shadowStorageDataClassInstance.AllocatedSpace = 0
                                 Else
-                                    If Not ULong.TryParse(queryObj("AllocatedSpace").ToString, shadowStorageDataClassInstance.AllocatedSpace) Then shadowStorageDataClassInstance.AllocatedSpace = 0
+                                    If ULong.TryParse(queryObj("AllocatedSpace").ToString, shadowStorageDataClassInstance.AllocatedSpace) Then
+                                        shadowStorageDataClassInstance.AllocatedSpaceHuman = support.bytesToHumanSize(shadowStorageDataClassInstance.AllocatedSpace)
+                                    Else
+                                        shadowStorageDataClassInstance.AllocatedSpace = 0
+                                        shadowStorageDataClassInstance.AllocatedSpaceHuman = "0 Bytes"
+                                    End If
                                 End If
 
                                 ' This is all in an effort to try and prevent Null Reference Exceptions.
                                 If queryObj("MaxSpace") Is Nothing Then
                                     shadowStorageDataClassInstance.MaxSpace = 0
                                 Else
-                                    If Not ULong.TryParse(queryObj("MaxSpace").ToString, shadowStorageDataClassInstance.MaxSpace) Then shadowStorageDataClassInstance.MaxSpace = 0
+                                    If ULong.TryParse(queryObj("MaxSpace").ToString, shadowStorageDataClassInstance.MaxSpace) Then
+                                        shadowStorageDataClassInstance.MaxSpaceHuman = support.bytesToHumanSize(shadowStorageDataClassInstance.MaxSpace)
+                                    Else
+                                        shadowStorageDataClassInstance.MaxSpace = 0
+                                        shadowStorageDataClassInstance.MaxSpaceHuman = "0 Bytes"
+                                    End If
                                 End If
 
                                 ' This is all in an effort to try and prevent Null Reference Exceptions.
                                 If queryObj("UsedSpace") Is Nothing Then : shadowStorageDataClassInstance.UsedSpace = 0
                                 Else
-                                    If Not ULong.TryParse(queryObj("UsedSpace").ToString, shadowStorageDataClassInstance.UsedSpace) Then shadowStorageDataClassInstance.UsedSpace = 0
+                                    If ULong.TryParse(queryObj("UsedSpace").ToString, shadowStorageDataClassInstance.UsedSpace) Then
+                                        shadowStorageDataClassInstance.UsedSpaceHuman = support.bytesToHumanSize(shadowStorageDataClassInstance.UsedSpace)
+                                    Else
+                                        shadowStorageDataClassInstance.UsedSpace = 0
+                                        shadowStorageDataClassInstance.UsedSpaceHuman = "0 Bytes"
+                                    End If
                                 End If
 
                                 ' This is all in an effort to try and prevent Null Reference Exceptions.
