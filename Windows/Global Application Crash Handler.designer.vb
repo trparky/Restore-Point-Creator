@@ -48,7 +48,8 @@ Partial Class frmCrash
         Me.pleaseWaitPanel = New System.Windows.Forms.Panel()
         Me.pleaseWaitBorderText = New System.Windows.Forms.Label()
         Me.pleaseWaitlblLabel = New System.Windows.Forms.Label()
-        Me.pleaseWaitProgressBar = New SmoothProgressBar()
+        Me.pleaseWaitProgressBar = New Restore_Point_Creator.SmoothProgressBar()
+        Me.chkSaveInfo = New System.Windows.Forms.CheckBox()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.pleaseWaitPanel.SuspendLayout()
@@ -62,7 +63,7 @@ Partial Class frmCrash
         Me.txtStackTrace.Name = "txtStackTrace"
         Me.txtStackTrace.ReadOnly = True
         Me.txtStackTrace.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtStackTrace.Size = New System.Drawing.Size(511, 450)
+        Me.txtStackTrace.Size = New System.Drawing.Size(511, 463)
         Me.txtStackTrace.TabIndex = 2
         '
         'Label1
@@ -101,7 +102,7 @@ Partial Class frmCrash
         '
         'txtDoing
         '
-        Me.txtDoing.Location = New System.Drawing.Point(532, 366)
+        Me.txtDoing.Location = New System.Drawing.Point(529, 379)
         Me.txtDoing.Multiline = True
         Me.txtDoing.Name = "txtDoing"
         Me.txtDoing.Size = New System.Drawing.Size(464, 81)
@@ -110,7 +111,7 @@ Partial Class frmCrash
         'Label5
         '
         Me.Label5.AutoSize = True
-        Me.Label5.Location = New System.Drawing.Point(529, 350)
+        Me.Label5.Location = New System.Drawing.Point(529, 363)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(266, 13)
         Me.Label5.TabIndex = 28
@@ -129,7 +130,7 @@ Partial Class frmCrash
         'chkReproducable
         '
         Me.chkReproducable.AutoSize = True
-        Me.chkReproducable.Location = New System.Drawing.Point(532, 310)
+        Me.chkReproducable.Location = New System.Drawing.Point(532, 330)
         Me.chkReproducable.Name = "chkReproducable"
         Me.chkReproducable.Size = New System.Drawing.Size(304, 30)
         Me.chkReproducable.TabIndex = 23
@@ -140,7 +141,7 @@ Partial Class frmCrash
         'Label6
         '
         Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(529, 70)
+        Me.Label6.Location = New System.Drawing.Point(529, 93)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(479, 234)
         Me.Label6.TabIndex = 26
@@ -210,7 +211,7 @@ Partial Class frmCrash
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.btnClose, 1, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.btnSubmitData, 0, 0)
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(532, 476)
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(529, 489)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 1
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
@@ -222,7 +223,7 @@ Partial Class frmCrash
         Me.chkSendLogs.AutoSize = True
         Me.chkSendLogs.Checked = True
         Me.chkSendLogs.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkSendLogs.Location = New System.Drawing.Point(535, 453)
+        Me.chkSendLogs.Location = New System.Drawing.Point(529, 466)
         Me.chkSendLogs.Name = "chkSendLogs"
         Me.chkSendLogs.Size = New System.Drawing.Size(301, 17)
         Me.chkSendLogs.TabIndex = 46
@@ -280,11 +281,22 @@ Partial Class frmCrash
         Me.pleaseWaitProgressBar.TabIndex = 2
         Me.pleaseWaitProgressBar.Value = 0
         '
+        'chkSaveInfo
+        '
+        Me.chkSaveInfo.AutoSize = True
+        Me.chkSaveInfo.Location = New System.Drawing.Point(532, 73)
+        Me.chkSaveInfo.Name = "chkSaveInfo"
+        Me.chkSaveInfo.Size = New System.Drawing.Size(364, 17)
+        Me.chkSaveInfo.TabIndex = 51
+        Me.chkSaveInfo.Text = "Save my name and email address so that you don't have to fill it in again"
+        Me.chkSaveInfo.UseVisualStyleBackColor = True
+        '
         'frmCrash
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
-        Me.ClientSize = New System.Drawing.Size(1008, 513)
+        Me.ClientSize = New System.Drawing.Size(1008, 524)
+        Me.Controls.Add(Me.chkSaveInfo)
         Me.Controls.Add(Me.pleaseWaitPanel)
         Me.Controls.Add(Me.chkSendLogs)
         Me.Controls.Add(Me.TableLayoutPanel1)
@@ -340,4 +352,5 @@ Partial Class frmCrash
     Friend WithEvents pleaseWaitBorderText As Label
     Friend WithEvents pleaseWaitlblLabel As Label
     Friend WithEvents pleaseWaitProgressBar As SmoothProgressBar
+    Friend WithEvents chkSaveInfo As CheckBox
 End Class

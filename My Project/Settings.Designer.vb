@@ -1000,6 +1000,42 @@ Namespace My
                 Me("showSystemRestoreSpaceForAllDrivesOnDiskSpaceUsage") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property boolSaveInfo() As Boolean
+            Get
+                Return CType(Me("boolSaveInfo"),Boolean)
+            End Get
+            Set
+                Me("boolSaveInfo") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property usersName() As String
+            Get
+                Return CType(Me("usersName"),String)
+            End Get
+            Set
+                Me("usersName") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+        Public Property usersEmail() As String
+            Get
+                Return CType(Me("usersEmail"),String)
+            End Get
+            Set
+                Me("usersEmail") = value
+            End Set
+        End Property
     End Class
 End Namespace
 
