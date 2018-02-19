@@ -2425,7 +2425,20 @@ Public Class Form1
 
 #Region "--== ToolStrip Click Events ==--"
     Private Sub EnableAdvancedDebugModeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EnableAdvancedDebugModeToolStripMenuItem.Click
-        My.Settings.debug = EnableAdvancedDebugModeToolStripMenuItem.Checked
+        If EnableAdvancedDebugModeToolStripMenuItem.Checked Then
+            Dim messageBoxResult As MsgBoxResult = MsgBox("You are activating Advanced Debug Mode. This mode will cause the program to write far more logs and data to the application log file than normal." & vbCrLf & vbCrLf & "This data can be used to help fix issues if you submit the data to me, the developer. This is completely optional, you have COMPLETE control over the data recorded by the program." & vbCrLf & vbCrLf & "Are you sure you want to enable Advanced Debug Mode?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Are you sure?")
+
+            If messageBoxResult = MsgBoxResult.Yes Then
+                My.Settings.debug = True
+            Else
+                My.Settings.debug = False
+                EnableAdvancedDebugModeToolStripMenuItem.Checked = False
+            End If
+        Else
+            My.Settings.debug = False
+        End If
+
+        My.Settings.Save()
     End Sub
 
     Private Sub ExtendedDebugToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExtendedDebugToolStripMenuItem.Click
