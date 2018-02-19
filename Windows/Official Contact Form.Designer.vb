@@ -39,7 +39,7 @@ Partial Class Official_Contact_Form
         Me.btnClear = New System.Windows.Forms.Button()
         Me.btnDeleteAttachment = New System.Windows.Forms.Button()
         Me.btnAttachEventLogs = New System.Windows.Forms.Button()
-        Me.maxSize = New SmoothProgressBar()
+        Me.maxSize = New Restore_Point_Creator.SmoothProgressBar()
         Me.lblTotalFileSize = New System.Windows.Forms.Label()
         Me.listAttachedFiles = New System.Windows.Forms.ListView()
         Me.ColumnHeader1 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
@@ -47,9 +47,10 @@ Partial Class Official_Contact_Form
         Me.pleaseWaitPanel = New System.Windows.Forms.Panel()
         Me.pleaseWaitBorderText = New System.Windows.Forms.Label()
         Me.pleaseWaitlblLabel = New System.Windows.Forms.Label()
-        Me.pleaseWaitProgressBar = New SmoothProgressBar()
+        Me.pleaseWaitProgressBar = New Restore_Point_Creator.SmoothProgressBar()
         Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
         Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
+        Me.chkSaveInfo = New System.Windows.Forms.CheckBox()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.pleaseWaitPanel.SuspendLayout()
         Me.SuspendLayout()
@@ -89,7 +90,7 @@ Partial Class Official_Contact_Form
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(12, 55)
+        Me.Label3.Location = New System.Drawing.Point(12, 78)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(414, 52)
         Me.Label3.TabIndex = 4
@@ -98,7 +99,7 @@ Partial Class Official_Contact_Form
         '
         'txtMessage
         '
-        Me.txtMessage.Location = New System.Drawing.Point(10, 110)
+        Me.txtMessage.Location = New System.Drawing.Point(10, 133)
         Me.txtMessage.Multiline = True
         Me.txtMessage.Name = "txtMessage"
         Me.txtMessage.Size = New System.Drawing.Size(491, 200)
@@ -111,7 +112,7 @@ Partial Class Official_Contact_Form
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.btnClose, 0, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.btnSubmit, 0, 0)
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(10, 566)
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(10, 589)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 1
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
@@ -147,7 +148,7 @@ Partial Class Official_Contact_Form
         '
         Me.btnBrowse.Image = Global.Restore_Point_Creator.My.Resources.Resources.folder_explore
         Me.btnBrowse.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.btnBrowse.Location = New System.Drawing.Point(394, 346)
+        Me.btnBrowse.Location = New System.Drawing.Point(394, 369)
         Me.btnBrowse.Name = "btnBrowse"
         Me.btnBrowse.Size = New System.Drawing.Size(107, 35)
         Me.btnBrowse.TabIndex = 4
@@ -163,7 +164,7 @@ Partial Class Official_Contact_Form
         'Label4
         '
         Me.Label4.AutoSize = True
-        Me.Label4.Location = New System.Drawing.Point(15, 317)
+        Me.Label4.Location = New System.Drawing.Point(15, 340)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(486, 26)
         Me.Label4.TabIndex = 12
@@ -175,7 +176,7 @@ Partial Class Official_Contact_Form
         '
         Me.btnClear.Image = Global.Restore_Point_Creator.My.Resources.Resources.edit_clear
         Me.btnClear.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.btnClear.Location = New System.Drawing.Point(394, 477)
+        Me.btnClear.Location = New System.Drawing.Point(394, 500)
         Me.btnClear.Name = "btnClear"
         Me.btnClear.Size = New System.Drawing.Size(107, 40)
         Me.btnClear.TabIndex = 6
@@ -187,7 +188,7 @@ Partial Class Official_Contact_Form
         '
         Me.btnDeleteAttachment.Image = Global.Restore_Point_Creator.My.Resources.Resources.delete
         Me.btnDeleteAttachment.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.btnDeleteAttachment.Location = New System.Drawing.Point(394, 387)
+        Me.btnDeleteAttachment.Location = New System.Drawing.Point(394, 410)
         Me.btnDeleteAttachment.Name = "btnDeleteAttachment"
         Me.btnDeleteAttachment.Size = New System.Drawing.Size(107, 40)
         Me.btnDeleteAttachment.TabIndex = 5
@@ -199,7 +200,7 @@ Partial Class Official_Contact_Form
         '
         Me.btnAttachEventLogs.Image = Global.Restore_Point_Creator.My.Resources.Resources.textBlock
         Me.btnAttachEventLogs.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
-        Me.btnAttachEventLogs.Location = New System.Drawing.Point(394, 433)
+        Me.btnAttachEventLogs.Location = New System.Drawing.Point(394, 456)
         Me.btnAttachEventLogs.Name = "btnAttachEventLogs"
         Me.btnAttachEventLogs.Size = New System.Drawing.Size(107, 38)
         Me.btnAttachEventLogs.TabIndex = 14
@@ -209,7 +210,7 @@ Partial Class Official_Contact_Form
         '
         'maxSize
         '
-        Me.maxSize.Location = New System.Drawing.Point(10, 538)
+        Me.maxSize.Location = New System.Drawing.Point(10, 561)
         Me.maxSize.Maximum = 100
         Me.maxSize.Minimum = 0
         Me.maxSize.Name = "maxSize"
@@ -221,7 +222,7 @@ Partial Class Official_Contact_Form
         'lblTotalFileSize
         '
         Me.lblTotalFileSize.AutoSize = True
-        Me.lblTotalFileSize.Location = New System.Drawing.Point(7, 522)
+        Me.lblTotalFileSize.Location = New System.Drawing.Point(7, 545)
         Me.lblTotalFileSize.Name = "lblTotalFileSize"
         Me.lblTotalFileSize.Size = New System.Drawing.Size(275, 13)
         Me.lblTotalFileSize.TabIndex = 16
@@ -231,7 +232,7 @@ Partial Class Official_Contact_Form
         '
         Me.listAttachedFiles.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader1, Me.ColumnHeader2})
         Me.listAttachedFiles.FullRowSelect = True
-        Me.listAttachedFiles.Location = New System.Drawing.Point(10, 346)
+        Me.listAttachedFiles.Location = New System.Drawing.Point(10, 369)
         Me.listAttachedFiles.Name = "listAttachedFiles"
         Me.listAttachedFiles.Size = New System.Drawing.Size(378, 171)
         Me.listAttachedFiles.TabIndex = 17
@@ -299,11 +300,22 @@ Partial Class Official_Contact_Form
         '
         Me.pleaseWaitProgressBarChanger.Interval = 25
         '
+        'chkSaveInfo
+        '
+        Me.chkSaveInfo.AutoSize = True
+        Me.chkSaveInfo.Location = New System.Drawing.Point(15, 58)
+        Me.chkSaveInfo.Name = "chkSaveInfo"
+        Me.chkSaveInfo.Size = New System.Drawing.Size(364, 17)
+        Me.chkSaveInfo.TabIndex = 50
+        Me.chkSaveInfo.Text = "Save my name and email address so that you don't have to fill it in again"
+        Me.chkSaveInfo.UseVisualStyleBackColor = True
+        '
         'Official_Contact_Form
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
-        Me.ClientSize = New System.Drawing.Size(509, 603)
+        Me.ClientSize = New System.Drawing.Size(509, 625)
+        Me.Controls.Add(Me.chkSaveInfo)
         Me.Controls.Add(Me.pleaseWaitPanel)
         Me.Controls.Add(Me.listAttachedFiles)
         Me.Controls.Add(Me.lblTotalFileSize)
@@ -360,4 +372,5 @@ Partial Class Official_Contact_Form
     Friend WithEvents pleaseWaitProgressBar As SmoothProgressBar
     Friend WithEvents pleaseWaitMessageChanger As Timer
     Friend WithEvents pleaseWaitProgressBarChanger As Timer
+    Friend WithEvents chkSaveInfo As CheckBox
 End Class

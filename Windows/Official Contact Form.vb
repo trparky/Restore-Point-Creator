@@ -145,7 +145,30 @@ Public Class Official_Contact_Form
             openPleaseWaitPanel("Compressing and Sending Data... Please Wait.")
         End If
 
+        If chkSaveInfo.Checked Then
+            My.Settings.usersName = txtName.Text
+            My.Settings.usersEmail = txtEmail.Text
+        End If
+
         Threading.ThreadPool.QueueUserWorkItem(AddressOf dataSubmitThread)
+    End Sub
+
+    Private Sub chkSaveInfo_Click(sender As Object, e As EventArgs) Handles chkSaveInfo.Click
+        If chkSaveInfo.Checked Then
+            If MsgBox("Are you sure you want to save your info in the program's settings?" & vbCrLf & vbCrLf & "This is COMPLETELY optional, it is only for the purpose of not burdening you with having to refill your info every time you use either the Official Contact Form or the Crash Submission Form.", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Are you sure?") = MsgBoxResult.No Then
+                chkSaveInfo.Checked = False
+            End If
+        Else
+            If MsgBox("Unchecking this checkbox will delete your saved name and email from the program settings." & vbCrLf & vbCrLf & "Are you sure you want to do this?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Are you sure?") = MsgBoxResult.Yes Then
+                My.Settings.usersName = Nothing
+                My.Settings.usersEmail = Nothing
+                chkSaveInfo.Checked = False
+            Else
+                chkSaveInfo.Checked = True
+            End If
+        End If
+
+        My.Settings.boolSaveInfo = chkSaveInfo.Checked
     End Sub
 
     Private Sub Official_Contact_Form_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -154,6 +177,11 @@ Public Class Official_Contact_Form
         If My.Settings.useSSL = True Then
             btnSubmit.Image = My.Resources.lock
             ToolTip.SetToolTip(btnSubmit, "Secured by SSL.")
+        End If
+
+        If My.Settings.boolSaveInfo Then
+            txtName.Text = My.Settings.usersName
+            txtEmail.Text = My.Settings.usersEmail
         End If
     End Sub
 
