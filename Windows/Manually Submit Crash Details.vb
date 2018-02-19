@@ -21,6 +21,7 @@
         End If
 
         If My.Settings.boolSaveInfo Then
+            chkSaveInfo.Checked = True
             txtName.Text = My.Settings.usersName
             txtEmail.Text = My.Settings.usersEmail
         End If
