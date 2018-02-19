@@ -61,7 +61,7 @@ Partial Class Official_Contact_Form
         Me.Label1.Location = New System.Drawing.Point(12, 9)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(60, 13)
-        Me.Label1.TabIndex = 0
+        Me.Label1.TabIndex = 19
         Me.Label1.Text = "Your Name"
         '
         'Label2
@@ -70,7 +70,7 @@ Partial Class Official_Contact_Form
         Me.Label2.Location = New System.Drawing.Point(12, 35)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(98, 13)
-        Me.Label2.TabIndex = 1
+        Me.Label2.TabIndex = 18
         Me.Label2.Text = "Your Email Address"
         '
         'txtName
@@ -78,14 +78,14 @@ Partial Class Official_Contact_Form
         Me.txtName.Location = New System.Drawing.Point(78, 6)
         Me.txtName.Name = "txtName"
         Me.txtName.Size = New System.Drawing.Size(423, 20)
-        Me.txtName.TabIndex = 1
+        Me.txtName.TabIndex = 0
         '
         'txtEmail
         '
         Me.txtEmail.Location = New System.Drawing.Point(116, 32)
         Me.txtEmail.Name = "txtEmail"
         Me.txtEmail.Size = New System.Drawing.Size(385, 20)
-        Me.txtEmail.TabIndex = 2
+        Me.txtEmail.TabIndex = 1
         '
         'Label3
         '
@@ -93,7 +93,7 @@ Partial Class Official_Contact_Form
         Me.Label3.Location = New System.Drawing.Point(12, 78)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(414, 52)
-        Me.Label3.TabIndex = 4
+        Me.Label3.TabIndex = 17
         Me.Label3.Text = "Your email address will be kept strictly confidential and will NOT be sold to thi" &
     "rd-parties." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Believe me, I hate spam just as much as you do." & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Your Message"
         '
@@ -117,7 +117,7 @@ Partial Class Official_Contact_Form
         Me.TableLayoutPanel1.RowCount = 1
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.Size = New System.Drawing.Size(491, 29)
-        Me.TableLayoutPanel1.TabIndex = 7
+        Me.TableLayoutPanel1.TabIndex = 16
         '
         'btnClose
         '
@@ -167,7 +167,7 @@ Partial Class Official_Contact_Form
         Me.Label4.Location = New System.Drawing.Point(15, 340)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(486, 26)
-        Me.Label4.TabIndex = 12
+        Me.Label4.TabIndex = 15
         Me.Label4.Text = "Attached Files (This is optional. Perfect for if you need to send screenshots to " &
     "me.)" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Please don't attach any executable files (EXE, BAT, DLL, etc.), they will " &
     "be blocked by my mail server."
@@ -179,7 +179,7 @@ Partial Class Official_Contact_Form
         Me.btnClear.Location = New System.Drawing.Point(394, 500)
         Me.btnClear.Name = "btnClear"
         Me.btnClear.Size = New System.Drawing.Size(107, 40)
-        Me.btnClear.TabIndex = 6
+        Me.btnClear.TabIndex = 7
         Me.btnClear.Text = "Clear" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Attachments"
         Me.btnClear.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.btnClear.UseVisualStyleBackColor = True
@@ -203,7 +203,7 @@ Partial Class Official_Contact_Form
         Me.btnAttachEventLogs.Location = New System.Drawing.Point(394, 456)
         Me.btnAttachEventLogs.Name = "btnAttachEventLogs"
         Me.btnAttachEventLogs.Size = New System.Drawing.Size(107, 38)
-        Me.btnAttachEventLogs.TabIndex = 14
+        Me.btnAttachEventLogs.TabIndex = 6
         Me.btnAttachEventLogs.Text = "Attach Program Event Logs"
         Me.btnAttachEventLogs.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.btnAttachEventLogs.UseVisualStyleBackColor = True
@@ -216,7 +216,8 @@ Partial Class Official_Contact_Form
         Me.maxSize.Name = "maxSize"
         Me.maxSize.ProgressBarColor = System.Drawing.Color.LightGreen
         Me.maxSize.Size = New System.Drawing.Size(491, 22)
-        Me.maxSize.TabIndex = 15
+        Me.maxSize.TabIndex = 13
+        Me.maxSize.TabStop = False
         Me.maxSize.Value = 0
         '
         'lblTotalFileSize
@@ -225,7 +226,7 @@ Partial Class Official_Contact_Form
         Me.lblTotalFileSize.Location = New System.Drawing.Point(7, 545)
         Me.lblTotalFileSize.Name = "lblTotalFileSize"
         Me.lblTotalFileSize.Size = New System.Drawing.Size(275, 13)
-        Me.lblTotalFileSize.TabIndex = 16
+        Me.lblTotalFileSize.TabIndex = 12
         Me.lblTotalFileSize.Text = "You have attached 0 KB of the maximum 6 MBs allowed."
         '
         'listAttachedFiles
@@ -235,7 +236,8 @@ Partial Class Official_Contact_Form
         Me.listAttachedFiles.Location = New System.Drawing.Point(10, 369)
         Me.listAttachedFiles.Name = "listAttachedFiles"
         Me.listAttachedFiles.Size = New System.Drawing.Size(378, 171)
-        Me.listAttachedFiles.TabIndex = 17
+        Me.listAttachedFiles.TabIndex = 11
+        Me.listAttachedFiles.TabStop = False
         Me.listAttachedFiles.UseCompatibleStateImageBehavior = False
         Me.listAttachedFiles.View = System.Windows.Forms.View.Details
         '
@@ -258,7 +260,7 @@ Partial Class Official_Contact_Form
         Me.pleaseWaitPanel.Location = New System.Drawing.Point(108, 258)
         Me.pleaseWaitPanel.Name = "pleaseWaitPanel"
         Me.pleaseWaitPanel.Size = New System.Drawing.Size(293, 86)
-        Me.pleaseWaitPanel.TabIndex = 49
+        Me.pleaseWaitPanel.TabIndex = 10
         Me.pleaseWaitPanel.Visible = False
         '
         'pleaseWaitBorderText
@@ -268,7 +270,7 @@ Partial Class Official_Contact_Form
         Me.pleaseWaitBorderText.Name = "pleaseWaitBorderText"
         Me.pleaseWaitBorderText.Padding = New System.Windows.Forms.Padding(3, 0, 0, 0)
         Me.pleaseWaitBorderText.Size = New System.Drawing.Size(292, 23)
-        Me.pleaseWaitBorderText.TabIndex = 4
+        Me.pleaseWaitBorderText.TabIndex = 0
         Me.pleaseWaitBorderText.Text = "Please Wait..."
         Me.pleaseWaitBorderText.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
@@ -278,7 +280,7 @@ Partial Class Official_Contact_Form
         Me.pleaseWaitlblLabel.Location = New System.Drawing.Point(3, 31)
         Me.pleaseWaitlblLabel.Name = "pleaseWaitlblLabel"
         Me.pleaseWaitlblLabel.Size = New System.Drawing.Size(39, 13)
-        Me.pleaseWaitlblLabel.TabIndex = 3
+        Me.pleaseWaitlblLabel.TabIndex = 1
         Me.pleaseWaitlblLabel.Text = "Label1"
         '
         'pleaseWaitProgressBar
@@ -290,6 +292,7 @@ Partial Class Official_Contact_Form
         Me.pleaseWaitProgressBar.ProgressBarColor = System.Drawing.Color.Blue
         Me.pleaseWaitProgressBar.Size = New System.Drawing.Size(280, 19)
         Me.pleaseWaitProgressBar.TabIndex = 2
+        Me.pleaseWaitProgressBar.TabStop = False
         Me.pleaseWaitProgressBar.Value = 0
         '
         'pleaseWaitMessageChanger
@@ -306,7 +309,7 @@ Partial Class Official_Contact_Form
         Me.chkSaveInfo.Location = New System.Drawing.Point(15, 58)
         Me.chkSaveInfo.Name = "chkSaveInfo"
         Me.chkSaveInfo.Size = New System.Drawing.Size(364, 17)
-        Me.chkSaveInfo.TabIndex = 50
+        Me.chkSaveInfo.TabIndex = 2
         Me.chkSaveInfo.Text = "Save my name and email address so that you don't have to fill it in again"
         Me.chkSaveInfo.UseVisualStyleBackColor = True
         '
