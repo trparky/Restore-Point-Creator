@@ -382,6 +382,7 @@ Public Class Form1
             AskBeforeUpgradingUpdatingToolStripMenuItem.Checked = My.Settings.askToUpgrade
             Me.Location = Functions.support.verifyWindowLocation(My.Settings.mainWindowPosition)
             AskBeforeCreatingRestorePointToolStripMenuItem.Checked = My.Settings.askBeforeCreatingRestorePoint
+            WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem.Checked = Functions.registryStuff.getBooleanValueFromRegistry("Write Restore Space Info to Application Log", True)
 
             If My.Settings.CheckForUpdates = True Then
                 If My.Settings.checkForUpdatesEveryInDays = 7 Then
@@ -2424,6 +2425,10 @@ Public Class Form1
 #End Region
 
 #Region "--== ToolStrip Click Events ==--"
+    Private Sub WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem.Click
+        Functions.registryStuff.setBooleanValueInRegistry("Write Restore Space Info to Application Log", WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem.Checked)
+    End Sub
+
     Private Sub EnableAdvancedDebugModeToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EnableAdvancedDebugModeToolStripMenuItem.Click
         If EnableAdvancedDebugModeToolStripMenuItem.Checked Then
             Dim messageBoxResult As MsgBoxResult = MsgBox("You are activating Advanced Debug Mode. This mode will cause the program to write far more logs and data to the application log file than normal." & vbCrLf & vbCrLf & "This data can be used to help fix issues if you submit the data to me, the developer. This is completely optional, you have COMPLETE control over the data recorded by the program." & vbCrLf & vbCrLf & "Are you sure you want to enable Advanced Debug Mode?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Are you sure?")

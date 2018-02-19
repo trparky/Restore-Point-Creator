@@ -145,6 +145,7 @@ Partial Class Form1
         Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
         Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
         Me.EnableAdvancedDebugModeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.restorePointListContextMenu.SuspendLayout()
         Me.buttonTableLayout.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
@@ -519,7 +520,7 @@ Partial Class Form1
         '
         'AdditionalOptionsAndSettingsToolStripMenuItem
         '
-        Me.AdditionalOptionsAndSettingsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CheckSystemDrivesForFullShadowStorageToolStripMenuItem, Me.toolStripConfirmDeletions, Me.ConfirmRestorePointDeletionsInBatchesToolStripMenuItem, Me.toolStripLogRestorePointDeletions, Me.toolStripCloseAfterRestorePointIsCreated, Me.AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem, Me.BypassNoUACLauncherToolStripMenuItem, Me.LogProgramLoadsAndExitsToEventLogToolStripMenuItem, Me.ExtendedLoggingForScheduledTasks, Me.AskBeforeCreatingRestorePointToolStripMenuItem, Me.chkShowVersionInTitleBarToolStripMenuItem, Me.EnableAdvancedDebugModeToolStripMenuItem})
+        Me.AdditionalOptionsAndSettingsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CheckSystemDrivesForFullShadowStorageToolStripMenuItem, Me.toolStripConfirmDeletions, Me.ConfirmRestorePointDeletionsInBatchesToolStripMenuItem, Me.toolStripLogRestorePointDeletions, Me.toolStripCloseAfterRestorePointIsCreated, Me.AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem, Me.BypassNoUACLauncherToolStripMenuItem, Me.LogProgramLoadsAndExitsToEventLogToolStripMenuItem, Me.ExtendedLoggingForScheduledTasks, Me.AskBeforeCreatingRestorePointToolStripMenuItem, Me.chkShowVersionInTitleBarToolStripMenuItem, Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem, Me.EnableAdvancedDebugModeToolStripMenuItem})
         Me.AdditionalOptionsAndSettingsToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.increase
         Me.AdditionalOptionsAndSettingsToolStripMenuItem.Name = "AdditionalOptionsAndSettingsToolStripMenuItem"
         Me.AdditionalOptionsAndSettingsToolStripMenuItem.Size = New System.Drawing.Size(431, 22)
@@ -1040,6 +1041,13 @@ Partial Class Form1
         Me.pleaseWaitlblLabel.TabIndex = 3
         Me.pleaseWaitlblLabel.Text = "Label1"
         '
+        'WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem
+        '
+        Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem.CheckOnClick = True
+        Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem.Name = "WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem"
+        Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem.Size = New System.Drawing.Size(435, 22)
+        Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem.Text = "Write restore space info to log file when creating a restore point"
+        '
         'pleaseWaitProgressBar
         '
         Me.pleaseWaitProgressBar.Location = New System.Drawing.Point(6, 56)
@@ -1214,4 +1222,5 @@ Partial Class Form1
     Friend WithEvents barBelowColorSettings As ToolStripSeparator
     Friend WithEvents ExtendedDebugToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents EnableAdvancedDebugModeToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem As ToolStripMenuItem
 End Class

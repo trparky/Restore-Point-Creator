@@ -202,7 +202,7 @@ Namespace Functions.wmi
         End Sub
 
         Public Function createRestorePoint(restorePointName As String, restorePointType As restorePointStuff.RestoreType, ByRef restorePointID As Long) As Integer
-            notateSystemRestoreSpaceUsageInApplicationLog()
+            If registryStuff.getBooleanValueFromRegistry("Write Restore Space Info to Application Log", True) Then notateSystemRestoreSpaceUsageInApplicationLog()
 
             Try
                 Dim managementScope As New Management.ManagementScope("\\localhost\root\default")
