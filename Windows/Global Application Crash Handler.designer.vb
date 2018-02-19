@@ -106,7 +106,7 @@ Partial Class frmCrash
         Me.txtDoing.Multiline = True
         Me.txtDoing.Name = "txtDoing"
         Me.txtDoing.Size = New System.Drawing.Size(464, 81)
-        Me.txtDoing.TabIndex = 24
+        Me.txtDoing.TabIndex = 4
         '
         'Label5
         '
@@ -133,7 +133,7 @@ Partial Class frmCrash
         Me.chkReproducable.Location = New System.Drawing.Point(532, 330)
         Me.chkReproducable.Name = "chkReproducable"
         Me.chkReproducable.Size = New System.Drawing.Size(304, 30)
-        Me.chkReproducable.TabIndex = 23
+        Me.chkReproducable.TabIndex = 3
         Me.chkReproducable.Text = "Is this crash reproducable?" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "Meaning, does this issue happen all the time or some" &
     "times?"
         Me.chkReproducable.UseVisualStyleBackColor = True
@@ -161,14 +161,14 @@ Partial Class frmCrash
         Me.txtEmail.Location = New System.Drawing.Point(636, 47)
         Me.txtEmail.Name = "txtEmail"
         Me.txtEmail.Size = New System.Drawing.Size(360, 20)
-        Me.txtEmail.TabIndex = 22
+        Me.txtEmail.TabIndex = 1
         '
         'txtName
         '
         Me.txtName.Location = New System.Drawing.Point(598, 20)
         Me.txtName.Name = "txtName"
         Me.txtName.Size = New System.Drawing.Size(398, 20)
-        Me.txtName.TabIndex = 20
+        Me.txtName.TabIndex = 0
         '
         'Label8
         '
@@ -188,7 +188,7 @@ Partial Class frmCrash
         Me.btnSubmitData.Location = New System.Drawing.Point(3, 3)
         Me.btnSubmitData.Name = "btnSubmitData"
         Me.btnSubmitData.Size = New System.Drawing.Size(226, 23)
-        Me.btnSubmitData.TabIndex = 29
+        Me.btnSubmitData.TabIndex = 6
         Me.btnSubmitData.Text = "Submit Crash Data"
         Me.btnSubmitData.UseVisualStyleBackColor = True
         '
@@ -200,7 +200,7 @@ Partial Class frmCrash
         Me.btnClose.Location = New System.Drawing.Point(235, 3)
         Me.btnClose.Name = "btnClose"
         Me.btnClose.Size = New System.Drawing.Size(226, 23)
-        Me.btnClose.TabIndex = 30
+        Me.btnClose.TabIndex = 7
         Me.btnClose.Text = "Close"
         Me.btnClose.UseVisualStyleBackColor = True
         '
@@ -226,7 +226,7 @@ Partial Class frmCrash
         Me.chkSendLogs.Location = New System.Drawing.Point(529, 466)
         Me.chkSendLogs.Name = "chkSendLogs"
         Me.chkSendLogs.Size = New System.Drawing.Size(301, 17)
-        Me.chkSendLogs.TabIndex = 46
+        Me.chkSendLogs.TabIndex = 5
         Me.chkSendLogs.Text = "Send program logs as part of crash report (Recommended)"
         Me.chkSendLogs.UseVisualStyleBackColor = True
         '
@@ -279,6 +279,7 @@ Partial Class frmCrash
         Me.pleaseWaitProgressBar.ProgressBarColor = System.Drawing.Color.Blue
         Me.pleaseWaitProgressBar.Size = New System.Drawing.Size(280, 19)
         Me.pleaseWaitProgressBar.TabIndex = 2
+        Me.pleaseWaitProgressBar.TabStop = False
         Me.pleaseWaitProgressBar.Value = 0
         '
         'chkSaveInfo
@@ -287,7 +288,7 @@ Partial Class frmCrash
         Me.chkSaveInfo.Location = New System.Drawing.Point(532, 73)
         Me.chkSaveInfo.Name = "chkSaveInfo"
         Me.chkSaveInfo.Size = New System.Drawing.Size(364, 17)
-        Me.chkSaveInfo.TabIndex = 51
+        Me.chkSaveInfo.TabIndex = 2
         Me.chkSaveInfo.Text = "Save my name and email address so that you don't have to fill it in again"
         Me.chkSaveInfo.UseVisualStyleBackColor = True
         '
