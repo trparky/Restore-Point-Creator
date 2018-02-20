@@ -1661,7 +1661,8 @@ Public Class Form1
         ' This checks to see if automatic checking for updates is enabled or not, if so this routine runs. There's also
         ' a way to force this routine to run and that is by passing a True value for the forceRunOfUpdate variable.
         If My.Settings.CheckForUpdates = True Or forceRunOfUpdate = True Then
-            toolStripAutomaticallyCheckForUpdates.Checked = True ' This puts a checkbox for the toolStripAutomaticallyCheckForUpdates checkbox.
+            toolStripAutomaticallyCheckForUpdates.Checked = My.Settings.CheckForUpdates ' This puts a checkbox for the toolStripAutomaticallyCheckForUpdates checkbox.
+
             Dim longDateDiff As Long = Math.Abs(DateDiff(DateInterval.Day, Now, My.Settings.lastUpdateTime)) ' This determinds the amount of days since the last update check.
 
             ' This checks to see if the number of executions of the program has exceeded 50 times or if the days since last update is greater than the user specified days interval for update checking. It also has the ability to bypass this check by setting the forceRunOfUpdate variable to True.
