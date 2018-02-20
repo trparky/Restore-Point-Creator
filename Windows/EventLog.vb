@@ -244,6 +244,7 @@
 
         Me.Location = Functions.support.verifyWindowLocation(My.Settings.eventLogFormWindowLocation)
         chkAskMeToSubmitIfViewingAnExceptionEntry.Checked = My.Settings.boolAskMeToSubmitIfViewingAnExceptionEntry
+        chkPromptBeforeLogDeletion.Checked = My.Settings.boolPromptBeforeLogDeletion
         applySavedSorting()
 
         If Not areWeAnAdministrator Then
@@ -576,6 +577,14 @@
     End Sub
 
     Private Sub btnDeleteIndividualLogEntry_Click(sender As Object, e As EventArgs) Handles btnDeleteIndividualLogEntry.Click
+        If chkPromptBeforeLogDeletion.Checked Then
+            If eventLogList.SelectedItems.Count = 1 Then
+                If MsgBox("Are you sure you want to delete the selected log entry?", MsgBoxStyle.Question + MsgBoxStyle.YesNo + vbDefaultButton2, "Are you sure?") = MsgBoxResult.No Then Exit Sub
+            Else
+                If MsgBox("You currently have " & eventLogList.SelectedItems.Count.ToString & " log entries selected for deletion." & vbCrLf & vbCrLf & "Are you sure you want to delete the selected log entries?", MsgBoxStyle.Question + MsgBoxStyle.YesNo + vbDefaultButton2, "Are you sure?") = MsgBoxResult.No Then Exit Sub
+            End If
+        End If
+
         Dim boolSuccessfulDelete As Boolean = True
 
         If eventLogList.SelectedItems.Count = 1 Then
@@ -659,6 +668,10 @@
     Private Sub chkToolMultiSelectMode_Click(sender As Object, e As EventArgs) Handles chkToolMultiSelectMode.Click
         chkMultiSelectMode.Checked = chkToolMultiSelectMode.Checked
         eventLogList.MultiSelect = chkToolMultiSelectMode.Checked
+    End Sub
+
+    Private Sub chkPromptBeforeLogDeletion_Click(sender As Object, e As EventArgs) Handles chkPromptBeforeLogDeletion.Click
+        My.Settings.boolPromptBeforeLogDeletion = chkPromptBeforeLogDeletion.Checked
     End Sub
 
 #Region "--== Please Wait Panel Code ==--"
