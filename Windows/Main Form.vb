@@ -405,7 +405,7 @@ Public Class Form1
 
             If registryObject IsNot Nothing Then
                 boolUpdateAtNextRunTime = Functions.registryStuff.getBooleanValueFromRegistry(registryObject, "UpdateAtNextRunTime", False)
-                registryObject.DeleteValue("UpdateAtNextRunTime", False)
+                If boolUpdateAtNextRunTime Then registryObject.DeleteValue("UpdateAtNextRunTime", False)
 
                 boolShowDonationMessage = Functions.registryStuff.getBooleanValueFromRegistry(registryObject, "Show Donation Message", True)
 
