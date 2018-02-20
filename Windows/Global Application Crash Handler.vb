@@ -148,63 +148,63 @@ Public Class frmCrash
                 If strHTTPResponse.Equals("ok", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = True
                     Functions.eventLogFunctions.markLastExceptionLogAsSubmitted()
-                    MsgBox("Crash data has been submitted. The program will now close.", MsgBoxStyle.Information, "Restore Point Creator Crash Reporter")
+                    MsgBox("Crash data has been submitted. The program will now close.", MsgBoxStyle.Information + MsgBoxStyle.ApplicationModal, "Restore Point Creator Crash Reporter")
                     Me.Close()
                 ElseIf strHTTPResponse.Equals("error", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
-                    MsgBox("There was an error in submission. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
+                    MsgBox("There was an error in submission. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, "Restore Point Creator Crash Reporter")
                 ElseIf strHTTPResponse.Equals("error-invalid-email", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
-                    MsgBox("Invalid email address. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
+                    MsgBox("Invalid email address. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, "Restore Point Creator Crash Reporter")
                 ElseIf strHTTPResponse.Equals("email-server-said-user-doesnt-exist", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
-                    MsgBox("The remote email server said that the email address doesn't exist. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
+                    MsgBox("The remote email server said that the email address doesn't exist. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, "Restore Point Creator Crash Reporter")
                 ElseIf strHTTPResponse.Equals("no-email-servers-contactable", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
-                    MsgBox("No mail servers found, more than likely your email address is invalid. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
+                    MsgBox("No mail servers found, more than likely your email address is invalid. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, "Restore Point Creator Crash Reporter")
                 ElseIf strHTTPResponse.Equals("dns-error", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
-                    MsgBox("The domain name doesn't exist. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
+                    MsgBox("The domain name doesn't exist. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, "Restore Point Creator Crash Reporter")
                 ElseIf strHTTPResponse.Equals("server-connect-error", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
-                    MsgBox("Unable to contact mail server, more than likely your email address is invalid. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
+                    MsgBox("Unable to contact mail server, more than likely your email address is invalid. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, "Restore Point Creator Crash Reporter")
                 ElseIf strHTTPResponse.Equals("error-no-crash-data-found", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
-                    MsgBox("Something went wrong, no crash data found in submission data. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
+                    MsgBox("Something went wrong, no crash data found in submission data. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, "Restore Point Creator Crash Reporter")
                 ElseIf strHTTPResponse.Equals("error-no-program-code-found", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
-                    MsgBox("Something went wrong, no program code found in submission data. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
+                    MsgBox("Something went wrong, no program code found in submission data. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, "Restore Point Creator Crash Reporter")
                 ElseIf strHTTPResponse.Equals("error-no-email-address-found", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
-                    MsgBox("Something went wrong, no email address found in submission data. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
+                    MsgBox("Something went wrong, no email address found in submission data. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, "Restore Point Creator Crash Reporter")
                 ElseIf strHTTPResponse.Equals("error-no-name-found", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
-                    MsgBox("Something went wrong, no name found in submission data. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
+                    MsgBox("Something went wrong, no name found in submission data. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, "Restore Point Creator Crash Reporter")
                 ElseIf strHTTPResponse.Equals("invalid-email-syntax", StringComparison.OrdinalIgnoreCase) Then
                     boolSubmitted = False
                     Me.btnSubmitData.Enabled = True
                     Me.btnClose.Enabled = True
-                    MsgBox("The email address didn't pass syntax validation. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
+                    MsgBox("The email address didn't pass syntax validation. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, "Restore Point Creator Crash Reporter")
                 Else
                     boolSubmitted = True
                     Me.btnSubmitData.Enabled = True
@@ -218,7 +218,7 @@ Public Class frmCrash
                 boolSubmitted = False
                 Me.btnSubmitData.Enabled = True
                 Me.btnClose.Enabled = True
-                MsgBox("Something went wrong while submitting data. Please try again.", MsgBoxStyle.Critical, "Restore Point Creator Crash Reporter")
+                MsgBox("Something went wrong while submitting data. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, "Restore Point Creator Crash Reporter")
             End If
         Catch ex As Exception
             If boolDoWeHaveAttachments = True Then closePleaseWaitPanel()
@@ -229,7 +229,7 @@ Public Class frmCrash
 
     Private Sub btnSubmitData_Click(sender As Object, e As EventArgs) Handles btnSubmitData.Click
         If String.IsNullOrWhiteSpace(txtEmail.Text.Trim) Then
-            MsgBox("You must provide your email address.", MsgBoxStyle.Critical, Me.Text)
+            MsgBox("You must provide your email address.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, Me.Text)
             Exit Sub
         End If
 
@@ -360,10 +360,10 @@ Namespace exceptionHandler
             Dim exceptionMessage As String = exceptionObject.Message
 
             If exceptionType = GetType(IO.FileLoadException) And exceptionMessage.regExSearch("(?:restoreToSystemRestorePoint|createRestorePoint)") = True Then
-                MsgBox("There has been an error while loading a required system library for System Restore. Please reboot your computer and try again.", MsgBoxStyle.Critical, "System Restore Point Creator")
+                MsgBox("There has been an error while loading a required system library for System Restore. Please reboot your computer and try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, "System Restore Point Creator")
                 Process.GetCurrentProcess.Kill()
             ElseIf exceptionType = GetType(Configuration.ConfigurationErrorsException) Or exceptionType = GetType(Configuration.ConfigurationException) Then
-                MsgBox("There has been an error in loading the program's user configuration data. Please relaunch the program.", MsgBoxStyle.Critical, "System Restore Point Creator")
+                MsgBox("There has been an error in loading the program's user configuration data. Please relaunch the program.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, "System Restore Point Creator")
                 Process.GetCurrentProcess.Kill()
             ElseIf exceptionType = GetType(OutOfMemoryException) Then
                 MsgBox("Your system appears to have run out of operating memory. Please reboot your computer and try again." & vbCrLf & vbCrLf & "This program will now close.", MsgBoxStyle.Information, "System Restore Point Creator")
@@ -468,7 +468,7 @@ Friend Class ThreadExceptionHandler
     Private Sub writeCrashToEventLogAndGiveErrorMessage(exceptionObject As Exception)
         Try
             Functions.eventLogFunctions.writeCrashToApplicationLogFile(exceptionObject)
-            MsgBox("A fatal error occurred and the program will now close. Please check the application event log for more details.", MsgBoxStyle.Critical, "Restore Point Creator Fatal Program Crash")
+            MsgBox("A fatal error occurred and the program will now close. Please check the application event log for more details.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, "Restore Point Creator Fatal Program Crash")
             Process.GetCurrentProcess.Kill()
         Catch ex As Exception
         End Try

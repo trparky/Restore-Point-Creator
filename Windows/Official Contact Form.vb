@@ -31,12 +31,12 @@ Public Class Official_Contact_Form
             Try
                 Using zipFileObject As IO.Compression.ZipArchive = IO.Compression.ZipFile.Open(zipFilePath, IO.Compression.ZipArchiveMode.Create)
                     If zipFileObject Is Nothing Then
-                        MsgBox("There was an error while creating the ZIP file to contain your attached files, submission process aborted.", MsgBoxStyle.Critical, Me.Text)
+                        MsgBox("There was an error while creating the ZIP file to contain your attached files, submission process aborted.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, Me.Text)
                         Exit Sub
                     Else
                         For Each item As myListViewItemTypes.contactFormFileListItem In listAttachedFiles.Items
                             If Not Functions.support.addFileToZipFile(zipFileObject, item.strFileName) Then
-                                MsgBox("There was an error while writing the attached files to the ZIP file, submission process aborted.", MsgBoxStyle.Critical, Me.Text)
+                                MsgBox("There was an error while writing the attached files to the ZIP file, submission process aborted.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, Me.Text)
                                 Exit Sub
                             End If
                         Next
@@ -46,7 +46,7 @@ Public Class Official_Contact_Form
                 enableFormElements()
                 Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 closePleaseWaitPanel()
-                MsgBox("There was an error while preparing your file attachments for submission. Please see the Event Log for more details.", MsgBoxStyle.Critical, Me.Text)
+                MsgBox("There was an error while preparing your file attachments for submission. Please see the Event Log for more details.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, Me.Text)
                 Exit Sub
             End Try
         End If
@@ -64,7 +64,7 @@ Public Class Official_Contact_Form
                 httpHelper.addFileUpload("attachment", zipFilePath, Nothing, "application/zip")
             Catch ex As IO.FileNotFoundException
                 closePleaseWaitPanel()
-                MsgBox("The file attachment you have chosen doesn't exist.", MsgBoxStyle.Critical, Me.Text)
+                MsgBox("The file attachment you have chosen doesn't exist.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, Me.Text)
                 enableFormElements()
                 Exit Sub
             End Try
@@ -89,32 +89,32 @@ Public Class Official_Contact_Form
                     listAttachedFiles.Items.Clear()
                     If IO.File.Exists(zipFilePath) Then IO.File.Delete(zipFilePath)
 
-                    MsgBox("Your email to the developer has been sent. This window will now close.", MsgBoxStyle.Information, Me.Text)
+                    MsgBox("Your email to the developer has been sent. This window will now close.", MsgBoxStyle.Information + MsgBoxStyle.ApplicationModal, Me.Text)
                     Me.Close()
                 ElseIf strHTTPResponse.Equals("error-invalid-email", StringComparison.OrdinalIgnoreCase) Then
-                    MsgBox("Invalid email address. Please try again.", MsgBoxStyle.Critical, Me.Text)
+                    MsgBox("Invalid email address. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, Me.Text)
                 ElseIf strHTTPResponse.Equals("email-server-said-user-doesnt-exist", StringComparison.OrdinalIgnoreCase) Then
-                    MsgBox("The remote email server said that the email address doesn't exist. Please try again.", MsgBoxStyle.Critical, Me.Text)
+                    MsgBox("The remote email server said that the email address doesn't exist. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, Me.Text)
                 ElseIf strHTTPResponse.Equals("dns-error", StringComparison.OrdinalIgnoreCase) Then
-                    MsgBox("The domain name doesn't exist. Please try again.", MsgBoxStyle.Critical, Me.Text)
+                    MsgBox("The domain name doesn't exist. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, Me.Text)
                 ElseIf strHTTPResponse.Equals("server-connect-error", StringComparison.OrdinalIgnoreCase) Then
-                    MsgBox("Unable to contact mail server, more than likely your email address is invalid. Please try again.", MsgBoxStyle.Critical, Me.Text)
+                    MsgBox("Unable to contact mail server, more than likely your email address is invalid. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, Me.Text)
                 ElseIf strHTTPResponse.Equals("invalid-email-syntax", StringComparison.OrdinalIgnoreCase) Then
-                    MsgBox("The email address didn't pass syntax validation. Please try again.", MsgBoxStyle.Critical, Me.Text)
+                    MsgBox("The email address didn't pass syntax validation. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, Me.Text)
                 ElseIf strHTTPResponse.Equals("no-email-servers-contactable", StringComparison.OrdinalIgnoreCase) Then
-                    MsgBox("No mail servers found, more than likely your email address is invalid. Please try again.", MsgBoxStyle.Critical, Me.Text)
+                    MsgBox("No mail servers found, more than likely your email address is invalid. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, Me.Text)
                 ElseIf strHTTPResponse.Equals("no-access-allowed", StringComparison.OrdinalIgnoreCase) Then
-                    MsgBox("Error accessing server side script.", MsgBoxStyle.Critical, Me.Text)
+                    MsgBox("Error accessing server side script.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, Me.Text)
                 ElseIf strHTTPResponse.Equals("error-no-message-found", StringComparison.OrdinalIgnoreCase) Then
-                    MsgBox("No message found. Please try again.", MsgBoxStyle.Critical, Me.Text)
+                    MsgBox("No message found. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, Me.Text)
                 ElseIf strHTTPResponse.Equals("file_attachment_failure", StringComparison.OrdinalIgnoreCase) Then
-                    MsgBox("File attachment failure. Please try again.", MsgBoxStyle.Critical, Me.Text)
+                    MsgBox("File attachment failure. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, Me.Text)
                 End If
 
                 btnSubmit.Enabled = True
             Else
                 closePleaseWaitPanel()
-                MsgBox("Error accessing server side script.", MsgBoxStyle.Critical, Me.Text)
+                MsgBox("Error accessing server side script.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, Me.Text)
             End If
         Catch ex As Exception
         Finally
@@ -263,13 +263,13 @@ Public Class Official_Contact_Form
 
                 MsgBox(String.Format("{0} log entries have been successfully exported and added to the list of attached files.{1}{1}Application Event Log exported in {2}ms ({3} seconds).", logCount, vbCrLf, timeStamp.ElapsedMilliseconds, Math.Round(timeStamp.Elapsed.TotalSeconds, 3)), MsgBoxStyle.Information, Me.Text)
             Else
-                MsgBox("There was an error while attempting to export the program's event log entries.", MsgBoxStyle.Critical, Me.Text)
+                MsgBox("There was an error while attempting to export the program's event log entries.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, Me.Text)
             End If
         Catch ex As Exception
             Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
             Functions.eventLogFunctions.writeToApplicationLogFile("There was an error while attempting to export the program's event log entries.", EventLogEntryType.Error)
 
-            MsgBox("There was an error while exporting the log data. Please see the Event Log for more details.", MsgBoxStyle.Critical, Me.Text)
+            MsgBox("There was an error while exporting the log data. Please see the Event Log for more details.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, Me.Text)
         End Try
     End Sub
 
