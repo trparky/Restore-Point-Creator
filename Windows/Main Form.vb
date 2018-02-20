@@ -2463,7 +2463,7 @@ Public Class Form1
     End Sub
 
     Private Sub RebootSystemToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RebootSystemToolStripMenuItem.Click
-        If MsgBox("Are you sure you want to reboot your system?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Reboot System?") = MsgBoxResult.Yes Then
+        If MsgBox("Are you sure you want to reboot your system?", MsgBoxStyle.Question + MsgBoxStyle.YesNo + vbDefaultButton2, "Reboot System?") = MsgBoxResult.Yes Then
             Functions.support.rebootSystem()
         End If
     End Sub
