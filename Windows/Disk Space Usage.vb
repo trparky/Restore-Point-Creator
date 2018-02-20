@@ -268,9 +268,7 @@
     End Sub
 
     Private Sub Disk_Space_Usage_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
-        If e.KeyCode = Keys.F5 Then
-            btnRefresh.PerformClick()
-        End If
+        If e.KeyCode = Keys.F5 Then btnRefresh.PerformClick()
     End Sub
 
     Sub formLoadDiskData()

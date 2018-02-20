@@ -8,9 +8,7 @@ Public Class Set_Default_Custom_Restore_Point_Name
     End Sub
 
     Private Sub txtName_KeyUp(sender As Object, e As KeyEventArgs) Handles txtName.KeyUp
-        If e.KeyCode = Keys.Enter Then
-            btnOK.PerformClick()
-        End If
+        If e.KeyCode = Keys.Enter Then btnOK.PerformClick()
     End Sub
 
     Private Sub btnOK_Click(sender As Object, e As EventArgs) Handles btnOK.Click
