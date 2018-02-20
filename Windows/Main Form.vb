@@ -1976,7 +1976,7 @@ Public Class Form1
 
     Private Sub txtRestorePointDescription_KeyUp(sender As Object, e As KeyEventArgs) Handles txtRestorePointDescription.KeyUp
         If String.IsNullOrEmpty(txtRestorePointDescription.Text.Trim) Then btnCreate.Enabled = False
-        If e.KeyCode = Keys.Enter And btnCreate.Enabled = True And Not String.IsNullOrEmpty(txtRestorePointDescription.Text.Trim) And Functions.support.areWeInSafeMode() = False Then
+        If e.KeyCode = Keys.Enter AndAlso btnCreate.Enabled AndAlso Not String.IsNullOrEmpty(txtRestorePointDescription.Text.Trim) AndAlso Not Functions.support.areWeInSafeMode() Then
             btnCreate.PerformClick()
         End If
     End Sub
@@ -2362,9 +2362,7 @@ Public Class Form1
     End Sub
 
     Private Sub ListView2_KeyUp(sender As Object, e As KeyEventArgs) Handles systemRestorePointsList.KeyUp
-        If e.KeyCode = Keys.Delete Then
-            btnDeleteRestorePoint.PerformClick()
-        End If
+        If e.KeyCode = Keys.Delete Then btnDeleteRestorePoint.PerformClick()
     End Sub
 #End Region
 
