@@ -56,6 +56,7 @@ Partial Class eventLogForm
         Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
         Me.logFileWatcher = New System.IO.FileSystemWatcher()
         Me.chkToolMultiSelectMode = New System.Windows.Forms.ToolStripMenuItem()
+        Me.chkPromptBeforeLogDeletion = New System.Windows.Forms.CheckBox()
         Me.ContextMenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -387,11 +388,23 @@ Partial Class eventLogForm
         Me.chkToolMultiSelectMode.Size = New System.Drawing.Size(207, 22)
         Me.chkToolMultiSelectMode.Text = "Multi-Select Mode"
         '
+        'chkPromptBeforeLogDeletion
+        '
+        Me.chkPromptBeforeLogDeletion.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.chkPromptBeforeLogDeletion.AutoSize = True
+        Me.chkPromptBeforeLogDeletion.Location = New System.Drawing.Point(526, 290)
+        Me.chkPromptBeforeLogDeletion.Name = "chkPromptBeforeLogDeletion"
+        Me.chkPromptBeforeLogDeletion.Size = New System.Drawing.Size(183, 17)
+        Me.chkPromptBeforeLogDeletion.TabIndex = 42
+        Me.chkPromptBeforeLogDeletion.Text = "Prompt before deleting log entries"
+        Me.chkPromptBeforeLogDeletion.UseVisualStyleBackColor = True
+        '
         'eventLogForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.ClientSize = New System.Drawing.Size(860, 332)
+        Me.Controls.Add(Me.chkPromptBeforeLogDeletion)
         Me.Controls.Add(Me.pleaseWaitPanel)
         Me.Controls.Add(Me.chkAskMeToSubmitIfViewingAnExceptionEntry)
         Me.Controls.Add(Me.SplitContainer1)
@@ -451,4 +464,5 @@ Partial Class eventLogForm
     Friend WithEvents RefreshToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents DeleteSelectedLogEntryToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents chkToolMultiSelectMode As ToolStripMenuItem
+    Friend WithEvents chkPromptBeforeLogDeletion As CheckBox
 End Class
