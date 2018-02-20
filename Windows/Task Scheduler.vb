@@ -486,9 +486,7 @@ Public Class frmTaskScheduler
     End Sub
 
     Private Sub txtDays_KeyUp(sender As Object, e As KeyEventArgs) Handles txtDays.KeyUp
-        If e.KeyCode = Keys.Enter Then
-            btnSet.PerformClick()
-        End If
+        If e.KeyCode = Keys.Enter Then btnSet.PerformClick()
     End Sub
 
     Private Sub txtDays_Leave(sender As Object, e As EventArgs) Handles txtDays.Leave

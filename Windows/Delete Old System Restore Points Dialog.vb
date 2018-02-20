@@ -53,9 +53,7 @@ Public Class frmDeleteOldSystemRestorePoints
     End Sub
 
     Private Sub txtMaxAge_KeyUp(sender As Object, e As System.Windows.Forms.KeyEventArgs) Handles txtMaxAge.KeyUp
-        If e.KeyCode = Keys.Enter Then
-            btnOK.PerformClick()
-        End If
+        If e.KeyCode = Keys.Enter Then btnOK.PerformClick()
     End Sub
 
     Private Sub frmDeleteOldSystemRestorePoints_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load

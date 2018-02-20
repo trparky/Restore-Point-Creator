@@ -21,8 +21,6 @@
     End Sub
 
     Private Sub txtRestorePointName_KeyUp(sender As Object, e As KeyEventArgs) Handles txtRestorePointName.KeyUp
-        If e.KeyCode = Keys.Enter Then
-            btnOK.PerformClick()
-        End If
+        If e.KeyCode = Keys.Enter Then btnOK.PerformClick()
     End Sub
 End Class

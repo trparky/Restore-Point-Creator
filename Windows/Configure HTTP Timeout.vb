@@ -9,8 +9,6 @@
     End Sub
 
     Private Sub timeout_KeyUp(sender As Object, e As KeyEventArgs) Handles timeout.KeyUp
-        If e.KeyCode = Keys.Enter Then
-            btnSave.PerformClick()
-        End If
+        If e.KeyCode = Keys.Enter Then btnSave.PerformClick()
     End Sub
 End Class

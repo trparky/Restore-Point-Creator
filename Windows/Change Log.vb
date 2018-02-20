@@ -89,9 +89,7 @@
     End Sub
 
     Private Sub Change_Log_KeyUp(sender As Object, e As KeyEventArgs) Handles MyBase.KeyUp
-        If e.KeyCode = Keys.F5 Then
-            loadChangelog()
-        End If
+        If e.KeyCode = Keys.F5 Then loadChangelog()
     End Sub
 
 #Region "--== Please Wait Panel Code ==--"

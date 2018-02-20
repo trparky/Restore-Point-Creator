@@ -40,8 +40,6 @@
     End Sub
 
     Private Sub txtDays_KeyUp(sender As Object, e As KeyEventArgs) Handles txtDays.KeyUp
-        If e.KeyCode = Keys.Enter Then
-            btnOK.PerformClick()
-        End If
+        If e.KeyCode = Keys.Enter Then btnOK.PerformClick()
     End Sub
 End Class

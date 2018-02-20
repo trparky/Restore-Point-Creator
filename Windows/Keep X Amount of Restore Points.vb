@@ -23,9 +23,7 @@
     End Sub
 
     Private Sub txtMaxNumber_KeyUp(sender As Object, e As KeyEventArgs) Handles txtMaxNumber.KeyUp
-        If e.KeyCode = Keys.Enter Then
-            btnOK.PerformClick()
-        End If
+        If e.KeyCode = Keys.Enter Then btnOK.PerformClick()
     End Sub
 
     Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
