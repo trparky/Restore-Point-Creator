@@ -152,7 +152,7 @@
     End Sub
 
     Private Sub eventLogForm_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
-        If e.KeyCode = Keys.F5 And Not boolAreWeLoadingTheEventLogData Then
+        If e.KeyCode = Keys.F5 AndAlso Not boolAreWeLoadingTheEventLogData Then
             If IO.File.Exists(Functions.eventLogFunctions.strLogFile) Then
                 getFileDetailsAndActivateDataLoadThread()
             Else
@@ -161,7 +161,7 @@
                 lblLogFileSize.Text = "Log File Size: (File Doesn't Exist)"
                 lblLastModified.Text = "Last Modified: (File Doesn't Exist)"
             End If
-        ElseIf e.KeyCode = Keys.Delete And eventLogList.SelectedItems.Count > 0 Then
+        ElseIf e.KeyCode = Keys.Delete AndAlso eventLogList.SelectedItems.Count > 0 Then
             btnDeleteIndividualLogEntry.PerformClick()
         End If
     End Sub
@@ -608,7 +608,7 @@
     End Sub
 
     Private Sub eventLogList_KeyUp(sender As Object, e As KeyEventArgs) Handles eventLogList.KeyUp
-        If e.KeyCode = Keys.A And e.Modifiers = Keys.Control Then
+        If e.Modifiers = Keys.Control AndAlso e.KeyCode = Keys.A Then
             chkMultiSelectMode.Checked = True
             eventLogList.MultiSelect = True
             eventLogList.Items.Cast(Of ListViewItem).ToList.ForEach(Sub(item As ListViewItem) item.Selected = True)
