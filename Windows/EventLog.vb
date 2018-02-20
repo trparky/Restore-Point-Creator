@@ -536,7 +536,7 @@
     End Sub
 
     Private Sub btnCleanLogFile_Click(sender As Object, e As EventArgs) Handles btnCleanLogFile.Click
-        If MsgBox("Are you sure you want to delete the application event log?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Are you sure?") = MsgBoxResult.Yes Then
+        If MsgBox("Are you sure you want to delete the application event log?", MsgBoxStyle.Question + MsgBoxStyle.YesNo + vbDefaultButton2, "Are you sure?") = MsgBoxResult.Yes Then
             IO.File.Delete(Functions.eventLogFunctions.strLogFile)
             Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Log file cleaned by user {0}.", Environment.UserName), EventLogEntryType.Information)
         Else
