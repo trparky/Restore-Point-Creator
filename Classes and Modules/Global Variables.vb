@@ -140,6 +140,7 @@ Namespace globalVariables
         Namespace core
             Module core
                 Public Const strWebSite As String = "www.toms-world.org/blog/restore_point_creator"
+                Public Const strBitBucketSite As String = "https://bitbucket.org/trparky/restore_point_creator/issues?status=new&status=open"
                 Public Const strBetaDetails As String = "www.toms-world.org/betadetails"
                 Public Const strProgramUpdateChecker As String = "www.toms-world.org/updates/restore_point_creator.xml"
 

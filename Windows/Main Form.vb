@@ -2424,6 +2424,10 @@ Public Class Form1
 #End Region
 
 #Region "--== ToolStrip Click Events ==--"
+    Private Sub BitBucketProjectSite_Click(sender As Object, e As EventArgs) Handles BitBucketProjectSite.Click
+        Functions.support.launchURLInWebBrowser(globalVariables.webURLs.core.strBitBucketSite, "An error occurred when trying to launch the product's web site URL in your default browser. The URL has been copied to your Windows Clipboard for you to paste into the address bar in the browser of your choice.")
+    End Sub
+
     Private Sub WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem.Click
         Functions.registryStuff.setBooleanValueInRegistry("Write Restore Space Info to Application Log", WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem.Checked)
     End Sub

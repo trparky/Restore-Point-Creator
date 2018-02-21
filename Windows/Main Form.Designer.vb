@@ -78,6 +78,8 @@ Partial Class Form1
         Me.ExtendedLoggingForScheduledTasks = New System.Windows.Forms.ToolStripMenuItem()
         Me.AskBeforeCreatingRestorePointToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.chkShowVersionInTitleBarToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.EnableAdvancedDebugModeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ConfigurationBackupRestoreToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BackupToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RestoreToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -124,6 +126,7 @@ Partial Class Form1
         Me.AboutThisProgramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.FrequentlyAskedQuestionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ProductWebSiteToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.BitBucketProjectSite = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContactTheDeveloperToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ViewOfficialChangeLogToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.CommandLineArgumentsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -141,11 +144,9 @@ Partial Class Form1
         Me.pleaseWaitPanel = New System.Windows.Forms.Panel()
         Me.pleaseWaitBorderText = New System.Windows.Forms.Label()
         Me.pleaseWaitlblLabel = New System.Windows.Forms.Label()
-        Me.pleaseWaitProgressBar = New SmoothProgressBar()
+        Me.pleaseWaitProgressBar = New Restore_Point_Creator.SmoothProgressBar()
         Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
         Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
-        Me.EnableAdvancedDebugModeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.restorePointListContextMenu.SuspendLayout()
         Me.buttonTableLayout.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
@@ -603,6 +604,14 @@ Partial Class Form1
         Me.chkShowVersionInTitleBarToolStripMenuItem.Size = New System.Drawing.Size(435, 22)
         Me.chkShowVersionInTitleBarToolStripMenuItem.Text = "Show Version in Title Bar"
         '
+        'WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem
+        '
+        Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem.CheckOnClick = True
+        Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem.Name = "WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuIt" &
+    "em"
+        Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem.Size = New System.Drawing.Size(435, 22)
+        Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem.Text = "Write restore space info to log file when creating a restore point"
+        '
         'EnableAdvancedDebugModeToolStripMenuItem
         '
         Me.EnableAdvancedDebugModeToolStripMenuItem.CheckOnClick = True
@@ -900,7 +909,7 @@ Partial Class Form1
         '
         'toolStripAbout
         '
-        Me.toolStripAbout.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AboutThisProgramToolStripMenuItem, Me.FrequentlyAskedQuestionsToolStripMenuItem, Me.ProductWebSiteToolStripMenuItem, Me.ContactTheDeveloperToolStripMenuItem, Me.ViewOfficialChangeLogToolStripMenuItem1, Me.CommandLineArgumentsToolStripMenuItem})
+        Me.toolStripAbout.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AboutThisProgramToolStripMenuItem, Me.FrequentlyAskedQuestionsToolStripMenuItem, Me.ProductWebSiteToolStripMenuItem, Me.BitBucketProjectSite, Me.ContactTheDeveloperToolStripMenuItem, Me.ViewOfficialChangeLogToolStripMenuItem1, Me.CommandLineArgumentsToolStripMenuItem})
         Me.toolStripAbout.Name = "toolStripAbout"
         Me.toolStripAbout.Size = New System.Drawing.Size(52, 20)
         Me.toolStripAbout.Text = "&About"
@@ -925,6 +934,13 @@ Partial Class Form1
         Me.ProductWebSiteToolStripMenuItem.Name = "ProductWebSiteToolStripMenuItem"
         Me.ProductWebSiteToolStripMenuItem.Size = New System.Drawing.Size(256, 22)
         Me.ProductWebSiteToolStripMenuItem.Text = "Open Product Web Site"
+        '
+        'BitBucketProjectSite
+        '
+        Me.BitBucketProjectSite.Image = Global.Restore_Point_Creator.My.Resources.Resources.website
+        Me.BitBucketProjectSite.Name = "BitBucketProjectSite"
+        Me.BitBucketProjectSite.Size = New System.Drawing.Size(256, 22)
+        Me.BitBucketProjectSite.Text = "Open BitBucket Project Site"
         '
         'ContactTheDeveloperToolStripMenuItem
         '
@@ -1040,13 +1056,6 @@ Partial Class Form1
         Me.pleaseWaitlblLabel.Size = New System.Drawing.Size(39, 13)
         Me.pleaseWaitlblLabel.TabIndex = 3
         Me.pleaseWaitlblLabel.Text = "Label1"
-        '
-        'WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem
-        '
-        Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem.CheckOnClick = True
-        Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem.Name = "WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem"
-        Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem.Size = New System.Drawing.Size(435, 22)
-        Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem.Text = "Write restore space info to log file when creating a restore point"
         '
         'pleaseWaitProgressBar
         '
@@ -1223,4 +1232,5 @@ Partial Class Form1
     Friend WithEvents ExtendedDebugToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents EnableAdvancedDebugModeToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents BitBucketProjectSite As ToolStripMenuItem
 End Class
