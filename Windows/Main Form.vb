@@ -1260,7 +1260,12 @@ Public Class Form1
 
                 closePleaseWaitPanel()
 
-                MsgBox(String.Format("There was an error while attempting to creating the restore point. The error code returned from the system was ""{0}"" ({1}).", result, Functions.support.convertErrorCodeToHex(result)), MsgBoxStyle.Critical, strMessageBoxTitle)
+                If result = Functions.APIs.errorCodes.ERROR_DISK_FULL Then
+                    MsgBox(String.Format("There was an error while attempting to creating the restore point. The error code returned from the system was {0} (ERROR_DISK_FULL).", result.ToString), MsgBoxStyle.Critical, strMessageBoxTitle)
+                Else
+                    MsgBox(String.Format("There was an error while attempting to creating the restore point. The error code returned from the system was ""{0}"" ({1}).", result, Functions.support.convertErrorCodeToHex(result)), MsgBoxStyle.Critical, strMessageBoxTitle)
+                End If
+
                 Exit Sub
             End If
 
