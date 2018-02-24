@@ -1323,12 +1323,14 @@ Public Class Form1
         Dim memoryStream As New IO.MemoryStream()
         Dim overrideURLPaths As Boolean = False
 
-        If boolOverrideUserUpdateChannelPreferences And Not updateChannel.Equals(globalVariables.updateChannels.stable) Then
+        ' This checks to see if the boolOverrideUserUpdateChannelPreferences variable is set to True AND if the update channel is NOT set to stable.
+        If boolOverrideUserUpdateChannelPreferences And Not updateChannel.Equals(globalVariables.updateChannels.stable, StringComparison.OrdinalIgnoreCase) Then
+            ' Yes, these conditions are met so we need to do some stuff. In this case we need to override the user's update channel preference to the stable branch.
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                 Functions.eventLogFunctions.writeToApplicationLogFile("Forcing the update channel to the stable channel for this update session.", EventLogEntryType.Information, False)
             End If
 
-            updateChannel = globalVariables.updateChannels.stable
+            updateChannel = globalVariables.updateChannels.stable ' We override the update channel to stable.
 
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                 Functions.eventLogFunctions.writeToApplicationLogFile("Setting extractPDB flag to True.", EventLogEntryType.Information, False)
@@ -1343,7 +1345,7 @@ Public Class Form1
             overrideURLPaths = True
         End If
 
-        If updateChannel = globalVariables.updateChannels.stable Then
+        If updateChannel.Equals(globalVariables.updateChannels.stable, StringComparison.OrdinalIgnoreCase) Then
             If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                 Functions.eventLogFunctions.writeToApplicationLogFile("Downloading compressed application ZIP package into system RAM.", EventLogEntryType.Information, False)
             End If
@@ -1351,11 +1353,14 @@ Public Class Form1
             Dim urlToZipFile As String = globalVariables.webURLs.updateBranch.main.strProgramZIP
             Dim urlToZipFileSHA2 As String = globalVariables.webURLs.updateBranch.main.strProgramZIPSHA2
 
+            ' We check to see if the boolOverrideUserUpdateChannelPreferences and overrideURLPaths variables are set to True.
             If boolOverrideUserUpdateChannelPreferences And overrideURLPaths Then
+                ' Yes, they are.
                 If globalVariables.boolExtendedLoggingDuringUpdating = True Then
                     Functions.eventLogFunctions.writeToApplicationLogFile("Overriding URL paths for download in this update session.", EventLogEntryType.Information, False)
                 End If
 
+                ' We override the URLs to the debug versions.
                 urlToZipFile = globalVariables.webURLs.updateBranch.debug.strProgramZIP
                 urlToZipFileSHA2 = globalVariables.webURLs.updateBranch.debug.strProgramZIPSHA2
             End If
@@ -1608,7 +1613,9 @@ Public Class Form1
             ' 1. If the update channel is set to beta or tom.
             ' 2. If the remote version (5.8, 5.9, etc.) does not equal the current version of the program (5.8, 5.9, etc.).
             ' If both conditions are met then that means that a new .1 version has been released (5.8, 5.9, etc.) and that
-            ' we need to upgrade the user to the latest release branch version first.
+            ' we need to upgrade the user to the latest release branch version first. If the
+            ' boolOverrideUserUpdateChannelPreferences variable is set to True it instructs the download function to
+            ' download the debug version.
             If (My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta, StringComparison.OrdinalIgnoreCase) Or My.Settings.updateChannel.Equals(globalVariables.updateChannels.tom, StringComparison.OrdinalIgnoreCase)) And remoteVersion <> globalVariables.version.versionStringWithoutBuild Then
                 ' OK, both conditions were met so we need to set some stuff up for later use in this function.
 
@@ -1639,6 +1646,8 @@ Public Class Form1
                     Functions.registryStuff.setBooleanValueInRegistry("UpdateAtNextRunTime", True)
                 End If
 
+                Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Starting the download process to update to version {0} Build {1} from version {2}.", remoteVersion, remoteBuild, globalVariables.version.strFullVersionString), EventLogEntryType.Information, False)
+
                 ' The user said yes.
                 openThePleaseWaitWindowAndStartTheDownloadThread(boolOverrideUserUpdateChannelPreferences) ' Starts the download and update thread.
             ElseIf updateDialogResponse = Update_Message.userResponse.dontDoTheUpdate Then
@@ -1649,10 +1658,10 @@ Public Class Form1
             Exit Sub ' Exit the routine.
         Else
             If updateType = Functions.support.updateType.buildLessThanError Then
-                Functions.eventLogFunctions.writeToApplicationLogFile("A software update check was performed and something weird happened. Your current version is newer than what is listed on the web site.", EventLogEntryType.Information, False) ' Log it.
+                Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("A software update check was performed and something weird happened. Your current version is newer than what is listed on the web site. The version listed on the web site is {0} Build {1}, you have version {2}.", remoteVersion, remoteBuild, globalVariables.version.strFullVersionString), EventLogEntryType.Information, False) ' Log it.
                 giveFeedbackToUser("Something weird happened. Your current version is newer than what is listed on the web site.") ' Gives feedback.
             Else
-                Functions.eventLogFunctions.writeToApplicationLogFile("A software update check was performed and it's been determined that you already have the latest version.", EventLogEntryType.Information, False) ' Log it.
+                Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("A software update check was performed and it's been determined that you already have the latest version. The current version is {0} Build {1}.", remoteVersion, remoteBuild), EventLogEntryType.Information, False) ' Log it.
                 giveFeedbackToUser("You already have the latest version.") ' Gives feedback.
             End If
 
