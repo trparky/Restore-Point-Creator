@@ -65,9 +65,19 @@ Namespace globalVariables
 
     Namespace version
         Module version
+            Sub New()
+                If boolBeta Then
+                    strFullVersionString = String.Format("{0}.{1} Build {2} Public Beta {3}", versionInfo(enums.versionPieces.major), versionInfo(enums.versionPieces.minor), versionInfo(enums.versionPieces.build), shortBetaVersion)
+                ElseIf boolReleaseCandidate Then
+                    strFullVersionString = String.Format("{0}.{1} Build {2} Release Candidate {3}", versionInfo(enums.versionPieces.major), versionInfo(enums.versionPieces.minor), versionInfo(enums.versionPieces.build), shortReleaseCandidateVersion)
+                Else
+                    strFullVersionString = String.Format("{0}.{1} Build {2}", versionInfo(enums.versionPieces.major), versionInfo(enums.versionPieces.minor), versionInfo(enums.versionPieces.build))
+                End If
+            End Sub
+
             Public ReadOnly versionInfo As String() = Application.ProductVersion.Split(".")
 
-            Public ReadOnly strFullVersionString As String = String.Format("{0}.{1} Build {2}", versionInfo(enums.versionPieces.major), versionInfo(enums.versionPieces.minor), versionInfo(enums.versionPieces.build))
+            Public ReadOnly strFullVersionString As String
 
             Public ReadOnly shortMajor As Short = Short.Parse(versionInfo(enums.versionPieces.major).Trim)
             Public ReadOnly shortMinor As Short = Short.Parse(versionInfo(enums.versionPieces.minor).Trim)

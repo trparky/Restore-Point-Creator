@@ -598,14 +598,7 @@ Namespace Functions.startupFunctions
 
                     If commandLineArgument.Equals("-update", StringComparison.OrdinalIgnoreCase) Then
                         registryStuff.updateRestorePointCreatorUninstallationInfo()
-
-                        If globalVariables.version.boolBeta = True Then
-                            eventLogFunctions.writeToApplicationLogFile(String.Format("Updated program to version {0} Public Beta {1}.", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion), EventLogEntryType.Information, False)
-                        ElseIf globalVariables.version.boolReleaseCandidate = True Then
-                            eventLogFunctions.writeToApplicationLogFile(String.Format("Updated program to version {0} Release Candidate {1}.", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion), EventLogEntryType.Information, False)
-                        Else
-                            eventLogFunctions.writeToApplicationLogFile(String.Format("Updated program to version {0}.", globalVariables.version.strFullVersionString), EventLogEntryType.Information, False)
-                        End If
+                        eventLogFunctions.writeToApplicationLogFile(String.Format("Updated program to version {0}.", globalVariables.version.strFullVersionString), EventLogEntryType.Information, False)
                     End If
 
                     If File.Exists(globalVariables.pdbFileNameInZIP & ".new") = True Then

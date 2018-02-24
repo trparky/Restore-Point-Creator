@@ -563,13 +563,7 @@
 
             stringBuilder.AppendLine()
 
-            If globalVariables.version.boolBeta = True Then
-                stringBuilder.AppendLine("Program Version: " & String.Format("{0} Public Beta {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion))
-            ElseIf globalVariables.version.boolReleaseCandidate = True Then
-                stringBuilder.AppendLine("Program Version: " & String.Format("{0} Release Candidate {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion))
-            Else
-                stringBuilder.AppendLine("Program Version: " & globalVariables.version.strFullVersionString)
-            End If
+            stringBuilder.AppendLine("Program Version: " & globalVariables.version.strFullVersionString)
 
             support.addExtendedCrashData(stringBuilder, exceptionObject)
 

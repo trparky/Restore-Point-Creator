@@ -32,13 +32,7 @@ Namespace Functions.registryStuff
                     displayName = installerRegistryPath.GetValue("DisplayName", "")
 
                     If displayName.caseInsensitiveContains("restore point creator") Then
-                        If globalVariables.version.boolBeta Then
-                            installerRegistryPath.SetValue("DisplayName", String.Format("Restore Point Creator version {0} Public Beta {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion), RegistryValueKind.String)
-                        ElseIf globalVariables.version.boolReleaseCandidate Then
-                            installerRegistryPath.SetValue("DisplayName", String.Format("Restore Point Creator version {0} Release Candidate {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion), RegistryValueKind.String)
-                        Else
-                            installerRegistryPath.SetValue("DisplayName", String.Format("Restore Point Creator version {0}", globalVariables.version.strFullVersionString), RegistryValueKind.String)
-                        End If
+                        installerRegistryPath.SetValue("DisplayName", String.Format("Restore Point Creator version {0}", globalVariables.version.strFullVersionString), RegistryValueKind.String)
 
                         installerRegistryPath.SetValue("DisplayVersion", globalVariables.version.versionInfo(enums.versionPieces.major) & "." & globalVariables.version.versionInfo(enums.versionPieces.minor), RegistryValueKind.String)
                         installerRegistryPath.SetValue("DisplayIcon", Application.ExecutablePath.caseInsensitiveReplace(".new.exe", "") & ",0", RegistryValueKind.String)

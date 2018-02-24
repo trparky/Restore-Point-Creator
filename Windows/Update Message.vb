@@ -125,13 +125,7 @@
             lblTopUpdateMessage.Text = String.Format("There is an updated Release Candidate version of System Restore Point Creator. Version {0} Build {1} {2}.", globalVariables.version.versionStringWithoutBuild, remoteBuild, remoteBetaRCVersion)
         End If
 
-        If globalVariables.version.boolBeta Then
-            lblCurrentVersion.Text = String.Format("Current Version: {0} Public Beta {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion)
-        ElseIf globalVariables.version.boolReleaseCandidate Then
-            lblCurrentVersion.Text = String.Format("Current Version: {0} Release Candidate {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion)
-        Else
-            lblCurrentVersion.Text = String.Format("Current Version: {0}", globalVariables.version.strFullVersionString)
-        End If
+        lblCurrentVersion.Text = String.Format("Current Version: {0}", globalVariables.version.strFullVersionString)
 
         If My.Settings.updateNotificationWindowLocation.X <> 0 And My.Settings.updateNotificationWindowLocation.Y <> 0 Then
             Me.Location = Functions.support.verifyWindowLocation(My.Settings.updateNotificationWindowLocation)

@@ -2345,15 +2345,7 @@ Public Class Form1
             ExtendedDebugToolStripMenuItem.Visible = globalVariables.version.boolDebugBuild
             ExtendedDebugToolStripMenuItem.Checked = My.Settings.debug
 
-            If My.Settings.boolShowVersionInWindowTitle = True Then
-                If globalVariables.version.boolBeta Then
-                    Me.Text = String.Format("Restore Point Creator ({0} Public Beta {1})", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion)
-                ElseIf globalVariables.version.boolReleaseCandidate Then
-                    Me.Text = String.Format("Restore Point Creator ({0} Release Candidate {1})", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion)
-                Else
-                    Me.Text = "Restore Point Creator (" & globalVariables.version.strFullVersionString & ")"
-                End If
-            End If
+            If My.Settings.boolShowVersionInWindowTitle Then Me.Text = "Restore Point Creator (" & globalVariables.version.strFullVersionString & ")"
 
             EnableAdvancedDebugModeToolStripMenuItem.Visible = globalVariables.version.boolDebugBuild
             EnableAdvancedDebugModeToolStripMenuItem.Checked = My.Settings.debug
@@ -2497,14 +2489,8 @@ Public Class Form1
     Private Sub chkShowVersionInTitleBarToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles chkShowVersionInTitleBarToolStripMenuItem.Click
         My.Settings.boolShowVersionInWindowTitle = chkShowVersionInTitleBarToolStripMenuItem.Checked
 
-        If My.Settings.boolShowVersionInWindowTitle = True Then
-            If globalVariables.version.boolBeta Then
-                Me.Text = String.Format("Restore Point Creator ({0} Public Beta {1})", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion)
-            ElseIf globalVariables.version.boolReleaseCandidate Then
-                Me.Text = String.Format("Restore Point Creator ({0} Release Candidate {1})", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion)
-            Else
-                Me.Text = "Restore Point Creator (" & globalVariables.version.strFullVersionString & ")"
-            End If
+        If My.Settings.boolShowVersionInWindowTitle Then
+            Me.Text = "Restore Point Creator (" & globalVariables.version.strFullVersionString & ")"
         Else
             Me.Text = "Restore Point Creator"
         End If
@@ -2987,13 +2973,7 @@ Public Class Form1
         stringBuilder.AppendLine("Copyright Thomas Parkison 2012-2019.")
         stringBuilder.AppendLine()
 
-        If globalVariables.version.boolBeta Then
-            stringBuilder.AppendFormat("Version {0} Public Beta {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion)
-        ElseIf globalVariables.version.boolReleaseCandidate Then
-            stringBuilder.AppendFormat("Version {0} Release Candidate {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion)
-        Else
-            stringBuilder.AppendFormat("Version {0}", globalVariables.version.strFullVersionString)
-        End If
+        stringBuilder.AppendFormat("Version {0}", globalVariables.version.strFullVersionString)
 
         If globalVariables.version.boolDebugBuild = True Then
             stringBuilder.Append(" (Debug Build)")

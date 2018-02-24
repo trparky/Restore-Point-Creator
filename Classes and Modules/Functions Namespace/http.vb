@@ -7,13 +7,7 @@
         ''' <summary>Creates a User Agent String for this program to be used in HTTP requests.</summary>
         ''' <returns>String type.</returns>
         Private Function createHTTPUserAgentHeaderString() As String
-            If globalVariables.version.boolBeta Then
-                Return String.Format("{0} version {1} Public Beta {2} on {3}", globalVariables.programName, globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion, osVersionInfo.getFullOSVersionString())
-            ElseIf globalVariables.version.boolReleaseCandidate Then
-                Return String.Format("{0} version {1} Release Candidate {2} on {3}", globalVariables.programName, globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion, osVersionInfo.getFullOSVersionString())
-            Else
-                Return String.Format("{0} version {1} on {2}", globalVariables.programName, globalVariables.version.strFullVersionString, osVersionInfo.getFullOSVersionString())
-            End If
+            Return String.Format("{0} version {1} on {2}", globalVariables.programName, globalVariables.version.strFullVersionString, osVersionInfo.getFullOSVersionString())
         End Function
 
         Public Function downloadFile(ByVal urlToDownloadFrom As String, ByRef memStream As IO.MemoryStream) As Boolean
