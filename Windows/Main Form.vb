@@ -1646,10 +1646,8 @@ Public Class Form1
                     Functions.registryStuff.setBooleanValueInRegistry("UpdateAtNextRunTime", True)
                 End If
 
-                If updateType = Functions.support.updateType.beta Then
-                    Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Starting the download process to update to version {0} Build {1} Public Beta {2} from version {3}.", remoteVersion, remoteBuild, strRemoteBetaRCVersion, globalVariables.version.strFullVersionString), EventLogEntryType.Information, False)
-                ElseIf updateType = Functions.support.updateType.candidate Then
-                    Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Starting the download process to update to version {0} Build {1} Release Candidate {2} from version {3}.", remoteVersion, remoteBuild, strRemoteBetaRCVersion, globalVariables.version.strFullVersionString), EventLogEntryType.Information, False)
+                If updateType = Functions.support.updateType.beta Or updateType = Functions.support.updateType.candidate Then
+                    Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Starting the download process to update to version {0} Build {1} {2} from version {3}.", remoteVersion, remoteBuild, strRemoteBetaRCVersion, globalVariables.version.strFullVersionString), EventLogEntryType.Information, False)
                 ElseIf updateType = Functions.support.updateType.release Then
                     Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Starting the download process to update to version {0} Build {1} from version {2}.", remoteVersion, remoteBuild, globalVariables.version.strFullVersionString), EventLogEntryType.Information, False)
                 End If
