@@ -1661,7 +1661,17 @@ Public Class Form1
                 Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("A software update check was performed and something weird happened. Your current version is newer than what is listed on the web site. The version listed on the web site is {0} Build {1}, you have version {2}.", remoteVersion, remoteBuild, globalVariables.version.strFullVersionString), EventLogEntryType.Information, False) ' Log it.
                 giveFeedbackToUser("Something weird happened. Your current version is newer than what is listed on the web site.") ' Gives feedback.
             Else
-                Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("A software update check was performed and it's been determined that you already have the latest version. The current version is {0} Build {1}.", remoteVersion, remoteBuild), EventLogEntryType.Information, False) ' Log it.
+                If updateType = Functions.support.updateType.release Then
+                    Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("A software update check was performed and it's been determined that you already have the latest version. The current version is {0} Build {1}.", remoteVersion, remoteBuild), EventLogEntryType.Information, False) ' Log it.
+                ElseIf updateType = Functions.support.updateType.beta Then
+                    If My.Settings.onlyGiveMeRCs Then
+                        Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("A software update check was performed and there's a new version but you have specified that you only want release candidate versions. The new version is {0} Build {1} Public Beta {2}.", remoteVersion, remoteBuild, strRemoteBetaRCVersion), EventLogEntryType.Information, False) ' Log it.
+                    Else
+                        Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("A software update check was performed and it's been determined that you already have the latest version. The current version is {0} Build {1} Public Beta {2}.", remoteVersion, remoteBuild, strRemoteBetaRCVersion), EventLogEntryType.Information, False) ' Log it.
+                    End If
+                ElseIf updateType = Functions.support.updateType.candidate Then
+                    Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("A software update check was performed and it's been determined that you already have the latest version. The current version is {0} Build {1} Release Candidate {2}.", remoteVersion, remoteBuild, strRemoteBetaRCVersion), EventLogEntryType.Information, False) ' Log it.
+                End If
                 giveFeedbackToUser("You already have the latest version.") ' Gives feedback.
             End If
 

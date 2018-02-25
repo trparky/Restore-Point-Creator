@@ -103,6 +103,16 @@ Namespace Functions.support
 
                 ' This checks to see if current version and the current build matches that of the remote values in the XML document.
                 If remoteVersion.Equals(globalVariables.version.versionStringWithoutBuild) And remoteBuild.Equals(globalVariables.version.shortBuild.ToString) Then
+                    If strRemoteType.Equals("release", StringComparison.OrdinalIgnoreCase) Then
+                        updateType = updateType.release
+                    ElseIf strRemoteType.Equals("candidate", StringComparison.OrdinalIgnoreCase) Then
+                        updateType = updateType.candidate
+                        strRemoteBetaRCVersion = xmlNode.SelectSingleNode("betaRCVersion").InnerText.Trim
+                    ElseIf strRemoteType.Equals("beta", StringComparison.OrdinalIgnoreCase) Then
+                        updateType = updateType.beta
+                        strRemoteBetaRCVersion = xmlNode.SelectSingleNode("betaRCVersion").InnerText.Trim
+                    End If
+
                     ' OK, they match so there's no update to download and update to therefore we return a False value.
                     Return False
                 Else
@@ -123,6 +133,9 @@ Namespace Functions.support
 
                         ' Now let's check to see if the user wants any betas if the current new version is a beta.
                         If strRemoteType.Equals("beta", StringComparison.OrdinalIgnoreCase) And My.Settings.onlyGiveMeRCs Then
+                            updateType = updateType.beta
+                            strRemoteBetaRCVersion = xmlNode.SelectSingleNode("betaRCVersion").InnerText.Trim
+
                             ' Nope, the user doesn't want betas versions, they only want release candidates, so we return
                             ' a False value indicating that there is no new version to download and update to.
                             Return False
