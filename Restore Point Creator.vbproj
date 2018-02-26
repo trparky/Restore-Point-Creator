@@ -194,6 +194,12 @@
     <Compile Include="Windows\Convert Old Logs.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Windows\Log File Bigger than 1 MB.Designer.vb">
+      <DependentUpon>Log File Bigger than 1 MB.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Log File Bigger than 1 MB.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Windows\Reserved Space for System Drive.Designer.vb">
       <DependentUpon>Reserved Space for System Drive.vb</DependentUpon>
     </Compile>
@@ -407,6 +413,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Keep X Amount of Restore Points.resx">
       <DependentUpon>Keep X Amount of Restore Points.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Log File Bigger than 1 MB.resx">
+      <DependentUpon>Log File Bigger than 1 MB.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Main Form.resx">
       <DependentUpon>Main Form.vb</DependentUpon>

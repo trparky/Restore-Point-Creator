@@ -147,6 +147,7 @@ Partial Class Form1
         Me.pleaseWaitProgressBar = New Restore_Point_Creator.SmoothProgressBar()
         Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
         Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
+        Me.CheckLogFileSizeAtApplicationStartupToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.restorePointListContextMenu.SuspendLayout()
         Me.buttonTableLayout.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
@@ -521,7 +522,7 @@ Partial Class Form1
         '
         'AdditionalOptionsAndSettingsToolStripMenuItem
         '
-        Me.AdditionalOptionsAndSettingsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CheckSystemDrivesForFullShadowStorageToolStripMenuItem, Me.toolStripConfirmDeletions, Me.ConfirmRestorePointDeletionsInBatchesToolStripMenuItem, Me.toolStripLogRestorePointDeletions, Me.toolStripCloseAfterRestorePointIsCreated, Me.AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem, Me.BypassNoUACLauncherToolStripMenuItem, Me.LogProgramLoadsAndExitsToEventLogToolStripMenuItem, Me.ExtendedLoggingForScheduledTasks, Me.AskBeforeCreatingRestorePointToolStripMenuItem, Me.chkShowVersionInTitleBarToolStripMenuItem, Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem, Me.EnableAdvancedDebugModeToolStripMenuItem})
+        Me.AdditionalOptionsAndSettingsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CheckSystemDrivesForFullShadowStorageToolStripMenuItem, Me.toolStripConfirmDeletions, Me.ConfirmRestorePointDeletionsInBatchesToolStripMenuItem, Me.toolStripLogRestorePointDeletions, Me.toolStripCloseAfterRestorePointIsCreated, Me.AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem, Me.BypassNoUACLauncherToolStripMenuItem, Me.LogProgramLoadsAndExitsToEventLogToolStripMenuItem, Me.ExtendedLoggingForScheduledTasks, Me.AskBeforeCreatingRestorePointToolStripMenuItem, Me.chkShowVersionInTitleBarToolStripMenuItem, Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem, Me.EnableAdvancedDebugModeToolStripMenuItem, Me.CheckLogFileSizeAtApplicationStartupToolStripMenuItem})
         Me.AdditionalOptionsAndSettingsToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.increase
         Me.AdditionalOptionsAndSettingsToolStripMenuItem.Name = "AdditionalOptionsAndSettingsToolStripMenuItem"
         Me.AdditionalOptionsAndSettingsToolStripMenuItem.Size = New System.Drawing.Size(431, 22)
@@ -1076,6 +1077,13 @@ Partial Class Form1
         '
         Me.pleaseWaitMessageChanger.Interval = 250
         '
+        'CheckLogFileSizeAtApplicationStartupToolStripMenuItem
+        '
+        Me.CheckLogFileSizeAtApplicationStartupToolStripMenuItem.CheckOnClick = True
+        Me.CheckLogFileSizeAtApplicationStartupToolStripMenuItem.Name = "CheckLogFileSizeAtApplicationStartupToolStripMenuItem"
+        Me.CheckLogFileSizeAtApplicationStartupToolStripMenuItem.Size = New System.Drawing.Size(435, 22)
+        Me.CheckLogFileSizeAtApplicationStartupToolStripMenuItem.Text = "Check Log File Size at Application Startup"
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
@@ -1233,4 +1241,5 @@ Partial Class Form1
     Friend WithEvents EnableAdvancedDebugModeToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents BitBucketProjectSite As ToolStripMenuItem
+    Friend WithEvents CheckLogFileSizeAtApplicationStartupToolStripMenuItem As ToolStripMenuItem
 End Class

@@ -1048,6 +1048,18 @@ Namespace My
                 Me("boolPromptBeforeLogDeletion") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("True")>  _
+        Public Property boolCheckLogFileSize() As Boolean
+            Get
+                Return CType(Me("boolCheckLogFileSize"),Boolean)
+            End Get
+            Set
+                Me("boolCheckLogFileSize") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

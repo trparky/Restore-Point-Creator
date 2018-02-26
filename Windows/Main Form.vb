@@ -2191,8 +2191,19 @@ Public Class Form1
 
         doOldLogFileConversionRoutineAndStartLoadingRestorePoints()
 
-        If Functions.eventLogFunctions.isLogFileTooBig() AndAlso MsgBox("The program has detected that the application log file has exceded 1 MB in size, please consider getting rid of old log entries in the application event log." & vbCrLf & vbCrLf & "You can do so by opening the Application Event Log and when the window appears select some logs and press the Delete key on your keyboard (obviously older logs would be preferable)." & vbCrLf & vbCrLf & "Would you like to do that now?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, strMessageBoxTitle) = MsgBoxResult.Yes Then
-            ProgramEventLogToolStripMenuItem.PerformClick()
+        CheckLogFileSizeAtApplicationStartupToolStripMenuItem.Checked = My.Settings.boolCheckLogFileSize
+
+        If CheckLogFileSizeAtApplicationStartupToolStripMenuItem.Checked AndAlso Functions.eventLogFunctions.isLogFileTooBig() Then
+            Dim logFileTooBigWindowInstance As New Log_File_Bigger_than_1_MB
+            logFileTooBigWindowInstance.StartPosition = FormStartPosition.CenterParent
+            logFileTooBigWindowInstance.ShowDialog(Me)
+
+            If logFileTooBigWindowInstance.userResponse = Log_File_Bigger_than_1_MB.userResponseEnum.yes Then
+                ProgramEventLogToolStripMenuItem.PerformClick()
+            ElseIf logFileTooBigWindowInstance.userResponse = Log_File_Bigger_than_1_MB.userResponseEnum.dontAskAgain Then
+                CheckLogFileSizeAtApplicationStartupToolStripMenuItem.Checked = False
+                My.Settings.boolCheckLogFileSize = False
+            End If
         End If
     End Sub
 
@@ -2444,6 +2455,10 @@ Public Class Form1
 #End Region
 
 #Region "--== ToolStrip Click Events ==--"
+    Private Sub CheckLogFileSizeAtApplicationStartupToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CheckLogFileSizeAtApplicationStartupToolStripMenuItem.Click
+        My.Settings.boolCheckLogFileSize = CheckLogFileSizeAtApplicationStartupToolStripMenuItem.Checked
+    End Sub
+
     Private Sub BitBucketProjectSite_Click(sender As Object, e As EventArgs) Handles BitBucketProjectSite.Click
         Functions.support.launchURLInWebBrowser(globalVariables.webURLs.core.strBitBucketSite, "An error occurred when trying to launch the product's web site URL in your default browser. The URL has been copied to your Windows Clipboard for you to paste into the address bar in the browser of your choice.")
     End Sub
