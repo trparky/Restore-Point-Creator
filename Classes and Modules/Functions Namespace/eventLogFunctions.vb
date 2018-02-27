@@ -111,52 +111,58 @@
             End Try
         End Function
 
-        Public Function getLogObject(Optional boolAcquireMutexLock As Boolean = True) As List(Of restorePointCreatorExportedLog)
-            If boolAcquireMutexLock Then myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
-            Dim internalApplicationLog As New List(Of restorePointCreatorExportedLog)
+        ''' <summary>Reads the application log file and decodes it.</summary>
+        ''' <returns>Returns a List Object containing restorePointCreatorExportedLog Class Objects.</returns>
+        ''' <exception cref="myExceptions.unableToGetLockOnLogFile" />
+        Public Function getLogObject() As List(Of restorePointCreatorExportedLog)
+            If myLogFileLockingMutex.WaitOne(500) Then
+                Dim internalApplicationLog As New List(Of restorePointCreatorExportedLog)
 
-            If IO.File.Exists(strLogFile) Then
-                Try
-                    Dim boolDidWeHaveACorruptedLogFile As Boolean = False
+                If IO.File.Exists(strLogFile) Then
+                    Try
+                        Dim boolDidWeHaveACorruptedLogFile As Boolean = False
 
-                    Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Read)
-                        Using streamReader As New IO.StreamReader(fileStream)
-                            If (New IO.FileInfo(strLogFile)).Length = 0 Then
-                                internalApplicationLog.Add(New restorePointCreatorExportedLog With {
-                                    .logData = "The log file was found to be empty.",
-                                    .logType = EventLogEntryType.Error,
-                                    .unixTime = 0,
-                                    .logSource = "Restore Point Creator",
-                                    .logID = internalApplicationLog.Count,
-                                    .dateObject = Now.ToUniversalTime,
-                                    .boolException = False
-                                })
+                        Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Read)
+                            Using streamReader As New IO.StreamReader(fileStream)
+                                If (New IO.FileInfo(strLogFile)).Length = 0 Then
+                                    internalApplicationLog.Add(New restorePointCreatorExportedLog With {
+                                        .logData = "The log file was found to be empty.",
+                                        .logType = EventLogEntryType.Error,
+                                        .unixTime = 0,
+                                        .logSource = "Restore Point Creator",
+                                        .logID = internalApplicationLog.Count,
+                                        .dateObject = Now.ToUniversalTime,
+                                        .boolException = False
+                                    })
 
-                                boolDidWeHaveACorruptedLogFile = True
-                            Else
-                                Try
-                                    internalApplicationLog = xmlSerializerObject.Deserialize(streamReader)
-                                Catch ex As Exception
                                     boolDidWeHaveACorruptedLogFile = True
-                                    handleCorruptedXMLLogFile(internalApplicationLog, fileStream)
-                                End Try
-                            End If
+                                Else
+                                    Try
+                                        internalApplicationLog = xmlSerializerObject.Deserialize(streamReader)
+                                    Catch ex As Exception
+                                        boolDidWeHaveACorruptedLogFile = True
+                                        handleCorruptedXMLLogFile(internalApplicationLog, fileStream)
+                                    End Try
+                                End If
+                            End Using
                         End Using
-                    End Using
 
-                    If boolDidWeHaveACorruptedLogFile Then
-                        Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Write, IO.FileMode.Create, False)
-                            xmlSerializerObject.Serialize(fileStream, internalApplicationLog)
-                        End Using
-                    End If
-                Catch ex As myExceptions.unableToGetLockOnLogFile
-                    oldEventLogFunctions.boolShowErrorMessage = True
-                    oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
-                End Try
+                        If boolDidWeHaveACorruptedLogFile Then
+                            Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Write, IO.FileMode.Create, False)
+                                xmlSerializerObject.Serialize(fileStream, internalApplicationLog)
+                            End Using
+                        End If
+                    Catch ex As myExceptions.unableToGetLockOnLogFile
+                        oldEventLogFunctions.boolShowErrorMessage = True
+                        oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
+                    End Try
+                End If
+
+                myLogFileLockingMutex.ReleaseMutex()
+                Return internalApplicationLog
+            Else
+                Throw New myExceptions.unableToGetLockOnLogFile("Unable to acquire mutex lock on application log file.")
             End If
-
-            If boolAcquireMutexLock Then myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
-            Return internalApplicationLog
         End Function
 
         ''' <summary>Writes the contents of a MemoryStream to disk and verifies the contents of both. It returns a Boolean value indicating the results of the file operation.</summary>
