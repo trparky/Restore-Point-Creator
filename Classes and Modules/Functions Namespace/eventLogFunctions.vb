@@ -208,53 +208,56 @@
         End Function
 
         ''' <exception cref="myExceptions.logFileWriteToDiskFailureException" />
+        ''' <exception cref="myExceptions.unableToGetLockOnLogFile" />
         Public Sub getOldLogsFromWindowsEventLog()
-            Try
-                myLogFileLockingMutex.WaitOne()
-
-                If Not IO.File.Exists(strLogFile) Then createLogFile()
-                writeToApplicationLogFile("Starting log conversion process.", EventLogEntryType.Information, False, False)
-
-                Dim applicationLog As New List(Of restorePointCreatorExportedLog)
-                Dim logCount, longOldLogCount As Long
-                Dim stopwatch As Stopwatch = Stopwatch.StartNew
-
+            If myLogFileLockingMutex.WaitOne(500) Then
                 Try
-                    Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Read)
-                        Using streamReader As New IO.StreamReader(fileStream)
-                            applicationLog = xmlSerializerObject.Deserialize(streamReader)
+                    If Not IO.File.Exists(strLogFile) Then createLogFile(False) ' We already have a mutex lock, don't make a new one.
+                    writeToApplicationLogFile("Starting log conversion process.", EventLogEntryType.Information, False, False)
+
+                    Dim applicationLog As New List(Of restorePointCreatorExportedLog)
+                    Dim logCount, longOldLogCount As Long
+                    Dim stopwatch As Stopwatch = Stopwatch.StartNew
+
+                    Try
+                        Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Read)
+                            Using streamReader As New IO.StreamReader(fileStream)
+                                applicationLog = xmlSerializerObject.Deserialize(streamReader)
+                            End Using
                         End Using
-                    End Using
 
-                    logCount = applicationLog.Count
-                    longOldLogCount = logCount
+                        logCount = applicationLog.Count
+                        longOldLogCount = logCount
 
-                    exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strApplication, applicationLog, logCount)
-                    exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strSystemRestorePointCreator, applicationLog, logCount)
+                        exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strApplication, applicationLog, logCount)
+                        exportApplicationEventLogEntriesToFile(globalVariables.eventLog.strSystemRestorePointCreator, applicationLog, logCount)
 
-                    If Not writeDataToDiskAndVerifyIt(applicationLog) Then Throw New myExceptions.logFileWriteToDiskFailureException()
-                Catch ex As myExceptions.unableToGetLockOnLogFile
-                    oldEventLogFunctions.boolShowErrorMessage = True
-                    oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
-                    Exit Sub
+                        If Not writeDataToDiskAndVerifyIt(applicationLog) Then Throw New myExceptions.logFileWriteToDiskFailureException()
+                    Catch ex As myExceptions.unableToGetLockOnLogFile
+                        oldEventLogFunctions.boolShowErrorMessage = True
+                        oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
+                        Exit Sub
+                    End Try
+
+                    Dim longNumberOfImportedLogs As Long = applicationLog.Count - longOldLogCount
+
+                    writeToApplicationLogFile("Log conversion process complete.", EventLogEntryType.Information, False, False)
+
+                    If longNumberOfImportedLogs = 1 Then
+                        writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. 1 log entry was imported.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information, False, False)
+                    ElseIf longNumberOfImportedLogs > 1 Then
+                        writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. {1} log entries were imported.", stopwatch.ElapsedMilliseconds.ToString, longNumberOfImportedLogs.ToString("N0")), EventLogEntryType.Information, False, False)
+                    Else
+                        writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. No old log entries were detected.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information, False, False)
+                    End If
+                Catch ex As Exception
+                    writeCrashToApplicationLogFile(ex)
+                Finally
+                    myLogFileLockingMutex.ReleaseMutex()
                 End Try
-
-                Dim longNumberOfImportedLogs As Long = applicationLog.Count - longOldLogCount
-
-                writeToApplicationLogFile("Log conversion process complete.", EventLogEntryType.Information, False, False)
-
-                If longNumberOfImportedLogs = 1 Then
-                    writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. 1 log entry was imported.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information, False, False)
-                ElseIf longNumberOfImportedLogs > 1 Then
-                    writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. {1} log entries were imported.", stopwatch.ElapsedMilliseconds.ToString, longNumberOfImportedLogs.ToString("N0")), EventLogEntryType.Information, False, False)
-                Else
-                    writeToApplicationLogFile(String.Format("Converted log data to new log file format in {0}ms. No old log entries were detected.", stopwatch.ElapsedMilliseconds.ToString), EventLogEntryType.Information, False, False)
-                End If
-            Catch ex As Exception
-                writeCrashToApplicationLogFile(ex)
-            Finally
-                myLogFileLockingMutex.ReleaseMutex()
-            End Try
+            Else
+                Throw New myExceptions.unableToGetLockOnLogFile("Unable to acquire mutex lock on application log file.")
+            End If
         End Sub
 
         Private Sub createLogFile(Optional boolAcquireMutexLock As Boolean = True)
