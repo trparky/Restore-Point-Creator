@@ -411,9 +411,8 @@
             })
         End Sub
 
-        Public Sub markLastExceptionLogAsSubmitted(Optional boolAcquireMutexLock As Boolean = True)
+        Private Sub markLastExceptionLogAsSubmittedSub()
             Try
-                If boolAcquireMutexLock Then myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
                 Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Read)
@@ -436,14 +435,25 @@
 
                 writeDataToDiskAndVerifyIt(applicationLog)
             Catch ex As Exception
-            Finally
-                If boolAcquireMutexLock Then myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
             End Try
         End Sub
 
-        Public Sub markLogEntryAsSubmitted(inputLogID As Long, Optional boolAcquireMutexLock As Boolean = True)
+        ''' <exception cref="myExceptions.unableToGetLockOnLogFile" />
+        Public Sub markLastExceptionLogAsSubmitted(Optional boolAcquireMutexLock As Boolean = True)
+            If boolAcquireMutexLock Then
+                If myLogFileLockingMutex.WaitOne(500) Then
+                    markLastExceptionLogAsSubmittedSub()
+                    myLogFileLockingMutex.ReleaseMutex()
+                Else
+                    Throw New myExceptions.unableToGetLockOnLogFile("Unable to acquire mutex lock on application log file.")
+                End If
+            Else
+                markLastExceptionLogAsSubmittedSub()
+            End If
+        End Sub
+
+        Private Sub markLogEntryAsSubmittedSub(inputLogID As Long)
             Try
-                If boolAcquireMutexLock Then myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
                 Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Read)
@@ -463,9 +473,21 @@
 
                 writeDataToDiskAndVerifyIt(applicationLog)
             Catch ex As Exception
-            Finally
-                If boolAcquireMutexLock Then myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
             End Try
+        End Sub
+
+        ''' <exception cref="myExceptions.unableToGetLockOnLogFile" />
+        Public Sub markLogEntryAsSubmitted(inputLogID As Long, Optional boolAcquireMutexLock As Boolean = True)
+            If boolAcquireMutexLock Then
+                If myLogFileLockingMutex.WaitOne(500) Then
+                    markLogEntryAsSubmittedSub(inputLogID)
+                    myLogFileLockingMutex.ReleaseMutex()
+                Else
+                    Throw New myExceptions.unableToGetLockOnLogFile("Unable to acquire mutex lock on application log file.")
+                End If
+            Else
+                markLogEntryAsSubmittedSub(inputLogID)
+            End If
         End Sub
 
         Private Sub writeToApplicationLogFileSub(logMessage As String, eventLogType As EventLogEntryType, boolExceptionInput As Boolean)
