@@ -468,13 +468,8 @@
             End Try
         End Sub
 
-        ''' <summary>Writes a log entry to the System Event Log.</summary>
-        ''' <param name="logMessage">The text you want to have in your new System Event Log entry.</param>
-        ''' <param name="eventLogType">The type of log that you want your entry to be. The three major options are Error, Information, and Warning.</param>
-        ''' <example>functions.eventLogFunctions.writeToSystemEventLog("My Event Log Entry", EventLogEntryType.Information, False)</example>
-        Public Sub writeToApplicationLogFile(logMessage As String, eventLogType As EventLogEntryType, boolExceptionInput As Boolean, Optional boolAcquireMutexLock As Boolean = True)
+        Private Sub writeToApplicationLogFileSub(logMessage As String, eventLogType As EventLogEntryType, boolExceptionInput As Boolean)
             Try
-                If boolAcquireMutexLock Then myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
                 If Not IO.File.Exists(strLogFile) Then createLogFile()
@@ -518,9 +513,25 @@
                 oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
             Catch ex As Exception
                 oldEventLogFunctions.writeCrashToEventLog(ex)
-            Finally
-                If boolAcquireMutexLock Then myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
             End Try
+        End Sub
+
+        ''' <summary>Writes a log entry to the System Event Log.</summary>
+        ''' <param name="logMessage">The text you want to have in your new System Event Log entry.</param>
+        ''' <param name="eventLogType">The type of log that you want your entry to be. The three major options are Error, Information, and Warning.</param>
+        ''' <example>functions.eventLogFunctions.writeToSystemEventLog("My Event Log Entry", EventLogEntryType.Information, False)</example>
+        ''' <exception cref="myExceptions.unableToGetLockOnLogFile" />
+        Public Sub writeToApplicationLogFile(logMessage As String, eventLogType As EventLogEntryType, boolExceptionInput As Boolean, Optional boolAcquireMutexLock As Boolean = True)
+            If boolAcquireMutexLock Then
+                If myLogFileLockingMutex.WaitOne(500) Then
+                    writeToApplicationLogFileSub(logMessage, eventLogType, boolExceptionInput)
+                    myLogFileLockingMutex.ReleaseMutex()
+                Else
+                    Throw New myExceptions.unableToGetLockOnLogFile("Unable to acquire mutex lock on application log file.")
+                End If
+            Else
+                writeToApplicationLogFileSub(logMessage, eventLogType, boolExceptionInput)
+            End If
         End Sub
 
         Public Function convertLogTypeToText(errorType As EventLogEntryType) As String
