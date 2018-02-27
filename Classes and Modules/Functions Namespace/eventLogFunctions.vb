@@ -349,9 +349,8 @@
 
         ''' <summary>Deletes an individual log entry from the log.</summary>
         ''' <exception cref="myExceptions.logFileWriteToDiskFailureException" />
-        Public Sub deleteEntryFromLog(longIDToBeDeleted As Long, Optional boolAcquireMutexLock As Boolean = True)
+        Public Sub deleteEntryFromLog(longIDToBeDeleted As Long)
             Try
-                If boolAcquireMutexLock Then myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
                 Using fileStream As IO.FileStream = getLogFileIOFileStream(strLogFile, IO.FileAccess.Read)
@@ -369,8 +368,6 @@
                 oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
             Catch ex As Exception
                 ' Does nothing.
-            Finally
-                If boolAcquireMutexLock Then myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
             End Try
         End Sub
 

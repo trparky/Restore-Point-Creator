@@ -556,35 +556,40 @@
             End If
         End If
 
-        Dim boolSuccessfulDelete As Boolean = True
+        If Functions.eventLogFunctions.myLogFileLockingMutex.WaitOne(500) Then
+            Dim boolSuccessfulDelete As Boolean = True
 
-        If eventLogList.SelectedItems.Count = 1 Then
-            Try
-                Functions.eventLogFunctions.deleteEntryFromLog(DirectCast(eventLogList.SelectedItems(0), myListViewItemTypes.eventLogListEntry).longEventLogEntryID)
-            Catch ex As Functions.myExceptions.logFileWriteToDiskFailureException
-                boolSuccessfulDelete = False
-            End Try
+            If eventLogList.SelectedItems.Count = 1 Then
+                Try
+                    Functions.eventLogFunctions.deleteEntryFromLog(DirectCast(eventLogList.SelectedItems(0), myListViewItemTypes.eventLogListEntry).longEventLogEntryID)
+                Catch ex As Functions.myExceptions.logFileWriteToDiskFailureException
+                    boolSuccessfulDelete = False
+                End Try
+            Else
+                Dim logsToBeDeleted As New List(Of Long)
+                For Each item As myListViewItemTypes.eventLogListEntry In eventLogList.SelectedItems
+                    logsToBeDeleted.Add(item.longEventLogEntryID)
+                Next
+
+                Try
+                    Functions.eventLogFunctions.deleteEntryFromLog(logsToBeDeleted)
+                Catch ex As Functions.myExceptions.logFileWriteToDiskFailureException
+                    boolSuccessfulDelete = False
+                End Try
+
+                logsToBeDeleted = Nothing
+            End If
+
+            Functions.eventLogFunctions.myLogFileLockingMutex.ReleaseMutex()
+            btnClear.Enabled = False
+
+            If boolSuccessfulDelete Then
+                getFileDetailsAndActivateDataLoadThread()
+            Else
+                MsgBox("There was an error writing the new log file to disk.", MsgBoxStyle.Critical, Me.Text)
+            End If
         Else
-            Dim logsToBeDeleted As New List(Of Long)
-            For Each item As myListViewItemTypes.eventLogListEntry In eventLogList.SelectedItems
-                logsToBeDeleted.Add(item.longEventLogEntryID)
-            Next
-
-            Try
-                Functions.eventLogFunctions.deleteEntryFromLog(logsToBeDeleted)
-            Catch ex As Functions.myExceptions.logFileWriteToDiskFailureException
-                boolSuccessfulDelete = False
-            End Try
-
-            logsToBeDeleted = Nothing
-        End If
-
-        btnClear.Enabled = False
-
-        If boolSuccessfulDelete Then
-            getFileDetailsAndActivateDataLoadThread()
-        Else
-            MsgBox("There was an error writing the new log file to disk.", MsgBoxStyle.Critical, Me.Text)
+            MsgBox("Unable to acquire mutex lock on application log file, log file deletion routine aborted.", MsgBoxStyle.Critical, Me.Text)
         End If
     End Sub
 
