@@ -561,18 +561,8 @@
             stringBuilder.AppendLine("Time of Crash: " & Now.ToString)
             stringBuilder.AppendLine("Operating System: " & osVersionInfo.getFullOSVersionString())
             stringBuilder.AppendLine("System RAM: " & support.getSystemRAM())
-
-            If Debugger.IsAttached Then
-                stringBuilder.AppendLine("Debug Mode: True")
-            Else
-                stringBuilder.AppendLine("Debug Mode: False")
-            End If
-
-            If globalVariables.version.boolDebugBuild Then
-                stringBuilder.AppendLine("Debug Build: True")
-            Else
-                stringBuilder.AppendLine("Debug Build: False")
-            End If
+            stringBuilder.AppendLine("Debug Mode: " & If(Debugger.IsAttached, "True", "False"))
+            stringBuilder.AppendLine("Debug Build: " & If(globalVariables.version.boolDebugBuild, "True", "False"))
 
             Dim processorInfo As supportClasses.processorInfoClass = wmi.getSystemProcessor()
             stringBuilder.AppendLine("CPU: " & processorInfo.strProcessor)
