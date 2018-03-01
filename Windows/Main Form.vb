@@ -1666,7 +1666,7 @@ Public Class Form1
                 giveFeedbackToUser("Something weird happened. Your current version is newer than what is listed on the web site.") ' Gives feedback.
             Else
                 If updateType = Functions.support.updateType.release Then
-                    Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("A software update check was performed and it's been determined that you already have the latest version. The current version is {0} Build {1}.", remoteVersion, remoteBuild), EventLogEntryType.Information, False) ' Log it.
+                    Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("A software update check was performed and it's been determined that you already have the latest version. The current version in the {2} update channel is {0} Build {1}.", remoteVersion, remoteBuild, My.Settings.updateChannel), EventLogEntryType.Information, False) ' Log it.
                 ElseIf updateType = Functions.support.updateType.beta Then
                     If My.Settings.onlyGiveMeRCs Then
                         Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("A software update check was performed and there's a new version but you have specified that you only want release candidate versions. The new version is {0} Build {1} Public Beta {2}.", remoteVersion, remoteBuild, strRemoteBetaRCVersion), EventLogEntryType.Information, False) ' Log it.
