@@ -566,18 +566,11 @@
                     boolSuccessfulDelete = False
                 End Try
             Else
-                Dim logsToBeDeleted As New List(Of Long)
-                For Each item As myListViewItemTypes.eventLogListEntry In eventLogList.SelectedItems
-                    logsToBeDeleted.Add(item.longEventLogEntryID)
-                Next
-
                 Try
-                    Functions.eventLogFunctions.deleteEntryFromLog(logsToBeDeleted)
+                    Functions.eventLogFunctions.deleteEntryFromLog(eventLogList.SelectedItems)
                 Catch ex As Functions.myExceptions.logFileWriteToDiskFailureException
                     boolSuccessfulDelete = False
                 End Try
-
-                logsToBeDeleted = Nothing
             End If
 
             Functions.eventLogFunctions.myLogFileLockingMutex.ReleaseMutex()

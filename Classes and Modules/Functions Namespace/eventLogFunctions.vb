@@ -338,7 +338,7 @@
 
         ''' <summary>Deletes a list of individual log entries from the log.</summary>
         ''' <exception cref="myExceptions.logFileWriteToDiskFailureException" />
-        Public Sub deleteEntryFromLog(idsOfLogsToBeDeleted As List(Of Long))
+        Public Sub deleteEntryFromLog(selectedLogEntries As ListView.SelectedListViewItemCollection)
             Try
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
@@ -348,8 +348,8 @@
                     End Using
                 End Using
 
-                For Each longIDToBeDeleted As Long In idsOfLogsToBeDeleted
-                    deleteEntryFromLogSubRoutine(applicationLog, longIDToBeDeleted)
+                For Each item As myListViewItemTypes.eventLogListEntry In selectedLogEntries
+                    deleteEntryFromLogSubRoutine(applicationLog, item.longEventLogEntryID)
                 Next
 
                 applicationLog = reIDTheLogEntries(applicationLog)
