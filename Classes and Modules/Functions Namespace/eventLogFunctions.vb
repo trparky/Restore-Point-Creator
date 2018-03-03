@@ -260,9 +260,8 @@
             End If
         End Sub
 
-        Private Sub createLogFile(Optional boolAcquireMutexLock As Boolean = True)
+        Private Sub createLogFileSub()
             Try
-                If boolAcquireMutexLock Then myLogFileLockingMutex.WaitOne() ' We wait here until any other code that's working with the log file is finished executing.
                 Dim applicationLog As New List(Of restorePointCreatorExportedLog)
 
                 applicationLog.Add(New restorePointCreatorExportedLog With {
@@ -294,12 +293,23 @@
                 Catch ex As myExceptions.unableToGetLockOnLogFile
                     oldEventLogFunctions.boolShowErrorMessage = True
                     oldEventLogFunctions.writeCrashToEventLog(ex.innerIOException)
-                Finally
-                    If boolAcquireMutexLock Then myLogFileLockingMutex.ReleaseMutex() ' Release the mutex so that other code can work with the log file.
                 End Try
             Catch ex As Exception
                 MsgBox(ex.Message)
             End Try
+        End Sub
+
+        Private Sub createLogFile(Optional boolAcquireMutexLock As Boolean = True)
+            If boolAcquireMutexLock Then
+                If myLogFileLockingMutex.WaitOne(500) Then
+                    createLogFileSub()
+                    myLogFileLockingMutex.ReleaseMutex()
+                Else
+                    Throw New myExceptions.unableToGetLockOnLogFile("Unable to acquire mutex lock on application log file.")
+                End If
+            Else
+                createLogFileSub()
+            End If
         End Sub
 
         ''' <summary>A function that re-IDs all of the log entries.</summary>
