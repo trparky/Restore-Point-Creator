@@ -157,12 +157,30 @@ Namespace Functions.BCD
                     ' This calls the "GetElement" API and stores the result as a ManagementBaseObject.
                     Dim getElementInvokationResults As ManagementBaseObject = currentBootloader.InvokeMethod("GetElement", getElementParameters, Nothing)
 
-                    ' The returned value is an Object but we know that it's really a Short (or 16-bit Integer) so we convert it to a Short then
-                    ' DirectCast it to a BcdLibrary_SafeBoot Type to get the Safe Mode Boot Flag value (Minimal or with Networking).
-                    Dim shortReturnValue As Short
-                    If Short.TryParse(getElementInvokationResults.Properties("ReturnValue").Value.ToString, shortReturnValue) Then
-                        safeModeBootType = DirectCast(shortReturnValue, BcdLibrary_SafeBoot)
+                    ' Now we DirectCast the ReturnValue's value to a Boolean and then check it.
+                    If DirectCast(getElementInvokationResults.Properties("ReturnValue").Value, Boolean) Then
+                        ' The ReturnValue's value is True so we assume that the system IS set up
+                        ' to boot to Safe Mode. Now we need to get more data from the system.
+
+                        ' We are now going to find out what kind of Safe Mode boot that the system is setup to
+                        ' boot to. We do this by DirectCast'ing the Element's value to a ManagementBaseObject.
+                        Dim elementResult As ManagementBaseObject = DirectCast(getElementInvokationResults.Properties("Element").Value, ManagementBaseObject)
+
+                        ' We create a Short Object to store the value.
+                        Dim shortReturnedProperty As Short
+
+                        ' And now we try to parse the Integer value from the elementResult properties collection.
+                        If Short.TryParse(elementResult.Properties("Integer").Value.ToString, shortReturnedProperty) Then
+                            ' Good, the parsing of the value from the ManagementBaseObject was successful but we need to do some additional
+                            ' things with the data, namely DirectCast the shortReturnedProperty into a BcdLibrary_SafeBoot Type to get the
+                            ' Safe Mode Boot Flag value (Minimal or with Networking).
+                            safeModeBootType = DirectCast(shortReturnedProperty, BcdLibrary_SafeBoot)
+                        Else
+                            ' The parsing failed so we assume that the system isn't set up to boot to Safe Mode.
+                            boolResult = False
+                        End If
                     Else
+                        ' The ReturnValue's value is False so we assume that the system isn't set up to boot to Safe Mode.
                         boolResult = False
                     End If
                 End If
