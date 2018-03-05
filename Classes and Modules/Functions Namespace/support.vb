@@ -665,8 +665,16 @@ Namespace Functions.support
                 Dim bcdEditor As New BCD.bcdEditor()
 
                 If bcdEditor.getSafeModeBootStatus() Then
+                    eventLogFunctions.writeToApplicationLogFile("The Safe Mode Boot flag has been detected, now attempting to remove it so the system can boot into normal mode.", EventLogEntryType.Information, False)
                     bcdEditor.removeSafeModeBootFlag()
-                    eventLogFunctions.writeToApplicationLogFile("Successfully removed Safe Mode Boot flag.", EventLogEntryType.Information, False)
+
+                    If bcdEditor.getSafeModeBootStatus() Then
+                        eventLogFunctions.writeToApplicationLogFile("Something went wrong, the Safe Mode Boot flag still exists.", EventLogEntryType.Error, False)
+                    Else
+                        eventLogFunctions.writeToApplicationLogFile("The Safe Mode Boot flag has been successfully removed.", EventLogEntryType.Information, False)
+                    End If
+                Else
+                    eventLogFunctions.writeToApplicationLogFile("No Safe Mode Boot flag has been detected.", EventLogEntryType.Information, False)
                 End If
 
                 bcdEditor.dispose()
