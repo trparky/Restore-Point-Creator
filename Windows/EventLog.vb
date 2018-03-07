@@ -526,11 +526,13 @@
 
     Private Sub logFileWatcher_Changed(sender As Object, e As IO.FileSystemEventArgs) Handles logFileWatcher.Changed
         If Functions.eventLogFunctions.myLogFileLockingMutex.WaitOne(1000) Then
+            Functions.eventLogFunctions.strMutexAcquiredWhere = "Mutex acquired in logFileWatcher Changed event."
             If e.ChangeType = IO.WatcherChangeTypes.Changed Then
                 ' This hack is required because of a bug in the File System Watcher that causes it to fire multiple events one after
                 ' another even though there was only one change to the file we are watching. ARG Microsoft! You stupid idiots!
                 If (Date.Now.Subtract(dateLastFileSystemWatcherEventRaised).TotalMilliseconds < 500) Then
                     Functions.eventLogFunctions.myLogFileLockingMutex.ReleaseMutex()
+                    Functions.eventLogFunctions.strMutexAcquiredWhere = ""
                     Exit Sub ' Crap, multiple events have been fired... we need to exit this routine.
                 End If
                 dateLastFileSystemWatcherEventRaised = Date.Now
@@ -544,6 +546,7 @@
             End If
 
             Functions.eventLogFunctions.myLogFileLockingMutex.ReleaseMutex()
+            Functions.eventLogFunctions.strMutexAcquiredWhere = ""
         End If
     End Sub
 
@@ -557,6 +560,7 @@
         End If
 
         If Functions.eventLogFunctions.myLogFileLockingMutex.WaitOne(500) Then
+            Functions.eventLogFunctions.strMutexAcquiredWhere = "Mutex acquired in log entry deletion routine."
             Dim boolSuccessfulDelete As Boolean = True
 
             If eventLogList.SelectedItems.Count = 1 Then
@@ -574,6 +578,7 @@
             End If
 
             Functions.eventLogFunctions.myLogFileLockingMutex.ReleaseMutex()
+            Functions.eventLogFunctions.strMutexAcquiredWhere = ""
             btnClear.Enabled = False
 
             If boolSuccessfulDelete Then

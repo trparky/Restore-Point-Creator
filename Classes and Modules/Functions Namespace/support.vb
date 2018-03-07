@@ -239,7 +239,8 @@ Namespace Functions.support
                     GetType(StackOverflowException),
                     GetType(PlatformNotSupportedException),
                     GetType(NotSupportedException),
-                    GetType(UnauthorizedAccessException)
+                    GetType(UnauthorizedAccessException),
+                    GetType(myExceptions.unableToGetLockOnLogFile)
                 }
 
                 If listExceptionTypes.Contains(exceptionType) Then
@@ -318,6 +319,8 @@ Namespace Functions.support
                         Dim StackOverflowExceptionObject As StackOverflowException = DirectCast(rawExceptionObject, StackOverflowException)
                         stringBuilder.AppendLine(String.Format("Source: {0}", StackOverflowExceptionObject.Source))
                         addJSONedExtendedExceptionDataPackage(StackOverflowExceptionObject, stringBuilder)
+                    ElseIf exceptionType.Equals(GetType(myExceptions.unableToGetLockOnLogFile)) Then
+                        If Not String.IsNullOrWhiteSpace(eventLogFunctions.strMutexAcquiredWhere) Then stringBuilder.AppendLine("Mutex Last Acquired Where: " & eventLogFunctions.strMutexAcquiredWhere)
                     End If
 
                     addJSONedExtendedExceptionDataPackage(rawExceptionObject, stringBuilder)

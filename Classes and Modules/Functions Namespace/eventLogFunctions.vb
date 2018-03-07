@@ -7,6 +7,7 @@
         Private ReadOnly boolCachedCanIWriteThereResults As Boolean
         Private ReadOnly xmlSerializerObject As Xml.Serialization.XmlSerializer
         Public myLogFileLockingMutex As New Threading.Mutex(False, "restorepointcreatorlogfilemutex")
+        Public strMutexAcquiredWhere As String
 
         ' All operations on the log file are done using atomic file transactions. This means that until we have verified that
         ' all data has been written to disk after changing the log file the original file remains intact because the original
@@ -116,6 +117,7 @@
         ''' <exception cref="myExceptions.unableToGetLockOnLogFile" />
         Public Function getLogObject() As List(Of restorePointCreatorExportedLog)
             If myLogFileLockingMutex.WaitOne(500) Then
+                strMutexAcquiredWhere = "Mutex acquired in getLogObject()."
                 Dim internalApplicationLog As New List(Of restorePointCreatorExportedLog)
 
                 If IO.File.Exists(strLogFile) Then
@@ -159,6 +161,7 @@
                 End If
 
                 myLogFileLockingMutex.ReleaseMutex()
+                strMutexAcquiredWhere = ""
                 Return internalApplicationLog
             Else
                 Throw New myExceptions.unableToGetLockOnLogFile("Unable to acquire mutex lock on application log file.")
@@ -211,6 +214,7 @@
         ''' <exception cref="myExceptions.unableToGetLockOnLogFile" />
         Public Sub getOldLogsFromWindowsEventLog()
             If myLogFileLockingMutex.WaitOne(500) Then
+                strMutexAcquiredWhere = "Mutex acquired in getOldLogsFromWindowsEventLog()."
                 Try
                     If Not IO.File.Exists(strLogFile) Then createLogFile(False) ' We already have a mutex lock, don't make a new one.
                     writeToApplicationLogFile("Starting log conversion process.", EventLogEntryType.Information, False, False)
@@ -254,6 +258,7 @@
                     writeCrashToApplicationLogFile(ex)
                 Finally
                     myLogFileLockingMutex.ReleaseMutex()
+                    strMutexAcquiredWhere = ""
                 End Try
             Else
                 Throw New myExceptions.unableToGetLockOnLogFile("Unable to acquire mutex lock on application log file.")
@@ -302,8 +307,10 @@
         Private Sub createLogFile(Optional boolAcquireMutexLock As Boolean = True)
             If boolAcquireMutexLock Then
                 If myLogFileLockingMutex.WaitOne(500) Then
+                    strMutexAcquiredWhere = "Mutex acquired in createLogFile()."
                     createLogFileSub()
                     myLogFileLockingMutex.ReleaseMutex()
+                    strMutexAcquiredWhere = ""
                 Else
                     Throw New myExceptions.unableToGetLockOnLogFile("Unable to acquire mutex lock on application log file.")
                 End If
@@ -449,8 +456,10 @@
         Public Sub markLastExceptionLogAsSubmitted(Optional boolAcquireMutexLock As Boolean = True)
             If boolAcquireMutexLock Then
                 If myLogFileLockingMutex.WaitOne(500) Then
+                    strMutexAcquiredWhere = "Mutex acquired in markLastExceptionLogAsSubmitted()."
                     markLastExceptionLogAsSubmittedSub()
                     myLogFileLockingMutex.ReleaseMutex()
+                    strMutexAcquiredWhere = ""
                 Else
                     Throw New myExceptions.unableToGetLockOnLogFile("Unable to acquire mutex lock on application log file.")
                 End If
@@ -487,8 +496,10 @@
         Public Sub markLogEntryAsSubmitted(inputLogID As Long, Optional boolAcquireMutexLock As Boolean = True)
             If boolAcquireMutexLock Then
                 If myLogFileLockingMutex.WaitOne(500) Then
+                    strMutexAcquiredWhere = "Mutex acquired in markLogEntryAsSubmitted()."
                     markLogEntryAsSubmittedSub(inputLogID)
                     myLogFileLockingMutex.ReleaseMutex()
+                    strMutexAcquiredWhere = ""
                 Else
                     Throw New myExceptions.unableToGetLockOnLogFile("Unable to acquire mutex lock on application log file.")
                 End If
@@ -553,8 +564,10 @@
         Public Sub writeToApplicationLogFile(logMessage As String, eventLogType As EventLogEntryType, boolExceptionInput As Boolean, Optional boolAcquireMutexLock As Boolean = True)
             If boolAcquireMutexLock Then
                 If myLogFileLockingMutex.WaitOne(500) Then
+                    strMutexAcquiredWhere = "Mutex acquired in writeToApplicationLogFileSub()."
                     writeToApplicationLogFileSub(logMessage, eventLogType, boolExceptionInput)
                     myLogFileLockingMutex.ReleaseMutex()
+                    strMutexAcquiredWhere = ""
                 Else
                     Throw New myExceptions.unableToGetLockOnLogFile("Unable to acquire mutex lock on application log file.")
                 End If
