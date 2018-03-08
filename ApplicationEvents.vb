@@ -381,7 +381,15 @@ Namespace My
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.deleteOldRestorePoints, StringComparison.OrdinalIgnoreCase) Then
-                            Functions.startupFunctions.deleteOldRestorePoints()
+                            If Functions.eventLogFunctions.myLogFileLockingMutex.WaitOne(500) Then
+                                Functions.eventLogFunctions.strMutexAcquiredWhere = "Mutex acquired in " & globalVariables.commandLineSwitches.deleteOldRestorePoints & " command line argument routine."
+
+                                Functions.startupFunctions.deleteOldRestorePoints()
+
+                                Functions.eventLogFunctions.myLogFileLockingMutex.ReleaseMutex()
+                                Functions.eventLogFunctions.strMutexAcquiredWhere = Nothing
+                            End If
+
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints, StringComparison.OrdinalIgnoreCase) Then
