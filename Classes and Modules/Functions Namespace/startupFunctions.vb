@@ -119,17 +119,21 @@ Namespace Functions.startupFunctions
             If deleteOldRestorePointCommandLineCount <> 0 Then
                 Dim numberOfRestorePoints As Integer = wmi.getNumberOfRestorePoints()
 
-                If deleteOldRestorePointCommandLineCount < numberOfRestorePoints Then
+                If deleteOldRestorePointCommandLineCount < numberOfRestorePoints AndAlso eventLogFunctions.myLogFileLockingMutex.WaitOne(500) Then
+                    eventLogFunctions.strMutexAcquiredWhere = "Mutex acquired in doKeepXNumberOfRestorePointsRoutine()."
                     restorePointStuff.writeSystemRestorePointsToApplicationLogs()
 
                     wmi.doDeletingOfXNumberOfRestorePoints(deleteOldRestorePointCommandLineCount)
 
                     While numberOfRestorePoints = wmi.getNumberOfRestorePoints()
-                        Threading.Thread.Sleep(500)
+                            Threading.Thread.Sleep(500)
                     End While
 
                     restorePointStuff.writeSystemRestorePointsToApplicationLogs()
-                    eventLogFunctions.writeToApplicationLogFile("Deletion of X number of restore points complete.", EventLogEntryType.Information, False, True)
+                    eventLogFunctions.writeToApplicationLogFile("Deletion of X number of restore points complete.", EventLogEntryType.Information, False, False)
+
+                    eventLogFunctions.myLogFileLockingMutex.ReleaseMutex()
+                    eventLogFunctions.strMutexAcquiredWhere = Nothing
                 End If
             End If
 
@@ -138,55 +142,65 @@ Namespace Functions.startupFunctions
         End Sub
 
         Public Sub doScheduledRestorePointRoutine(ByRef registryKey As RegistryKey, ByVal boolAreWeAnAdministrator As Boolean)
-            Dim restorePointNameForScheduledTasks As String = globalVariables.strDefaultNameForScheduledTasks
-            Dim boolExtendedLoggingForScheduledTasks As Boolean = True
-            Dim boolWriteRestorePointListToLog As Boolean = True
-            Dim oldNewestRestorePointID As Integer
+            If eventLogFunctions.myLogFileLockingMutex.WaitOne(500) Then
+                eventLogFunctions.strMutexAcquiredWhere = "Mutex acquired in doScheduledRestorePointRoutine()."
 
-            registryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+                Dim restorePointNameForScheduledTasks As String = globalVariables.strDefaultNameForScheduledTasks
+                Dim boolExtendedLoggingForScheduledTasks As Boolean = True
+                Dim boolWriteRestorePointListToLog As Boolean = True
+                Dim oldNewestRestorePointID As Integer
 
-            If registryKey IsNot Nothing Then
-                restorePointNameForScheduledTasks = registryKey.GetValue("Custom Name for Scheduled Restore Points", globalVariables.strDefaultNameForScheduledTasks)
+                registryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
 
-                boolExtendedLoggingForScheduledTasks = registryStuff.getBooleanValueFromRegistry(registryKey, "Extended Logging For Scheduled Tasks", True)
-                boolWriteRestorePointListToLog = registryStuff.getBooleanValueFromRegistry(registryKey, globalVariables.strWriteRestorePointListToApplicationLogRegistryValue, True)
+                If registryKey IsNot Nothing Then
+                    restorePointNameForScheduledTasks = registryKey.GetValue("Custom Name for Scheduled Restore Points", globalVariables.strDefaultNameForScheduledTasks)
 
-                registryKey.Close()
-                registryKey.Dispose()
-                registryKey = Nothing
+                    boolExtendedLoggingForScheduledTasks = registryStuff.getBooleanValueFromRegistry(registryKey, "Extended Logging For Scheduled Tasks", True)
+                    boolWriteRestorePointListToLog = registryStuff.getBooleanValueFromRegistry(registryKey, globalVariables.strWriteRestorePointListToApplicationLogRegistryValue, True)
+
+                    registryKey.Close()
+                    registryKey.Dispose()
+                    registryKey = Nothing
+                End If
+
+                If boolExtendedLoggingForScheduledTasks = True Then
+                    eventLogFunctions.writeToApplicationLogFile(String.Format("Starting scheduled restore point job. Task running as user {0}. There are currently {1} system restore point(s) on this system.", Environment.UserName, wmi.getNumberOfRestorePoints()), EventLogEntryType.Information, False)
+                    eventLogFunctions.writeToApplicationLogFile(String.Format("Starting scheduled restore point job. Task running as user {0}. There are currently {1} system restore point(s) on this system.", Environment.UserName, wmi.getNumberOfRestorePoints()), EventLogEntryType.Information, False, False)
+                Else
+                    eventLogFunctions.writeToApplicationLogFile(String.Format("Starting scheduled restore point job. Task running As user {0}.", Environment.UserName), EventLogEntryType.Information, False)
+                    eventLogFunctions.writeToApplicationLogFile(String.Format("Starting scheduled restore point job. Task running As user {0}.", Environment.UserName), EventLogEntryType.Information, False, False)
+                End If
+
+                If boolAreWeAnAdministrator Then writeLastRunFile()
+
+                If boolExtendedLoggingForScheduledTasks = True Then oldNewestRestorePointID = wmi.getNewestSystemRestorePointID()
+
+                restorePointStuff.createScheduledSystemRestorePoint(restorePointNameForScheduledTasks)
+
+                If boolExtendedLoggingForScheduledTasks = True Then
+                    ' We wait here with this loop until the system's has the restore point created.
+                    While oldNewestRestorePointID = wmi.getNewestSystemRestorePointID()
+                        ' Does nothing, just loops and sleeps for half a second.
+                        Threading.Thread.Sleep(500)
+                    End While
+                End If
+
+                If boolExtendedLoggingForScheduledTasks And boolWriteRestorePointListToLog Then restorePointStuff.writeSystemRestorePointsToApplicationLogs()
+
+                If registryStuff.getBooleanValueFromRegistry(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False), "Delete Old Restore Points", False) Then
+                    deleteOldRestorePoints()
+                End If
+
+                If globalVariables.KeepXAmountOfRestorePoints = True Then
+                    wmi.doDeletingOfXNumberOfRestorePoints(globalVariables.KeepXAmountofRestorePointsValue)
+                End If
+
+                eventLogFunctions.writeToApplicationLogFile("Scheduled restore point job complete.", EventLogEntryType.Information, False)
+                eventLogFunctions.writeToApplicationLogFile("Scheduled restore point job complete.", EventLogEntryType.Information, False, False)
+
+                eventLogFunctions.myLogFileLockingMutex.ReleaseMutex()
+                eventLogFunctions.strMutexAcquiredWhere = Nothing
             End If
-
-            If boolExtendedLoggingForScheduledTasks = True Then
-                eventLogFunctions.writeToApplicationLogFile(String.Format("Starting scheduled restore point job. Task running as user {0}. There are currently {1} system restore point(s) on this system.", Environment.UserName, wmi.getNumberOfRestorePoints()), EventLogEntryType.Information, False)
-            Else
-                eventLogFunctions.writeToApplicationLogFile(String.Format("Starting scheduled restore point job. Task running As user {0}.", Environment.UserName), EventLogEntryType.Information, False)
-            End If
-
-            If boolAreWeAnAdministrator Then writeLastRunFile()
-
-            If boolExtendedLoggingForScheduledTasks = True Then oldNewestRestorePointID = wmi.getNewestSystemRestorePointID()
-
-            restorePointStuff.createScheduledSystemRestorePoint(restorePointNameForScheduledTasks)
-
-            If boolExtendedLoggingForScheduledTasks = True Then
-                ' We wait here with this loop until the system's has the restore point created.
-                While oldNewestRestorePointID = wmi.getNewestSystemRestorePointID()
-                    ' Does nothing, just loops and sleeps for half a second.
-                    Threading.Thread.Sleep(500)
-                End While
-            End If
-
-            If boolExtendedLoggingForScheduledTasks And boolWriteRestorePointListToLog Then restorePointStuff.writeSystemRestorePointsToApplicationLogs()
-
-            If registryStuff.getBooleanValueFromRegistry(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False), "Delete Old Restore Points", False) Then
-                deleteOldRestorePoints()
-            End If
-
-            If globalVariables.KeepXAmountOfRestorePoints = True Then
-                wmi.doDeletingOfXNumberOfRestorePoints(globalVariables.KeepXAmountofRestorePointsValue)
-            End If
-
-            eventLogFunctions.writeToApplicationLogFile("Scheduled restore point job complete.", EventLogEntryType.Information, False)
         End Sub
 
         Public Sub doCreateCustomRestorePointRoutine(boolAreWeInSafeMode As Boolean)
