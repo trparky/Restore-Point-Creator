@@ -140,9 +140,9 @@ Namespace Functions.wmi
                                         Exit Sub
                                     Else
                                         If numberOfRestorePointsToBeDeleted = 1 Then
-                                            eventLogFunctions.writeToApplicationLogFile("Preparing to delete 1 restore point.", EventLogEntryType.Information, False)
+                                            eventLogFunctions.writeToApplicationLogFile("Preparing to delete 1 restore point.", EventLogEntryType.Information, False, False)
                                         Else
-                                            eventLogFunctions.writeToApplicationLogFile("Preparing to delete " & numberOfRestorePointsToBeDeleted & " restore points.", EventLogEntryType.Information, False)
+                                            eventLogFunctions.writeToApplicationLogFile("Preparing to delete " & numberOfRestorePointsToBeDeleted & " restore points.", EventLogEntryType.Information, False, False)
                                         End If
 
                                         For Each managementObject As Management.ManagementObject In managementObjectCollection.Cast(Of Management.ManagementObject).ToList.OrderBy(Function(managementObject2 As Management.ManagementObject) Integer.Parse(managementObject2("SequenceNumber").ToString))
@@ -152,7 +152,7 @@ Namespace Functions.wmi
                                                 numberOfRestorePointsToBeDeleted -= 1
 
                                                 Dim restorePointCreationDate As Date = restorePointStuff.parseSystemRestorePointCreationDate(managementObject("CreationTime").ToString)
-                                                eventLogFunctions.writeToApplicationLogFile(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", managementObject("Description").ToString, restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information, False)
+                                                eventLogFunctions.writeToApplicationLogFile(String.Format("The user {3}/{4} deleted the restore point named ""{0}"" which was created on {1} at {2}.", managementObject("Description").ToString, restorePointCreationDate.ToShortDateString, restorePointCreationDate.ToShortTimeString, Environment.MachineName, Environment.UserName), EventLogEntryType.Information, False, False)
 
                                                 APIs.NativeMethods.SRRemoveRestorePoint(Integer.Parse(managementObject("SequenceNumber").ToString))
                                             End If
