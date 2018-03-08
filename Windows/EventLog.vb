@@ -532,7 +532,7 @@
                 ' another even though there was only one change to the file we are watching. ARG Microsoft! You stupid idiots!
                 If (Date.Now.Subtract(dateLastFileSystemWatcherEventRaised).TotalMilliseconds < 500) Then
                     Functions.eventLogFunctions.myLogFileLockingMutex.ReleaseMutex()
-                    Functions.eventLogFunctions.strMutexAcquiredWhere = ""
+                    Functions.eventLogFunctions.strMutexAcquiredWhere = Nothing
                     Exit Sub ' Crap, multiple events have been fired... we need to exit this routine.
                 End If
                 dateLastFileSystemWatcherEventRaised = Date.Now
@@ -546,7 +546,7 @@
             End If
 
             Functions.eventLogFunctions.myLogFileLockingMutex.ReleaseMutex()
-            Functions.eventLogFunctions.strMutexAcquiredWhere = ""
+            Functions.eventLogFunctions.strMutexAcquiredWhere = Nothing
         End If
     End Sub
 
@@ -578,7 +578,7 @@
             End If
 
             Functions.eventLogFunctions.myLogFileLockingMutex.ReleaseMutex()
-            Functions.eventLogFunctions.strMutexAcquiredWhere = ""
+            Functions.eventLogFunctions.strMutexAcquiredWhere = Nothing
             btnClear.Enabled = False
 
             If boolSuccessfulDelete Then

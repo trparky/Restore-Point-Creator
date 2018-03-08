@@ -161,7 +161,7 @@
                 End If
 
                 myLogFileLockingMutex.ReleaseMutex()
-                strMutexAcquiredWhere = ""
+                strMutexAcquiredWhere = Nothing
                 Return internalApplicationLog
             Else
                 Throw New myExceptions.unableToGetLockOnLogFile("Unable to acquire mutex lock on application log file.")
@@ -258,7 +258,7 @@
                     writeCrashToApplicationLogFile(ex)
                 Finally
                     myLogFileLockingMutex.ReleaseMutex()
-                    strMutexAcquiredWhere = ""
+                    strMutexAcquiredWhere = Nothing
                 End Try
             Else
                 Throw New myExceptions.unableToGetLockOnLogFile("Unable to acquire mutex lock on application log file.")
@@ -310,7 +310,7 @@
                     strMutexAcquiredWhere = "Mutex acquired in createLogFile()."
                     createLogFileSub()
                     myLogFileLockingMutex.ReleaseMutex()
-                    strMutexAcquiredWhere = ""
+                    strMutexAcquiredWhere = Nothing
                 Else
                     Throw New myExceptions.unableToGetLockOnLogFile("Unable to acquire mutex lock on application log file.")
                 End If
@@ -459,7 +459,7 @@
                     strMutexAcquiredWhere = "Mutex acquired in markLastExceptionLogAsSubmitted()."
                     markLastExceptionLogAsSubmittedSub()
                     myLogFileLockingMutex.ReleaseMutex()
-                    strMutexAcquiredWhere = ""
+                    strMutexAcquiredWhere = Nothing
                 Else
                     Throw New myExceptions.unableToGetLockOnLogFile("Unable to acquire mutex lock on application log file.")
                 End If
@@ -499,7 +499,7 @@
                     strMutexAcquiredWhere = "Mutex acquired in markLogEntryAsSubmitted()."
                     markLogEntryAsSubmittedSub(inputLogID)
                     myLogFileLockingMutex.ReleaseMutex()
-                    strMutexAcquiredWhere = ""
+                    strMutexAcquiredWhere = Nothing
                 Else
                     Throw New myExceptions.unableToGetLockOnLogFile("Unable to acquire mutex lock on application log file.")
                 End If
@@ -567,7 +567,7 @@
                     strMutexAcquiredWhere = "Mutex acquired in writeToApplicationLogFileSub()."
                     writeToApplicationLogFileSub(logMessage, eventLogType, boolExceptionInput)
                     myLogFileLockingMutex.ReleaseMutex()
-                    strMutexAcquiredWhere = ""
+                    strMutexAcquiredWhere = Nothing
                 Else
                     Throw New myExceptions.unableToGetLockOnLogFile("Unable to acquire mutex lock on application log file.")
                 End If
