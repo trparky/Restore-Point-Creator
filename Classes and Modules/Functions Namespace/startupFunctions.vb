@@ -155,10 +155,8 @@ Namespace Functions.startupFunctions
                 End Using
 
                 If boolExtendedLoggingForScheduledTasks = True Then
-                    eventLogFunctions.writeToApplicationLogFile(String.Format("Starting scheduled restore point job. Task running as user {0}. There are currently {1} system restore point(s) on this system.", Environment.UserName, wmi.getNumberOfRestorePoints()), EventLogEntryType.Information, False)
                     eventLogFunctions.writeToApplicationLogFile(String.Format("Starting scheduled restore point job. Task running as user {0}. There are currently {1} system restore point(s) on this system.", Environment.UserName, wmi.getNumberOfRestorePoints()), EventLogEntryType.Information, False, False)
                 Else
-                    eventLogFunctions.writeToApplicationLogFile(String.Format("Starting scheduled restore point job. Task running As user {0}.", Environment.UserName), EventLogEntryType.Information, False)
                     eventLogFunctions.writeToApplicationLogFile(String.Format("Starting scheduled restore point job. Task running As user {0}.", Environment.UserName), EventLogEntryType.Information, False, False)
                 End If
 
@@ -186,7 +184,6 @@ Namespace Functions.startupFunctions
                     wmi.doDeletingOfXNumberOfRestorePoints(globalVariables.KeepXAmountofRestorePointsValue)
                 End If
 
-                eventLogFunctions.writeToApplicationLogFile("Scheduled restore point job complete.", EventLogEntryType.Information, False)
                 eventLogFunctions.writeToApplicationLogFile("Scheduled restore point job complete.", EventLogEntryType.Information, False, False)
 
                 eventLogFunctions.myLogFileLockingMutex.ReleaseMutex()
@@ -429,7 +426,6 @@ Namespace Functions.startupFunctions
                 Dim boolLogDeletedRestorePoints As Boolean = registryStuff.getBooleanValueFromRegistry(Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey), "Log Restore Point Deletions", True)
 
                 If boolLogDeletedRestorePoints Then
-                    eventLogFunctions.writeToApplicationLogFile("Began processing of old System Restore Points.", EventLogEntryType.Information, False)
                     eventLogFunctions.writeToApplicationLogFile("Began processing of old System Restore Points.", EventLogEntryType.Information, False, False)
                 End If
 
@@ -447,7 +443,6 @@ Namespace Functions.startupFunctions
                                 numberOfOldRestorePointsDeleted += 1
 
                                 If boolLogDeletedRestorePoints = True Then
-                                    eventLogFunctions.writeToApplicationLogFile(String.Format("Deleted Restore Point named ""{0}"" which was created on {1} at {2}.", systemRestorePoint("Description"), systemRestorePointCreationDate.ToLongDateString, systemRestorePointCreationDate.ToShortTimeString), EventLogEntryType.Information, False)
                                     eventLogFunctions.writeToApplicationLogFile(String.Format("Deleted Restore Point named ""{0}"" which was created on {1} at {2}.", systemRestorePoint("Description"), systemRestorePointCreationDate.ToLongDateString, systemRestorePointCreationDate.ToShortTimeString), EventLogEntryType.Information, False, False)
                                 End If
                             End If
@@ -462,13 +457,10 @@ Namespace Functions.startupFunctions
 
                 If boolLogDeletedRestorePoints = True Then
                     If numberOfOldRestorePointsDeleted = 0 Then
-                        eventLogFunctions.writeToApplicationLogFile("End of processing old System Restore Points.  No old System Restore Point were deleted.", EventLogEntryType.Information, False)
                         eventLogFunctions.writeToApplicationLogFile("End of processing old System Restore Points.  No old System Restore Point were deleted.", EventLogEntryType.Information, False, False)
                     ElseIf numberOfOldRestorePointsDeleted = 1 Then
-                        eventLogFunctions.writeToApplicationLogFile("End of processing old System Restore Points.  1 old System Restore Point was deleted.", EventLogEntryType.Information, False)
                         eventLogFunctions.writeToApplicationLogFile("End of processing old System Restore Points.  1 old System Restore Point was deleted.", EventLogEntryType.Information, False, False)
                     Else
-                        eventLogFunctions.writeToApplicationLogFile(String.Format("End of processing old System Restore Points.  {0} old System Restore Points were deleted.", numberOfOldRestorePointsDeleted), EventLogEntryType.Information, False)
                         eventLogFunctions.writeToApplicationLogFile(String.Format("End of processing old System Restore Points.  {0} old System Restore Points were deleted.", numberOfOldRestorePointsDeleted), EventLogEntryType.Information, False, False)
                     End If
                 End If
