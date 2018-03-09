@@ -57,7 +57,7 @@ Namespace Functions.startupFunctions
             End If
         End Sub
 
-        Public Sub doKeepXNumberOfRestorePointsRoutine(ByRef registryKey As RegistryKey)
+        Public Sub doKeepXNumberOfRestorePointsRoutine()
             Dim deleteOldRestorePointCommandLineCount As Short
 
             ' This checks if the user provided a "-count" argument.
@@ -66,31 +66,26 @@ Namespace Functions.startupFunctions
 
                 ' First, let's see if the user provided a setting in an un-elevated execution of this program.
                 If My.Settings.deleteOldRestorePointCommandLineCount = 0 Then
-                    ' The user didn't so let's see if there's a setting in the Registry. We open the program's Registry Key here.
-                    registryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+                    Using registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+                        ' This checks to see if the Registry Key exists by doing a Null check.
+                        If registryKey IsNot Nothing Then
+                            ' The key does exist so let's pull our value from the Registry.
+                            Dim stringlocal_KeepXAmountofRestorePointsValue As String = registryKey.GetValue("Keep X Amount of Restore Points Value", "")
 
-                    ' This checks to see if the Registry Key exists by doing a Null check.
-                    If registryKey IsNot Nothing Then
-                        ' The key does exist so let's pull our value from the Registry.
-                        Dim stringlocal_KeepXAmountofRestorePointsValue As String = registryKey.GetValue("Keep X Amount of Restore Points Value", "")
-
-                        ' And let's close the Registry Object.
-                        registryKey.Close()
-                        registryKey.Dispose()
-
-                        ' OK, let's check to see if the value we pulled from the Registry is null.
-                        If String.IsNullOrEmpty(stringlocal_KeepXAmountofRestorePointsValue) Then
-                            giveNoCountGivenError() ' OK, it is so we give the user an error message.
-                        Else
-                            ' OK, the value we got from the Registry isn't null so we try to parse it. If it parses then what's inside the IF statement will not execute and this is just fine; things are OK so we can continue as normal.
-                            If Not Short.TryParse(stringlocal_KeepXAmountofRestorePointsValue, deleteOldRestorePointCommandLineCount) Then
-                                giveNoCountGivenError() ' We tried to parse it and we failed so we give the user an error message.
+                            ' OK, let's check to see if the value we pulled from the Registry is null.
+                            If String.IsNullOrEmpty(stringlocal_KeepXAmountofRestorePointsValue) Then
+                                giveNoCountGivenError() ' OK, it is so we give the user an error message.
+                            Else
+                                ' OK, the value we got from the Registry isn't null so we try to parse it. If it parses then what's inside the IF statement will not execute and this is just fine; things are OK so we can continue as normal.
+                                If Not Short.TryParse(stringlocal_KeepXAmountofRestorePointsValue, deleteOldRestorePointCommandLineCount) Then
+                                    giveNoCountGivenError() ' We tried to parse it and we failed so we give the user an error message.
+                                End If
                             End If
+                        Else
+                            ' OK, the registry key doesn't exist so we give the user an error message.
+                            giveNoCountGivenError()
                         End If
-                    Else
-                        ' OK, the registry key doesn't exist so we give the user an error message.
-                        giveNoCountGivenError()
-                    End If
+                    End Using
                 Else
                     ' Yes, the user did so let's work with it.
                     deleteOldRestorePointCommandLineCount = My.Settings.deleteOldRestorePointCommandLineCount
@@ -126,7 +121,7 @@ Namespace Functions.startupFunctions
                     wmi.doDeletingOfXNumberOfRestorePoints(deleteOldRestorePointCommandLineCount)
 
                     While numberOfRestorePoints = wmi.getNumberOfRestorePoints()
-                            Threading.Thread.Sleep(500)
+                        Threading.Thread.Sleep(500)
                     End While
 
                     restorePointStuff.writeSystemRestorePointsToApplicationLogs()
@@ -141,7 +136,7 @@ Namespace Functions.startupFunctions
             My.Settings.Save()
         End Sub
 
-        Public Sub doScheduledRestorePointRoutine(ByRef registryKey As RegistryKey, ByVal boolAreWeAnAdministrator As Boolean)
+        Public Sub doScheduledRestorePointRoutine(ByVal boolAreWeAnAdministrator As Boolean)
             If eventLogFunctions.myLogFileLockingMutex.WaitOne(500) Then
                 eventLogFunctions.strMutexAcquiredWhere = "Mutex acquired in doScheduledRestorePointRoutine()."
 
@@ -150,18 +145,14 @@ Namespace Functions.startupFunctions
                 Dim boolWriteRestorePointListToLog As Boolean = True
                 Dim oldNewestRestorePointID As Integer
 
-                registryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+                Using registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+                    If registryKey IsNot Nothing Then
+                        restorePointNameForScheduledTasks = registryKey.GetValue("Custom Name for Scheduled Restore Points", globalVariables.strDefaultNameForScheduledTasks)
 
-                If registryKey IsNot Nothing Then
-                    restorePointNameForScheduledTasks = registryKey.GetValue("Custom Name for Scheduled Restore Points", globalVariables.strDefaultNameForScheduledTasks)
-
-                    boolExtendedLoggingForScheduledTasks = registryStuff.getBooleanValueFromRegistry(registryKey, "Extended Logging For Scheduled Tasks", True)
-                    boolWriteRestorePointListToLog = registryStuff.getBooleanValueFromRegistry(registryKey, globalVariables.strWriteRestorePointListToApplicationLogRegistryValue, True)
-
-                    registryKey.Close()
-                    registryKey.Dispose()
-                    registryKey = Nothing
-                End If
+                        boolExtendedLoggingForScheduledTasks = registryStuff.getBooleanValueFromRegistry(registryKey, "Extended Logging For Scheduled Tasks", True)
+                        boolWriteRestorePointListToLog = registryStuff.getBooleanValueFromRegistry(registryKey, globalVariables.strWriteRestorePointListToApplicationLogRegistryValue, True)
+                    End If
+                End Using
 
                 If boolExtendedLoggingForScheduledTasks = True Then
                     eventLogFunctions.writeToApplicationLogFile(String.Format("Starting scheduled restore point job. Task running as user {0}. There are currently {1} system restore point(s) on this system.", Environment.UserName, wmi.getNumberOfRestorePoints()), EventLogEntryType.Information, False)

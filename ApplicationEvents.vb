@@ -65,7 +65,6 @@ Namespace My
             exceptionHandler.loadExceptionHandler()
 
             Dim commandLineArgument As String
-            Dim registryKey As RegistryKey
             Dim boolNoTask As Boolean = False ' Create a Boolean data type variable.
 
             If Functions.osVersionInfo.isThisAServerOS() = True Then
@@ -195,35 +194,30 @@ Namespace My
 
                     ' This checks if the user provided a "-count" argument.
                     If My.Application.CommandLineArgs.Count <> 2 Then
-                        ' No, the user didn't so let's do some stuff in the Registry. We open the program's Registry Key here.
-                        registryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+                        Using registryKey As registrykey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+                            ' This checks to see if the Registry Key exists by doing a Null check.
+                            If registryKey IsNot Nothing Then
+                                ' The key does exist so let's pull our value from the Registry.
+                                Dim stringlocal_KeepXAmountofRestorePointsValue As String = registryKey.GetValue("Keep X Amount of Restore Points Value", "")
 
-                        ' This checks to see if the Registry Key exists by doing a Null check.
-                        If registryKey IsNot Nothing Then
-                            ' The key does exist so let's pull our value from the Registry.
-                            Dim stringlocal_KeepXAmountofRestorePointsValue As String = registryKey.GetValue("Keep X Amount of Restore Points Value", "")
-
-                            ' And let's close the Registry Object.
-                            registryKey.Close()
-                            registryKey.Dispose()
-
-                            ' OK, let's check to see if the value we pulled from the Registry is null.
-                            If String.IsNullOrEmpty(stringlocal_KeepXAmountofRestorePointsValue) Then
-                                Functions.startupFunctions.giveNoCountGivenError() ' OK, it is so we give the user an error message.
-                            Else
-                                ' OK, the value we got from the Registry isn't null so we try to parse it now.
-                                If Short.TryParse(stringlocal_KeepXAmountofRestorePointsValue, local_KeepXAmountofRestorePointsValue) Then
-                                    ' OK, we were able to parse it so we save it to the application's settings to use it in the relaunch.
-                                    My.Settings.deleteOldRestorePointCommandLineCount = local_KeepXAmountofRestorePointsValue
-                                    My.Settings.Save()
+                                ' OK, let's check to see if the value we pulled from the Registry is null.
+                                If String.IsNullOrEmpty(stringlocal_KeepXAmountofRestorePointsValue) Then
+                                    Functions.startupFunctions.giveNoCountGivenError() ' OK, it is so we give the user an error message.
                                 Else
-                                    Functions.startupFunctions.giveNoCountGivenError() ' We tried to parse it and we failed so we give the user an error message.
+                                    ' OK, the value we got from the Registry isn't null so we try to parse it now.
+                                    If Short.TryParse(stringlocal_KeepXAmountofRestorePointsValue, local_KeepXAmountofRestorePointsValue) Then
+                                        ' OK, we were able to parse it so we save it to the application's settings to use it in the relaunch.
+                                        My.Settings.deleteOldRestorePointCommandLineCount = local_KeepXAmountofRestorePointsValue
+                                        My.Settings.Save()
+                                    Else
+                                        Functions.startupFunctions.giveNoCountGivenError() ' We tried to parse it and we failed so we give the user an error message.
+                                    End If
                                 End If
+                            Else
+                                ' OK, the registry key doesn't exist so we give the user an error message.
+                                Functions.startupFunctions.giveNoCountGivenError()
                             End If
-                        Else
-                            ' OK, the registry key doesn't exist so we give the user an error message.
-                            Functions.startupFunctions.giveNoCountGivenError()
-                        End If
+                        End Using
                     Else
                         ' OK, the user provided a second command line argument so let's check it out.
                         If My.Application.CommandLineArgs(1).Trim.StartsWith("-count", StringComparison.OrdinalIgnoreCase) Then
@@ -335,21 +329,17 @@ Namespace My
                 ' Ordinarily on Windows Vista and newer this code should not be needed but we have it in there to check if we do indeed have Administrator user rights.
                 If Not boolAreWeAnAdministrator Then Functions.support.reRunWithAdminUserRights()
 
-                registryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+                Using registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+                    If registryKey IsNot Nothing Then
+                        globalVariables.KeepXAmountOfRestorePoints = Functions.registryStuff.getBooleanValueFromRegistry(registryKey, "Keep X Amount of Restore Points", False)
 
-                If registryKey IsNot Nothing Then
-                    globalVariables.KeepXAmountOfRestorePoints = Functions.registryStuff.getBooleanValueFromRegistry(registryKey, "Keep X Amount of Restore Points", False)
+                        If globalVariables.KeepXAmountOfRestorePoints Then
+                            Short.TryParse(registryKey.GetValue("Keep X Amount of Restore Points Value", "-10"), globalVariables.KeepXAmountofRestorePointsValue)
+                        End If
 
-                    If globalVariables.KeepXAmountOfRestorePoints Then
-                        Short.TryParse(registryKey.GetValue("Keep X Amount of Restore Points Value", "-10"), globalVariables.KeepXAmountofRestorePointsValue)
+                        globalVariables.boolLogLoadsAndExits = Functions.registryStuff.getBooleanValueFromRegistry(registryKey, "Log Program Loads and Exits to Event Log", True)
                     End If
-
-                    globalVariables.boolLogLoadsAndExits = Functions.registryStuff.getBooleanValueFromRegistry(registryKey, "Log Program Loads and Exits to Event Log", True)
-
-                    registryKey.Close()
-                    registryKey.Dispose()
-                    registryKey = Nothing
-                End If
+                End Using
 
                 If My.Settings.UpdateRequired Then
                     My.Settings.Upgrade()
@@ -373,7 +363,7 @@ Namespace My
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.scheduledRestorePoint, StringComparison.OrdinalIgnoreCase) Then
-                            Functions.startupFunctions.doScheduledRestorePointRoutine(registryKey, boolAreWeAnAdministrator)
+                            Functions.startupFunctions.doScheduledRestorePointRoutine(boolAreWeAnAdministrator)
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals("-restoretopoint", StringComparison.OrdinalIgnoreCase) Then
@@ -393,7 +383,7 @@ Namespace My
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints, StringComparison.OrdinalIgnoreCase) Then
-                            Functions.startupFunctions.doKeepXNumberOfRestorePointsRoutine(registryKey)
+                            Functions.startupFunctions.doKeepXNumberOfRestorePointsRoutine()
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals("-prefscleanup", StringComparison.OrdinalIgnoreCase) Then
