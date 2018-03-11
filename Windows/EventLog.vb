@@ -76,7 +76,7 @@
                         .SubItems.Add(.logDate.ToString)
                     End If
 
-                    .SubItems.Add(logEntry.logID.ToString("N0"))
+                    .SubItems.Add(logEntry.logID.ToString)
 
                     .strEventLogText = Functions.support.removeSourceCodePathInfo(convertLineFeeds(logEntry.logData))
                     .longEventLogEntryID = logEntry.logID
