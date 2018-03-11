@@ -677,7 +677,7 @@ Namespace Functions.support
                         eventLogFunctions.writeToApplicationLogFile("The Safe Mode Boot flag has been successfully removed.", EventLogEntryType.Information, False)
                     End If
                 Else
-                    eventLogFunctions.writeToApplicationLogFile("No Safe Mode Boot flag has been detected.", EventLogEntryType.Information, False)
+                    If My.Settings.debug Then eventLogFunctions.writeToApplicationLogFile("No Safe Mode Boot flag has been detected.", EventLogEntryType.Information, False)
                 End If
 
                 bcdEditor.dispose()
