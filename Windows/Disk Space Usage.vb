@@ -178,45 +178,59 @@
                                 yPosition += 22 ' Advances the Y position down a bit so that we make room for the next object.
                                 xPosition = 12 ' Resets the X position back to the beginning of the line.
 
-                                shadowStorageFreeSpace = shadowStorageData.MaxSpace - shadowStorageData.UsedSpace
+                                If shadowStorageData.MaxSpace > shadowStorageData.UsedSpace Then
+                                    shadowStorageFreeSpace = shadowStorageData.MaxSpace - shadowStorageData.UsedSpace
 
-                                shadowStorageUsedPercentage = Functions.support.calculatePercentageValue(shadowStorageData.UsedSpace, shadowStorageData.MaxSpace)
-                                shadowStorageFreeSpacePercentage = 100 - shadowStorageUsedPercentage
-
-
-
-
-                                ' Creates "System Restore Capacity:" header.
-                                xPosition = createLabel("System Restore Capacity:", xPosition, yPosition, True)
-
-                                ' Creates System Restore Capacity data label.
-                                xPosition = createLabel(Functions.support.bytesToHumanSize(shadowStorageData.MaxSpace), xPosition - 2, yPosition, False)
-
-                                ' Creates the "Used Space:" header.
-                                xPosition = createLabel("Used Space:", xPosition + 10, yPosition, True)
-
-                                ' Creates the Used Space data label.
-                                xPosition = createLabel(String.Format("{0} ({1}%)", Functions.support.bytesToHumanSize(shadowStorageData.UsedSpace), shadowStorageUsedPercentage), xPosition - 2, yPosition, False)
-
-                                ' Creates the "Free Space:" header.
-                                xPosition = createLabel("Free Space:", xPosition + 10, yPosition, True)
-
-                                ' Creates the Free Space data label.
-                                xPosition = createLabel(String.Format("{0} ({1}%)", Functions.support.bytesToHumanSize(shadowStorageFreeSpace), shadowStorageFreeSpacePercentage), xPosition - 2, yPosition, False)
-
-                                ' Handles the creation of the Manage Disk Space control lable.
-                                createLinkLabel("Manage System Restore Space", xPosition + 10, yPosition, currentDriveLetter)
+                                    shadowStorageUsedPercentage = Functions.support.calculatePercentageValue(shadowStorageData.UsedSpace, shadowStorageData.MaxSpace)
+                                    shadowStorageFreeSpacePercentage = 100 - shadowStorageUsedPercentage
 
 
 
 
-                                yPosition += 15 ' Advances the Y position down a bit so that we make room for the next object.
+                                    ' Creates "System Restore Capacity:" header.
+                                    xPosition = createLabel("System Restore Capacity:", xPosition, yPosition, True)
+
+                                    ' Creates System Restore Capacity data label.
+                                    xPosition = createLabel(Functions.support.bytesToHumanSize(shadowStorageData.MaxSpace), xPosition - 2, yPosition, False)
+
+                                    ' Creates the "Used Space:" header.
+                                    xPosition = createLabel("Used Space:", xPosition + 10, yPosition, True)
+
+                                    ' Creates the Used Space data label.
+                                    xPosition = createLabel(String.Format("{0} ({1}%)", Functions.support.bytesToHumanSize(shadowStorageData.UsedSpace), shadowStorageUsedPercentage), xPosition - 2, yPosition, False)
+
+                                    ' Creates the "Free Space:" header.
+                                    xPosition = createLabel("Free Space:", xPosition + 10, yPosition, True)
+
+                                    ' Creates the Free Space data label.
+                                    xPosition = createLabel(String.Format("{0} ({1}%)", Functions.support.bytesToHumanSize(shadowStorageFreeSpace), shadowStorageFreeSpacePercentage), xPosition - 2, yPosition, False)
+
+                                    ' Handles the creation of the Manage Disk Space control lable.
+                                    createLinkLabel("Manage System Restore Space", xPosition + 10, yPosition, currentDriveLetter)
 
 
 
 
-                                ' Handles the creation of the Shadow Copy Disk Free Disk Space progress bar.
-                                createColoredBar(shadowStorageUsedPercentage, shadowStorageFreeSpacePercentage, 12, yPosition)
+                                    yPosition += 15 ' Advances the Y position down a bit so that we make room for the next object.
+
+
+
+
+                                    ' Handles the creation of the Shadow Copy Disk Free Disk Space progress bar.
+                                    createColoredBar(shadowStorageUsedPercentage, shadowStorageFreeSpacePercentage, 12, yPosition)
+                                Else
+                                    xPosition = createLabel("System Restore Capacity:", xPosition, yPosition, True)
+                                    xPosition = createLabel("(There was an error calculating this data, please see the Application Event Log for more details.)", xPosition - 2, yPosition, False)
+
+                                    Dim eventLogEntryStringBuilder As New Text.StringBuilder
+                                    eventLogEntryStringBuilder.AppendLine("This is very weird, the Shadow Storage configuration for " & If(currentDrive.RootDirectory.ToString.Length = 3, String.Format("Drive Letter {0}", currentDrive.RootDirectory.ToString.Replace("\", "")), String.Format("Mount Point {0}{1}{0}", Chr(34), currentDrive.RootDirectory.ToString)) & " is setup very weird. Below is the data from the system API.")
+                                    eventLogEntryStringBuilder.AppendLine()
+                                    eventLogEntryStringBuilder.AppendLine(String.Format("Max Space = {0} ({1})", shadowStorageData.MaxSpace.ToString, shadowStorageData.MaxSpaceHuman))
+                                    eventLogEntryStringBuilder.AppendLine(String.Format("Used Space = {0} ({1})", shadowStorageData.UsedSpace.ToString, shadowStorageData.UsedSpaceHuman))
+
+                                    Functions.eventLogFunctions.writeToApplicationLogFile(eventLogEntryStringBuilder.ToString.Trim, EventLogEntryType.Error, False, True)
+                                    eventLogEntryStringBuilder = Nothing
+                                End If
 
                                 shadowStorageData = Nothing
                             End If
