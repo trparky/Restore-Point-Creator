@@ -96,20 +96,10 @@
 
 
                         ' Creates the "Drive:" or "Mount Point:" header.
-                        If currentDrive.RootDirectory.ToString.Length = 3 Then
-                            xPosition = createLabel("Drive:", xPosition, yPosition, True)
-                        Else
-                            xPosition = createLabel("Mount Point:", xPosition, yPosition, True)
-                        End If
-                        ' Creates the "Drive:" or "Mount Point:" header.
+                        xPosition = createLabel(If(currentDrive.RootDirectory.ToString.Length = 3, "Drive:", "Mount Point:"), xPosition, yPosition, True)
 
                         ' Creates the Drive or Mount Point data label.
-                        If currentDrive.RootDirectory.ToString.Length = 3 Then
-                            xPosition = createLabel(currentDrive.RootDirectory.ToString.Replace("\", ""), xPosition, yPosition, False)
-                        Else
-                            xPosition = createLabel(currentDrive.RootDirectory.ToString, xPosition, yPosition, False)
-                        End If
-                        ' Creates the Drive or Mount Point data label.
+                        xPosition = createLabel(If(currentDrive.RootDirectory.ToString.Length = 3, currentDrive.RootDirectory.ToString.Replace("\", ""), currentDrive.RootDirectory.ToString), xPosition, yPosition, False)
 
                         ' If the drive has no drive label, why display one?
                         If Not String.IsNullOrWhiteSpace(currentDrive.VolumeLabel) Then
@@ -331,10 +321,10 @@
     Sub doTheResizingOfTheBars()
         If GroupBox1 IsNot Nothing Then
         	For Each controlObject As Control In GroupBox1.Controls
-            	If controlObject IsNot Nothing AndAlso controlObject.GetType = GetType(SmoothProgressBar) Then
-            		DirectCast(controlObject, SmoothProgressBar).Width = If(GroupBox1.VerticalScroll.Visible, GroupBox1.Width - 48, GroupBox1.Width - 30)
+                If controlObject IsNot Nothing AndAlso controlObject.GetType.Equals(GetType(SmoothProgressBar)) Then
+                    DirectCast(controlObject, SmoothProgressBar).Width = If(GroupBox1.VerticalScroll.Visible, GroupBox1.Width - 48, GroupBox1.Width - 30)
                 End If
-        	Next
+            Next
         End If
     End Sub
 
@@ -359,9 +349,9 @@
     Private Sub setBarColors()
         Dim smoothProgressBarObject As SmoothProgressBar
 
-        For Each control As Control In GroupBox1.Controls
-            If control.GetType.Equals(GetType(SmoothProgressBar)) Then
-                smoothProgressBarObject = DirectCast(control, SmoothProgressBar)
+        For Each controlObject As Control In GroupBox1.Controls
+            If controlObject IsNot Nothing AndAlso controlObject.GetType.Equals(GetType(SmoothProgressBar)) Then
+                smoothProgressBarObject = DirectCast(controlObject, SmoothProgressBar)
                 smoothProgressBarObject.ProgressBarColor = If(smoothProgressBarObject.Value > globalVariables.warningPercentage And My.Settings.ShowFullDisksAsRed, Color.Red, My.Settings.barColor)
             End If
         Next
