@@ -102,8 +102,6 @@ Public Class frmManageSystemRestoreStorageSpace
     End Function
 
     Private Sub getSize(driveLetter As String)
-        Dim strHumanSize As String = Nothing
-
         Dim strDriveLabel As String = getDriveLabel(driveLetter)
 
         If strDriveLabel Is Nothing Then
@@ -124,8 +122,6 @@ Public Class frmManageSystemRestoreStorageSpace
         Try
             ' This makes sure we don't have a Null Reference Exception.
             If shadowStorageStatistics IsNot Nothing And boolGetVSSDataResult = True Then
-                strHumanSize = Functions.support.bytesToHumanSize(shadowStorageStatistics.MaxSpace)
-
                 Dim percentage As Double = Functions.support.calculatePercentageValue(shadowStorageStatistics.UsedSpace, shadowStorageStatistics.MaxSpace)
                 percentageIndicator.Value = Math.Round(percentage, 0)
 
@@ -135,21 +131,22 @@ Public Class frmManageSystemRestoreStorageSpace
                     percentageIndicator.ProgressBarColor = My.Settings.barColor
                 End If
 
-                lblUsedShadowStorageSpace.Invoke(Sub() lblUsedShadowStorageSpace.Text = String.Format("Used Shadow Storage Space: {0} of {1} ({2}% Used)", Functions.support.bytesToHumanSize(shadowStorageStatistics.UsedSpace), strHumanSize, percentage))
+                lblUsedShadowStorageSpace.Invoke(Sub() lblUsedShadowStorageSpace.Text = String.Format("Used Shadow Storage Space: {0} of {1} ({2}% Used)", shadowStorageStatistics.UsedSpaceHuman, shadowStorageStatistics.MaxSpaceHuman, percentage))
 
-                If strHumanSize.Contains("Bytes") Then
+                If shadowStorageStatistics.MaxSpaceHuman.Contains("Bytes") Then
                     listSizeType.SelectedIndex = 0
-                ElseIf strHumanSize.Contains("KBs") Then
+                ElseIf shadowStorageStatistics.MaxSpaceHuman.Contains("KBs") Then
                     listSizeType.SelectedIndex = 1
-                ElseIf strHumanSize.Contains("MBs") Then
+                ElseIf shadowStorageStatistics.MaxSpaceHuman.Contains("MBs") Then
                     listSizeType.SelectedIndex = 2
-                ElseIf strHumanSize.Contains("GBs") Then
+                ElseIf shadowStorageStatistics.MaxSpaceHuman.Contains("GBs") Then
                     listSizeType.SelectedIndex = 3
-                ElseIf strHumanSize.Contains("TBs") Then
+                ElseIf shadowStorageStatistics.MaxSpaceHuman.Contains("TBs") Then
                     listSizeType.SelectedIndex = 4
                 End If
 
-                txtSize.Text = Regex.Replace(strHumanSize, "(?:Bytes|KBs|MBs|GBs|TBs|PBs)", "", RegexOptions.IgnoreCase).Trim
+                txtSize.Text = Regex.Replace(shadowStorageStatistics.MaxSpaceHuman, "(?:Bytes|KBs|MBs|GBs|TBs|PBs)", "", RegexOptions.IgnoreCase).Trim
+                shadowStorageStatistics = Nothing
             Else
                 ' If it errors out, do this.
                 lblUsedShadowStorageSpace.Invoke(Sub() lblUsedShadowStorageSpace.Text = "Used Shadow Storage Space: (None Allocated)")
