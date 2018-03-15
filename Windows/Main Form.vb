@@ -389,6 +389,8 @@ Public Class Form1
                     toolStripCheckEveryWeek.Checked = True
                 ElseIf My.Settings.checkForUpdatesEveryInDays = 14 Then
                     toolStripCheckEveryTwoWeeks.Checked = True
+                ElseIf My.Settings.checkForUpdatesEveryInDays = 0 Then
+                    EveryTimeILaunchTheProgramToolStripMenuItem.Checked = True
                 Else
                     toolStripCheckCustom.Checked = True
                     toolStripCheckCustom.Text = If(My.Settings.checkForUpdatesEveryInDays = 1, "Custom Time Interval (Check for updates every day)", "Custom Time Interval (Check for updates every " & My.Settings.checkForUpdatesEveryInDays & " days)")
@@ -3156,18 +3158,28 @@ Public Class Form1
         End If
     End Sub
 
+    Private Sub EveryTimeILaunchTheProgramToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EveryTimeILaunchTheProgramToolStripMenuItem.Click
+        toolStripCheckEveryTwoWeeks.Checked = False
+        toolStripCheckEveryWeek.Checked = False
+        toolStripCheckCustom.Checked = False
+        My.Settings.checkForUpdatesEveryInDays = 0
+        toolStripCheckCustom.Text = "Custom Time Interval"
+    End Sub
+
     Private Sub toolStripCheckEveryWeek_Click(sender As Object, e As EventArgs) Handles toolStripCheckEveryWeek.Click
+        EveryTimeILaunchTheProgramToolStripMenuItem.Checked = False
         toolStripCheckEveryTwoWeeks.Checked = False
         toolStripCheckCustom.Checked = False
         My.Settings.checkForUpdatesEveryInDays = 7
-        toolStripCheckCustom.Text = "Custom"
+        toolStripCheckCustom.Text = "Custom Time Interval"
     End Sub
 
     Private Sub toolStripCheckEveryTwoWeeks_Click(sender As Object, e As EventArgs) Handles toolStripCheckEveryTwoWeeks.Click
+        EveryTimeILaunchTheProgramToolStripMenuItem.Checked = False
         toolStripCheckEveryWeek.Checked = False
         toolStripCheckCustom.Checked = False
         My.Settings.checkForUpdatesEveryInDays = 14
-        toolStripCheckCustom.Text = "Custom"
+        toolStripCheckCustom.Text = "Custom Time Interval"
     End Sub
 
     Private Sub toolStripCheckCustom_Click(sender As Object, e As EventArgs) Handles toolStripCheckCustom.Click

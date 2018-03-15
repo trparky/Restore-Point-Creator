@@ -148,6 +148,7 @@ Partial Class Form1
         Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
         Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
         Me.CheckLogFileSizeAtApplicationStartupToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.EveryTimeILaunchTheProgramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.restorePointListContextMenu.SuspendLayout()
         Me.buttonTableLayout.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
@@ -771,7 +772,7 @@ Partial Class Form1
         '
         'ConfigureAutomaticUpdatesToolStripMenuItem
         '
-        Me.ConfigureAutomaticUpdatesToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.toolStripCheckEveryWeek, Me.toolStripCheckEveryTwoWeeks, Me.toolStripCheckCustom})
+        Me.ConfigureAutomaticUpdatesToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.EveryTimeILaunchTheProgramToolStripMenuItem, Me.toolStripCheckEveryWeek, Me.toolStripCheckEveryTwoWeeks, Me.toolStripCheckCustom})
         Me.ConfigureAutomaticUpdatesToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.chronometer
         Me.ConfigureAutomaticUpdatesToolStripMenuItem.Name = "ConfigureAutomaticUpdatesToolStripMenuItem"
         Me.ConfigureAutomaticUpdatesToolStripMenuItem.Size = New System.Drawing.Size(352, 22)
@@ -1077,6 +1078,13 @@ Partial Class Form1
         '
         Me.pleaseWaitMessageChanger.Interval = 250
         '
+        'EveryTimeILaunchTheProgramToolStripMenuItem
+        '
+        Me.EveryTimeILaunchTheProgramToolStripMenuItem.CheckOnClick = True
+        Me.EveryTimeILaunchTheProgramToolStripMenuItem.Name = "EveryTimeILaunchTheProgramToolStripMenuItem"
+        Me.EveryTimeILaunchTheProgramToolStripMenuItem.Size = New System.Drawing.Size(243, 22)
+        Me.EveryTimeILaunchTheProgramToolStripMenuItem.Text = "Every time I launch the program"
+        '
         'CheckLogFileSizeAtApplicationStartupToolStripMenuItem
         '
         Me.CheckLogFileSizeAtApplicationStartupToolStripMenuItem.CheckOnClick = True
@@ -1242,4 +1250,5 @@ Partial Class Form1
     Friend WithEvents WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents BitBucketProjectSite As ToolStripMenuItem
     Friend WithEvents CheckLogFileSizeAtApplicationStartupToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents EveryTimeILaunchTheProgramToolStripMenuItem As ToolStripMenuItem
 End Class
