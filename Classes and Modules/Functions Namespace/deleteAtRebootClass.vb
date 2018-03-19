@@ -82,9 +82,10 @@ Namespace Functions
             Dim _pendingOperations As New List(Of deleteAtRebootClass)
 
             Try
-                Dim registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\Control\Session Manager", False)
-                Dim pendingOperations As String() = registryKey.GetValue("PendingFileRenameOperations")
-                registryKey.Close()
+                Dim pendingOperations As String()
+                Using registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\Control\Session Manager", False)
+                    pendingOperations = registryKey.GetValue("PendingFileRenameOperations")
+                End Using
 
                 Dim strFileToBeWorkedOn, strFileToBeRenamedTo As String
 
@@ -109,30 +110,28 @@ Namespace Functions
 
         ''' <summary>This function saves any and all pending operations within this class instance back to the system Registry.</summary>
         Private Sub saveStagedPendingOperations()
-            Dim registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\Control\Session Manager", True)
+            Using registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\Control\Session Manager", True)
+                If pendingOperations.Count = 0 Then
+                    registryKey.DeleteValue("PendingFileRenameOperations")
+                Else
+                    Dim itemsToBeSavedToTheRegistry As New Specialized.StringCollection()
 
-            If pendingOperations.Count = 0 Then
-                registryKey.DeleteValue("PendingFileRenameOperations")
-            Else
-                Dim itemsToBeSavedToTheRegistry As New Specialized.StringCollection()
+                    For Each pendingOperation As deleteAtRebootClass In pendingOperations
+                        If pendingOperation.boolDelete Then
+                            itemsToBeSavedToTheRegistry.Add("\??\" & pendingOperation.strFileToBeWorkedOn)
+                            itemsToBeSavedToTheRegistry.Add("")
+                        Else
+                            itemsToBeSavedToTheRegistry.Add("\??\" & pendingOperation.strFileToBeWorkedOn)
+                            itemsToBeSavedToTheRegistry.Add("\??\" & pendingOperation.strToBeRenamedTo)
+                        End If
+                    Next
 
-                For Each pendingOperation As deleteAtRebootClass In pendingOperations
-                    If pendingOperation.boolDelete Then
-                        itemsToBeSavedToTheRegistry.Add("\??\" & pendingOperation.strFileToBeWorkedOn)
-                        itemsToBeSavedToTheRegistry.Add("")
-                    Else
-                        itemsToBeSavedToTheRegistry.Add("\??\" & pendingOperation.strFileToBeWorkedOn)
-                        itemsToBeSavedToTheRegistry.Add("\??\" & pendingOperation.strToBeRenamedTo)
-                    End If
-                Next
+                    Dim valuesToBeSavedToTheRegistry(itemsToBeSavedToTheRegistry.Count - 1) As String
+                    itemsToBeSavedToTheRegistry.CopyTo(valuesToBeSavedToTheRegistry, 0)
 
-                Dim valuesToBeSavedToTheRegistry(itemsToBeSavedToTheRegistry.Count - 1) As String
-                itemsToBeSavedToTheRegistry.CopyTo(valuesToBeSavedToTheRegistry, 0)
-
-                registryKey.SetValue("PendingFileRenameOperations", valuesToBeSavedToTheRegistry, RegistryValueKind.MultiString)
-            End If
-
-            registryKey.Close()
+                    registryKey.SetValue("PendingFileRenameOperations", valuesToBeSavedToTheRegistry, RegistryValueKind.MultiString)
+                End If
+            End Using
         End Sub
     End Class
 
