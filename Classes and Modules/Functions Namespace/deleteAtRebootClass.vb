@@ -26,7 +26,9 @@ Namespace Functions
         ''' <summary>This function removes an item from the list of pending file operations that are to occur at the next system reboot.</summary>
         ''' <param name="strFileToBeRemoved">The name of the file that's in the operations queue that needs to be removed.</param>
         ''' <param name="boolExactMatch">This is an optional parameter. If True then the function will do an exact match check, if False the function will simply remove an item from the operations queue if the file to be worked on contains the value of the strFileToBeRemoved input parameter.</param>
+        ''' <exception cref="ArgumentNullException" />
         Public Sub removeItem(strFileToBeRemoved As String, Optional boolExactMatch As Boolean = False)
+            If String.IsNullOrWhiteSpace(strFileToBeRemoved) Then Throw New ArgumentNullException(NameOf(strFileToBeRemoved))
             If Not pendingOperations.Count.Equals(0) Then
                 For Each item As deleteAtRebootClass In pendingOperations
                     If boolExactMatch Then
@@ -48,7 +50,9 @@ Namespace Functions
 
         ''' <summary>This adds an item to be deleted to the list of operations.</summary>
         ''' <param name="strFileToBeDeleted">The file to be deleted.</param>
+        ''' <exception cref="ArgumentNullException" />
         Public Sub addItem(strFileToBeDeleted As String)
+            If String.IsNullOrWhiteSpace(strFileToBeDeleted) Then Throw New ArgumentNullException(NameOf(strFileToBeDeleted))
             pendingOperations.Add(New deleteAtRebootClass(strFileToBeDeleted))
             boolThingsChanged = True
         End Sub
@@ -56,7 +60,10 @@ Namespace Functions
         ''' <summary>This adds an item to be renamed to the list of operations.</summary>
         ''' <param name="strFileToBeRenamed">The name of the file to be renamed.</param>
         ''' <param name="strNewName">The new name of the file.</param>
+        ''' <exception cref="ArgumentNullException" />
         Public Sub addItem(strFileToBeRenamed As String, strNewName As String)
+            If String.IsNullOrWhiteSpace(strFileToBeRenamed) Then Throw New ArgumentNullException(NameOf(strFileToBeRenamed))
+            If String.IsNullOrWhiteSpace(strNewName) Then Throw New ArgumentNullException(NameOf(strNewName))
             pendingOperations.Add(New deleteAtRebootClass(strFileToBeRenamed, strNewName))
             boolThingsChanged = True
         End Sub
