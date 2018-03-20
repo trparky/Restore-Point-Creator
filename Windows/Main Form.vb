@@ -18,7 +18,6 @@ Public Class Form1
     Private Const strTypeYourRestorePointName As String = "Type in a name for your custom-named System Restore Point and press Enter..."
     Private Const strMessageBoxTitle As String = "System Restore Point Creator"
     Public defaultCustomRestorePointName As String
-    Private boolHaveWeTriedToCreateTheRestorePointAgain As Boolean = False
 
     'Private restorePointDateData As New Dictionary(Of String, String)
 #End Region
@@ -1199,73 +1198,15 @@ Public Class Form1
 
             result = Functions.wmi.createRestorePoint(stringRestorePointName, Functions.restorePointStuff.RestoreType.WindowsType, sequenceNumber)
 
-            If My.Settings.debug Then Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("EXTENDED DEBUG MESSAGE{0}The error code returned from System Restore API was {1} ({2}).", vbCrLf, result.ToString(), Functions.support.convertErrorCodeToHex(result)), EventLogEntryType.Information, False)
-
-            If result = Functions.APIs.errorCodes.ERROR_SERVICE_DISABLED Then
-                Dim reservedSpaceSize As ULong = Functions.vss.getMaxSize(globalVariables.systemDriveLetter)
-
-                Functions.eventLogFunctions.writeToApplicationLogFile("The system restore point API returned error code 1058 (ERROR_SERVICE_DISABLED). Attempting to auto-correct this issue.", EventLogEntryType.Warning, False)
-
-                If reservedSpaceSize = 0 Then
-                    If boolHaveWeTriedToCreateTheRestorePointAgain Then
-                        Functions.eventLogFunctions.writeToApplicationLogFile("Auto-corrections to system configuration has failed. Unable to create restore point.", EventLogEntryType.Error, False)
-                        Exit Sub
-                    Else
-                        Dim gigabytesInBytes As Long = 1073741824
-                        Dim newSize As Long = gigabytesInBytes * 20 ' Sets the size to 20 GBs.
-
-                        Functions.eventLogFunctions.writeToApplicationLogFile("The system returned error code 1058 (ERROR_SERVICE_DISABLED). Attempting to correct it by setting up reserved system restore point space and enabling system restore on the system drive.", EventLogEntryType.Information, False)
-
-                        If MsgBox("The system has returned error code 1058 (ERROR_SERVICE_DISABLED). System Restore Point Creator can go about fixing this issue but it could have unintended consequences." & vbCrLf & vbCrLf & "Do you want System Restore Point Creator to attempt repairs to your system?", MsgBoxStyle.Question + MsgBoxStyle.YesNo + MsgBoxStyle.ApplicationModal, "System Error 1058 (ERROR_SERVICE_DISABLED) -- System Restore Point Creator") = MsgBoxResult.Yes Then
-                            Functions.vss.executeVSSAdminCommand(globalVariables.systemDriveLetter)
-                            Functions.vss.setShadowStorageSize(globalVariables.systemDriveLetter, newSize)
-                            Functions.vss.enableSystemRestoreOnDriveWMI(globalVariables.systemDriveLetter)
-                            boolHaveWeTriedToCreateTheRestorePointAgain = True
-                        Else
-                            MsgBox("You have chosen not to repair your system. System Restore Point creation has failed.", MsgBoxStyle.Exclamation, "System Restore Point Creator")
-                            Exit Sub
-                        End If
-
-                        Functions.eventLogFunctions.writeToApplicationLogFile("Attempting to create the restore point after system configuration corrections.", EventLogEntryType.Information, False)
-                        unifiedCreateSystemRestorePoint(stringRestorePointName)
-                        Exit Sub
-                    End If
-                Else
-                    Dim msgBoxAndEventLogText As String = "The reserved space for restore points on the system drive appears to be set correctly, something else appears to be wrong. Auto-correction of system configurations may cause unintended side-effects. The auto-correction routine has halted."
-
-                    Functions.eventLogFunctions.writeToApplicationLogFile(msgBoxAndEventLogText, EventLogEntryType.Error, False)
-
-                    enableFormElements()
-
-                    closePleaseWaitPanel()
-                    systemRestorePoints.Dispose()
-                    giveFeedbackAfterCreatingRestorePoint(result)
-                    loadRestorePointsFromSystemIntoList()
-
-                    txtRestorePointDescription.Text = Nothing
-                    doTheGrayingOfTheRestorePointNameTextBox()
-
-                    MsgBox(msgBoxAndEventLogText & vbCrLf & vbCrLf & "If you want to try and correct it, go to the Utilities menu and click on ""Manually Fix System Restore"".", MsgBoxStyle.Exclamation, strMessageBoxTitle)
-
-                    Exit Sub
-                End If
-            End If
-
-            If result = Functions.APIs.errorCodes.ERROR_SUCCESS Then
-                boolHaveWeTriedToCreateTheRestorePointAgain = False
-            End If
-
             If result <> Functions.APIs.errorCodes.ERROR_SUCCESS Then
-                If result <> Functions.APIs.errorCodes.ERROR_SERVICE_DISABLED Then
-                    Functions.eventLogFunctions.writeToApplicationLogFile("The system restore point API returned an error code (" & Functions.support.convertErrorCodeToHex(result) & ").", EventLogEntryType.Warning, False)
-                End If
+                Functions.eventLogFunctions.writeToApplicationLogFile("The system restore point API returned an error code (" & Functions.support.convertErrorCodeToHex(result) & ").", EventLogEntryType.Warning, False)
 
                 closePleaseWaitPanel()
 
                 If result = Functions.APIs.errorCodes.ERROR_DISK_FULL Then
                     MsgBox(String.Format("There was an error while attempting to creating the restore point. The error code returned from the system was {0} (ERROR_DISK_FULL).", result.ToString), MsgBoxStyle.Critical, strMessageBoxTitle)
                 Else
-                    MsgBox(String.Format("There was an error while attempting to creating the restore point. The error code returned from the system was ""{0}"" ({1}).", result, Functions.support.convertErrorCodeToHex(result)), MsgBoxStyle.Critical, strMessageBoxTitle)
+                    MsgBox(String.Format("There was an error while attempting to creating the restore point. The error code returned from the system was ""{0}"" ({1}). Please go to the System Restore Point Utilities menu in this program and click on ""Manually Fix System Restore"".", result, Functions.support.convertErrorCodeToHex(result)), MsgBoxStyle.Critical, strMessageBoxTitle)
                 End If
 
                 Exit Sub
