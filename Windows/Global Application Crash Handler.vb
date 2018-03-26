@@ -9,18 +9,11 @@ Public Class frmCrash
     Private strFileToHaveDataExportedTo As String = IO.Path.Combine(IO.Path.GetTempPath(), "event log entries.reslogx")
     Private strTempZIPFile As String = IO.Path.Combine(IO.Path.GetTempPath(), "attachments.zip")
 
-    Sub deleteFileWithCrashPrevention(strPathToFile As String)
-        Try
-            If IO.File.Exists(strPathToFile) = True Then IO.File.Delete(strPathToFile)
-        Catch ex As Exception
-        End Try
-    End Sub
-
     Sub deleteTempFiles()
         If boolDoWeHaveAttachments = True Then
-            deleteFileWithCrashPrevention(strTempZIPFile)
-            deleteFileWithCrashPrevention(strFileToHaveDataExportedTo)
-            deleteFileWithCrashPrevention(globalVariables.strDumpFilePath)
+            Functions.support.deleteFileWithNoException(strTempZIPFile)
+            Functions.support.deleteFileWithNoException(strFileToHaveDataExportedTo)
+            Functions.support.deleteFileWithNoException(globalVariables.strDumpFilePath)
         End If
     End Sub
 
