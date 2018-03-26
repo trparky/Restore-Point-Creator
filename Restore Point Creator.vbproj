@@ -218,6 +218,12 @@
     <Compile Include="Windows\Search Event Log.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Windows\Setup Auto Crash Submission.Designer.vb">
+      <DependentUpon>Setup Auto Crash Submission.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Setup Auto Crash Submission.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Windows\Update Message.Designer.vb">
       <DependentUpon>Update Message.vb</DependentUpon>
     </Compile>
@@ -452,6 +458,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Set Default Custom Restore Point Name.resx">
       <DependentUpon>Set Default Custom Restore Point Name.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\Setup Auto Crash Submission.resx">
+      <DependentUpon>Setup Auto Crash Submission.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Task Scheduler.resx">
       <DependentUpon>Task Scheduler.vb</DependentUpon>

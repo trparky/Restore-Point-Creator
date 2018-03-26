@@ -80,6 +80,7 @@ Partial Class Form1
         Me.chkShowVersionInTitleBarToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.EnableAdvancedDebugModeToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.AutoCrashSubmissionToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ConfigurationBackupRestoreToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BackupToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RestoreToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -523,7 +524,7 @@ Partial Class Form1
         '
         'AdditionalOptionsAndSettingsToolStripMenuItem
         '
-        Me.AdditionalOptionsAndSettingsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CheckSystemDrivesForFullShadowStorageToolStripMenuItem, Me.toolStripConfirmDeletions, Me.ConfirmRestorePointDeletionsInBatchesToolStripMenuItem, Me.toolStripLogRestorePointDeletions, Me.toolStripCloseAfterRestorePointIsCreated, Me.AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem, Me.BypassNoUACLauncherToolStripMenuItem, Me.LogProgramLoadsAndExitsToEventLogToolStripMenuItem, Me.ExtendedLoggingForScheduledTasks, Me.AskBeforeCreatingRestorePointToolStripMenuItem, Me.chkShowVersionInTitleBarToolStripMenuItem, Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem, Me.EnableAdvancedDebugModeToolStripMenuItem, Me.CheckLogFileSizeAtApplicationStartupToolStripMenuItem})
+        Me.AdditionalOptionsAndSettingsToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CheckSystemDrivesForFullShadowStorageToolStripMenuItem, Me.toolStripConfirmDeletions, Me.ConfirmRestorePointDeletionsInBatchesToolStripMenuItem, Me.toolStripLogRestorePointDeletions, Me.toolStripCloseAfterRestorePointIsCreated, Me.AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem, Me.BypassNoUACLauncherToolStripMenuItem, Me.LogProgramLoadsAndExitsToEventLogToolStripMenuItem, Me.ExtendedLoggingForScheduledTasks, Me.AskBeforeCreatingRestorePointToolStripMenuItem, Me.chkShowVersionInTitleBarToolStripMenuItem, Me.WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem, Me.EnableAdvancedDebugModeToolStripMenuItem, Me.CheckLogFileSizeAtApplicationStartupToolStripMenuItem, Me.AutoCrashSubmissionToolStripMenuItem})
         Me.AdditionalOptionsAndSettingsToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.increase
         Me.AdditionalOptionsAndSettingsToolStripMenuItem.Name = "AdditionalOptionsAndSettingsToolStripMenuItem"
         Me.AdditionalOptionsAndSettingsToolStripMenuItem.Size = New System.Drawing.Size(431, 22)
@@ -1092,6 +1093,13 @@ Partial Class Form1
         Me.CheckLogFileSizeAtApplicationStartupToolStripMenuItem.Size = New System.Drawing.Size(435, 22)
         Me.CheckLogFileSizeAtApplicationStartupToolStripMenuItem.Text = "Check Log File Size at Application Startup"
         '
+        'AutoCrashSubmissionToolStripMenuItem
+        '
+        Me.AutoCrashSubmissionToolStripMenuItem.CheckOnClick = True
+        Me.AutoCrashSubmissionToolStripMenuItem.Name = "AutoCrashSubmissionToolStripMenuItem"
+        Me.AutoCrashSubmissionToolStripMenuItem.Size = New System.Drawing.Size(435, 22)
+        Me.AutoCrashSubmissionToolStripMenuItem.Text = "Auto Crash Submission"
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
@@ -1251,4 +1259,5 @@ Partial Class Form1
     Friend WithEvents BitBucketProjectSite As ToolStripMenuItem
     Friend WithEvents CheckLogFileSizeAtApplicationStartupToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents EveryTimeILaunchTheProgramToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents AutoCrashSubmissionToolStripMenuItem As ToolStripMenuItem
 End Class

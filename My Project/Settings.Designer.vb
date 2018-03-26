@@ -1060,6 +1060,30 @@ Namespace My
                 Me("boolCheckLogFileSize") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property boolUserSetAutoCrashSubmission() As Boolean
+            Get
+                Return CType(Me("boolUserSetAutoCrashSubmission"),Boolean)
+            End Get
+            Set
+                Me("boolUserSetAutoCrashSubmission") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
+        Public Property boolAutoCrashSubmissionEnabled() As Boolean
+            Get
+                Return CType(Me("boolAutoCrashSubmissionEnabled"),Boolean)
+            End Get
+            Set
+                Me("boolAutoCrashSubmissionEnabled") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

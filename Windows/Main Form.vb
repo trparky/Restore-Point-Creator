@@ -373,6 +373,7 @@ Public Class Form1
             ColumnHeader4.Width = My.Settings.column4Size
             ColumnHeader5.Width = My.Settings.column5Size
 
+            AutoCrashSubmissionToolStripMenuItem.Checked = My.Settings.boolAutoCrashSubmissionEnabled
             ShowMessageBoxAfterSuccessfulCreationOfRestorePointToolStripMenuItem.Checked = My.Settings.ShowMessageBoxAfterSuccessfulCreationOfRestorePoint
             ShowMessageBoxAfterSuccessfulDeletionOfRestorePointsToolStripMenuItem.Checked = My.Settings.ShowMessageBoxAfterSuccessfulDeletionOfRestorePoints
             CheckSystemDrivesForFullShadowStorageToolStripMenuItem.Checked = My.Settings.checkSystemDrivesForFullShadowStorage
@@ -2214,6 +2215,11 @@ Public Class Form1
     End Sub
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        If Not My.Settings.boolUserSetAutoCrashSubmission Then
+            Dim setupAutoCrashSubmissionInstance As New Setup_Auto_Crash_Submission() With {.StartPosition = FormStartPosition.CenterParent}
+            setupAutoCrashSubmissionInstance.ShowDialog()
+        End If
+
         verifyUpdateChannel()
 
         ' This code checks to see if the current version is a beta or Release Candidate and if the user's update channel is already set to beta mode.
@@ -2398,6 +2404,10 @@ Public Class Form1
 #End Region
 
 #Region "--== ToolStrip Click Events ==--"
+    Private Sub AutoCrashSubmissionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AutoCrashSubmissionToolStripMenuItem.Click
+        My.Settings.boolAutoCrashSubmissionEnabled = AutoCrashSubmissionToolStripMenuItem.Checked
+    End Sub
+
     Private Sub CheckLogFileSizeAtApplicationStartupToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CheckLogFileSizeAtApplicationStartupToolStripMenuItem.Click
         My.Settings.boolCheckLogFileSize = CheckLogFileSizeAtApplicationStartupToolStripMenuItem.Checked
     End Sub

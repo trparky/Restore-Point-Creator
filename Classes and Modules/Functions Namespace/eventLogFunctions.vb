@@ -654,13 +654,47 @@
             Return stringBuilder.ToString.Trim
         End Function
 
+        Private Sub autoSendCrashData(strCrashData As String)
+            Dim httpHelper As httpHelper = http.createNewHTTPHelperObject()
+            Dim strFileToHaveDataExportedTo As String = IO.Path.Combine(IO.Path.GetTempPath(), "event log entries.reslogx")
+            Dim strTempZIPFile As String = IO.Path.Combine(IO.Path.GetTempPath(), "attachments.zip")
+
+            httpHelper.addPOSTData("name", My.Settings.usersName)
+            httpHelper.addPOSTData("email", My.Settings.usersEmail)
+            httpHelper.addPOSTData("program", globalVariables.programName)
+            httpHelper.addPOSTData("submissionversion", "4")
+            httpHelper.addPOSTData("manually", "false")
+            httpHelper.addPOSTData("crashdata", strCrashData)
+            httpHelper.setHTTPTimeout = 1
+
+            Try
+                Dim logCount As ULong = 0
+
+                If exportLogsToFile(strFileToHaveDataExportedTo, logCount) AndAlso support.addFileToZipFile(strTempZIPFile, strFileToHaveDataExportedTo) AndAlso IO.File.Exists(strTempZIPFile) Then
+                    httpHelper.addFileUpload("attachment", strTempZIPFile, Nothing, "application/zip")
+                End If
+
+                Dim strHTTPResponse As String = Nothing
+                httpHelper.uploadData(globalVariables.webURLs.dataProcessors.strCrashReporter, strHTTPResponse)
+            Catch ex As Exception
+                ' If this crashes, we don't care.
+            Finally
+                support.deleteFileWithNoException(strTempZIPFile)
+                support.deleteFileWithNoException(strFileToHaveDataExportedTo)
+                support.deleteFileWithNoException(globalVariables.strDumpFilePath)
+            End Try
+        End Sub
+
         ''' <summary>Writes the exception event to the System Log File. This is a universal exception logging function that's built to handle various forms of exceptions and not not any particular type.</summary>
         ''' <param name="exceptionObject">The exception object.</param>
         ''' <param name="errorType">The type of Event Log you want the Exception Event to be recorded to the Application Event Log as.</param>
         ''' <example>functions.eventLogFunctions.writeCrashToEventLog(ex)</example>
         Public Sub writeCrashToApplicationLogFile(exceptionObject As Exception, Optional errorType As EventLogEntryType = EventLogEntryType.Error)
             Try
-                writeToApplicationLogFile(assembleCrashData(exceptionObject, errorType), errorType, True, False)
+                Dim txtCrashData As String = assembleCrashData(exceptionObject, errorType)
+                If My.Settings.boolAutoCrashSubmissionEnabled Then autoSendCrashData(txtCrashData)
+                writeToApplicationLogFile(txtCrashData, errorType, True, False)
+                txtCrashData = Nothing
             Catch ex2 As Exception
                 oldEventLogFunctions.writeCrashToEventLog(ex2)
             End Try
