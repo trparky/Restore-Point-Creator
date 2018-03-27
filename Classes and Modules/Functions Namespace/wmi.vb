@@ -45,7 +45,7 @@ Namespace Functions.wmi
         ''' <summary>Gets the total capcity of a system drive.</summary>
         ''' <param name="driveLetter">C: or D:</param>
         ''' <returns></returns>
-        Public Function getDriveSize(driveLetter As String) As ULong
+        Public Function getDriveSize(driveLetter As String) As Long
             driveLetter = driveLetter.Trim
             If driveLetter.Length = 1 Then driveLetter &= ":"
             driveLetter = driveLetter.ToUpper
@@ -60,8 +60,8 @@ Namespace Functions.wmi
                                 Return 0
                             Else
                                 Dim capacityString As String = managementObjectCollection(0)("Capacity").ToString
-                                Dim uLongCapacity As ULong
-                                Return If(ULong.TryParse(capacityString, uLongCapacity), uLongCapacity, 0)
+                                Dim longCapacity As Long
+                                Return If(Long.TryParse(capacityString, longCapacity), longCapacity, 0)
                             End If
                         Else
                             Return 0

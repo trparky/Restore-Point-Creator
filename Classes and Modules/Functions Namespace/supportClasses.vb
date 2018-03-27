@@ -2,8 +2,8 @@
     Public Class ShadowStorageData
         Public AllocatedSpace As ULong = 0
         Public DiffVolume As String = Nothing
-        Public MaxSpace As ULong = 0
-        Public UsedSpace As ULong = 0
+        Public MaxSpace As Long = 0
+        Public UsedSpace As Long = 0
         Public Volume As String = Nothing
         Public UsedSpaceHuman As String = Nothing
         Public MaxSpaceHuman As String = Nothing

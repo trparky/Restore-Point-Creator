@@ -588,7 +588,7 @@ Namespace Functions.support
         ''' <param name="size">The amount of data in Bytes.</param>
         ''' <param name="roundToNearestWholeNumber">Tells the function if it should round the number to the nearest whole number.</param>
         ''' <returns>A String value such as 100 MBs or 100 GBs.</returns>
-        Public Function bytesToHumanSize(ByVal size As ULong, Optional roundToNearestWholeNumber As Boolean = False) As String
+        Public Function bytesToHumanSize(ByVal size As Long, Optional roundToNearestWholeNumber As Boolean = False) As String
             Dim result As String
             Dim shortRoundNumber As Short = If(roundToNearestWholeNumber, 0, 2)
 
@@ -868,7 +868,7 @@ Namespace Functions.support
             Threading.Thread.Sleep(250) ' We're going to sleep (again) to give the system some time to kill the process.
         End Sub
 
-        Public Function calculatePercentageValue(longSmallerNumber As ULong, longLargerNumber As ULong) As Double
+        Public Function calculatePercentageValue(longSmallerNumber As Long, longLargerNumber As Long) As Double
             Dim result As Double = Math.Round(((longSmallerNumber / longLargerNumber) * 100), 2)
 
             If result > 100 Then

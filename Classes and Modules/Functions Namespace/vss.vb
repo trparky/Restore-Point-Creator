@@ -52,7 +52,7 @@
                                 If queryObj("AllocatedSpace") Is Nothing Then
                                     shadowStorageDataClassInstance.AllocatedSpace = 0
                                 Else
-                                    If ULong.TryParse(queryObj("AllocatedSpace").ToString, shadowStorageDataClassInstance.AllocatedSpace) Then
+                                    If Long.TryParse(queryObj("AllocatedSpace").ToString, shadowStorageDataClassInstance.AllocatedSpace) Then
                                         shadowStorageDataClassInstance.AllocatedSpaceHuman = support.bytesToHumanSize(shadowStorageDataClassInstance.AllocatedSpace)
                                     Else
                                         shadowStorageDataClassInstance.AllocatedSpace = 0
@@ -64,7 +64,7 @@
                                 If queryObj("MaxSpace") Is Nothing Then
                                     shadowStorageDataClassInstance.MaxSpace = 0
                                 Else
-                                    If ULong.TryParse(queryObj("MaxSpace").ToString, shadowStorageDataClassInstance.MaxSpace) Then
+                                    If Long.TryParse(queryObj("MaxSpace").ToString, shadowStorageDataClassInstance.MaxSpace) Then
                                         shadowStorageDataClassInstance.MaxSpaceHuman = support.bytesToHumanSize(shadowStorageDataClassInstance.MaxSpace)
                                     Else
                                         shadowStorageDataClassInstance.MaxSpace = 0
@@ -75,7 +75,7 @@
                                 ' This is all in an effort to try and prevent Null Reference Exceptions.
                                 If queryObj("UsedSpace") Is Nothing Then : shadowStorageDataClassInstance.UsedSpace = 0
                                 Else
-                                    If ULong.TryParse(queryObj("UsedSpace").ToString, shadowStorageDataClassInstance.UsedSpace) Then
+                                    If Long.TryParse(queryObj("UsedSpace").ToString, shadowStorageDataClassInstance.UsedSpace) Then
                                         shadowStorageDataClassInstance.UsedSpaceHuman = support.bytesToHumanSize(shadowStorageDataClassInstance.UsedSpace)
                                     Else
                                         shadowStorageDataClassInstance.UsedSpace = 0
@@ -107,8 +107,8 @@
 
         ''' <summary>Gets the Shadow Storage Information for a particular storage device in the system.</summary>
         ''' <param name="driveLetter">This input can accept either a storage device GUID or a drive letter such as "C:".</param>
-        ''' <returns>A 64-bit Unsigned (ULong) Integer.</returns>
-        Public Function getMaxSize(ByVal driveLetter As String) As ULong
+        ''' <returns>A 64-bit Signed (Long) Integer.</returns>
+        Public Function getMaxSize(ByVal driveLetter As String) As Long
             Dim boolResult As Boolean
             Dim vssData As supportClasses.ShadowStorageData = getData(driveLetter, boolResult)
             Return If(boolResult, vssData.MaxSpace, 0)
@@ -140,8 +140,8 @@
             Catch ex2 As ComponentModel.Win32Exception
                 eventLogFunctions.writeToApplicationLogFile("An issue came up while attempting to run the vssadmin.exe command, perhaps due to Group Policy Restrictions. Falling back to WMI mode.", EventLogEntryType.Error, False)
 
-                Dim uLongDriveCapacity As ULong = wmi.getDriveSize(driveLetter)
-                Dim newSize As Long = uLongDriveCapacity * 0.2
+                Dim longDriveCapacity As Long = wmi.getDriveSize(driveLetter)
+                Dim newSize As Long = longDriveCapacity * 0.2
 
                 setShadowStorageSize(driveLetter, newSize)
             Catch ex As Exception

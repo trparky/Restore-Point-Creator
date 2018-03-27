@@ -71,7 +71,7 @@
         Try
             Dim currentDriveLetter As String
 
-            Dim theFreeSpace, theTotalSpace, usedSpace, shadowStorageFreeSpace As ULong
+            Dim theFreeSpace, theTotalSpace, usedSpace, shadowStorageFreeSpace As Long
             Dim usedSpacePercentage, freeSpacePercentage, shadowStorageUsedPercentage, shadowStorageFreeSpacePercentage As Double
             Dim yPosition As Integer = 10
             Dim xPosition As Integer = 12

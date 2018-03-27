@@ -4,7 +4,7 @@
     Private Const gigabytesInBytes As Long = 1073741824
     Private Const terabytesInBytes As Long = 1099511627776
 
-    Function getTotalDriveSize(drive As String) As ULong
+    Function getTotalDriveSize(drive As String) As Long
         For Each currentDrive As IO.DriveInfo In My.Computer.FileSystem.Drives
             If currentDrive.RootDirectory.ToString.Replace("\", "").Equals(drive, StringComparison.OrdinalIgnoreCase) Then Return currentDrive.TotalSize
         Next
@@ -21,9 +21,9 @@
             If boolResult = True Then
                 If My.Settings.debug Then Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("EXTENDED DEBUG MESSAGE{0}DeviceID for boot drive has been detected as {1}.", vbCrLf, deviceID), EventLogEntryType.Information, False)
 
-                Dim totalDriveSize As ULong = getTotalDriveSize(globalVariables.systemDriveLetter)
-                Dim oldShadowStorageSize As ULong = Functions.vss.getMaxSize(globalVariables.systemDriveLetter)
-                Dim newShadowStorageSize As ULong
+                Dim totalDriveSize As Long = getTotalDriveSize(globalVariables.systemDriveLetter)
+                Dim oldShadowStorageSize As Long = Functions.vss.getMaxSize(globalVariables.systemDriveLetter)
+                Dim newShadowStorageSize As Long
 
                 If My.Settings.debug Then Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("EXTENDED DEBUG MESSAGE{0}Total system drive size was detected as {1} and the old reserved space was detected as {2}.", vbCrLf, Functions.support.bytesToHumanSize(totalDriveSize), Functions.support.bytesToHumanSize(oldShadowStorageSize)), EventLogEntryType.Information, False)
 
