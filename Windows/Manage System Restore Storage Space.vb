@@ -14,7 +14,7 @@ Public Class frmManageSystemRestoreStorageSpace
         globalVariables.windows.frmManageSystemRestoreStorageSpace = Nothing
     End Sub
 
-    Function getSizeOfDrive(strDriveLetter As String) As ULong
+    Function getSizeOfDrive(strDriveLetter As String) As Long
         Dim strDriveLetterInLoop As String
 
         For Each currentDrive As IO.DriveInfo In My.Computer.FileSystem.Drives
@@ -175,7 +175,7 @@ Public Class frmManageSystemRestoreStorageSpace
             newSize = getSizeOfDrive(strDriveLetterWeAreWorkingWith) * dblSize
         End If
 
-        Dim size As ULong = Functions.vss.getMaxSize(strDriveLetterWeAreWorkingWith)
+        Dim size As Long = Functions.vss.getMaxSize(strDriveLetterWeAreWorkingWith)
 
         If size = newSize Then
             MsgBox("You didn't change the size.", MsgBoxStyle.Information, Me.Text)
