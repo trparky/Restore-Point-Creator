@@ -693,8 +693,14 @@
         Public Sub writeCrashToApplicationLogFile(exceptionObject As Exception, Optional errorType As EventLogEntryType = EventLogEntryType.Error)
             Try
                 Dim txtCrashData As String = assembleCrashData(exceptionObject, errorType)
-                If My.Settings.boolAutoCrashSubmissionEnabled Then autoSendCrashData(txtCrashData)
-                writeToApplicationLogFile(txtCrashData, errorType, True, False)
+
+                If My.Settings.boolAutoCrashSubmissionEnabled Then
+                    Threading.ThreadPool.QueueUserWorkItem(Sub() autoSendCrashData(txtCrashData))
+                    writeToApplicationLogFile(txtCrashData, errorType, True, True)
+                Else
+                    writeToApplicationLogFile(txtCrashData, errorType, True, False)
+                End If
+
                 txtCrashData = Nothing
             Catch ex2 As Exception
                 oldEventLogFunctions.writeCrashToEventLog(ex2)
