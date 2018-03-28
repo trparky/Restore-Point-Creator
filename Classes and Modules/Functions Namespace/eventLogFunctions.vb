@@ -697,6 +697,7 @@
                 If My.Settings.boolAutoCrashSubmissionEnabled Then
                     Threading.ThreadPool.QueueUserWorkItem(Sub() autoSendCrashData(txtCrashData))
                     writeToApplicationLogFile(txtCrashData, errorType, True, True)
+                    markLastExceptionLogAsSubmitted(True)
                 Else
                     writeToApplicationLogFile(txtCrashData, errorType, True, False)
                 End If
