@@ -665,6 +665,7 @@
             httpHelper.addPOSTData("submissionversion", "4")
             httpHelper.addPOSTData("manually", "false")
             httpHelper.addPOSTData("crashdata", strCrashData)
+            httpHelper.addPOSTData("autosubmitted", "true")
             httpHelper.setHTTPTimeout = 1
 
             Try

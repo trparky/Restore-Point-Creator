@@ -91,6 +91,7 @@ Public Class frmCrash
         httpHelper.addPOSTData("program", globalVariables.programName)
         httpHelper.addPOSTData("submissionversion", "4")
         httpHelper.addPOSTData("manually", "false")
+        httpHelper.addPOSTData("autosubmitted", "false")
 
         If chkReproducable.Checked = True Then
             httpHelper.addPOSTData("reproducable", "Yes")
