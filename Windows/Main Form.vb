@@ -1476,7 +1476,7 @@ Public Class Form1
     Private Sub disableAutomaticUpdatesAndNotifyUser()
         Dim msgBoxResult As MsgBoxResult = MsgBox("Since you have told the program that you didn't want to update to the newest supported version, do you want to also disable Automatic Update Checking?" & vbCrLf & vbCrLf & "By disabling Automatic Update Checking you will no longer be notified about new versions of this program, that is, unless you manually check for updates." & vbCrLf & vbCrLf & "Do you want to disable Automatic Checking for Updates?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, strMessageBoxTitle)
 
-        If msgBoxResult = MsgBoxResult.Yes Then
+        If msgBoxResult = msgBoxResult.Yes Then
             My.Settings.CheckForUpdates = False
             ConfigureAutomaticUpdatesToolStripMenuItem.Visible = False
             toolStripAutomaticallyCheckForUpdates.Checked = False
@@ -1649,7 +1649,7 @@ Public Class Form1
         Dim listViewItem As myListViewItemTypes.restorePointEntryItem
         Dim listOfRestorePoints As New List(Of myListViewItemTypes.restorePointEntryItem)
         Dim restorePointAge As Double
-        Dim stopWatch As Stopwatch = Stopwatch.StartNew()
+        Dim stopWatch As Stopwatch = stopWatch.StartNew()
 
         Try
             systemRestorePointsList.Enabled = False
@@ -2552,7 +2552,7 @@ Public Class Form1
     Private Sub SetWindowsActivePowerPlanSettingsForWakeTimersBackToDefaultToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetWindowsActivePowerPlanSettingsForWakeTimersBackToDefaultToolStripMenuItem.Click
         Dim msgBoxResult As MsgBoxResult = MsgBox("Setting the Windows Active Power Plan Wake Times feature back to default (Disabled) will prevent System Restore from creating restore points while your system is asleep." & vbCrLf & vbCrLf & "Are you sure you want to do this?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Are you sure?")
 
-        If msgBoxResult = MsgBoxResult.Yes Then
+        If msgBoxResult = msgBoxResult.Yes Then
             Functions.power.disablePowerPlanWakeFromSleep()
         End If
     End Sub
@@ -2561,7 +2561,7 @@ Public Class Form1
         If UseSSLToolStripMenuItem.Checked = False Then
             Dim msgBoxResult As MsgBoxResult = MsgBox("It's recommended to have SSL enabled so that downloads and data that's sent to my web site is secure. Please reconsider this." & vbCrLf & vbCrLf & "Are you sure you want to disable SSL?", MsgBoxStyle.Question + vbYesNo, "Are you sure?")
 
-            If msgBoxResult = MsgBoxResult.Yes Then
+            If msgBoxResult = msgBoxResult.Yes Then
                 My.Settings.useSSL = UseSSLToolStripMenuItem.Checked
             Else
                 UseSSLToolStripMenuItem.Checked = True
@@ -2668,7 +2668,7 @@ Public Class Form1
 
         Dim msgBoxResult As MsgBoxResult = MsgBox("The debug build is a build that's not optimized for normal use but may help in the process of debugging crashes and other issues that you may have with the program. The debug build outputs far more crash data than the release type build." & vbCrLf & vbCrLf & "Are you sure you want to switch to the debug build?", MsgBoxStyle.Question + MsgBoxStyle.YesNo)
 
-        If msgBoxResult = MsgBoxResult.Yes Then
+        If msgBoxResult = msgBoxResult.Yes Then
             openPleaseWaitPanel("Downloading Debug Build... Please Wait.")
             Threading.ThreadPool.QueueUserWorkItem(AddressOf switchToDebugBuildDownloadThreadSub)
         End If
@@ -2882,43 +2882,9 @@ Public Class Form1
     End Function
 
     Private Sub AboutThisProgramToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutThisProgramToolStripMenuItem.Click
-        Dim taskLibraryVersion As Version = getReferencedAssemblyVersion("Microsoft.Win32.TaskScheduler")
-        Dim strTaskLibraryVersion As String = String.Format("{0}.{1} Build {2}", taskLibraryVersion.Major, taskLibraryVersion.Minor, taskLibraryVersion.Build)
-        Dim stringBuilder As New StringBuilder
-
-        stringBuilder.AppendLine("Restore Point Creator")
-        stringBuilder.AppendLine("Written By Tom Parkison")
-        stringBuilder.AppendLine("Copyright Thomas Parkison 2012-2019.")
-        stringBuilder.AppendLine()
-
-        If globalVariables.version.boolBeta Then
-            stringBuilder.AppendFormat("Version {0} Public Beta {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortBetaVersion)
-        ElseIf globalVariables.version.boolReleaseCandidate Then
-            stringBuilder.AppendFormat("Version {0} Release Candidate {1}", globalVariables.version.strFullVersionString, globalVariables.version.shortReleaseCandidateVersion)
-        Else
-            stringBuilder.AppendFormat("Version {0}", globalVariables.version.strFullVersionString)
-        End If
-
-        If globalVariables.version.boolDebugBuild = True Then
-            stringBuilder.Append(" (Debug Build)")
-            stringBuilder.AppendLine()
-        Else
-            stringBuilder.AppendLine()
-        End If
-
-        stringBuilder.AppendLine()
-        stringBuilder.AppendLine("This program uses the Microsoft.Win32.TaskScheduler library version " & strTaskLibraryVersion & " to interface with the Windows Task Scheduler, copyright David Hall.")
-
-        stringBuilder.AppendLine()
-        stringBuilder.AppendLine("All operations that have to do with Microsoft Windows System Restore are processed by approved Microsoft APIs, System DLLs, and Microsoft Windows Management Instrumentation APIs.")
-        stringBuilder.AppendLine()
-        stringBuilder.AppendLine("Windows and Windows System Restore are registered trademarks of Microsoft Corporation in the United States and other countries.")
-        'stringBuilder.AppendLine()
-        'stringBuilder.AppendLine("The icons and images that are used in this program are property of FindIcons.com and are used with permission of FindIcons.com.")
-
-        MsgBox(stringBuilder.ToString.Trim, MsgBoxStyle.Information, "About")
-
-        stringBuilder = Nothing
+        Dim aboutWindowInstance As New About With {.taskScheduledAssemblyVersion = getReferencedAssemblyVersion("Microsoft.Win32.TaskScheduler")}
+        aboutWindowInstance.StartPosition = FormStartPosition.CenterParent
+        aboutWindowInstance.ShowDialog(Me)
     End Sub
 
     Private Sub toolStripDonate_Click(sender As Object, e As EventArgs) Handles toolStripDonate.Click
@@ -3171,7 +3137,7 @@ Public Class Form1
 
         Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot into Safe Mode and perform the restore process there and reboot after the process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, selectedRestorePoint.strName, selectedRestorePoint.strCreatedDate, selectedRestorePoint.strRestorePointType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
 
-        If msgboxResult = MsgBoxResult.Yes Then
+        If msgboxResult = msgboxResult.Yes Then
             Functions.support.setSafeModeBoot() ' Set the system up for Safe Mode Boot.
 
             ' Set the restore point that we're going to restore back to.
@@ -3211,13 +3177,13 @@ Public Class Form1
 
         txtRestorePointDescription.Text = txtRestorePointDescription.Text.Trim
 
-        Dim msgBoxResult As MsgBoxResult = MsgBoxResult.Yes
+        Dim msgBoxResult As MsgBoxResult = msgBoxResult.Yes
 
         If My.Settings.askBeforeCreatingRestorePoint = True Then
             msgBoxResult = MsgBox(String.Format("Are you sure you want to create a new system restore point with the name of {0}{1}{0}?", Chr(34), txtRestorePointDescription.Text), MsgBoxStyle.Question + vbYesNo, "Restore Point Creator")
         End If
 
-        If msgBoxResult = MsgBoxResult.Yes Then
+        If msgBoxResult = msgBoxResult.Yes Then
             openPleaseWaitPanel("Creating Restore Point... Please Wait.")
             Threading.ThreadPool.QueueUserWorkItem(Sub() unifiedCreateSystemRestorePoint(txtRestorePointDescription.Text))
         End If
@@ -3229,13 +3195,13 @@ Public Class Form1
             Exit Sub
         End If
 
-        Dim msgBoxResult As MsgBoxResult = MsgBoxResult.Yes
+        Dim msgBoxResult As MsgBoxResult = msgBoxResult.Yes
 
         If My.Settings.askBeforeCreatingRestorePoint = True Then
             msgBoxResult = MsgBox("Are you sure you want to create a new system restore point?", MsgBoxStyle.Question + vbYesNo, "Restore Point Creator")
         End If
 
-        If msgBoxResult = MsgBoxResult.Yes Then
+        If msgBoxResult = msgBoxResult.Yes Then
             openPleaseWaitPanel("Creating Restore Point... Please Wait.")
             Threading.ThreadPool.QueueUserWorkItem(Sub() unifiedCreateSystemRestorePoint())
         End If
@@ -3254,7 +3220,7 @@ Public Class Form1
 
         Dim msgboxResult As MsgBoxResult = MsgBox(String.Format("Are you sure you want to restore your system back to the selected System Restore Point?  Your system will reboot after the restoration process is complete.{0}{0}Description: {1}{0}Created On: {2}{0}Type: {3}", vbCrLf, selectedRestorePoint.strName, selectedRestorePoint.strCreatedDate, selectedRestorePoint.strRestorePointType), MsgBoxStyle.YesNo + MsgBoxStyle.Question, "Are you sure?")
 
-        If msgboxResult = MsgBoxResult.Yes Then
+        If msgboxResult = msgboxResult.Yes Then
             openPleaseWaitPanel("Beginning the Restore Process... Please Wait.")
             Threading.ThreadPool.QueueUserWorkItem(Sub() restoreSystemRestorePoint(selectedRestorePoint.intID))
         Else

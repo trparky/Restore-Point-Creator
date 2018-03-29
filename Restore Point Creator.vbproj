@@ -164,6 +164,12 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="GlobalSuppressions.vb" />
+    <Compile Include="Windows\About.Designer.vb">
+      <DependentUpon>About.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\About.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Windows\Command Line Arguments.Designer.vb">
       <DependentUpon>Command Line Arguments.vb</DependentUpon>
     </Compile>
@@ -365,6 +371,9 @@
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\About.resx">
+      <DependentUpon>About.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Change Log.resx">
       <DependentUpon>Change Log.vb</DependentUpon>
