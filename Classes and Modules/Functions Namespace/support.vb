@@ -320,7 +320,7 @@ Namespace Functions.support
                         stringBuilder.AppendLine(String.Format("Source: {0}", StackOverflowExceptionObject.Source))
                         addJSONedExtendedExceptionDataPackage(StackOverflowExceptionObject, stringBuilder)
                     ElseIf exceptionType.Equals(GetType(myExceptions.unableToGetLockOnLogFile)) Then
-                        If Not String.IsNullOrWhiteSpace(eventLogFunctions.strMutexAcquiredWhere) Then stringBuilder.AppendLine("Mutex Last Acquired Where: " & eventLogFunctions.strMutexAcquiredWhere)
+                        stringBuilder.AppendLine("Mutex Last Acquired Where: " & If(String.IsNullOrWhiteSpace(eventLogFunctions.strMutexAcquiredWhere), "Null", eventLogFunctions.strMutexAcquiredWhere))
                     End If
 
                     addJSONedExtendedExceptionDataPackage(rawExceptionObject, stringBuilder)
