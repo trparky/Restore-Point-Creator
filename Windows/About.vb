@@ -13,10 +13,8 @@
             strTaskLibraryVersion = String.Format("{0}.{1} Build {2}", taskScheduledAssemblyVersion.Major, taskScheduledAssemblyVersion.Minor, taskScheduledAssemblyVersion.Build)
         End If
 
-        Dim strLocalVersionString As String = globalVariables.version.strFullVersionString
-        If globalVariables.version.boolDebugBuild Then strLocalVersionString &= " (Debug Build)"
-
-        lblAbout.Text = String.Format(lblAbout.Text, strLocalVersionString, strTaskLibraryVersion)
+        ' Replace the placeholders in the label's text with the appropriate data.
+        lblAbout.Text = String.Format(lblAbout.Text, If(globalVariables.version.boolDebugBuild, globalVariables.version.strFullVersionString & " (Debug Build)", globalVariables.version.strFullVersionString), strTaskLibraryVersion)
     End Sub
 
     Private Sub OpenTaskSchedulerProjectSite_Click(sender As Object, e As EventArgs) Handles OpenTaskSchedulerProjectSite.Click
