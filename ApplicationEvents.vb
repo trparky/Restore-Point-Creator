@@ -371,7 +371,7 @@ Namespace My
                             e.Cancel = True
                             Exit Sub
                         ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.deleteOldRestorePoints, StringComparison.OrdinalIgnoreCase) Then
-                            If Functions.eventLogFunctions.myLogFileLockingMutex.WaitOne(500) Then
+                            If Functions.eventLogFunctions.myLogFileLockingMutex.WaitOne(1000) Then
                                 Functions.eventLogFunctions.strMutexAcquiredWhere = "Mutex acquired in " & globalVariables.commandLineSwitches.deleteOldRestorePoints & " command line argument routine."
 
                                 Functions.startupFunctions.deleteOldRestorePoints()

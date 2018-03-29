@@ -559,7 +559,7 @@
             End If
         End If
 
-        If Functions.eventLogFunctions.myLogFileLockingMutex.WaitOne(500) Then
+        If Functions.eventLogFunctions.myLogFileLockingMutex.WaitOne(1000) Then
             Functions.eventLogFunctions.strMutexAcquiredWhere = "Mutex acquired in log entry deletion routine."
             Dim boolSuccessfulDelete As Boolean = True
 

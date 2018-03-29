@@ -114,7 +114,7 @@ Namespace Functions.startupFunctions
             If deleteOldRestorePointCommandLineCount <> 0 Then
                 Dim numberOfRestorePoints As Integer = wmi.getNumberOfRestorePoints()
 
-                If deleteOldRestorePointCommandLineCount < numberOfRestorePoints AndAlso eventLogFunctions.myLogFileLockingMutex.WaitOne(500) Then
+                If deleteOldRestorePointCommandLineCount < numberOfRestorePoints AndAlso eventLogFunctions.myLogFileLockingMutex.WaitOne(1000) Then
                     eventLogFunctions.strMutexAcquiredWhere = "Mutex acquired in doKeepXNumberOfRestorePointsRoutine()."
                     restorePointStuff.writeSystemRestorePointsToApplicationLogs()
 
@@ -137,7 +137,7 @@ Namespace Functions.startupFunctions
         End Sub
 
         Public Sub doScheduledRestorePointRoutine(ByVal boolAreWeAnAdministrator As Boolean)
-            If eventLogFunctions.myLogFileLockingMutex.WaitOne(500) Then
+            If eventLogFunctions.myLogFileLockingMutex.WaitOne(1000) Then
                 eventLogFunctions.strMutexAcquiredWhere = "Mutex acquired in doScheduledRestorePointRoutine()."
 
                 Dim restorePointNameForScheduledTasks As String = globalVariables.strDefaultNameForScheduledTasks
