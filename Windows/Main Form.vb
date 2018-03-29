@@ -2946,37 +2946,9 @@ Public Class Form1
     End Function
 
     Private Sub AboutThisProgramToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutThisProgramToolStripMenuItem.Click
-        Dim taskLibraryVersion As Version = getReferencedAssemblyVersion("Microsoft.Win32.TaskScheduler")
-        Dim strTaskLibraryVersion As String = String.Format("{0}.{1} Build {2}", taskLibraryVersion.Major, taskLibraryVersion.Minor, taskLibraryVersion.Build)
-        Dim stringBuilder As New StringBuilder
-
-        stringBuilder.AppendLine("Restore Point Creator")
-        stringBuilder.AppendLine("Written By Tom Parkison")
-        stringBuilder.AppendLine("Copyright Thomas Parkison 2012-2019.")
-        stringBuilder.AppendLine()
-
-        stringBuilder.AppendFormat("Version {0}", globalVariables.version.strFullVersionString)
-
-        If globalVariables.version.boolDebugBuild = True Then
-            stringBuilder.Append(" (Debug Build)")
-            stringBuilder.AppendLine()
-        Else
-            stringBuilder.AppendLine()
-        End If
-
-        stringBuilder.AppendLine()
-        stringBuilder.AppendLine("This program uses the Microsoft.Win32.TaskScheduler library version " & strTaskLibraryVersion & " to interface with the Windows Task Scheduler, copyright David Hall.")
-
-        stringBuilder.AppendLine()
-        stringBuilder.AppendLine("All operations that have to do with Microsoft Windows System Restore are processed by approved Microsoft APIs, System DLLs, and Microsoft Windows Management Instrumentation APIs.")
-        stringBuilder.AppendLine()
-        stringBuilder.AppendLine("Windows and Windows System Restore are registered trademarks of Microsoft Corporation in the United States and other countries.")
-        'stringBuilder.AppendLine()
-        'stringBuilder.AppendLine("The icons and images that are used in this program are property of FindIcons.com and are used with permission of FindIcons.com.")
-
-        MsgBox(stringBuilder.ToString.Trim, MsgBoxStyle.Information, "About")
-
-        stringBuilder = Nothing
+        Dim aboutWindowInstance As New About With {.taskScheduledAssemblyVersion = getReferencedAssemblyVersion("Microsoft.Win32.TaskScheduler")}
+        aboutWindowInstance.StartPosition = FormStartPosition.CenterParent
+        aboutWindowInstance.ShowDialog(Me)
     End Sub
 
     Private Sub toolStripDonate_Click(sender As Object, e As EventArgs) Handles toolStripDonate.Click
