@@ -24,4 +24,8 @@
     Private Sub btnClose_Click(sender As Object, e As EventArgs) Handles btnClose.Click
         Me.Close()
     End Sub
+
+    Private Sub OpenRPCWebSite_Click(sender As Object, e As EventArgs) Handles OpenRPCWebSite.Click
+        Functions.support.launchURLInWebBrowser("https://www.toms-world.org/blog/rpc")
+    End Sub
 End Class

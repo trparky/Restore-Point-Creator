@@ -30,6 +30,7 @@ Partial Class About
         Me.OpenTaskSchedulerProjectSite = New System.Windows.Forms.ToolStripMenuItem()
         Me.btnClose = New System.Windows.Forms.Button()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.OpenRPCWebSite = New System.Windows.Forms.ToolStripMenuItem()
         Me.ContextMenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -38,7 +39,7 @@ Partial Class About
         Me.lblAbout.ContextMenuStrip = Me.ContextMenuStrip1
         Me.lblAbout.Location = New System.Drawing.Point(50, 12)
         Me.lblAbout.Name = "lblAbout"
-        Me.lblAbout.Size = New System.Drawing.Size(694, 176)
+        Me.lblAbout.Size = New System.Drawing.Size(694, 202)
         Me.lblAbout.TabIndex = 0
         Me.lblAbout.Text = resources.GetString("lblAbout.Text")
         '
@@ -52,9 +53,9 @@ Partial Class About
         '
         'ContextMenuStrip1
         '
-        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.OpenTaskSchedulerProjectSite})
+        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.OpenTaskSchedulerProjectSite, Me.OpenRPCWebSite})
         Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(323, 26)
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(323, 70)
         '
         'OpenTaskSchedulerProjectSite
         '
@@ -64,18 +65,24 @@ Partial Class About
         '
         'btnClose
         '
-        Me.btnClose.Location = New System.Drawing.Point(669, 191)
+        Me.btnClose.Location = New System.Drawing.Point(669, 208)
         Me.btnClose.Name = "btnClose"
         Me.btnClose.Size = New System.Drawing.Size(75, 23)
         Me.btnClose.TabIndex = 12
         Me.btnClose.Text = "&Close"
         Me.btnClose.UseVisualStyleBackColor = True
         '
+        'OpenRPCWebSite
+        '
+        Me.OpenRPCWebSite.Name = "OpenRPCWebSite"
+        Me.OpenRPCWebSite.Size = New System.Drawing.Size(322, 22)
+        Me.OpenRPCWebSite.Text = "Open https//www.toms-world.org/blog/rpc"
+        '
         'About
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(756, 225)
+        Me.ClientSize = New System.Drawing.Size(756, 241)
         Me.Controls.Add(Me.btnClose)
         Me.Controls.Add(Me.PictureBox1)
         Me.Controls.Add(Me.lblAbout)
@@ -96,4 +103,5 @@ Partial Class About
     Friend WithEvents ContextMenuStrip1 As ContextMenuStrip
     Friend WithEvents OpenTaskSchedulerProjectSite As ToolStripMenuItem
     Friend WithEvents btnClose As Button
+    Friend WithEvents OpenRPCWebSite As ToolStripMenuItem
 End Class
