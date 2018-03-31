@@ -2406,6 +2406,11 @@ Public Class Form1
 #Region "--== ToolStrip Click Events ==--"
     Private Sub AutoCrashSubmissionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AutoCrashSubmissionToolStripMenuItem.Click
         My.Settings.boolAutoCrashSubmissionEnabled = AutoCrashSubmissionToolStripMenuItem.Checked
+
+        If Not My.Settings.boolSaveInfo And My.Settings.boolAutoCrashSubmissionEnabled Then
+            Dim setupAutoCrashSubmissionInstance As New Setup_Auto_Crash_Submission() With {.StartPosition = FormStartPosition.CenterParent}
+            setupAutoCrashSubmissionInstance.ShowDialog()
+        End If
     End Sub
 
     Private Sub CheckLogFileSizeAtApplicationStartupToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CheckLogFileSizeAtApplicationStartupToolStripMenuItem.Click

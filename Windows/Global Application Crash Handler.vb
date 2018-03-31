@@ -257,6 +257,7 @@ Public Class frmCrash
             If MsgBox("Unchecking this checkbox will delete your saved name and email from the program settings." & vbCrLf & vbCrLf & "Are you sure you want to do this?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Are you sure?") = MsgBoxResult.Yes Then
                 My.Settings.usersName = Nothing
                 My.Settings.usersEmail = Nothing
+                My.Settings.boolAutoCrashSubmissionEnabled = False
                 chkSaveInfo.Checked = False
             Else
                 chkSaveInfo.Checked = True

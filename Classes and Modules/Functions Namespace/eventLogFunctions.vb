@@ -694,7 +694,7 @@
             Try
                 Dim txtCrashData As String = assembleCrashData(exceptionObject, errorType)
 
-                If My.Settings.boolAutoCrashSubmissionEnabled Then
+                If My.Settings.boolAutoCrashSubmissionEnabled And My.Settings.boolSaveInfo And Not privilegeChecks.areWeRunningAsSystemUser() Then
                     Threading.ThreadPool.QueueUserWorkItem(Sub() autoSendCrashData(txtCrashData))
                     writeToApplicationLogFile(txtCrashData, errorType, True, True)
                     markLastExceptionLogAsSubmitted(True)
