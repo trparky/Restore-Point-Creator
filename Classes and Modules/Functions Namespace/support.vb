@@ -806,15 +806,9 @@ Namespace Functions.support
 
         Public Sub reRunWithAdminUserRights()
             Try
-                Dim startInfo As New ProcessStartInfo With {
-                    .FileName = New IO.FileInfo(Application.ExecutablePath).FullName
-                }
-
-                If Environment.GetCommandLineArgs.Count <> 1 Then
-                    startInfo.Arguments = Environment.GetCommandLineArgs(1)
-                End If
-
-                If privilegeChecks.areWeAnAdministrator() = False Then startInfo.Verb = "runas"
+                Dim startInfo As New ProcessStartInfo With {.FileName = New IO.FileInfo(Application.ExecutablePath).FullName}
+                If Environment.GetCommandLineArgs.Count <> 1 Then startInfo.Arguments = Environment.GetCommandLineArgs(1)
+                If Not privilegeChecks.areWeAnAdministrator() Then startInfo.Verb = "runas"
 
                 Process.Start(startInfo)
                 Process.GetCurrentProcess.Kill()
