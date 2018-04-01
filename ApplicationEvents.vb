@@ -54,6 +54,8 @@ Namespace My
         End Function
 
         Private Sub MyApplication_Startup(sender As Object, e As ApplicationServices.StartupEventArgs) Handles Me.Startup
+            If Functions.privilegeChecks.areWeAnAdministrator() Then Functions.startupFunctions.checkSystemPathEnvironmentalVariable()
+
             If Functions.osVersionInfo.isThisWindowsXP() Then
                 MsgBox("System Restore Point Creator does not support Windows XP. This program will now terminate.", MsgBoxStyle.Critical, "System Restore Point Creator")
                 Process.GetCurrentProcess.Kill()
@@ -194,7 +196,7 @@ Namespace My
 
                     ' This checks if the user provided a "-count" argument.
                     If My.Application.CommandLineArgs.Count <> 2 Then
-                        Using registryKey As registrykey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
+                        Using registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, False)
                             ' This checks to see if the Registry Key exists by doing a Null check.
                             If registryKey IsNot Nothing Then
                                 ' The key does exist so let's pull our value from the Registry.

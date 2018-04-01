@@ -14,6 +14,25 @@ Namespace Functions.startupFunctions
             Process.GetCurrentProcess.Kill()
         End Sub
 
+        Public Sub checkSystemPathEnvironmentalVariable()
+            Try
+                Dim strSystem32Path As String = Environment.GetFolderPath(Environment.SpecialFolder.System)
+                Dim strCurrentEnvironmentalPath As String = Environment.GetEnvironmentVariable("path")
+                Dim strPathSearchResults As String = strCurrentEnvironmentalPath.Split(";").ToList().Where(Function(strPathPiece As String)
+                                                                                                               Return strPathPiece.Equals(strSystem32Path, StringComparison.OrdinalIgnoreCase)
+                                                                                                           End Function)(0)
+
+                If String.IsNullOrWhiteSpace(strPathSearchResults) Then
+                    eventLogFunctions.writeToApplicationLogFile("Adding path to System32 folder to correct system path environmental variable.", EventLogEntryType.Information, False)
+                    Environment.SetEnvironmentVariable("path", strSystem32Path & ";" & strCurrentEnvironmentalPath, EnvironmentVariableTarget.Machine)
+                    eventLogFunctions.writeToApplicationLogFile("Restarting application with newly setup environment.", EventLogEntryType.Information, False)
+                    support.reRunWithAdminUserRights()
+                End If
+            Catch ex As Exception
+                eventLogFunctions.writeCrashToApplicationLogFile(ex)
+            End Try
+        End Sub
+
         Public Sub doRestoreToPointRoutine()
             ' The first thing we do is disable Safe Mode boot so the user doesn't get trapped in Safe Mode.
             support.removeSafeModeBoot()
