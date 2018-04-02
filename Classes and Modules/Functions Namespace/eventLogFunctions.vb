@@ -592,6 +592,14 @@
             End If
         End Function
 
+        Private Sub getEnvironmentPathData(ByRef stringBuilder As Text.StringBuilder)
+            Try
+                stringBuilder.AppendLine("System Environment Path: " & Environment.GetEnvironmentVariable("path", EnvironmentVariableTarget.Machine))
+                stringBuilder.AppendLine("User Environment Path: " & Environment.GetEnvironmentVariable("path", EnvironmentVariableTarget.User))
+            Catch ex As Exception
+            End Try
+        End Sub
+
         ''' <summary>A function that is called in two different functions to assemble the crash data that's being written to the log file.</summary>
         ''' <param name="exceptionObject">The Exception Object.</param>
         ''' <param name="errorType">The ErrorType.</param>
@@ -605,6 +613,8 @@
             stringBuilder.AppendLine("System RAM: " & support.getSystemRAM())
             stringBuilder.AppendLine("Debug Mode: " & If(Debugger.IsAttached, "True", "False"))
             stringBuilder.AppendLine("Debug Build: " & If(globalVariables.version.boolDebugBuild, "True", "False"))
+
+            getEnvironmentPathData(stringBuilder)
 
             Dim processorInfo As supportClasses.processorInfoClass = wmi.getSystemProcessor()
             stringBuilder.AppendLine("CPU: " & processorInfo.strProcessor)
