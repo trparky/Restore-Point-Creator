@@ -25,8 +25,8 @@ Namespace Functions.startupFunctions
                 If String.IsNullOrWhiteSpace(strPathSearchResults) Then
                     eventLogFunctions.writeToApplicationLogFile("Adding path to System32 folder to correct system path environmental variable.", EventLogEntryType.Information, False)
                     Environment.SetEnvironmentVariable("path", strSystem32Path & ";" & strCurrentEnvironmentalPath, EnvironmentVariableTarget.Machine)
-                    eventLogFunctions.writeToApplicationLogFile("Restarting application with newly setup environment.", EventLogEntryType.Information, False)
-                    support.reRunWithAdminUserRights()
+                    MsgBox("System environmental variables have been corrected, the program will now close. You will now have to manually restart the program.", MsgBoxStyle.Information + MsgBoxStyle.SystemModal, "Restore Point Creator")
+                    Process.GetCurrentProcess.Kill()
                 End If
             Catch ex As Exception
                 eventLogFunctions.writeCrashToApplicationLogFile(ex)
