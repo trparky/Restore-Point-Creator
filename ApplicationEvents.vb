@@ -54,7 +54,7 @@ Namespace My
         End Function
 
         Private Sub MyApplication_Startup(sender As Object, e As ApplicationServices.StartupEventArgs) Handles Me.Startup
-            If Functions.privilegeChecks.areWeAnAdministrator() Then Functions.startupFunctions.checkSystemPathEnvironmentalVariable()
+            If Functions.privilegeChecks.areWeAnAdministrator() And Not boolAreWeInUpdateOrNoParentProcessCheckMode() Then Functions.startupFunctions.checkSystemPathEnvironmentalVariable()
 
             If Functions.osVersionInfo.isThisWindowsXP() Then
                 MsgBox("System Restore Point Creator does not support Windows XP. This program will now terminate.", MsgBoxStyle.Critical, "System Restore Point Creator")
