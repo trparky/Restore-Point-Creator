@@ -45,13 +45,7 @@ Namespace Functions.support
                     ' Yep, we're on Windows 8 or Windows 10 so lets go ahead and use that special API.
                     Dim color As UInteger, blend As Boolean
                     NativeMethod.NativeMethods.DwmGetColorizationColor(color, blend)
-                    Dim strHexColor As String = color.ToString("x")
-                    ' Converts from Hexidecimal (Base 16 Math) to Base 10 Math.
-                    Dim a As Integer = Convert.ToInt32(strHexColor.Substring(0, 2), 16)
-                    Dim r As Integer = Convert.ToInt32(strHexColor.Substring(2, 2), 16)
-                    Dim g As Integer = Convert.ToInt32(strHexColor.Substring(4, 2), 16)
-                    Dim b As Integer = Convert.ToInt32(strHexColor.Substring(6, 2), 16)
-                    Return Drawing.Color.FromArgb(a, r, g, b)
+                    Return ColorTranslator.FromHtml("#" & color.ToString("x"))
                 Else
                     ' This is for Windows Vista and Windows 7 machines.
                     Return My.Settings.pleaseWaitBorderColor
