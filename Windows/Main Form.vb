@@ -2404,6 +2404,52 @@ Public Class Form1
 #End Region
 
 #Region "--== ToolStrip Click Events ==--"
+    Private Sub CheckAndRepairWMIToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CheckAndRepairWMIToolStripMenuItem.Click
+        Dim strWinmgmtLocation As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "wbem", "winmgmt.exe")
+        Dim strOutput As String = Nothing
+
+        If Functions.support.executeShellCommandAndGetOutput(strOutput, strWinmgmtLocation, "/verifyrepository") Then
+            If strOutput.Trim.Equals("WMI repository is consistent", StringComparison.OrdinalIgnoreCase) Then
+                MsgBox("The status of the WMI has been verified, no repairs are needed.", MsgBoxStyle.Information, strMessageBoxTitle)
+            Else
+                If MsgBox("The WMI has been found to be in need of repair, do you want to repair the WMI now?" & vbCrLf & vbCrLf & "This process may take some time to complete.", MsgBoxStyle.Question + MsgBoxStyle.YesNo, strMessageBoxTitle) = MsgBoxResult.Yes Then repairWMI()
+            End If
+        End If
+    End Sub
+
+    Private Sub repairWMI(Optional boolSalvage As Boolean = True)
+        Dim strWinmgmtLocation As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "wbem", "winmgmt.exe")
+        Dim strOutput As String = Nothing
+
+        openPleaseWaitPanel("Attempting to repair the WMI... Please Wait.")
+
+        If boolSalvage Then
+            Threading.ThreadPool.QueueUserWorkItem(Sub()
+                                                       Functions.support.executeCommandWithWait(strWinmgmtLocation, "/salvagerepository", True)
+                                                       Me.Invoke(Sub() closePleaseWaitPanel())
+
+                                                       If Functions.support.executeShellCommandAndGetOutput(strOutput, strWinmgmtLocation, "/verifyrepository") Then
+                                                           If strOutput.Trim.Equals("WMI repository is consistent", StringComparison.OrdinalIgnoreCase) Then
+                                                               MsgBox("The WMI have has been repaired successfully.", MsgBoxStyle.Information, strMessageBoxTitle)
+                                                           Else
+                                                               repairWMI(False)
+                                                           End If
+                                                       End If
+                                                   End Sub)
+        Else
+            Threading.ThreadPool.QueueUserWorkItem(Sub()
+                                                       Functions.support.executeCommandWithWait(strWinmgmtLocation, "/resetrepository", True)
+                                                       Me.Invoke(Sub() closePleaseWaitPanel())
+
+                                                       If Functions.support.executeShellCommandAndGetOutput(strOutput, strWinmgmtLocation, "/verifyrepository") Then
+                                                           If Not strOutput.Trim.Equals("WMI repository is consistent", StringComparison.OrdinalIgnoreCase) Then
+                                                               MsgBox("All attempts to automatically repair the WMI have failed. Please consult Microsoft Support for more information.", MsgBoxStyle.Critical, strMessageBoxTitle)
+                                                           End If
+                                                       End If
+                                                   End Sub)
+        End If
+    End Sub
+
     Private Sub AutoCrashSubmissionToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AutoCrashSubmissionToolStripMenuItem.Click
         My.Settings.boolAutoCrashSubmissionEnabled = AutoCrashSubmissionToolStripMenuItem.Checked
 

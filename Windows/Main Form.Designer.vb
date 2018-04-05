@@ -150,6 +150,7 @@ Partial Class Form1
         Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
         Me.CheckLogFileSizeAtApplicationStartupToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.EveryTimeILaunchTheProgramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.CheckAndRepairWMIToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.restorePointListContextMenu.SuspendLayout()
         Me.buttonTableLayout.SuspendLayout()
         Me.MenuStrip1.SuspendLayout()
@@ -403,7 +404,7 @@ Partial Class Form1
         '
         'toolUtilities
         '
-        Me.toolUtilities.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ManuallyFixSystemRestoreToolStripMenuItem, Me.MountVolumeShadowCopyToolStripMenuItem, Me.CheckWindowsPowerPlanSettingsToolStripMenuItem, Me.toolStripDeleteRestorePoints, Me.toolStripViewDiskSpaceUsage, Me.toolStripManageSystemRestoreStorageSize, Me.toolStripScheduleRestorePoints, Me.FixRuntimeTasksToolStripMenuItem, Me.ProgramEventLogToolStripMenuItem, Me.RebootSystemToolStripMenuItem, Me.toolStripCheckForUpdates})
+        Me.toolUtilities.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ManuallyFixSystemRestoreToolStripMenuItem, Me.CheckAndRepairWMIToolStripMenuItem, Me.MountVolumeShadowCopyToolStripMenuItem, Me.CheckWindowsPowerPlanSettingsToolStripMenuItem, Me.toolStripDeleteRestorePoints, Me.toolStripViewDiskSpaceUsage, Me.toolStripManageSystemRestoreStorageSize, Me.toolStripScheduleRestorePoints, Me.FixRuntimeTasksToolStripMenuItem, Me.ProgramEventLogToolStripMenuItem, Me.RebootSystemToolStripMenuItem, Me.toolStripCheckForUpdates})
         Me.toolUtilities.Name = "toolUtilities"
         Me.toolUtilities.Size = New System.Drawing.Size(172, 20)
         Me.toolUtilities.Text = "System Restore Point &Utilities"
@@ -1079,6 +1080,12 @@ Partial Class Form1
         '
         Me.pleaseWaitMessageChanger.Interval = 250
         '
+        'CheckAndRepairWMIToolStripMenuItem
+        '
+        Me.CheckAndRepairWMIToolStripMenuItem.Name = "CheckAndRepairWMIToolStripMenuItem"
+        Me.CheckAndRepairWMIToolStripMenuItem.Size = New System.Drawing.Size(308, 22)
+        Me.CheckAndRepairWMIToolStripMenuItem.Text = "Check and Repair WMI"
+        '
         'EveryTimeILaunchTheProgramToolStripMenuItem
         '
         Me.EveryTimeILaunchTheProgramToolStripMenuItem.CheckOnClick = True
@@ -1260,4 +1267,5 @@ Partial Class Form1
     Friend WithEvents CheckLogFileSizeAtApplicationStartupToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents EveryTimeILaunchTheProgramToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents AutoCrashSubmissionToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents CheckAndRepairWMIToolStripMenuItem As ToolStripMenuItem
 End Class
