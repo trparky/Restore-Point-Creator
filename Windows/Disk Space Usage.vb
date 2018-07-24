@@ -218,7 +218,7 @@
                                     eventLogEntryStringBuilder.AppendLine(String.Format("Max Space = {0} ({1})", shadowStorageData.MaxSpace.ToString, shadowStorageData.MaxSpaceHuman))
                                     eventLogEntryStringBuilder.AppendLine(String.Format("Used Space = {0} ({1})", shadowStorageData.UsedSpace.ToString, shadowStorageData.UsedSpaceHuman))
 
-                                    Functions.eventLogFunctions.writeToApplicationLogFile(eventLogEntryStringBuilder.ToString.Trim, EventLogEntryType.Error, False, True)
+                                    Functions.eventLogFunctions.writeToApplicationLogFile(eventLogEntryStringBuilder.ToString.Trim, EventLogEntryType.Error, False)
                                     eventLogEntryStringBuilder = Nothing
                                 End If
 
