@@ -855,26 +855,6 @@ Public Class Form1
         End Try
     End Sub
 
-    Private Sub showDonationNotice()
-        Try
-            If boolShowDonationMessage = True Then
-                Dim randomNumberGenerator As New Random()
-
-                If randomNumberGenerator.Next(0, 5) = randomNumberGenerator.Next(0, 5) Then
-                    Dim result As MsgBoxResult = MsgBox("Though this is free software, donations are welcome." & vbCrLf & vbCrLf & "Remember... donations are optional, there is no requirement to donate to use this software." & vbCrLf & vbCrLf & "Do you want to donate today?  If not, click ""No"" and you won't be asked like this again.", MsgBoxStyle.YesNo + MsgBoxStyle.Question, strMessageBoxTitle)
-
-                    If result = MsgBoxResult.Yes Then
-                        launchDonationURL()
-                    Else
-                        savePreferenceToRegistry("Show Donation Message", "False")
-                    End If
-                End If
-            End If
-        Catch ex As Exception
-            Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
-        End Try
-    End Sub
-
     Private Sub launchDonationURL()
         Functions.support.launchURLInWebBrowser(globalVariables.webURLs.webPages.strPayPal, "An error occurred when trying to launch the donation URL in your default browser. The donation URL has been copied to your Windows Clipboard for you to paste into the address bar in the browser of your choice.")
     End Sub
@@ -2242,7 +2222,6 @@ Public Class Form1
             loadPreferences()
             checkForMyComputerRightClickOption()
             checkScheduledTaskEXEPaths()
-            showDonationNotice()
             loadRestorePointListColumnOrder()
             applySavedSorting()
 
