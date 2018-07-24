@@ -25,13 +25,13 @@ Partial Class About
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(About))
         Me.lblAbout = New System.Windows.Forms.Label()
-        Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.OpenTaskSchedulerProjectSite = New System.Windows.Forms.ToolStripMenuItem()
-        Me.btnClose = New System.Windows.Forms.Button()
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.OpenRPCWebSite = New System.Windows.Forms.ToolStripMenuItem()
+        Me.PictureBox1 = New System.Windows.Forms.PictureBox()
+        Me.btnClose = New System.Windows.Forms.Button()
         Me.ContextMenuStrip1.SuspendLayout()
+        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'lblAbout
@@ -39,9 +39,27 @@ Partial Class About
         Me.lblAbout.ContextMenuStrip = Me.ContextMenuStrip1
         Me.lblAbout.Location = New System.Drawing.Point(50, 12)
         Me.lblAbout.Name = "lblAbout"
-        Me.lblAbout.Size = New System.Drawing.Size(694, 202)
+        Me.lblAbout.Size = New System.Drawing.Size(694, 219)
         Me.lblAbout.TabIndex = 0
         Me.lblAbout.Text = resources.GetString("lblAbout.Text")
+        '
+        'ContextMenuStrip1
+        '
+        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.OpenTaskSchedulerProjectSite, Me.OpenRPCWebSite})
+        Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(323, 48)
+        '
+        'OpenTaskSchedulerProjectSite
+        '
+        Me.OpenTaskSchedulerProjectSite.Name = "OpenTaskSchedulerProjectSite"
+        Me.OpenTaskSchedulerProjectSite.Size = New System.Drawing.Size(322, 22)
+        Me.OpenTaskSchedulerProjectSite.Text = "Open https://github.com/dahall/taskscheduler"
+        '
+        'OpenRPCWebSite
+        '
+        Me.OpenRPCWebSite.Name = "OpenRPCWebSite"
+        Me.OpenRPCWebSite.Size = New System.Drawing.Size(322, 22)
+        Me.OpenRPCWebSite.Text = "Open https//www.toms-world.org/blog/rpc"
         '
         'PictureBox1
         '
@@ -51,18 +69,6 @@ Partial Class About
         Me.PictureBox1.TabIndex = 10
         Me.PictureBox1.TabStop = False
         '
-        'ContextMenuStrip1
-        '
-        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.OpenTaskSchedulerProjectSite, Me.OpenRPCWebSite})
-        Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(323, 70)
-        '
-        'OpenTaskSchedulerProjectSite
-        '
-        Me.OpenTaskSchedulerProjectSite.Name = "OpenTaskSchedulerProjectSite"
-        Me.OpenTaskSchedulerProjectSite.Size = New System.Drawing.Size(322, 22)
-        Me.OpenTaskSchedulerProjectSite.Text = "Open https://github.com/dahall/taskscheduler"
-        '
         'btnClose
         '
         Me.btnClose.Location = New System.Drawing.Point(669, 208)
@@ -71,12 +77,6 @@ Partial Class About
         Me.btnClose.TabIndex = 12
         Me.btnClose.Text = "&Close"
         Me.btnClose.UseVisualStyleBackColor = True
-        '
-        'OpenRPCWebSite
-        '
-        Me.OpenRPCWebSite.Name = "OpenRPCWebSite"
-        Me.OpenRPCWebSite.Size = New System.Drawing.Size(322, 22)
-        Me.OpenRPCWebSite.Text = "Open https//www.toms-world.org/blog/rpc"
         '
         'About
         '
@@ -92,8 +92,8 @@ Partial Class About
         Me.MinimizeBox = False
         Me.Name = "About"
         Me.Text = "About Restore Point Creator"
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ContextMenuStrip1.ResumeLayout(False)
+        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
