@@ -200,6 +200,12 @@
     <Compile Include="Windows\Convert Old Logs.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Windows\Not Supported.Designer.vb">
+      <DependentUpon>Not Supported.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Not Supported.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Windows\Reserved Space for System Drive.Designer.vb">
       <DependentUpon>Reserved Space for System Drive.vb</DependentUpon>
     </Compile>
@@ -275,9 +281,7 @@
     <Compile Include="Windows\Global Application Crash Handler.designer.vb">
       <DependentUpon>Global Application Crash Handler.vb</DependentUpon>
     </Compile>
-    <Compile Include="Windows\Global Application Crash Handler.vb">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Windows\Global Application Crash Handler.vb" />
     <Compile Include="Windows\Keep X Amount of Restore Points.Designer.vb">
       <DependentUpon>Keep X Amount of Restore Points.vb</DependentUpon>
     </Compile>
@@ -297,22 +301,10 @@
     <Compile Include="Windows\Manage System Restore Storage Space.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\Manually Submit Crash Details.Designer.vb">
-      <DependentUpon>Manually Submit Crash Details.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Windows\Manually Submit Crash Details.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Windows\Mount Volume Shadow Copy.Designer.vb">
       <DependentUpon>Mount Volume Shadow Copy.vb</DependentUpon>
     </Compile>
     <Compile Include="Windows\Mount Volume Shadow Copy.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Windows\Official Contact Form.Designer.vb">
-      <DependentUpon>Official Contact Form.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Windows\Official Contact Form.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Windows\Please Wait.Designer.vb">
@@ -423,17 +415,14 @@
     <EmbeddedResource Include="Windows\Manage System Restore Storage Space.resx">
       <DependentUpon>Manage System Restore Storage Space.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\Manually Submit Crash Details.resx">
-      <DependentUpon>Manually Submit Crash Details.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Windows\Mount Volume Shadow Copy.resx">
       <DependentUpon>Mount Volume Shadow Copy.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Command Line Arguments.resx">
       <DependentUpon>Command Line Arguments.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\Official Contact Form.resx">
-      <DependentUpon>Official Contact Form.vb</DependentUpon>
+    <EmbeddedResource Include="Windows\Not Supported.resx">
+      <DependentUpon>Not Supported.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\Please Wait.resx">
       <DependentUpon>Please Wait.vb</DependentUpon>

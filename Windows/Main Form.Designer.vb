@@ -124,7 +124,6 @@ Partial Class Form1
         Me.AboutThisProgramToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.FrequentlyAskedQuestionsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ProductWebSiteToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ContactTheDeveloperToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ViewOfficialChangeLogToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.CommandLineArgumentsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.toolStripDonate = New System.Windows.Forms.ToolStripMenuItem()
@@ -141,7 +140,7 @@ Partial Class Form1
         Me.pleaseWaitPanel = New System.Windows.Forms.Panel()
         Me.pleaseWaitBorderText = New System.Windows.Forms.Label()
         Me.pleaseWaitlblLabel = New System.Windows.Forms.Label()
-        Me.pleaseWaitProgressBar = New SmoothProgressBar()
+        Me.pleaseWaitProgressBar = New Restore_Point_Creator.SmoothProgressBar()
         Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
         Me.pleaseWaitMessageChanger = New System.Windows.Forms.Timer(Me.components)
         Me.restorePointListContextMenu.SuspendLayout()
@@ -890,7 +889,7 @@ Partial Class Form1
         '
         'toolStripAbout
         '
-        Me.toolStripAbout.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AboutThisProgramToolStripMenuItem, Me.FrequentlyAskedQuestionsToolStripMenuItem, Me.ProductWebSiteToolStripMenuItem, Me.ContactTheDeveloperToolStripMenuItem, Me.ViewOfficialChangeLogToolStripMenuItem1, Me.CommandLineArgumentsToolStripMenuItem})
+        Me.toolStripAbout.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AboutThisProgramToolStripMenuItem, Me.FrequentlyAskedQuestionsToolStripMenuItem, Me.ProductWebSiteToolStripMenuItem, Me.ViewOfficialChangeLogToolStripMenuItem1, Me.CommandLineArgumentsToolStripMenuItem})
         Me.toolStripAbout.Name = "toolStripAbout"
         Me.toolStripAbout.Size = New System.Drawing.Size(52, 20)
         Me.toolStripAbout.Text = "&About"
@@ -915,13 +914,6 @@ Partial Class Form1
         Me.ProductWebSiteToolStripMenuItem.Name = "ProductWebSiteToolStripMenuItem"
         Me.ProductWebSiteToolStripMenuItem.Size = New System.Drawing.Size(256, 22)
         Me.ProductWebSiteToolStripMenuItem.Text = "Open Product Web Site"
-        '
-        'ContactTheDeveloperToolStripMenuItem
-        '
-        Me.ContactTheDeveloperToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.contact
-        Me.ContactTheDeveloperToolStripMenuItem.Name = "ContactTheDeveloperToolStripMenuItem"
-        Me.ContactTheDeveloperToolStripMenuItem.Size = New System.Drawing.Size(256, 22)
-        Me.ContactTheDeveloperToolStripMenuItem.Text = "Contact the Developer"
         '
         'ViewOfficialChangeLogToolStripMenuItem1
         '
@@ -1130,7 +1122,6 @@ Partial Class Form1
     Friend WithEvents stripRestoreSafeMode As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents btnRestoreToRestorePointSafeMode As System.Windows.Forms.Button
     Friend WithEvents ProgramEventLogToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents ContactTheDeveloperToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents CheckWindowsPowerPlanSettingsToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents importBackupDialog As OpenFileDialog
     Friend WithEvents exportBackupDialog As SaveFileDialog

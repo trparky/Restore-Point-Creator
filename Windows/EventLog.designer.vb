@@ -46,7 +46,6 @@ Partial Class eventLogForm
         Me.btnDeleteIndividualLogEntry = New System.Windows.Forms.Button()
         Me.btnClear = New System.Windows.Forms.Button()
         Me.btnSearch = New System.Windows.Forms.Button()
-        Me.chkAskMeToSubmitIfViewingAnExceptionEntry = New System.Windows.Forms.CheckBox()
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
         Me.pleaseWaitProgressBarChanger = New System.Windows.Forms.Timer(Me.components)
         Me.pleaseWaitPanel = New System.Windows.Forms.Panel()
@@ -313,18 +312,6 @@ Partial Class eventLogForm
         Me.btnSearch.Text = "Search Event Log"
         Me.btnSearch.UseVisualStyleBackColor = True
         '
-        'chkAskMeToSubmitIfViewingAnExceptionEntry
-        '
-        Me.chkAskMeToSubmitIfViewingAnExceptionEntry.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.chkAskMeToSubmitIfViewingAnExceptionEntry.AutoSize = True
-        Me.chkAskMeToSubmitIfViewingAnExceptionEntry.Location = New System.Drawing.Point(12, 290)
-        Me.chkAskMeToSubmitIfViewingAnExceptionEntry.Name = "chkAskMeToSubmitIfViewingAnExceptionEntry"
-        Me.chkAskMeToSubmitIfViewingAnExceptionEntry.Size = New System.Drawing.Size(485, 17)
-        Me.chkAskMeToSubmitIfViewingAnExceptionEntry.TabIndex = 6
-        Me.chkAskMeToSubmitIfViewingAnExceptionEntry.Text = "Ask me if I want to submit a crash report if I view an Event Log Entry that conta" &
-    "ins Exception data"
-        Me.chkAskMeToSubmitIfViewingAnExceptionEntry.UseVisualStyleBackColor = True
-        '
         'pleaseWaitProgressBarChanger
         '
         Me.pleaseWaitProgressBarChanger.Interval = 25
@@ -392,7 +379,7 @@ Partial Class eventLogForm
         '
         Me.chkPromptBeforeLogDeletion.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.chkPromptBeforeLogDeletion.AutoSize = True
-        Me.chkPromptBeforeLogDeletion.Location = New System.Drawing.Point(526, 290)
+        Me.chkPromptBeforeLogDeletion.Location = New System.Drawing.Point(12, 290)
         Me.chkPromptBeforeLogDeletion.Name = "chkPromptBeforeLogDeletion"
         Me.chkPromptBeforeLogDeletion.Size = New System.Drawing.Size(183, 17)
         Me.chkPromptBeforeLogDeletion.TabIndex = 42
@@ -406,7 +393,6 @@ Partial Class eventLogForm
         Me.ClientSize = New System.Drawing.Size(860, 332)
         Me.Controls.Add(Me.chkPromptBeforeLogDeletion)
         Me.Controls.Add(Me.pleaseWaitPanel)
-        Me.Controls.Add(Me.chkAskMeToSubmitIfViewingAnExceptionEntry)
         Me.Controls.Add(Me.SplitContainer1)
         Me.Controls.Add(Me.StatusStrip1)
         Me.Icon = Global.Restore_Point_Creator.My.Resources.Resources.RestorePoint_noBackground_2
@@ -444,7 +430,6 @@ Partial Class eventLogForm
     Friend WithEvents btnCleanLogFile As System.Windows.Forms.Button
     Friend WithEvents SplitContainer1 As SplitContainer
     Friend WithEvents TableLayoutPanel2 As TableLayoutPanel
-    Friend WithEvents chkAskMeToSubmitIfViewingAnExceptionEntry As CheckBox
     Friend WithEvents btnSearch As Button
     Friend WithEvents btnClear As Button
     Friend WithEvents btnExportLogs As Button

@@ -243,7 +243,6 @@
         logFileInfo = Nothing
 
         Me.Location = Functions.support.verifyWindowLocation(My.Settings.eventLogFormWindowLocation)
-        chkAskMeToSubmitIfViewingAnExceptionEntry.Checked = My.Settings.boolAskMeToSubmitIfViewingAnExceptionEntry
         chkPromptBeforeLogDeletion.Checked = My.Settings.boolPromptBeforeLogDeletion
         applySavedSorting()
 
@@ -387,10 +386,6 @@
         End If
     End Sub
 
-    Private Sub chkAskMeToSubmitIfViewingAnExceptionEntry_Click(sender As Object, e As EventArgs) Handles chkAskMeToSubmitIfViewingAnExceptionEntry.Click
-        My.Settings.boolAskMeToSubmitIfViewingAnExceptionEntry = chkAskMeToSubmitIfViewingAnExceptionEntry.Checked
-    End Sub
-
     Private Sub eventLogList_SelectedIndexChanged(sender As Object, e As EventArgs) Handles eventLogList.SelectedIndexChanged
         Try
             If eventLogList.SelectedItems.Count <> 0 Then
@@ -401,24 +396,6 @@
 
                 Dim selectedItem As myListViewItemTypes.eventLogListEntry = DirectCast(eventLogList.SelectedItems(0), myListViewItemTypes.eventLogListEntry)
                 eventLogText.Text = selectedItem.strEventLogText
-
-                If selectedItem.eventLogType = EventLogEntryType.Error AndAlso Not selectedItem.boolSubmitted AndAlso (selectedItem.boolException OrElse eventLogText.Text.caseInsensitiveContains("exception")) AndAlso chkAskMeToSubmitIfViewingAnExceptionEntry.Checked AndAlso selectedIndex <> eventLogList.SelectedIndices(0) Then
-                    If MsgBox("The log entry that you're looking at appears to be a program exception and stack trace. Would you like to submit it?", MsgBoxStyle.Question + MsgBoxStyle.YesNo + MsgBoxStyle.DefaultButton2, Me.Text) = MsgBoxResult.Yes Then
-                        If (globalVariables.windows.frmManuallySubmitCrashDataInstance Is Nothing) Then
-                            globalVariables.windows.frmManuallySubmitCrashDataInstance = New frmManuallySubmitCrashData
-                            globalVariables.windows.frmManuallySubmitCrashDataInstance.StartPosition = FormStartPosition.CenterParent
-                            globalVariables.windows.frmManuallySubmitCrashDataInstance.crashData = eventLogText.Text
-                            globalVariables.windows.frmManuallySubmitCrashDataInstance.logID = selectedItem.longEventLogEntryID
-                            globalVariables.windows.frmManuallySubmitCrashDataInstance.Show()
-
-                            globalVariables.windows.frmManuallySubmitCrashDataInstance.Location = My.Settings.ManuallySubmitCrashDataInstanceLocation
-                        Else
-                            globalVariables.windows.frmManuallySubmitCrashDataInstance.BringToFront()
-                            globalVariables.windows.frmManuallySubmitCrashDataInstance.crashData = eventLogText.Text
-                            globalVariables.windows.frmManuallySubmitCrashDataInstance.logID = selectedItem.longEventLogEntryID
-                        End If
-                    End If
-                End If
 
                 selectedIndex = eventLogList.SelectedIndices(0)
             Else

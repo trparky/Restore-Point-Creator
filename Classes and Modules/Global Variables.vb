@@ -32,9 +32,7 @@ Namespace globalVariables
             Public frmPleaseWait As Please_Wait
             Public eventLogForm As eventLogForm
             Public mountVolumeShadowCopy As Mount_Volume_Shadow_Copy
-            Public officialContactForm As Official_Contact_Form
             Public configureProxy As Configure_Proxy
-            Public frmManuallySubmitCrashDataInstance As frmManuallySubmitCrashData
         End Module
     End Namespace
 

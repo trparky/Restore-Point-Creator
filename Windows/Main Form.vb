@@ -2160,6 +2160,11 @@ Public Class Form1
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         verifyUpdateChannel()
 
+        If Not My.Settings.boolDontBugMeAboutNoSupport Then
+            Dim notSupportedWindow As New NotSupportedWindow()
+            notSupportedWindow.ShowDialog(Me)
+        End If
+
         ' This code checks to see if the current version is a beta or Release Candidate and if the user's update channel is already set to beta mode.
         ' If the user's update channel isn't set to beta mode we then set it for the user here.
         If (globalVariables.version.boolBeta Or globalVariables.version.boolReleaseCandidate) And Not My.Settings.updateChannel.Equals(globalVariables.updateChannels.beta, StringComparison.OrdinalIgnoreCase) Then
@@ -2582,17 +2587,6 @@ Public Class Form1
             savePreferenceToRegistry("Log Program Loads And Exits to Event Log", "True")
         Else
             savePreferenceToRegistry("Log Program Loads And Exits to Event Log", "False")
-        End If
-    End Sub
-
-    Private Sub ContactTheDeveloperToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ContactTheDeveloperToolStripMenuItem.Click
-        If (globalVariables.windows.officialContactForm Is Nothing) Then
-            globalVariables.windows.officialContactForm = New Official_Contact_Form With {
-                .StartPosition = FormStartPosition.CenterParent
-            }
-            globalVariables.windows.officialContactForm.Show()
-        Else
-            globalVariables.windows.officialContactForm.BringToFront()
         End If
     End Sub
 

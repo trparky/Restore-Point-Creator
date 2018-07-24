@@ -117,16 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="ToolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
-  <metadata name="OpenFileDialog1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>109, 17</value>
-  </metadata>
-  <metadata name="pleaseWaitMessageChanger.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>245, 18</value>
-  </metadata>
-  <metadata name="pleaseWaitProgressBarChanger.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>450, 18</value>
-  </metadata>
+  <data name="Label1.Text" xml:space="preserve">
+    <value>System Restore Point Creator is no longer supported. Use of this program is at your own risk.
+
+The author of the program (Tom Parkison) is not to be held liable for anything that goes wrong with your
+system while using this unsupported program.
+
+By continuing to use this program you accept all risks. If you do not accept, uninstall this program promptly.</value>
+  </data>
 </root>
