@@ -3017,10 +3017,6 @@ Public Class Form1
         checkForUpdatesEveryInstance.ShowDialog()
     End Sub
 
-    Private Sub HelpToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles HelpToolStripMenuItem.Click
-        Functions.support.launchURLInWebBrowser(globalVariables.webURLs.webPages.strHelpVideos, "An error occurred when trying to launch the Help Videos URL in your default browser. The URL has been copied to your Windows Clipboard for you to paste into the address bar in the browser of your choice.")
-    End Sub
-
     Private Sub SetBarColorToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SetBarColorToolStripMenuItem.Click
         ColorDialog.CustomColors = Functions.support.loadCustomColors()
         ColorDialog.Color = My.Settings.barColor

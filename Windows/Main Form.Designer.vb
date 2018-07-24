@@ -127,7 +127,6 @@ Partial Class Form1
         Me.ViewOfficialChangeLogToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem()
         Me.CommandLineArgumentsToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.toolStripDonate = New System.Windows.Forms.ToolStripMenuItem()
-        Me.HelpToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.FfgdToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -387,7 +386,7 @@ Partial Class Form1
         '
         'MenuStrip1
         '
-        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.toolUtilities, Me.OptionsToolStripMenuItem, Me.toolStripAbout, Me.toolStripDonate, Me.HelpToolStripMenuItem})
+        Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.toolUtilities, Me.OptionsToolStripMenuItem, Me.toolStripAbout, Me.toolStripDonate})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
         Me.MenuStrip1.Size = New System.Drawing.Size(722, 24)
@@ -936,13 +935,6 @@ Partial Class Form1
         Me.toolStripDonate.Size = New System.Drawing.Size(163, 20)
         Me.toolStripDonate.Text = "Donate to the Developer"
         '
-        'HelpToolStripMenuItem
-        '
-        Me.HelpToolStripMenuItem.Image = Global.Restore_Point_Creator.My.Resources.Resources.movies
-        Me.HelpToolStripMenuItem.Name = "HelpToolStripMenuItem"
-        Me.HelpToolStripMenuItem.Size = New System.Drawing.Size(139, 20)
-        Me.HelpToolStripMenuItem.Text = "Instructional Videos"
-        '
         'Label5
         '
         Me.Label5.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
@@ -1113,7 +1105,6 @@ Partial Class Form1
     Friend WithEvents toolStripDeleteRestorePoints As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents toolStripDeleteOldRestorePoints As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents toolStripDeleteAllRestorePoints As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents HelpToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents ColorDialog As System.Windows.Forms.ColorDialog
     Friend WithEvents NotifyIcon1 As System.Windows.Forms.NotifyIcon
     Friend WithEvents btnCreateRestorePointNameWithDefaultName As System.Windows.Forms.Button

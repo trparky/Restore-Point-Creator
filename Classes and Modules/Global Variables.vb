@@ -122,7 +122,6 @@ Namespace globalVariables
                 Public Const strCOMExceptionCrash As String = "http://www.toms-world.org/blog/restore_point_creator/comexception-crash"
                 Public Const strProviderFailureMicrosoftKB As String = "http://support.microsoft.com/kb/2738812"
                 Public Const strFAQ As String = "http://www.toms-world.org/blog/restore_point_creator/faq"
-                Public Const strHelpVideos As String = "www.toms-world.org/blog/restore_point_creator/help-videos"
 
                 Public Const strPayPal As String = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=HQL3AC96XKM42&lc=US&no_note=1&no_shipping=1&rm=1&return=http%3a%2f%2fwww%2etoms%2dworld%2eorg%2fblog%2fthank%2dyou%2dfor%2dyour%2ddonation&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted"
             End Module
