@@ -384,6 +384,7 @@ Namespace Functions.support
                 End Try
             End If
 
+            APIs.NativeMethods.CloseHandle(processHandle)
             Return Nothing
         End Function
 
