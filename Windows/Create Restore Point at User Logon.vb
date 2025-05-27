@@ -148,7 +148,7 @@ Public Class Create_Restore_Point_at_User_Logon
     Private Sub btnCreateTask_Click(sender As Object, e As EventArgs) Handles btnCreateTask.Click
         Dim delayedTime As Short = 0
 
-        If doesAtUserLoginTaskExist(delayedTime) = True Then
+        If doesAtUserLoginTaskExist(delayedTime) Then
             deleteAtUserLogonTask()
         End If
 
@@ -177,7 +177,7 @@ Public Class Create_Restore_Point_at_User_Logon
 
         logonTriggerDefinition.UserId = Security.Principal.WindowsIdentity.GetCurrent().Name
 
-        If delayed = True Then
+        If delayed Then
             logonTriggerDefinition.Delay = TimeSpan.FromMinutes(delayTimeInMinutes)
         End If
 
@@ -227,7 +227,7 @@ Public Class Create_Restore_Point_at_User_Logon
     End Sub
 
     Private Sub Create_Restore_Point_at_User_Logon_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        If boolThingsChanged = True Then
+        If boolThingsChanged Then
             Dim msgBoxResult As MsgBoxResult = MsgBox("It seems that you have changed some things. Remember, you have to click the ""Make Restore Points at User Logon"" button after changing settings." & vbCrLf & vbCrLf & "Are you sure you want to abandon these changes?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, Me.Text)
 
             If msgBoxResult = Microsoft.VisualBasic.MsgBoxResult.No Then
@@ -245,7 +245,7 @@ Public Class Create_Restore_Point_at_User_Logon
             renameOldTask()
 
             Dim delayedTime As Short = 0
-            If doesAtUserLoginTaskExist(delayedTime) = True Then
+            If doesAtUserLoginTaskExist(delayedTime) Then
                 btnDeleteTask.Enabled = True
 
                 If delayedTime <> 0 Then
@@ -270,7 +270,7 @@ Public Class Create_Restore_Point_at_User_Logon
     Private Sub btnDeleteTask_Click(sender As Object, e As EventArgs) Handles btnDeleteTask.Click
         Dim delayedTime As Short = 0
 
-        If doesAtUserLoginTaskExist(delayedTime) = True Then
+        If doesAtUserLoginTaskExist(delayedTime) Then
             deleteAtUserLogonTask()
             btnDeleteTask.Enabled = False
             boolThingsChanged = False

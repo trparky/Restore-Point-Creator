@@ -18,7 +18,7 @@
             Dim boolResult As Boolean
             Dim deviceID As String = Functions.wmi.getDeviceIDFromDriveLetter(globalVariables.systemDriveLetter, boolResult)
 
-            If boolResult = True Then
+            If boolResult Then
                 If My.Settings.debug Then Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("EXTENDED DEBUG MESSAGE{0}DeviceID for boot drive has been detected as {1}.", vbCrLf, deviceID), EventLogEntryType.Information, False)
 
                 Dim totalDriveSize As Long = getTotalDriveSize(globalVariables.systemDriveLetter)

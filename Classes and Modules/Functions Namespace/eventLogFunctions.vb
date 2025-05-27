@@ -735,7 +735,7 @@
                     eventInstance = logReader.ReadEvent()
 
                     While eventInstance IsNot Nothing
-                        If eventInstance.ProviderName.Equals(strSystemRestorePointCreator, StringComparison.OrdinalIgnoreCase) Or eventInstance.ProviderName.caseInsensitiveContains(strSystemRestorePointCreator) = True Then
+                        If eventInstance.ProviderName.Equals(strSystemRestorePointCreator, StringComparison.OrdinalIgnoreCase) Or eventInstance.ProviderName.caseInsensitiveContains(strSystemRestorePointCreator) Then
                             logClass = New restorePointCreatorExportedLog With {
                                 .logData = "--== Imported Log ==--" & vbCrLf & vbCrLf & eventInstance.FormatDescription,
                                 .unixTime = 0,

@@ -17,11 +17,11 @@ Namespace Functions.importExportSettings
                 While streamReader.EndOfStream = False
                     strTemp = streamReader.ReadLine
 
-                    If strTemp.StartsWith("Payload: ", StringComparison.OrdinalIgnoreCase) = True Then
+                    If strTemp.StartsWith("Payload: ", StringComparison.OrdinalIgnoreCase) Then
                         strDataPayload = strTemp.caseInsensitiveReplace("Payload: ", "").Trim
-                    ElseIf strTemp.StartsWith("Random String: ", StringComparison.OrdinalIgnoreCase) = True Then
+                    ElseIf strTemp.StartsWith("Random String: ", StringComparison.OrdinalIgnoreCase) Then
                         strRandomString = strTemp.caseInsensitiveReplace("Random String: ", "").Trim
-                    ElseIf strTemp.StartsWith("Checksum: ", StringComparison.OrdinalIgnoreCase) = True Then
+                    ElseIf strTemp.StartsWith("Checksum: ", StringComparison.OrdinalIgnoreCase) Then
                         strChecksum = strTemp.caseInsensitiveReplace("Checksum: ", "").Trim
                     End If
                 End While
@@ -71,7 +71,7 @@ Namespace Functions.importExportSettings
                     ElseIf iniFileValue.StartsWith("System.Drawing.Size") Then
                         iniFileValue = iniFileValue.caseInsensitiveReplace("System.Drawing.Size,", "")
 
-                        If systemDrawingSizeRegexObject.IsMatch(iniFileValue) = True Then
+                        If systemDrawingSizeRegexObject.IsMatch(iniFileValue) Then
                             regExMatches = systemDrawingSizeRegexObject.Match(iniFileValue)
 
                             tempWidth = Integer.Parse(regExMatches.Groups("width").Value)

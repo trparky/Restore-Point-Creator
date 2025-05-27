@@ -10,7 +10,7 @@ Namespace Functions.taskStuff
             ' Apparently the SYSTEM user can't create scheduled tasks, so to prevent crashes we check to see if
             ' we are running in the SYSTEM user context and if we are we abort this subroutine by returning a
             ' True value even though the Task Folder may not actually exist.
-            If privilegeChecks.areWeRunningAsSystemUser() = True Then
+            If privilegeChecks.areWeRunningAsSystemUser() Then
                 Return True
             End If
 
@@ -45,7 +45,7 @@ Namespace Functions.taskStuff
                 Dim taskObject As TaskScheduler.Task = taskService.GetTask("Microsoft\Windows\SystemRestore\SR")
 
                 If taskObject IsNot Nothing Then
-                    If taskObject.Enabled = False Then
+                    If Not taskObject.Enabled Then
                         taskObject.Definition.Settings.Enabled = True
                         taskObject.RegisterChanges()
                         eventLogFunctions.writeToApplicationLogFile("Enabled built-in Windows System Restore Task.", EventLogEntryType.Information, False)
@@ -68,7 +68,7 @@ Namespace Functions.taskStuff
                 Dim taskObject As TaskScheduler.Task = taskService.GetTask("Microsoft\Windows\SystemRestore\SR")
 
                 If taskObject IsNot Nothing Then
-                    If taskObject.Enabled = True Then
+                    If taskObject.Enabled Then
                         taskObject.Definition.Settings.Enabled = False
                         taskObject.RegisterChanges()
                         eventLogFunctions.writeToApplicationLogFile("Disabled built-in Windows System Restore Task.", EventLogEntryType.Information, False)
@@ -92,7 +92,7 @@ Namespace Functions.taskStuff
         Public Sub addRunTimeTask(taskName As String, taskDescription As String, taskEXEPath As String, taskParameters As String, Optional boolAllowParallelRunMode As Boolean = False)
             ' Apparently the SYSTEM user can't create scheduled tasks, so to prevent crashes we check to
             ' see if we are running in the SYSTEM user context and if we are we abort this subroutine.
-            If privilegeChecks.areWeRunningAsSystemUser() = True Then
+            If privilegeChecks.areWeRunningAsSystemUser() Then
                 Exit Sub
             End If
 
@@ -102,7 +102,7 @@ Namespace Functions.taskStuff
                 taskEXEPath = taskEXEPath.Trim
                 taskParameters = taskParameters.Trim
 
-                If IO.File.Exists(taskEXEPath) = False Then
+                If Not IO.File.Exists(taskEXEPath) Then
                     MsgBox("Executable path not found.", MsgBoxStyle.Critical, "Restore Point Creator")
                     Exit Sub
                 End If
@@ -129,7 +129,7 @@ Namespace Functions.taskStuff
                     .Priority = ProcessPriorityClass.Normal
                 End With
 
-                If boolAllowParallelRunMode = True Then
+                If boolAllowParallelRunMode Then
                     newTask.Settings.MultipleInstances = TaskScheduler.TaskInstancesPolicy.Parallel
                 End If
 
@@ -167,26 +167,26 @@ Namespace Functions.taskStuff
         Public Sub createRunTimeTasksSubRoutine()
             ' Apparently the SYSTEM user can't create scheduled tasks, so to prevent crashes we check to
             ' see if we are running in the SYSTEM user context and if we are we abort this subroutine.
-            If privilegeChecks.areWeRunningAsSystemUser() = True Then
+            If privilegeChecks.areWeRunningAsSystemUser() Then
                 Exit Sub
             End If
 
             Try
                 Dim task As TaskScheduler.Task = Nothing
 
-                If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Restore Point)", task) = False Then
+                If Not doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Restore Point)", task) Then
                     addRunTimeTask("Restore Point Creator -- Run with no UAC (Create Restore Point)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, globalVariables.commandLineSwitches.createRestorePoint)
                 End If
-                If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Custom Restore Point)", task) = False Then
+                If Not doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Custom Restore Point)", task) Then
                     addRunTimeTask("Restore Point Creator -- Run with no UAC (Create Custom Restore Point)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, globalVariables.commandLineSwitches.createCustomRestorePoint)
                 End If
-                If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC", task) = False Then
+                If Not doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC", task) Then
                     addRunTimeTask("Restore Point Creator -- Run with no UAC", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, "", True)
                 End If
-                If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Delete old Restore Points)", task) = False Then
+                If Not doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Delete old Restore Points)", task) Then
                     addRunTimeTask("Restore Point Creator -- Run with no UAC (Delete old Restore Points)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, globalVariables.commandLineSwitches.deleteOldRestorePoints)
                 End If
-                If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Keep X Number of Restore Points)", task) = False Then
+                If Not doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Keep X Number of Restore Points)", task) Then
                     addRunTimeTask("Restore Point Creator -- Run with no UAC (Keep X Number of Restore Points)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, globalVariables.commandLineSwitches.keepXNumberOfRestorePoints)
                 End If
                 '"Restore Point Creator -- Run with no UAC (Keep X Number of Restore Points)"
@@ -208,7 +208,7 @@ Namespace Functions.taskStuff
                     Dim shortEvery As Short ' Creates a Short variable with a name of everyShort.
 
                     ' Now we try and parse the setting from the Registry from a String to a Short.
-                    If Short.TryParse(strEvery, shortEvery) = True Then
+                    If Short.TryParse(strEvery, shortEvery) Then
                         ' Good, the Short parsing worked.
 
                         Dim taskService As New TaskScheduler.TaskService ' Creates a new TaskService Object.
@@ -351,9 +351,9 @@ Namespace Functions.taskStuff
                     If taskObject.Definition.Actions.Count = 1 Then
                         execActionPath = DirectCast(taskObject.Definition.Actions(0), TaskScheduler.ExecAction).Path
 
-                        If execActionPath.Contains(Chr(34)) = True Then execActionPath = execActionPath.Replace(Chr(34), "")
+                        If execActionPath.Contains(Chr(34)) Then execActionPath = execActionPath.Replace(Chr(34), "")
 
-                        If IO.File.Exists(execActionPath) = True Then
+                        If IO.File.Exists(execActionPath) Then
                             Return True
                         Else
                             deleteTask(taskObject) ' This is an invalid RunTime task so we need to delete it.
@@ -380,7 +380,7 @@ Namespace Functions.taskStuff
 
         Private Sub runTheTask(ByRef task As TaskScheduler.Task)
             ' This checks to see if the task we are trying to run is allowed to be run on demand.
-            If task.Definition.Settings.AllowDemandStart = True Then
+            If task.Definition.Settings.AllowDemandStart Then
                 ' Yes, it's allowed so let's continue.
                 Try
                     task.Run() ' Runs the task.
@@ -405,7 +405,7 @@ Namespace Functions.taskStuff
 
             ' To make sure that nothing goes wrong... we wrap this code in a TRY block.
             Try
-                If Debugger.IsAttached = False Then ' Checks to see if a debugger is attached to the current process.
+                If Not Debugger.IsAttached Then ' Checks to see if a debugger is attached to the current process.
                     Dim boolNoTask As Boolean ' Create a Boolean data type variable.
 
                     ' We open our program's Registry key.
@@ -425,24 +425,24 @@ Namespace Functions.taskStuff
 
                         ' Checks to see if the Registry value was True and if we aren't an Admin. If boolNoTask
                         ' is True, then we aren't going to be using the Task Wrapper to launch the program.
-                        If boolNoTask = True And boolAreWeRunningAsAdministrator = False Then
+                        If boolNoTask And Not boolAreWeRunningAsAdministrator Then
                             ' OK, we relaunch the process with full Administrator privileges with a UAC prompt.
                             support.reRunWithAdminUserRights()
                         End If
                     End If
 
                     ' Checks to see if this application's executable is in a safe place, in this case... Program Files.
-                    If Application.ExecutablePath.caseInsensitiveContains("program files") = True Then
+                    If Application.ExecutablePath.caseInsensitiveContains("program files") Then
                         ' Yes, it is... so let's continue.
 
                         ' OK, we need to make sure that we are currently running with Administrator privileges.
-                        If boolAreWeRunningAsAdministrator = True Then
+                        If boolAreWeRunningAsAdministrator Then
                             ' Yes, we are.
 
                             ' Let's check to see if the tasks exist or not.  If they don't, let's create them.  We have a total of three tasks we need to create.
                             createRunTimeTasksSubRoutine()
                             ' Done creating the tasks.  So from this point on we keep on running as normal.
-                        ElseIf boolAreWeRunningAsAdministrator = False Then
+                        ElseIf Not boolAreWeRunningAsAdministrator Then
                             ' No we are not.  So we are either going to relaunch the program with Administrator
                             ' user rights using the Task Wrapper or prompt the user with a UAC prompt.
 
@@ -458,7 +458,7 @@ Namespace Functions.taskStuff
                                 ' Handles the creation of a restore point from the command line or shortcut.
                                 If commandLineArgument.Equals(globalVariables.commandLineSwitches.createRestorePoint, StringComparison.OrdinalIgnoreCase) Then
                                     ' Checks to see if the Task Wrapper task exists and returns both a Boolean value and a task object.
-                                    If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Restore Point)", task) = True Then
+                                    If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Restore Point)", task) Then
                                         ' Yes, the Task Wrapper task exists so we are going to run that task.
                                         runTheTask(task)
                                     Else
@@ -467,7 +467,7 @@ Namespace Functions.taskStuff
                                     End If
                                 ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.createCustomRestorePoint, StringComparison.OrdinalIgnoreCase) Then
                                     ' Checks to see if the Task Wrapper task exists and returns both a Boolean value and a task object.
-                                    If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Custom Restore Point)", task) = True Then
+                                    If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Custom Restore Point)", task) Then
                                         ' Yes, the Task Wrapper task exists so we are going to run that task.
                                         runTheTask(task)
                                     Else
@@ -476,7 +476,7 @@ Namespace Functions.taskStuff
                                     End If
                                 ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.deleteOldRestorePoints, StringComparison.OrdinalIgnoreCase) Then
                                     ' Checks to see if the Task Wrapper task exists and returns both a Boolean value and a task object.
-                                    If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Delete old Restore Points)", task) = True Then
+                                    If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Delete old Restore Points)", task) Then
                                         ' Yes, the Task Wrapper task exists so we are going to run that task.
                                         runTheTask(task)
                                     Else
@@ -485,14 +485,14 @@ Namespace Functions.taskStuff
                                     End If
                                 ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.keepXNumberOfRestorePoints, StringComparison.OrdinalIgnoreCase) Then
                                     ' Checks to see if the Task Wrapper task exists and returns both a Boolean value and a task object.
-                                    If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Keep X Number of Restore Points)", task) = True Then
+                                    If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Keep X Number of Restore Points)", task) Then
                                         ' Yes, the Task Wrapper task exists so we are going to run that task.
                                         runTheTask(task)
                                     Else
                                         ' OK, we relaunch the process with full Administrator privileges with a UAC prompt.
                                         support.reRunWithAdminUserRights()
                                     End If
-                                ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.forceUAC, StringComparison.OrdinalIgnoreCase) And boolAreWeRunningAsAdministrator = False Then
+                                ElseIf commandLineArgument.Equals(globalVariables.commandLineSwitches.forceUAC, StringComparison.OrdinalIgnoreCase) And Not boolAreWeRunningAsAdministrator Then
                                     ' OK, we relaunch the process with full Administrator privileges with a UAC prompt.
                                     support.reRunWithAdminUserRights()
                                 End If
@@ -500,7 +500,7 @@ Namespace Functions.taskStuff
                                 ' Nope, the user is running it normally without a command line argument.
 
                                 ' Checks to see if the Task Wrapper task exists and returns both a Boolean value and a task object.
-                                If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC", task) = True Then
+                                If doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC", task) Then
                                     ' Yes, the Task Wrapper task exists so we are going to run that task.
                                     runTheTask(task)
                                 Else
@@ -512,13 +512,13 @@ Namespace Functions.taskStuff
                     Else
                         ' No, so let's use the UAC prompt because we can't tell if the user is going to move
                         ' this executable or not. So to be on the safe side, we don't use the Task Wrapper.
-                        If boolAreWeRunningAsAdministrator = False Then support.reRunWithAdminUserRights()
+                        If Not boolAreWeRunningAsAdministrator Then support.reRunWithAdminUserRights()
                     End If
                 End If
             Catch ex As Exception
                 eventLogFunctions.writeCrashToApplicationLogFile(ex)
                 ' Something went very wrong, so let's just try and re-launch this program with standard Administrator privileges with a UAC prompt.
-                If boolAreWeRunningAsAdministrator = False Then support.reRunWithAdminUserRights()
+                If Not boolAreWeRunningAsAdministrator Then support.reRunWithAdminUserRights()
             End Try
         End Sub
     End Module

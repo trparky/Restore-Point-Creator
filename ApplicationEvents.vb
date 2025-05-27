@@ -69,12 +69,12 @@ Namespace My
             Dim commandLineArgument As String
             Dim boolNoTask As Boolean = False ' Create a Boolean data type variable.
 
-            If Functions.osVersionInfo.isThisAServerOS() = True Then
+            If Functions.osVersionInfo.isThisAServerOS() Then
                 MsgBox("You are running a Server edition of Microsoft Windows. System Restore Point Creator doesn't function on server operating systems." & vbCrLf & vbCrLf & "This application will now close.", MsgBoxStyle.Critical, "System Restore Point Creator -- Application Error")
                 Process.GetCurrentProcess.Kill()
             End If
 
-            If IO.File.Exists("portable.mode") = True Or IO.File.Exists("portablemode.txt") = True Then
+            If IO.File.Exists("portable.mode") Or IO.File.Exists("portablemode.txt") Then
                 globalVariables.boolPortableMode = True
                 boolNoTask = True
             End If
@@ -112,7 +112,7 @@ Namespace My
                 ' OK, it doesn't exist so we have to create it.
 
                 ' But first, we need to check if we are running with an Administrator user rights token.
-                If boolAreWeAnAdministrator = True Then
+                If boolAreWeAnAdministrator Then
                     ' OK, we're running as an Administrator so we can continue to create our Registry Key.
 
                     Try
@@ -251,14 +251,14 @@ Namespace My
             End If
 
             ' Checks to see if the update channel is set to stable, if a debug symbols file exists, and we are an Admin.
-            If My.Settings.updateChannel = globalVariables.updateChannels.stable And IO.File.Exists(globalVariables.pdbFileNameInZIP) = True And boolAreWeAnAdministrator = True Then
+            If My.Settings.updateChannel = globalVariables.updateChannels.stable And IO.File.Exists(globalVariables.pdbFileNameInZIP) And boolAreWeAnAdministrator Then
                 Functions.support.deleteFileWithNoException(globalVariables.pdbFileNameInZIP)
             End If
 
             Dim executablePathPathInfo As New IO.FileInfo(Windows.Forms.Application.ExecutablePath)
 
 #If DEBUG Then
-            If Debugger.IsAttached = True And boolAreWeAnAdministrator = False Then
+            If Debugger.IsAttached And Not boolAreWeAnAdministrator Then
                 MsgBox("You must restart Microsoft Visual Studio with Administrator privileges. Debugging will now stop.", MsgBoxStyle.Critical, "Debug Mode Enabled")
                 e.Cancel = True
                 Exit Sub
@@ -281,16 +281,16 @@ Namespace My
             End If
 
             ' Checks to see if we are in Safe Mode and if the No Task setting is set to False.  Both conditions have to be False for this code block to run.
-            If boolAreWeInSafeMode = False And boolNoTask = False Then
-                If Functions.privilegeChecks.IsUserInAdminGroup() = True Then
+            If Not boolAreWeInSafeMode And Not boolNoTask Then
+                If Functions.privilegeChecks.IsUserInAdminGroup() Then
                     ' This code creates the subfolder in the task scheduler for our runtime tasks.
 
                     ' Checks to see if the Task Folder doesn't exist.
-                    If Functions.taskStuff.doesTaskFolderExist() = False Then
+                    If Not Functions.taskStuff.doesTaskFolderExist() Then
                         ' If we aren't an Administrator, we relaunch this program as an admin.
-                        If boolAreWeAnAdministrator = False Then
+                        If Not boolAreWeAnAdministrator Then
                             Functions.support.reRunWithAdminUserRights()
-                        ElseIf boolAreWeAnAdministrator = True Then ' Yes, we are an Admin, so we go ahead and create the Task folder.
+                        ElseIf boolAreWeAnAdministrator Then ' Yes, we are an Admin, so we go ahead and create the Task folder.
                             Try
                                 Dim taskService As New TaskService
                                 taskService.RootFolder.CreateFolder(globalVariables.taskFolder)
@@ -398,7 +398,7 @@ Namespace My
                     Functions.support.removeSafeModeBoot()
                 End If
 
-                If (Functions.osVersionInfo.isThisWindows10() = True Or Functions.osVersionInfo.isThisWindows8x() = True) And boolAreWeAnAdministrator = True And boolAreWeInSafeMode = False Then
+                If (Functions.osVersionInfo.isThisWindows10() Or Functions.osVersionInfo.isThisWindows8x()) And boolAreWeAnAdministrator And Not boolAreWeInSafeMode Then
                     Functions.taskStuff.disableBuiltInRestorePointTask()
                 End If
             Catch ex As Exception
@@ -406,7 +406,7 @@ Namespace My
                 exceptionHandler.manuallyLoadCrashWindow(ex, "Application Startup Routine" & vbCrLf & vbCrLf & ex.Message, ex.StackTrace, ex.GetType)
             End Try
 
-            If boolAreWeAnAdministrator = True Then
+            If boolAreWeAnAdministrator Then
                 If Not Functions.registryStuff.getBooleanValueFromRegistry("Updated Scheduled Tasks with Every Setting", False) Then Functions.taskStuff.updateScheduledRestorePointCreationTaskWithEverySetting()
                 If Not Functions.registryStuff.getBooleanValueFromRegistry("Added MultiRun For Runtime Task", False) Then Functions.taskStuff.setMultiRunForTask()
                 If Not Functions.registryStuff.getBooleanValueFromRegistry("Added Priority Settings to Tasks", False) Then Functions.taskStuff.addPrioritySettings()
@@ -417,7 +417,7 @@ Namespace My
             Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
 
             Dim result As Boolean = exceptionHandler.handleCrashWithAnErrorOrRedirectUserInstead(e.Exception)
-            If result = True Then exceptionHandler.manuallyLoadCrashWindow(e.Exception, e.Exception.Message, e.Exception.StackTrace, e.Exception.GetType)
+            If result Then exceptionHandler.manuallyLoadCrashWindow(e.Exception, e.Exception.Message, e.Exception.StackTrace, e.Exception.GetType)
         End Sub
 
         Protected Overrides Sub Finalize()

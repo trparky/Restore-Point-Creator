@@ -5,7 +5,7 @@
         Try
             Dim shortMaxNumber As Short
 
-            If Short.TryParse(txtMaxNumber.Text.Trim, shortMaxNumber) = True Then
+            If Short.TryParse(txtMaxNumber.Text.Trim, shortMaxNumber) Then
                 Using regKey As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True)
                     regKey.SetValue("Keep X Amount of Restore Points Value", shortMaxNumber.ToString, Microsoft.Win32.RegistryValueKind.String)
                     regKey.SetValue("Keep X Amount of Restore Points", "True", Microsoft.Win32.RegistryValueKind.String)

@@ -164,7 +164,7 @@
                             Dim boolGetVSSDataResult As Boolean
                             Dim shadowStorageData As Functions.supportClasses.ShadowStorageData = Functions.vss.getData(currentDriveLetter, boolGetVSSDataResult)
 
-                            If shadowStorageData IsNot Nothing And boolGetVSSDataResult = True Then
+                            If shadowStorageData IsNot Nothing And boolGetVSSDataResult Then
                                 yPosition += 22 ' Advances the Y position down a bit so that we make room for the next object.
                                 xPosition = 12 ' Resets the X position back to the beginning of the line.
 
@@ -277,7 +277,7 @@
 
     Sub formLoadDiskData()
         Try
-            If Me.IsHandleCreated = True Then
+            If Me.IsHandleCreated Then
                 If GroupBox1.IsHandleCreated Then
                     openPleaseWaitPanel("Loading Disk Space Usage Information... Please Wait.")
 
@@ -374,7 +374,7 @@
     End Sub
 
     Private Sub Disk_Space_Usage_Shown(sender As Object, e As EventArgs) Handles Me.Shown
-        If Me.IsHandleCreated = False Then Me.CreateHandle()
+        If Not Me.IsHandleCreated Then Me.CreateHandle()
 
         Try
             Me.Size = My.Settings.diskUsageWindowSize

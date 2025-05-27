@@ -26,9 +26,9 @@ Namespace Functions.checksum
             Dim httpHelper As httpHelper = http.createNewHTTPHelperObject()
 
             Try
-                If httpHelper.getWebData(urlOfChecksumFile, checksumFromWeb) = True Then
+                If httpHelper.getWebData(urlOfChecksumFile, checksumFromWeb) Then
                     ' Checks to see if we have a valid SHA1 file.
-                    If Regex.IsMatch(checksumFromWeb, "([a-zA-Z0-9]{64})") = True Then
+                    If Regex.IsMatch(checksumFromWeb, "([a-zA-Z0-9]{64})") Then
                         ' Now that we have a valid SHA256 file we need to parse out what we want.
                         checksumFromWeb = Regex.Match(checksumFromWeb, "([a-zA-Z0-9]{64})").Groups(1).Value.Trim
 
@@ -38,21 +38,21 @@ Namespace Functions.checksum
                             Return True ' OK, things are good; the file passed checksum verification so we return True.
                         Else
                             ' The checksums don't match. Oops.
-                            If boolGiveUserAnErrorMessage = True Then
+                            If boolGiveUserAnErrorMessage Then
                                 MsgBox("There was an error in the download, checksums don't match. Update process aborted.", MsgBoxStyle.Critical, "Restore Point Creator")
                             End If
 
                             Return False
                         End If
                     Else
-                        If boolGiveUserAnErrorMessage = True Then
+                        If boolGiveUserAnErrorMessage Then
                             MsgBox("Invalid SHA2 file detected. Update process aborted.", MsgBoxStyle.Critical, "Restore Point Creator")
                         End If
 
                         Return False
                     End If
                 Else
-                    If boolGiveUserAnErrorMessage = True Then
+                    If boolGiveUserAnErrorMessage Then
                         MsgBox("There was an error downloading the checksum verification file. Update process aborted.", MsgBoxStyle.Critical, "Restore Point Creator")
                     End If
 
@@ -61,7 +61,7 @@ Namespace Functions.checksum
             Catch ex As Exception
                 eventLogFunctions.writeCrashToApplicationLogFile(ex)
 
-                If boolGiveUserAnErrorMessage = True Then
+                If boolGiveUserAnErrorMessage Then
                     MsgBox("There was an error downloading the checksum verification file. Update process aborted.", MsgBoxStyle.Critical, "Restore Point Creator")
                 End If
 
@@ -75,9 +75,9 @@ Namespace Functions.checksum
             Dim httpHelper As httpHelper = http.createNewHTTPHelperObject()
 
             Try
-                If httpHelper.getWebData(urlOfChecksumFile, checksumFromWeb) = True Then
+                If httpHelper.getWebData(urlOfChecksumFile, checksumFromWeb) Then
                     ' Checks to see if we have a valid SHA1 file.
-                    If Regex.IsMatch(checksumFromWeb, "([a-zA-Z0-9]{64})") = True Then
+                    If Regex.IsMatch(checksumFromWeb, "([a-zA-Z0-9]{64})") Then
                         ' Now that we have a valid SHA256 file we need to parse out what we want.
                         checksumFromWeb = Regex.Match(checksumFromWeb, "([a-zA-Z0-9]{64})").Groups(1).Value.Trim
 
@@ -87,21 +87,21 @@ Namespace Functions.checksum
                             Return True ' OK, things are good; the file passed checksum verification so we return True.
                         Else
                             ' The checksums don't match. Oops.
-                            If boolGiveUserAnErrorMessage = True Then
+                            If boolGiveUserAnErrorMessage Then
                                 MsgBox("There was an error in the download, checksums don't match. Update process aborted.", MsgBoxStyle.Critical, "Restore Point Creator")
                             End If
 
                             Return False
                         End If
                     Else
-                        If boolGiveUserAnErrorMessage = True Then
+                        If boolGiveUserAnErrorMessage Then
                             MsgBox("Invalid SHA2 file detected. Update process aborted.", MsgBoxStyle.Critical, "Restore Point Creator")
                         End If
 
                         Return False
                     End If
                 Else
-                    If boolGiveUserAnErrorMessage = True Then
+                    If boolGiveUserAnErrorMessage Then
                         MsgBox("There was an error downloading the checksum verification file. Update process aborted.", MsgBoxStyle.Critical, "Restore Point Creator")
                     End If
 
@@ -110,7 +110,7 @@ Namespace Functions.checksum
             Catch ex As Exception
                 eventLogFunctions.writeCrashToApplicationLogFile(ex)
 
-                If boolGiveUserAnErrorMessage = True Then
+                If boolGiveUserAnErrorMessage Then
                     MsgBox("There was an error downloading the checksum verification file. Update process aborted.", MsgBoxStyle.Critical, "Restore Point Creator")
                 End If
 

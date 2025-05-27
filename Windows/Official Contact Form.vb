@@ -10,7 +10,7 @@ Public Class Official_Contact_Form
     End Sub
 
     Private Sub Official_Contact_Form_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        If IO.File.Exists(strFileToHaveDataExportedTo) = True Then
+        If IO.File.Exists(strFileToHaveDataExportedTo) Then
             Functions.support.deleteFileWithNoException(strFileToHaveDataExportedTo)
         End If
 
@@ -27,7 +27,7 @@ Public Class Official_Contact_Form
         Dim boolDoWeHaveAttachments As Boolean = False
         If listAttachedFiles.Items.Count <> 0 Then boolDoWeHaveAttachments = True
 
-        If boolDoWeHaveAttachments = True Then
+        If boolDoWeHaveAttachments Then
             Try
                 Using zipFileObject As IO.Compression.ZipArchive = IO.Compression.ZipFile.Open(zipFilePath, IO.Compression.ZipArchiveMode.Create)
                     If zipFileObject Is Nothing Then
@@ -59,7 +59,7 @@ Public Class Official_Contact_Form
         httpHelper.addPOSTData("apiaccesscode", apiAccessCode)
         httpHelper.addPOSTData("submissionversion", "2")
 
-        If boolDoWeHaveAttachments = True Then
+        If boolDoWeHaveAttachments Then
             Try
                 httpHelper.addFileUpload("attachment", zipFilePath, Nothing, "application/zip")
             Catch ex As IO.FileNotFoundException
@@ -74,7 +74,7 @@ Public Class Official_Contact_Form
             Dim strHTTPResponse As String = Nothing
             Dim boolHTTPResponseResult As Boolean
 
-            If boolDoWeHaveAttachments = True Then
+            If boolDoWeHaveAttachments Then
                 ' If we have a file to upload we need to use the most complicated uploadData() function.
                 boolHTTPResponseResult = httpHelper.uploadData(globalVariables.webURLs.dataProcessors.strContactForm, strHTTPResponse)
             Else
@@ -82,8 +82,8 @@ Public Class Official_Contact_Form
                 boolHTTPResponseResult = httpHelper.getWebData(globalVariables.webURLs.dataProcessors.strContactForm, strHTTPResponse)
             End If
 
-            If boolHTTPResponseResult = True Then
-                If boolDoWeHaveAttachments = True Then closePleaseWaitPanel()
+            If boolHTTPResponseResult Then
+                If boolDoWeHaveAttachments Then closePleaseWaitPanel()
 
                 If strHTTPResponse.Equals("ok", StringComparison.OrdinalIgnoreCase) Then
                     listAttachedFiles.Items.Clear()
@@ -175,7 +175,7 @@ Public Class Official_Contact_Form
     Private Sub Official_Contact_Form_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         maxSize.ProgressBarColor = My.Settings.barColor
 
-        If My.Settings.useSSL = True Then
+        If My.Settings.useSSL Then
             btnSubmit.Image = My.Resources.lock
             ToolTip.SetToolTip(btnSubmit, "Secured by SSL.")
         End If
@@ -206,7 +206,7 @@ Public Class Official_Contact_Form
             Dim fileInfo As New IO.FileInfo(OpenFileDialog1.FileName)
 
             If fileInfo.Extension.Equals(".png", StringComparison.OrdinalIgnoreCase) Or fileInfo.Extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase) Or fileInfo.Extension.Equals(".jpeg", StringComparison.OrdinalIgnoreCase) Or fileInfo.Extension.Equals(".txt", StringComparison.OrdinalIgnoreCase) Or fileInfo.Extension.Equals(".log", StringComparison.OrdinalIgnoreCase) Or fileInfo.Extension.Equals(".reslog", StringComparison.OrdinalIgnoreCase) Then
-                If doesFileExistInList(OpenFileDialog1.FileName.ToString) = True Then
+                If doesFileExistInList(OpenFileDialog1.FileName.ToString) Then
                     MsgBox("A file by the name of " & Chr(34) & New IO.FileInfo(OpenFileDialog1.FileName.ToString).Name & Chr(34) & " already exists in the list of attached files.", MsgBoxStyle.Information, Me.Text)
                 Else
                     addFileToList(OpenFileDialog1.FileName.ToString)
@@ -275,7 +275,7 @@ Public Class Official_Contact_Form
     End Sub
 
     Private Sub Official_Contact_Form_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        If IO.File.Exists(strFileToHaveDataExportedTo) = True Then
+        If IO.File.Exists(strFileToHaveDataExportedTo) Then
             Try
                 IO.File.Delete(strFileToHaveDataExportedTo)
             Catch ex As Exception

@@ -10,7 +10,7 @@ Public Class frmCrash
     Private strTempZIPFile As String = IO.Path.Combine(IO.Path.GetTempPath(), "attachments.zip")
 
     Sub deleteTempFiles()
-        If boolDoWeHaveAttachments = True Then
+        If boolDoWeHaveAttachments Then
             Functions.support.deleteFileWithNoException(strTempZIPFile)
             Functions.support.deleteFileWithNoException(strFileToHaveDataExportedTo)
             Functions.support.deleteFileWithNoException(globalVariables.strDumpFilePath)
@@ -19,7 +19,7 @@ Public Class frmCrash
 
     Private Sub frmCrash_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
         Try
-            If boolSubmitted = False Then
+            If Not boolSubmitted Then
                 If MsgBox("Are you sure you want to close this window? You have not submitted the crash data yet.", MsgBoxStyle.Question + MsgBoxStyle.YesNo, Me.Text) = MsgBoxResult.No Then
                     e.Cancel = True
                     Exit Sub
@@ -37,7 +37,7 @@ Public Class frmCrash
         Control.CheckForIllegalCrossThreadCalls = False
         Media.SystemSounds.Hand.Play()
 
-        If My.Settings.useSSL = True Then
+        If My.Settings.useSSL Then
             btnSubmitData.Image = My.Resources.lock
             ToolTip.SetToolTip(btnSubmitData, "Secured by SSL.")
         End If
@@ -63,7 +63,7 @@ Public Class frmCrash
     End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        If lblHeader.Visible = True Then
+        If lblHeader.Visible Then
             lblHeader.Visible = False
         Else
             lblHeader.Visible = True
@@ -93,7 +93,7 @@ Public Class frmCrash
         httpHelper.addPOSTData("manually", "false")
         httpHelper.addPOSTData("autosubmitted", "false")
 
-        If chkReproducable.Checked = True Then
+        If chkReproducable.Checked Then
             httpHelper.addPOSTData("reproducable", "Yes")
         Else
             httpHelper.addPOSTData("reproducable", "No")
@@ -106,12 +106,12 @@ Public Class frmCrash
         End If
 
         Try
-            If chkSendLogs.Checked = True Then
+            If chkSendLogs.Checked Then
                 Dim logCount As ULong = 0
 
-                If Functions.eventLogFunctions.exportLogsToFile(strFileToHaveDataExportedTo, logCount) = True Then
-                    If Functions.support.addFileToZipFile(strTempZIPFile, strFileToHaveDataExportedTo) = True Then
-                        If IO.File.Exists(strTempZIPFile) = True Then
+                If Functions.eventLogFunctions.exportLogsToFile(strFileToHaveDataExportedTo, logCount) Then
+                    If Functions.support.addFileToZipFile(strTempZIPFile, strFileToHaveDataExportedTo) Then
+                        If IO.File.Exists(strTempZIPFile) Then
                             boolDoWeHaveAttachments = True
                             httpHelper.addFileUpload("attachment", strTempZIPFile, Nothing, "application/zip")
                         End If
@@ -120,7 +120,7 @@ Public Class frmCrash
             End If
 
             If IO.File.Exists(globalVariables.strDumpFilePath) Then
-                If Functions.support.addFileToZipFile(strTempZIPFile, globalVariables.strDumpFilePath) = True Then
+                If Functions.support.addFileToZipFile(strTempZIPFile, globalVariables.strDumpFilePath) Then
                     boolDoWeHaveAttachments = True
                     httpHelper.addFileUpload("attachment", strTempZIPFile, Nothing, "application/zip")
                 End If
@@ -129,14 +129,14 @@ Public Class frmCrash
             Dim strHTTPResponse As String = Nothing
             Dim boolHTTPResult As Boolean
 
-            If boolDoWeHaveAttachments = True Then
+            If boolDoWeHaveAttachments Then
                 boolHTTPResult = httpHelper.uploadData(globalVariables.webURLs.dataProcessors.strCrashReporter, strHTTPResponse)
             Else
                 boolHTTPResult = httpHelper.getWebData(globalVariables.webURLs.dataProcessors.strCrashReporter, strHTTPResponse)
             End If
 
-            If boolHTTPResult = True Then
-                If boolDoWeHaveAttachments = True Then closePleaseWaitPanel()
+            If boolHTTPResult Then
+                If boolDoWeHaveAttachments Then closePleaseWaitPanel()
                 deleteTempFiles()
 
                 If strHTTPResponse.Equals("ok", StringComparison.OrdinalIgnoreCase) Then
@@ -206,7 +206,7 @@ Public Class frmCrash
                     Debug.WriteLine("HTTP Response = " & strHTTPResponse)
                 End If
             Else
-                If boolDoWeHaveAttachments = True Then closePleaseWaitPanel()
+                If boolDoWeHaveAttachments Then closePleaseWaitPanel()
                 deleteTempFiles()
 
                 boolSubmitted = False
@@ -215,7 +215,7 @@ Public Class frmCrash
                 MsgBox("Something went wrong while submitting data. Please try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, "Restore Point Creator Crash Reporter")
             End If
         Catch ex As Exception
-            If boolDoWeHaveAttachments = True Then closePleaseWaitPanel()
+            If boolDoWeHaveAttachments Then closePleaseWaitPanel()
             deleteTempFiles()
             Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
         End Try
@@ -232,11 +232,11 @@ Public Class frmCrash
         If IO.File.Exists(globalVariables.strDumpFilePath) Then
             boolDoWeHaveAttachmentsInLine = True
         End If
-        If chkSendLogs.Checked = True Then
+        If chkSendLogs.Checked Then
             boolDoWeHaveAttachmentsInLine = True
         End If
 
-        If boolDoWeHaveAttachmentsInLine = True Then
+        If boolDoWeHaveAttachmentsInLine Then
             openPleaseWaitPanel("Compressing and Sending Data... Please Wait.")
         End If
 
@@ -268,7 +268,7 @@ Public Class frmCrash
     End Sub
 
     Private Sub btnClose_Click(sender As Object, e As EventArgs) Handles btnClose.Click
-        If boolSubmitted = False Then
+        If Not boolSubmitted Then
             If MsgBox("Are you sure you want to close this window? You have not submitted the crash data yet.", MsgBoxStyle.Question + MsgBoxStyle.YesNo, Me.Text) = MsgBoxResult.Yes Then
                 boolSubmitted = True
                 Functions.support.deleteFileWithNoException(globalVariables.strDumpFilePath)
@@ -354,7 +354,7 @@ Namespace exceptionHandler
 
             Dim exceptionMessage As String = exceptionObject.Message
 
-            If exceptionType = GetType(IO.FileLoadException) And exceptionMessage.regExSearch("(?:restoreToSystemRestorePoint|createRestorePoint)") = True Then
+            If exceptionType = GetType(IO.FileLoadException) And exceptionMessage.regExSearch("(?:restoreToSystemRestorePoint|createRestorePoint)") Then
                 MsgBox("There has been an error while loading a required system library for System Restore. Please reboot your computer and try again.", MsgBoxStyle.Critical + MsgBoxStyle.ApplicationModal, "System Restore Point Creator")
                 Process.GetCurrentProcess.Kill()
             ElseIf exceptionType = GetType(Configuration.ConfigurationErrorsException) Or exceptionType = GetType(Configuration.ConfigurationException) Then
@@ -375,7 +375,7 @@ Namespace exceptionHandler
                 MsgBox("There was an error while loading a required system library. Please check the Event Log Viewer for more information.", MsgBoxStyle.Exclamation, "System Restore Point Creator")
 
                 Return False
-            ElseIf exceptionType = GetType(ObjectDisposedException) And exceptionMessage.regExSearch("(?:Please_Wait|SmoothProgressBar|pleaseWaitlblLabel)") = True Then
+            ElseIf exceptionType = GetType(ObjectDisposedException) And exceptionMessage.regExSearch("(?:Please_Wait|SmoothProgressBar|pleaseWaitlblLabel)") Then
                 ' This is to hopefully catch an annoying crash that I've not been able to track down
                 ' so we're going to simply handle it silently with no notification to the user.
                 Functions.eventLogFunctions.writeCrashToApplicationLogFile(exceptionObject)
@@ -417,7 +417,7 @@ Namespace exceptionHandler
             exceptionMessage = Functions.support.removeSourceCodePathInfo(exceptionMessage).Trim
             exceptionStackTrace = Functions.support.removeSourceCodePathInfo(exceptionStackTrace).Trim
 
-            If handleCrashWithAnErrorOrRedirectUserInstead(exceptionType, exceptionObject) = True Then
+            If handleCrashWithAnErrorOrRedirectUserInstead(exceptionType, exceptionObject) Then
                 Try
                     Functions.miniDump.MiniDump.MiniDumpToFile(globalVariables.strDumpFilePath)
                 Catch Ex As Exception

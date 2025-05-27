@@ -390,7 +390,7 @@ Public Class httpHelper
     ''' <value>A Lambda</value>
     ''' <example>
     ''' httpHelper.setURLPreProcessor(Function(ByVal strURLInput As String) As String
-    '''   If strURLInput.ToLower.StartsWith("http://") = False Then
+    '''   If Not strURLInput.ToLower.StartsWith("http://") Then
     '''     strURLInput = "http://" + strURLInput
     '''   End If
     '''   Return strURLInput

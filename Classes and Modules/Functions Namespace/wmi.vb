@@ -83,7 +83,7 @@ Namespace Functions.wmi
         Public Function getDeviceIDFromDriveLetter(ByVal driveLetter As String, ByRef boolResult As Boolean) As String
             Try
                 driveLetter = driveLetter.Trim.ToUpper
-                If driveLetter.EndsWith(":") = False Then driveLetter &= ":"
+                If Not driveLetter.EndsWith(":") Then driveLetter &= ":"
 
                 Dim wmiQueryObject As New Management.ObjectQuery(String.Format("SELECT * FROM Win32_Volume Where DriveLetter='{0}'", driveLetter))
                 Using managementObjectSearcher As New Management.ManagementObjectSearcher(wmiQueryObject)
@@ -250,7 +250,7 @@ Namespace Functions.wmi
             Catch ex As Exception
                 Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
 
-                If privilegeChecks.areWeRunningAsSystemUser() = False Then
+                If Not privilegeChecks.areWeRunningAsSystemUser() Then
                     exceptionHandler.manuallyLoadCrashWindow(ex)
                 End If
 

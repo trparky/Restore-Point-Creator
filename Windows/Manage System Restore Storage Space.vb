@@ -121,7 +121,7 @@ Public Class frmManageSystemRestoreStorageSpace
 
         Try
             ' This makes sure we don't have a Null Reference Exception.
-            If shadowStorageStatistics IsNot Nothing And boolGetVSSDataResult = True Then
+            If shadowStorageStatistics IsNot Nothing And boolGetVSSDataResult Then
                 Dim percentage As Double = Functions.support.calculatePercentageValue(shadowStorageStatistics.UsedSpace, shadowStorageStatistics.MaxSpace)
                 percentageIndicator.Value = Math.Round(percentage, 0)
 
@@ -202,7 +202,7 @@ Public Class frmManageSystemRestoreStorageSpace
     Private Sub btnSetSize_Click(sender As Object, e As EventArgs) Handles btnSetSize.Click
         Dim dblSize As Double
 
-        If Double.TryParse(txtSize.Text, dblSize) = True Then
+        If Double.TryParse(txtSize.Text, dblSize) Then
             If dblSize = 0 Then
                 MsgBox("Zero is an invalid input.", MsgBoxStyle.Information, Me.Text)
                 Exit Sub

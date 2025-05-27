@@ -20,7 +20,7 @@
     End Sub
 
     Private Sub Convert_Old_Logs_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        If boolUserResponded = False Then _userResponse = userResponseENum.no
+        If Not boolUserResponded Then _userResponse = userResponseENum.no
     End Sub
 
     Private Sub btnConvertNow_Click(sender As Object, e As EventArgs) Handles btnConvertNow.Click

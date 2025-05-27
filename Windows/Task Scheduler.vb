@@ -10,7 +10,7 @@ Public Class frmTaskScheduler
     Private Const strDeleteTaskName As String = "Delete Old Restore Points"
 
     Private Sub frmTaskScheduler_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        If boolThingsChanged = True Then
+        If boolThingsChanged Then
             Dim msgBoxResponse As MsgBoxResult = MsgBox("You have changed some task settings but have yet to save them. Closing this window before saving your task settings will result in the loss of all recent changes." & vbCrLf & vbCrLf & "Remember, you must click the ""Save Task"" button to save your task settings." & vbCrLf & vbCrLf & "Are you sure you want close this window?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, Me.Text)
 
             If msgBoxResponse = MsgBoxResult.No Then
@@ -44,7 +44,7 @@ Public Class frmTaskScheduler
 
             For Each queryObj As ManagementObject In searcher.Get()
                 If queryObj("Name") = "Schedule" Then
-                    If (queryObj("StartMode").ToString = "Auto") = False Then
+                    If Not (queryObj("StartMode").ToString = "Auto") Then
                         MsgBox("Restore Point Creator has determined that the Windows Schedule Service has been disabled, Restore Point Creator will now attempt to repair this.", MsgBoxStyle.Information, Me.Text)
 
                         inParams = queryObj.GetMethodParameters("ChangeStartMode")
@@ -91,7 +91,7 @@ Public Class frmTaskScheduler
             serviceController = New ServiceProcess.ServiceController("Schedule")
 
             If serviceController IsNot Nothing Then
-                If (serviceController.Status = ServiceProcess.ServiceControllerStatus.Running) = False Then
+                If serviceController.Status <> ServiceProcess.ServiceControllerStatus.Running Then
                     MsgBox("The Windows Scheduler Service is currently not running, Restore Point Creator will attempt to start it.", MsgBoxStyle.Information, Me.Text)
                     serviceController.Start()
                     serviceController.WaitForStatus(ServiceProcess.ServiceControllerStatus.Running, New TimeSpan(0, 0, 0, 2))
@@ -127,7 +127,7 @@ Public Class frmTaskScheduler
         If (Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).GetValue("Every", Nothing) IsNot Nothing) Then
             txtEveryDay.Text = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).GetValue("Every")
 
-            If Functions.support.isNumeric(txtEveryDay.Text) = False Then
+            If Not Functions.support.isNumeric(txtEveryDay.Text) Then
                 txtEveryDay.Text = Nothing
                 lblDays.Visible = False
                 lblEvery.Visible = False
@@ -147,7 +147,7 @@ Public Class frmTaskScheduler
         radDaily.Checked = False
         radWeekly.Checked = False
 
-        If My.Settings.dontBugTheUserAboutPuttingTheEXEFileSomewhereSafe = False Then
+        If Not My.Settings.dontBugTheUserAboutPuttingTheEXEFileSomewhereSafe Then
             If Environment.Is64BitOperatingSystem Then
                 MsgBox("In order to use this option of the program, you must put this program in a safe place.  For instance, C:\Program Files (x86)." & vbCrLf & vbCrLf & "The reason why is that this portion of the program creates a Windows Scheduled Task that runs this program so if the scheduled task can't find the program's EXE file, the task won't run.", MsgBoxStyle.Information, Me.Text)
             Else
@@ -164,7 +164,7 @@ Public Class frmTaskScheduler
         Dim taskObject As Task = Nothing
 
         Try
-            If Functions.taskStuff.doesTaskExist(strDeleteTaskName, taskObject) = True Then
+            If Functions.taskStuff.doesTaskExist(strDeleteTaskName, taskObject) Then
                 lblRunTimesDelete.Text = "Next Run Time: " & taskObject.NextRunTime.ToString & vbCrLf & "Last Run Time: " & taskObject.LastRunTime.ToString
 
                 taskTriggers = taskObject.Definition.Triggers
@@ -208,7 +208,7 @@ Public Class frmTaskScheduler
         End Try
 
         Try
-            If Functions.taskStuff.doesTaskExist(strCheckPointTaskName, taskObject) = True Then
+            If Functions.taskStuff.doesTaskExist(strCheckPointTaskName, taskObject) Then
                 lblRunTimes.Text = "Next Run Time: " & taskObject.NextRunTime.ToString & vbCrLf & "Last Run Time: " & taskObject.LastRunTime.ToString
 
                 boolDoesTaskExist = True
@@ -302,7 +302,7 @@ Public Class frmTaskScheduler
         Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).DeleteValue("Every", False)
         Dim shortEvery As Short = Nothing
 
-        If radEvery.Checked = True And Short.TryParse(txtEveryDay.Text.Trim, shortEvery) = False Then
+        If radEvery.Checked And Not Short.TryParse(txtEveryDay.Text.Trim, shortEvery) Then
             MsgBox("Invalid input for Every setting.", MsgBoxStyle.Critical, Me.Text)
             Exit Sub
         End If
@@ -310,12 +310,12 @@ Public Class frmTaskScheduler
         Dim taskService As New TaskService
 
         Try
-            If radDaily.Checked = False And radWeekly.Checked = False And radEvery.Checked = False Then
+            If Not radDaily.Checked And Not radWeekly.Checked And Not radEvery.Checked Then
                 MsgBox("You must select a schedule type.", MsgBoxStyle.Information, Me.Text)
                 Exit Sub
             End If
 
-            If radWeekly.Checked = True And chkSunday.Checked = False And chkMonday.Checked = False And chkTuesday.Checked = False And chkWednesday.Checked = False And chkThursday.Checked = False And chkFriday.Checked = False And chkSaturday.Checked = False Then
+            If radWeekly.Checked And Not chkSunday.Checked And Not chkMonday.Checked And Not chkTuesday.Checked And Not chkWednesday.Checked And Not chkThursday.Checked And Not chkFriday.Checked And Not chkSaturday.Checked Then
                 MsgBox("You must select days of the week for your weekly schedule.", MsgBoxStyle.Information, Me.Text)
                 Exit Sub
             End If
@@ -363,7 +363,7 @@ Public Class frmTaskScheduler
             newTask.Settings.IdleSettings.StopOnIdleEnd = False
             newTask.Settings.WakeToRun = chkWake.Checked
 
-            If chkWake.Checked = True Then
+            If chkWake.Checked Then
                 Functions.power.checkIfActivePowerPlanIsSetProperlyForWakingFromSleep()
             End If
 
@@ -496,7 +496,7 @@ Public Class frmTaskScheduler
 
     Private Sub btnSet_Click(sender As Object, e As EventArgs) Handles btnSet.Click
         Dim shortDays As Short
-        If Short.TryParse(txtDays.Text, shortDays) = True Then
+        If Short.TryParse(txtDays.Text, shortDays) Then
             Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue("MaxDays", shortDays.ToString, Microsoft.Win32.RegistryValueKind.String)
 
             MsgBox("Max Age Setting Saved.", MsgBoxStyle.Information, "Setting Saved.")
@@ -512,14 +512,14 @@ Public Class frmTaskScheduler
             ' This checks to see if the user inputted an Integer and not a String.
             If Not Functions.support.isNumeric(txtDaysDelete.Text.Trim) Then txtDaysDelete.Text = 10
 
-            If radWeeklyDelete.Checked = True And chkSundayDelete.Checked = False And chkMondayDelete.Checked = False And chkTuesdayDelete.Checked = False And chkWednesdayDelete.Checked = False And chkThursdayDelete.Checked = False And chkFridayDelete.Checked = False And chkSaturdayDelete.Checked = False Then
+            If radWeeklyDelete.Checked And Not chkSundayDelete.Checked And Not chkMondayDelete.Checked And Not chkTuesdayDelete.Checked And Not chkWednesdayDelete.Checked And Not chkThursdayDelete.Checked And Not chkFridayDelete.Checked And Not chkSaturdayDelete.Checked Then
                 MsgBox("You must select days of the week for your weekly schedule.", MsgBoxStyle.Information, Me.Text)
                 Exit Sub
             End If
 
             Microsoft.Win32.Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey, True).SetValue("MaxDays", Short.Parse(txtDays.Text.Trim), Microsoft.Win32.RegistryValueKind.String)
 
-            If radDailyDelete.Checked = False And radWeeklyDelete.Checked = False Then
+            If Not radDailyDelete.Checked And Not radWeeklyDelete.Checked Then
                 MsgBox("You must select a schedule type.", MsgBoxStyle.Information, Me.Text)
                 Exit Sub
             End If
@@ -569,7 +569,7 @@ Public Class frmTaskScheduler
             newTask.Settings.IdleSettings.StopOnIdleEnd = False
             newTask.Settings.WakeToRun = chkWakeDelete.Checked
 
-            If chkWakeDelete.Checked = True Then
+            If chkWakeDelete.Checked Then
                 Functions.power.checkIfActivePowerPlanIsSetProperlyForWakingFromSleep()
             End If
 
@@ -753,7 +753,7 @@ Public Class frmTaskScheduler
     End Sub
 
     Sub tellTheProgramThingsChanged()
-        If boolDoneLoading = True Then boolThingsChanged = True
+        If boolDoneLoading Then boolThingsChanged = True
     End Sub
 
     Private Sub chkWriteRestorePointListToLog_Click(sender As Object, e As EventArgs) Handles chkWriteRestorePointListToLog.Click

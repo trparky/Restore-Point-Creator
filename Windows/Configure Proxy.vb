@@ -18,7 +18,7 @@
     Sub doTheEnablingOfStuff()
         chkUseSystemProxy.Enabled = True
 
-        If My.Settings.useSystemProxyConfig = True Then
+        If My.Settings.useSystemProxyConfig Then
             txtPass.Enabled = False
             txtPort.Enabled = False
             txtProxyAddress.Enabled = False
@@ -35,7 +35,7 @@
         chkUseProxy.Checked = My.Settings.useHTTPProxy
         chkUseSystemProxy.Checked = My.Settings.useSystemProxyConfig
 
-        If My.Settings.useHTTPProxy = False Then
+        If Not My.Settings.useHTTPProxy Then
             doTheDisablingOfStuff()
         Else
             doTheEnablingOfStuff()
@@ -45,7 +45,7 @@
     Private Sub chkUseProxy_Click(sender As Object, e As EventArgs) Handles chkUseProxy.Click
         My.Settings.useHTTPProxy = chkUseProxy.Checked
 
-        If My.Settings.useHTTPProxy = False Then
+        If Not My.Settings.useHTTPProxy Then
             doTheDisablingOfStuff()
         Else
             doTheEnablingOfStuff()
@@ -55,7 +55,7 @@
     Private Sub chkUseSystemProxy_Click(sender As Object, e As EventArgs) Handles chkUseSystemProxy.Click
         My.Settings.useSystemProxyConfig = chkUseSystemProxy.Checked
 
-        If My.Settings.useSystemProxyConfig = True Then
+        If My.Settings.useSystemProxyConfig Then
             txtPass.Enabled = False
             txtPort.Enabled = False
             txtProxyAddress.Enabled = False
@@ -81,7 +81,7 @@
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
         Dim port As Integer
 
-        If Integer.TryParse(txtPort.Text.Trim, port) = True Then
+        If Integer.TryParse(txtPort.Text.Trim, port) Then
             My.Settings.proxyAddress = txtProxyAddress.Text
             My.Settings.proxyPort = port
             My.Settings.proxyUser = txtUser.Text

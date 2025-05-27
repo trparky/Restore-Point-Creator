@@ -45,7 +45,7 @@ Public Class Mount_Volume_Shadow_Copy
 
         '    itemTitle = (timeCreated.ToLongDateString & " at " & timeCreated.ToLongTimeString).Trim
 
-        '    If shadowCopyCache.ContainsKey(Functions.SHA1ChecksumString(itemTitle)) = False Then
+        '    If Not shadowCopyCache.ContainsKey(Functions.SHA1ChecksumString(itemTitle)) Then
         '        shadowCopyCache.Add(, queryObj("DeviceObject").ToString)
         '        listShadowCopyIDs.Items.Add((timeCreated.ToLongDateString & " at " & timeCreated.ToLongTimeString).Trim)
 
@@ -78,7 +78,7 @@ Public Class Mount_Volume_Shadow_Copy
         Try
             If IO.Directory.Exists(globalVariables.shadowCopyMountFolder) Then IO.Directory.Delete(globalVariables.shadowCopyMountFolder)
 
-            If shadowCopyCache.ContainsKey(listShadowCopyIDs.SelectedIndex) = True Then
+            If shadowCopyCache.ContainsKey(listShadowCopyIDs.SelectedIndex) Then
                 'Dim deviceID As String = shadowCopyCache(Functions.SHA1ChecksumString(listShadowCopyIDs.SelectedItem.ToString.Trim)) & "\"
                 Dim deviceID As String = shadowCopyCache(listShadowCopyIDs.SelectedIndex) & "\"
                 Debug.WriteLine("deviceID = " & deviceID)
@@ -117,7 +117,7 @@ Public Class Mount_Volume_Shadow_Copy
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        If shadowCopyCache.ContainsKey(listShadowCopyIDs.SelectedIndex) = True Then
+        If shadowCopyCache.ContainsKey(listShadowCopyIDs.SelectedIndex) Then
             Dim deviceID As String = shadowCopyCache(listShadowCopyIDs.SelectedIndex) & "\"
             MsgBox(deviceID)
         End If

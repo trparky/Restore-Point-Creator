@@ -42,7 +42,7 @@
                 globalVariables.windows.frmPleaseWait.ShowInTaskbar = boolShowOnTaskbar
                 globalVariables.windows.frmPleaseWait.systemModal = boolSystemModal
 
-                If openDialogInNewThread = True Then Threading.ThreadPool.QueueUserWorkItem(Sub() openPleaseWaitWindow())
+                If openDialogInNewThread Then Threading.ThreadPool.QueueUserWorkItem(Sub() openPleaseWaitWindow())
             Catch ex As Exception
             End Try
         End Sub

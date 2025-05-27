@@ -399,12 +399,12 @@ Namespace Functions.support
                     Try
                         processExecutablePathFileInfo = New IO.FileInfo(processExecutablePath)
 
-                        If boolFullFilePathPassed = True Then
-                            If strFileName.Equals(processExecutablePathFileInfo.FullName, StringComparison.OrdinalIgnoreCase) = True Then
+                        If boolFullFilePathPassed Then
+                            If strFileName.Equals(processExecutablePathFileInfo.FullName, StringComparison.OrdinalIgnoreCase) Then
                                 killProcess(process.Id, True)
                             End If
-                        ElseIf boolFullFilePathPassed = False Then
-                            If strFileName.Equals(processExecutablePathFileInfo.Name, StringComparison.OrdinalIgnoreCase) = True Then
+                        ElseIf Not boolFullFilePathPassed Then
+                            If strFileName.Equals(processExecutablePathFileInfo.Name, StringComparison.OrdinalIgnoreCase) Then
                                 killProcess(process.Id, True)
                             End If
                         End If
@@ -427,7 +427,7 @@ Namespace Functions.support
             Try
                 Dim extractionTargetFileInfo As New IO.FileInfo(extractionTarget)
 
-                If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                If globalVariables.boolExtendedLoggingDuringUpdating Then
                     eventLogFunctions.writeToApplicationLogFile(String.Format("Beginning extraction of {0}{1}{0} to {0}{2}{0}.", Chr(34), fileToExtract, extractionTargetFileInfo.Name), EventLogEntryType.Information, False)
                 End If
 
@@ -440,17 +440,17 @@ Namespace Functions.support
                     Return False ' Nope, the file doesn't exist in the ZIP file so we exit out of the routine by returning a False value for the function.
                 Else
                     ' This checks to see if the file we are trying to extract to from the ZIP file exists or not.
-                    If IO.File.Exists(extractionTarget) = True Then
-                        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                    If IO.File.Exists(extractionTarget) Then
+                        If globalVariables.boolExtendedLoggingDuringUpdating Then
                             eventLogFunctions.writeToApplicationLogFile(String.Format("The file named {0}{1}{0} already exists, attempting to delete it.", Chr(34), fileToExtract), EventLogEntryType.Information, False)
                         End If
                         ' OK, so it does exist, let's do something about it.
 
                         ' This checks to see if the programmer wants to delete the file if it exists in this function.
-                        If boolDeleteTargetIfExists = True Then
+                        If boolDeleteTargetIfExists Then
                             If extractionTargetFileInfo.Extension.Equals(".exe", StringComparison.OrdinalIgnoreCase) Then
                                 ' If the file is an EXE file, let's try and kill any parent processes first.
-                                If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                                If globalVariables.boolExtendedLoggingDuringUpdating Then
                                     eventLogFunctions.writeToApplicationLogFile(String.Format("Since this file is an EXE file we need to check for any processes that have this file as the parent executable file.{2}{2}Killing any possible processes that have a parent executable of {0}{1}{0}.", Chr(34), extractionTargetFileInfo.FullName, vbCrLf), EventLogEntryType.Information, False)
                                 End If
 
@@ -460,7 +460,7 @@ Namespace Functions.support
                             Try
                                 IO.File.Delete(extractionTarget) ' And now let's try and delete the file.
 
-                                If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                                If globalVariables.boolExtendedLoggingDuringUpdating Then
                                     eventLogFunctions.writeToApplicationLogFile(String.Format("The file named {0}{1}{0} has been successfully deleted.", Chr(34), extractionTargetFileInfo.FullName), EventLogEntryType.Information, False)
                                 End If
                             Catch ex As Exception
@@ -473,49 +473,49 @@ Namespace Functions.support
                             Return False
                         End If
                     Else
-                        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                        If globalVariables.boolExtendedLoggingDuringUpdating Then
                             eventLogFunctions.writeToApplicationLogFile(String.Format("The file named {0}{1}{0} does not exist, this is a good thing; we can continue with the update process.", Chr(34), extractionTargetFileInfo.Name), EventLogEntryType.Information, False)
                         End If
                     End If
 
-                    If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                    If globalVariables.boolExtendedLoggingDuringUpdating Then
                         eventLogFunctions.writeToApplicationLogFile(String.Format("Creating new IO.FileStream to write {0}{1}{0} as {0}{2}{0} to disk.", Chr(34), fileToExtract, extractionTargetFileInfo.Name), EventLogEntryType.Information, False)
                     End If
 
                     ' Create a new FileStream Object to write out our extracted file.
                     Dim fileStream As New IO.FileStream(extractionTarget, IO.FileMode.Create)
 
-                    If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                    If globalVariables.boolExtendedLoggingDuringUpdating Then
                         eventLogFunctions.writeToApplicationLogFile(String.Format("IO.FileStream created successfully. Commencing the process of writing file {0}{1}{0} as {0}{2}{0} to disk.", Chr(34), fileToExtract, extractionTargetFileInfo.Name), EventLogEntryType.Information, False)
                         eventLogFunctions.writeToApplicationLogFile("Opening IO.Stream from ZIP File Object.", EventLogEntryType.Information, False)
                     End If
 
                     ' This copies the data out of the ZIP File Data Stream to our FileStream Object that was created above.
                     Using zipFileEntryObjectIOStream As IO.Stream = zipFileEntryObject.Open()
-                        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                        If globalVariables.boolExtendedLoggingDuringUpdating Then
                             eventLogFunctions.writeToApplicationLogFile("ZIP File Object IO.Stream opened. Copying data from ZIP File Object IO.Stream to IO.FileStream.", EventLogEntryType.Information, False)
                         End If
 
                         zipFileEntryObjectIOStream.CopyTo(fileStream)
 
-                        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                        If globalVariables.boolExtendedLoggingDuringUpdating Then
                             eventLogFunctions.writeToApplicationLogFile("Data copying complete. Closing out ZIP File Object IO.Stream.", EventLogEntryType.Information, False)
                         End If
                     End Using
 
-                    If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                    If globalVariables.boolExtendedLoggingDuringUpdating Then
                         eventLogFunctions.writeToApplicationLogFile("File write operation complete. Closing out file and disposing of the IO.FileStream.", EventLogEntryType.Information, False)
                     End If
 
                     fileStream.Close() ' This closes our FileStream Object.
 
-                    If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                    If globalVariables.boolExtendedLoggingDuringUpdating Then
                         eventLogFunctions.writeToApplicationLogFile(String.Format("Extraction of {0}{1}{0} was successful.", Chr(34), fileToExtract), EventLogEntryType.Information, False)
                     End If
 
                     extractionTargetFileInfo = Nothing
 
-                    If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                    If globalVariables.boolExtendedLoggingDuringUpdating Then
                         eventLogFunctions.writeToApplicationLogFile("Returning a True value for the extractUpdatedFileFromZIPPackage() function.", EventLogEntryType.Information, False)
                     End If
 
@@ -684,7 +684,7 @@ Namespace Functions.support
         End Sub
 
         Public Sub executeCommand(pathToExecutable As String, strArguments As String, Optional runAsAdmin As Boolean = False)
-            If IO.File.Exists(pathToExecutable) = True Then
+            If IO.File.Exists(pathToExecutable) Then
                 Dim processStartInfo As New ProcessStartInfo() With {
                     .FileName = pathToExecutable,
                     .WindowStyle = ProcessWindowStyle.Hidden,
@@ -692,28 +692,28 @@ Namespace Functions.support
                     .CreateNoWindow = True
                 }
 
-                If runAsAdmin = True Then processStartInfo.Verb = "runas"
+                If runAsAdmin Then processStartInfo.Verb = "runas"
 
                 Process.Start(processStartInfo)
             End If
         End Sub
 
         Public Sub executeCommand(pathToExecutable As String, Optional runAsAdmin As Boolean = False)
-            If IO.File.Exists(pathToExecutable) = True Then
+            If IO.File.Exists(pathToExecutable) Then
                 Dim processStartInfo As New ProcessStartInfo() With {
                     .FileName = pathToExecutable,
                     .WindowStyle = ProcessWindowStyle.Hidden,
                     .CreateNoWindow = True
                 }
 
-                If runAsAdmin = True Then processStartInfo.Verb = "runas"
+                If runAsAdmin Then processStartInfo.Verb = "runas"
 
                 Process.Start(processStartInfo)
             End If
         End Sub
 
         Public Sub executeCommandWithWait(pathToExecutable As String, strArguments As String, Optional runAsAdmin As Boolean = False)
-            If IO.File.Exists(pathToExecutable) = True Then
+            If IO.File.Exists(pathToExecutable) Then
                 Dim processStartInfo As New ProcessStartInfo() With {
                     .FileName = pathToExecutable,
                     .WindowStyle = ProcessWindowStyle.Hidden,
@@ -721,21 +721,21 @@ Namespace Functions.support
                     .CreateNoWindow = True
                 }
 
-                If runAsAdmin = True Then processStartInfo.Verb = "runas"
+                If runAsAdmin Then processStartInfo.Verb = "runas"
 
                 Process.Start(processStartInfo).WaitForExit()
             End If
         End Sub
 
         Public Sub executeCommandWithWait(pathToExecutable As String, Optional runAsAdmin As Boolean = False)
-            If IO.File.Exists(pathToExecutable) = True Then
+            If IO.File.Exists(pathToExecutable) Then
                 Dim processStartInfo As New ProcessStartInfo() With {
                     .FileName = pathToExecutable,
                     .WindowStyle = ProcessWindowStyle.Hidden,
                     .CreateNoWindow = True
                 }
 
-                If runAsAdmin = True Then processStartInfo.Verb = "runas"
+                If runAsAdmin Then processStartInfo.Verb = "runas"
 
                 Process.Start(processStartInfo).WaitForExit()
             End If
@@ -744,7 +744,7 @@ Namespace Functions.support
         Public Sub rebootSystem()
             Dim strPathToShutDown As String = IO.Path.Combine(globalVariables.strPathToSystemFolder, "shutdown.exe")
 
-            If IO.File.Exists(strPathToShutDown) = True Then
+            If IO.File.Exists(strPathToShutDown) Then
                 executeCommand(strPathToShutDown, "-r -t 0", True)
             Else
                 MsgBox("Unable to find the Windows command line reboot tool to trigger a reboot. You will have to manually trigger a reboot yourself.", MsgBoxStyle.Exclamation, "Restore Point Creator")
@@ -788,7 +788,7 @@ Namespace Functions.support
                     .Arguments = "-fixruntimetasks"
                 }
 
-                If privilegeChecks.areWeAnAdministrator() = False Then startInfo.Verb = "runas"
+                If Not privilegeChecks.areWeAnAdministrator() Then startInfo.Verb = "runas"
 
                 Process.Start(startInfo)
                 Process.GetCurrentProcess.Kill()
@@ -824,14 +824,14 @@ Namespace Functions.support
         End Function
 
         Public Sub killProcess(processID As Integer, Optional boolLogToEventLog As Boolean = False)
-            If boolLogToEventLog = True Then
+            If boolLogToEventLog Then
                 eventLogFunctions.writeToApplicationLogFile("Killing process with PID of " & processID & ".", EventLogEntryType.Information, False)
             End If
 
             Dim processObject As Process = Nothing
 
             ' First we are going to check if the Process ID exists.
-            If doesProcessIDExist(processID, processObject) = True Then
+            If doesProcessIDExist(processID, processObject) Then
                 Try
                     processObject.Kill() ' Yes, it does so let's kill it.
                 Catch ex As Exception
@@ -844,7 +844,7 @@ Namespace Functions.support
             Threading.Thread.Sleep(250) ' We're going to sleep to give the system some time to kill the process.
 
             '' Now we are going to check again if the Process ID exists and if it does, we're going to attempt to kill it again.
-            If doesProcessIDExist(processID, processObject) = True Then
+            If doesProcessIDExist(processID, processObject) Then
                 Try
                     processObject.Kill()
                 Catch ex As Exception

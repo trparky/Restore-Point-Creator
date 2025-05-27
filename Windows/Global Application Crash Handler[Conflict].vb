@@ -4,7 +4,7 @@
     Property exceptionType As String
 
     Private Sub frmCrash_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        If boolSubmitted = False Then
+        If Not boolSubmitted Then
             If MsgBox("Are you sure you want to close this window? You have not submitted the crash data yet.", MsgBoxStyle.Question + MsgBoxStyle.YesNo, Me.Text) = MsgBoxResult.No Then
                 e.Cancel = True
                 Exit Sub
@@ -18,7 +18,7 @@
         Control.CheckForIllegalCrossThreadCalls = False
         Media.SystemSounds.Hand.Play()
 
-        If My.Settings.useSSL = True And GlobalVariables.boolWinXP = False Then
+        If My.Settings.useSSL And Not GlobalVariables.boolWinXP Then
             btnSubmitData.Image = My.Resources.lock
             ToolTip.SetToolTip(btnSubmitData, "Secured by SSL.")
         End If
@@ -36,15 +36,15 @@
 
         stringBuilder.AppendLine()
 
-        If GlobalVariables.boolBeta = True Then
+        If GlobalVariables.boolBeta Then
             stringBuilder.AppendLine("Program Version: " & String.Format("{0} Public Beta {1}", GlobalVariables.versionString, GlobalVariables.shortBetaVersion))
-        ElseIf GlobalVariables.boolReleaseCandidate = True Then
+        ElseIf GlobalVariables.boolReleaseCandidate Then
             stringBuilder.AppendLine("Program Version: " & String.Format("{0} Release Candidate {1}", GlobalVariables.versionString, GlobalVariables.shortReleaseCandidateVersion))
         Else
             stringBuilder.AppendLine("Program Version: " & GlobalVariables.versionString)
         End If
 
-        If GlobalVariables.boolDebugBuild = True Then
+        If GlobalVariables.boolDebugBuild Then
             stringBuilder.AppendLine("Debug Build: Yes")
         Else
             stringBuilder.AppendLine("Debug Build: No")
@@ -87,7 +87,7 @@
 
     '                                                 msgBoxResult = Microsoft.VisualBasic.MsgBoxResult.Retry
 
-    '                                                 If txtEmailAddress.Text.Trim <> Nothing And System.Text.RegularExpressions.Regex.IsMatch(txtEmailAddress.Text.Trim, "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?") = False Then
+    '                                                 If Not String.IsNullOrWhiteSpace(txtEmailAddress.Text.Trim) And Not System.Text.RegularExpressions.Regex.IsMatch(txtEmailAddress.Text.Trim, "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?") Then
     '                                                     msgBoxResult = MsgBox("Invalid Email Address Format." & vbCrLf & vbCrLf & "If you don't want to provide an email address, press the OK button.  Press the Cancel button to try again.", MsgBoxStyle.Information + MsgBoxStyle.OkCancel, Me.Text)
 
     '                                                     If msgBoxResult = Microsoft.VisualBasic.MsgBoxResult.Cancel Then
@@ -104,7 +104,7 @@
 
     '                                                 Dim dataToBeSent As String = String.Format("doing={0}&program={1}&error={2}", UrlEncode(stringWhatWereYouDoing), UrlEncode(Application.ProductName), UrlEncode(txtStackTrace.Text))
 
-    '                                                 If (txtEmailAddress.Text.Trim = Nothing) = False Then
+    '                                                 If Not String.IsNullOrWhitespace(txtEmailAddress.Text.Trim) Then
     '                                                     dataToBeSent &= "&email=" & UrlEncode(txtEmailAddress.Text)
     '                                                 End If
 
@@ -131,7 +131,7 @@
     'End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        If lblHeader.Visible = True Then
+        If lblHeader.Visible Then
             lblHeader.Visible = False
         Else
             lblHeader.Visible = True
@@ -196,7 +196,7 @@
                                                      httpPOSTData.Add("program", GlobalVariables.programName)
                                                      httpPOSTData.Add("submissionversion", "3")
 
-                                                     If chkReproducable.Checked = True Then
+                                                     If chkReproducable.Checked Then
                                                          httpPOSTData.Add("reproducable", "Yes")
                                                      Else
                                                          httpPOSTData.Add("reproducable", "No")
@@ -258,7 +258,7 @@
     End Sub
 
     Private Sub btnClose_Click(sender As Object, e As EventArgs) Handles btnClose.Click
-        If boolSubmitted = False Then
+        If Not boolSubmitted Then
             If MsgBox("Are you sure you want to close this window? You have not submitted the crash data yet.", MsgBoxStyle.Question + MsgBoxStyle.YesNo, Me.Text) = MsgBoxResult.Yes Then
                 boolSubmitted = True
                 Me.Close()
@@ -290,22 +290,22 @@ Namespace exceptionHandler
             ' Return a TRUE value to have the program show the crash window.
             ' Return a FALSE value to have the program NOT show the crash window.
 
-            If exceptionType.caseInsensitiveContains("ConfigurationErrorsException") = True Then
+            If exceptionType.caseInsensitiveContains("ConfigurationErrorsException") Then
                 MsgBox("There has been an error in loading the program's user configuration data. Please relaunch the program.", MsgBoxStyle.Critical, "System Restore Point Creator")
                 Process.GetCurrentProcess.Kill()
-            ElseIf exceptionType.caseInsensitiveContains("UnauthorizedAccessException") = True Then
+            ElseIf exceptionType.caseInsensitiveContains("UnauthorizedAccessException") Then
                 Functions.writeCrashToEventLog(exceptionObject)
 
                 MsgBox("It appears that you don't have the necessary user permissions to do what you are attempting to do. Please contact your system administrator for guidance.", MsgBoxStyle.Exclamation, "System Restore Point Creator")
 
                 Return False
-            ElseIf exceptionType.caseInsensitiveContains("BadImageFormatException") = True Then
+            ElseIf exceptionType.caseInsensitiveContains("BadImageFormatException") Then
                 Functions.writeCrashToEventLog(exceptionObject)
 
                 MsgBox("There was an error while loading a required system library. Please check the Event Log Viewer for more information.", MsgBoxStyle.Exclamation, "System Restore Point Creator")
 
                 Return False
-            ElseIf exceptionType.caseInsensitiveContains("ObjectDisposedException") = True And exceptionObject.Message.caseInsensitiveContains("Please_Wait") = True Then
+            ElseIf exceptionType.caseInsensitiveContains("ObjectDisposedException") = True And exceptionObject.Message.caseInsensitiveContains("Please_Wait") Then
                 ' This is to hopefully catch an annoying crash that I've not been able to track down
                 ' so we're going to simply handle it silently with no notification to the user.
                 Return False
@@ -332,7 +332,7 @@ Namespace exceptionHandler
 
             Dim handleCrashWithAnErrorInsteadResult As Boolean = handleCrashWithAnErrorInstead(exceptionType, exceptionObject)
 
-            If handleCrashWithAnErrorInsteadResult = True Then
+            If handleCrashWithAnErrorInsteadResult Then
                 Dim crashWindow As New frmCrash
                 crashWindow.Text = "Critical Application Error Detected!"
                 crashWindow.lblHeader.Text = "Critical Application Error Detected!"
@@ -348,7 +348,7 @@ Namespace exceptionHandler
         'Public Sub manuallyLoadCrashWindow(ex As Exception, message As String, stackTrace As String, crashType As System.Type)
         '    Dim handleCrashWithAnErrorInsteadResult As Boolean = handleCrashWithAnErrorInstead(crashType.ToString, ex)
 
-        '    If handleCrashWithAnErrorInsteadResult = True Then
+        '    If handleCrashWithAnErrorInsteadResult Then
         '        Dim crashWindow As New frmCrash
         '        crashWindow.Text = "Critical Application Error Detected!"
         '        crashWindow.lblHeader.Text = "Critical Application Error Detected!"
@@ -371,7 +371,7 @@ Friend Class ThreadExceptionHandler
         Try
             Dim handleCrashWithAnErrorInsteadResult As Boolean = exceptionHandler.handleCrashWithAnErrorInstead(exceptionObject.Exception)
 
-            If handleCrashWithAnErrorInsteadResult = True Then
+            If handleCrashWithAnErrorInsteadResult Then
                 Dim crashWindow As New frmCrash
                 Threading.Thread.CurrentThread.CurrentUICulture = New Globalization.CultureInfo("en-US")
                 crashWindow.exceptionMessage = exceptionObject.Exception.Message

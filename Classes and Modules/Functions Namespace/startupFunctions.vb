@@ -173,7 +173,7 @@ Namespace Functions.startupFunctions
                     End If
                 End Using
 
-                If boolExtendedLoggingForScheduledTasks = True Then
+                If boolExtendedLoggingForScheduledTasks Then
                     eventLogFunctions.writeToApplicationLogFile(String.Format("Starting scheduled restore point job. Task running as user {0}. There are currently {1} system restore point(s) on this system.", Environment.UserName, wmi.getNumberOfRestorePoints()), EventLogEntryType.Information, False, False)
                 Else
                     eventLogFunctions.writeToApplicationLogFile(String.Format("Starting scheduled restore point job. Task running As user {0}.", Environment.UserName), EventLogEntryType.Information, False, False)
@@ -181,11 +181,11 @@ Namespace Functions.startupFunctions
 
                 If boolAreWeAnAdministrator Then writeLastRunFile()
 
-                If boolExtendedLoggingForScheduledTasks = True Then oldNewestRestorePointID = wmi.getNewestSystemRestorePointID()
+                If boolExtendedLoggingForScheduledTasks Then oldNewestRestorePointID = wmi.getNewestSystemRestorePointID()
 
                 restorePointStuff.createScheduledSystemRestorePoint(restorePointNameForScheduledTasks)
 
-                If boolExtendedLoggingForScheduledTasks = True Then
+                If boolExtendedLoggingForScheduledTasks Then
                     ' We wait here with this loop until the system's has the restore point created.
                     While oldNewestRestorePointID = wmi.getNewestSystemRestorePointID()
                         ' Does nothing, just loops and sleeps for half a second.
@@ -199,7 +199,7 @@ Namespace Functions.startupFunctions
                     deleteOldRestorePoints()
                 End If
 
-                If globalVariables.KeepXAmountOfRestorePoints = True Then
+                If globalVariables.KeepXAmountOfRestorePoints Then
                     wmi.doDeletingOfXNumberOfRestorePoints(globalVariables.KeepXAmountofRestorePointsValue)
                 End If
 
@@ -221,7 +221,7 @@ Namespace Functions.startupFunctions
 
             Dim restorePointName As String
 
-            If Custom_Named_Restore_Point_Instance.createRestorePoint = False Then
+            If Not Custom_Named_Restore_Point_Instance.createRestorePoint Then
                 MsgBox("Restore Point not created.", MsgBoxStyle.Information, "Restore Point Creator") ' Gives the user some feedback.
                 Exit Sub
             Else
@@ -250,7 +250,7 @@ Namespace Functions.startupFunctions
                 End If
             End If
 
-            If String.IsNullOrEmpty(My.Settings.savedRestorePointFromCommandLine) = False Then
+            If Not String.IsNullOrEmpty(My.Settings.savedRestorePointFromCommandLine) Then
                 strRestorePointName = My.Settings.savedRestorePointFromCommandLine
                 My.Settings.savedRestorePointFromCommandLine = Nothing
                 My.Settings.Save()
@@ -279,35 +279,35 @@ Namespace Functions.startupFunctions
         Public Sub repairRuntimeTasks()
             Dim task As Task = Nothing
 
-            If taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Restore Point)", task) = True Then
+            If taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Restore Point)", task) Then
                 taskStuff.deleteTask(task)
                 task.Dispose()
 
                 taskStuff.addRunTimeTask("Restore Point Creator -- Run with no UAC (Create Restore Point)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, globalVariables.commandLineSwitches.createRestorePoint)
             End If
 
-            If taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Custom Restore Point)", task) = True Then
+            If taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Custom Restore Point)", task) Then
                 taskStuff.deleteTask(task)
                 task.Dispose()
 
                 taskStuff.addRunTimeTask("Restore Point Creator -- Run with no UAC (Create Custom Restore Point)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, globalVariables.commandLineSwitches.createCustomRestorePoint)
             End If
 
-            If taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC", task) = True Then
+            If taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC", task) Then
                 taskStuff.deleteTask(task)
                 task.Dispose()
 
                 taskStuff.addRunTimeTask("Restore Point Creator -- Run with no UAC", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, "", True)
             End If
 
-            If taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Delete old Restore Points)", task) = True Then
+            If taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Delete old Restore Points)", task) Then
                 taskStuff.deleteTask(task)
                 task.Dispose()
 
                 taskStuff.addRunTimeTask("Restore Point Creator -- Run with no UAC (Delete old Restore Points)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, globalVariables.commandLineSwitches.deleteOldRestorePoints)
             End If
 
-            If taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Keep X Number of Restore Points)", task) = True Then
+            If taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Keep X Number of Restore Points)", task) Then
                 taskStuff.deleteTask(task)
                 task.Dispose()
 
@@ -325,7 +325,7 @@ Namespace Functions.startupFunctions
                 Dim oldNewestRestorePointID As Integer = wmi.getNewestSystemRestorePointID()
                 result = wmi.createRestorePoint(strRestorePointDescription, restorePointStuff.RestoreType.WindowsType, newRestorePointID)
 
-                If displayMessage = True Then
+                If displayMessage Then
                     Dim msgBoxTitle As String = "Restore Point Creator"
 
                     If result = APIs.errorCodes.ERROR_SUCCESS Then
@@ -377,7 +377,7 @@ Namespace Functions.startupFunctions
                 taskFolderObject = Nothing
                 taskServiceObject = Nothing
 
-                If boolKillProcessAfterRun = True Then Process.GetCurrentProcess.Kill()
+                If boolKillProcessAfterRun Then Process.GetCurrentProcess.Kill()
             Catch ex As Exception
                 eventLogFunctions.writeCrashToApplicationLogFile(ex)
             End Try
@@ -392,7 +392,7 @@ Namespace Functions.startupFunctions
 
             Dim strPathToPrefsDataDirectory As String = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Restore_Point_Creator")
 
-            If Directory.Exists(strPathToPrefsDataDirectory) = True Then
+            If Directory.Exists(strPathToPrefsDataDirectory) Then
                 My.Settings.Reset()
                 My.Settings.Save()
 
@@ -450,7 +450,7 @@ Namespace Functions.startupFunctions
 
                 ' Loops through systemRestorePoints.
                 For Each systemRestorePoint As ManagementObject In systemRestorePoints.Get()
-                    If String.IsNullOrEmpty(systemRestorePoint("CreationTime").ToString.Trim) = False Then
+                    If Not String.IsNullOrEmpty(systemRestorePoint("CreationTime").ToString.Trim) Then
                         systemRestorePointCreationDate = restorePointStuff.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime"))
 
                         dateDiffResults = Math.Abs(DateDiff(DateInterval.Day, Date.Now, systemRestorePointCreationDate))
@@ -461,7 +461,7 @@ Namespace Functions.startupFunctions
                             If boolLogDeletedRestorePoints Then
                                 numberOfOldRestorePointsDeleted += 1
 
-                                If boolLogDeletedRestorePoints = True Then
+                                If boolLogDeletedRestorePoints Then
                                     eventLogFunctions.writeToApplicationLogFile(String.Format("Deleted Restore Point named ""{0}"" which was created on {1} at {2}.", systemRestorePoint("Description"), systemRestorePointCreationDate.ToLongDateString, systemRestorePointCreationDate.ToShortTimeString), EventLogEntryType.Information, False, False)
                                 End If
                             End If
@@ -474,7 +474,7 @@ Namespace Functions.startupFunctions
                     systemRestorePoint = Nothing
                 Next
 
-                If boolLogDeletedRestorePoints = True Then
+                If boolLogDeletedRestorePoints4 Then
                     If numberOfOldRestorePointsDeleted = 0 Then
                         eventLogFunctions.writeToApplicationLogFile("End of processing old System Restore Points.  No old System Restore Point were deleted.", EventLogEntryType.Information, False, False)
                     ElseIf numberOfOldRestorePointsDeleted = 1 Then
@@ -509,7 +509,7 @@ Namespace Functions.startupFunctions
         End Sub
 
         Public Sub giveSafeModeErrorMessage(boolAreWeInSafeMode As Boolean)
-            If boolAreWeInSafeMode = True Then
+            If boolAreWeInSafeMode Then
                 MsgBox("You are in Safe Mode, it's not recommended to make restore points in Safe Mode.", MsgBoxStyle.Information, "Restore Point Creator")
                 Process.GetCurrentProcess.Kill()
             End If
@@ -597,7 +597,7 @@ Namespace Functions.startupFunctions
 
                 wait.createPleaseWaitWindow("Updating Restore Point Creator... Please Wait.", True, enums.howToCenterWindow.screen, True, True)
 
-                If boolExtendedLoggingForUpdating = True Then
+                If boolExtendedLoggingForUpdating Then
                     eventLogFunctions.writeToApplicationLogFile("Update thread sleeping for 5 seconds for processes to close out before continuing with update procedure.", EventLogEntryType.Information, False)
                 End If
 
@@ -606,12 +606,12 @@ Namespace Functions.startupFunctions
                 Dim boolNeedsReboot As Boolean = False
                 Dim currentProcessFileName As String = New FileInfo(Application.ExecutablePath).Name
 
-                If boolExtendedLoggingForUpdating = True Then
+                If boolExtendedLoggingForUpdating Then
                     eventLogFunctions.writeToApplicationLogFile("Beginning second phase of application update process. Verifying environment for updating.", EventLogEntryType.Information, False)
                 End If
 
                 If currentProcessFileName.caseInsensitiveContains(".new.exe") Then
-                    If boolExtendedLoggingForUpdating = True Then
+                    If boolExtendedLoggingForUpdating Then
                         eventLogFunctions.writeToApplicationLogFile("The environment is ready for updating.", EventLogEntryType.Information, False)
                     End If
 
@@ -622,8 +622,8 @@ Namespace Functions.startupFunctions
                         eventLogFunctions.writeToApplicationLogFile(String.Format("Updated program to version {0}.", globalVariables.version.strFullVersionString), EventLogEntryType.Information, False)
                     End If
 
-                    If File.Exists(globalVariables.pdbFileNameInZIP & ".new") = True Then
-                        If boolExtendedLoggingForUpdating = True Then
+                    If File.Exists(globalVariables.pdbFileNameInZIP & ".new") Then
+                        If boolExtendedLoggingForUpdating Then
                             eventLogFunctions.writeToApplicationLogFile("PDB file found. Starting the updating of the PDF file.", EventLogEntryType.Information, False)
                         End If
 
@@ -637,7 +637,7 @@ Namespace Functions.startupFunctions
                             deleteAtReboot.dispose(True)
                             deleteAtReboot = Nothing
 
-                            If boolExtendedLoggingForUpdating = True Then
+                            If boolExtendedLoggingForUpdating Then
                                 eventLogFunctions.writeToApplicationLogFile("Update of the PDB file complete.", EventLogEntryType.Information, False)
                             End If
                         Catch ex As Exception
@@ -654,18 +654,18 @@ Namespace Functions.startupFunctions
                             eventLogFunctions.writeToApplicationLogFile("Something went wrong with the updating of the PDB file, scheduling it for update at system reboot.", EventLogEntryType.Error, False)
                         End Try
                     Else
-                        If boolExtendedLoggingForUpdating = True Then
+                        If boolExtendedLoggingForUpdating Then
                             eventLogFunctions.writeToApplicationLogFile("No PDB file found, skipping PDB file update.", EventLogEntryType.Information, False)
                         End If
                     End If
 
-                    If boolExtendedLoggingForUpdating = True Then
+                    If boolExtendedLoggingForUpdating Then
                         eventLogFunctions.writeToApplicationLogFile(String.Format("Killing process with parent executable of {0}{1}{0}.", Chr(34), restorePointCreatorMainEXEName), EventLogEntryType.Information, False)
                     End If
 
                     support.searchForProcessAndKillIt(restorePointCreatorMainEXEName, False)
 
-                    If boolExtendedLoggingForUpdating = True Then
+                    If boolExtendedLoggingForUpdating Then
                         eventLogFunctions.writeToApplicationLogFile("Starting the updating of the core executable file.", EventLogEntryType.Information, False)
                     End If
 
@@ -679,7 +679,7 @@ Namespace Functions.startupFunctions
                         deleteAtReboot.dispose(True)
                         deleteAtReboot = Nothing
 
-                        If boolExtendedLoggingForUpdating = True Then
+                        If boolExtendedLoggingForUpdating Then
                             eventLogFunctions.writeToApplicationLogFile("Update of the core executable file complete.", EventLogEntryType.Information, False)
                         End If
                     Catch ex As Exception
@@ -694,33 +694,33 @@ Namespace Functions.startupFunctions
                         eventLogFunctions.writeToApplicationLogFile("Something went wrong with the updating of the core executable file, scheduling it for update at system reboot.", EventLogEntryType.Error, False)
                     End Try
 
-                    If boolNeedsReboot = True Then
+                    If boolNeedsReboot Then
                         wait.closePleaseWaitWindow()
                         writeKeyToRegistryToForceUpdateAtNextRun()
 
                         Dim msgBoxResult As MsgBoxResult = MsgBox("A system restart will need to be done in order to finish the update. System Restore Point Creator will not function properly until you restart your system." & vbCrLf & vbCrLf & "Would you like to restart your system now?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Restart?")
 
                         If msgBoxResult = MsgBoxResult.Yes Then
-                            If boolExtendedLoggingForUpdating = True Then
+                            If boolExtendedLoggingForUpdating Then
                                 eventLogFunctions.writeToApplicationLogFile("Rebooting system.", EventLogEntryType.Information, False)
                             End If
 
                             support.rebootSystem()
                             Process.GetCurrentProcess.Kill()
                         Else
-                            If boolExtendedLoggingForUpdating = True Then
+                            If boolExtendedLoggingForUpdating Then
                                 eventLogFunctions.writeToApplicationLogFile("User chose not to reboot the system. Application updating is scheduled for the next system reboot.", EventLogEntryType.Information, False)
                             End If
 
                             MsgBox("System Restore Point Creator will not function properly until your system is rebooted.", MsgBoxStyle.Information, "System Restore Point Creator -- Application Update")
                         End If
                     Else
-                        If boolExtendedLoggingForUpdating = True Then
+                        If boolExtendedLoggingForUpdating Then
                             eventLogFunctions.writeToApplicationLogFile("Starting the third and final phase of application update procedure; verification of update.", EventLogEntryType.Information, False)
                         End If
 
-                        If File.Exists(restorePointCreatorMainEXEName) = True Then
-                            If boolExtendedLoggingForUpdating = True Then
+                        If File.Exists(restorePointCreatorMainEXEName) Then
+                            If boolExtendedLoggingForUpdating Then
                                 eventLogFunctions.writeToApplicationLogFile("Final verification of update complete, things all look good. Starting newly updated program.", EventLogEntryType.Information, False)
                             End If
 

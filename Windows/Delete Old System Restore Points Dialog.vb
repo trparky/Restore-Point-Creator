@@ -7,7 +7,7 @@ Public Class frmDeleteOldSystemRestorePoints
             txtMaxAge.Text = txtMaxAge.Text.Trim
 
             ' This checks to see if the user inputted an Integer and not a String.
-            If Short.TryParse(txtMaxAge.Text, shortMaxAge) = True Then
+            If Short.TryParse(txtMaxAge.Text, shortMaxAge) Then
                 If shortMaxAge < 5 Then
                     Dim msgBoxResult As MsgBoxResult
 

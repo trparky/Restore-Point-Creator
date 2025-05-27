@@ -36,7 +36,7 @@
             Dim stopWatch As Stopwatch = Stopwatch.StartNew()
 
             Try
-                If httpHelper.getWebData(globalVariables.webURLs.core.strFullChangeLog, changeLogData) = True Then
+                If httpHelper.getWebData(globalVariables.webURLs.core.strFullChangeLog, changeLogData) Then
                     Dim stringWeAreLookingFor As String = String.Format("Version {0}.{1} Build {2}", globalVariables.version.shortMajor, globalVariables.version.shortMinor, globalVariables.version.shortBuild)
                     changeLogData = changeLogData.Replace(stringWeAreLookingFor, stringWeAreLookingFor & " (Currently Installed Version)")
 

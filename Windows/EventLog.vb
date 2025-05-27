@@ -292,7 +292,7 @@
     End Sub
 
     Private Sub eventLogList_ColumnWidthChanged(sender As Object, e As ColumnWidthChangedEventArgs) Handles eventLogList.ColumnWidthChanged
-        If boolDoneLoading = True Then
+        If boolDoneLoading Then
             My.Settings.eventLogColumn1Size = ColumnHeader1.Width
             My.Settings.eventLogColumn2Size = ColumnHeader2.Width
             My.Settings.eventLogColumn3Size = ColumnHeader3.Width
@@ -425,7 +425,7 @@
             Dim boolUseRegEx As Boolean = searchWindow.boolUseRegEx
             Dim searchType As Search_Event_Log.searceType = searchWindow.searchType
 
-            If boolUseRegEx = True And Functions.support.boolTestRegExPattern(searchTerms) = False Then
+            If boolUseRegEx And Not Functions.support.boolTestRegExPattern(searchTerms) Then
                 MsgBox("Invalid RegEx Pattern.", MsgBoxStyle.Critical, Me.Text)
                 Exit Sub
             End If

@@ -59,7 +59,7 @@ Namespace Functions.power
             Dim commandLineOutput As String = Nothing
             Dim boolResult As Boolean = support.executeShellCommandAndGetOutput(commandLineOutput, IO.Path.Combine(globalVariables.strPathToSystemFolder, "powercfg.exe"), "/GETACTIVESCHEME")
 
-            If boolResult = True Then
+            If boolResult Then
                 commandLineOutput = commandLineOutput.Trim
 
                 If Regex.IsMatch(commandLineOutput, "([0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12})", RegexOptions.IgnoreCase) Then
@@ -78,7 +78,7 @@ Namespace Functions.power
             Try
                 Dim activePowerPlanGUID As String = Nothing
 
-                If getActivePowerPlanGUID(activePowerPlanGUID) = True Then
+                If getActivePowerPlanGUID(activePowerPlanGUID) Then
                     Dim registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\Control\Power\User\PowerSchemes\" & activePowerPlanGUID & "\238c9fa8-0aad-41ed-83f4-97be242c8f20\bd3b718a-0680-4d9d-8ab2-e1d2b4ac806d", False)
 
                     Dim boolDidWeChangeAnything As Boolean = False
@@ -97,7 +97,7 @@ Namespace Functions.power
                         registryKey = Nothing
                     End If
 
-                    If boolDidWeChangeAnything = True Then
+                    If boolDidWeChangeAnything Then
                         eventLogFunctions.writeToApplicationLogFile("System Restore Point Creator has set your Windows Power Plan back to default settings for wake timers.", EventLogEntryType.Information, False)
 
                         MsgBox("System Restore Point Creator has set your Windows Power Plan back to default settings for wake timers. Your system should no longer wake up for scheduled tasks.", MsgBoxStyle.Information, "System Restore Point Creator")
@@ -114,7 +114,7 @@ Namespace Functions.power
             Try
                 Dim activePowerPlanGUID As String = Nothing
 
-                If getActivePowerPlanGUID(activePowerPlanGUID) = True Then
+                If getActivePowerPlanGUID(activePowerPlanGUID) Then
                     Dim registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SYSTEM\CurrentControlSet\Control\Power\User\PowerSchemes\" & activePowerPlanGUID & "\238c9fa8-0aad-41ed-83f4-97be242c8f20\bd3b718a-0680-4d9d-8ab2-e1d2b4ac806d", False)
 
                     Dim boolDidWeChangeAnything As Boolean = False
@@ -133,12 +133,12 @@ Namespace Functions.power
                         registryKey = Nothing
                     End If
 
-                    If boolDidWeChangeAnything = True Then
+                    If boolDidWeChangeAnything Then
                         eventLogFunctions.writeToApplicationLogFile("System Restore Point Creator has set your Windows Power Plan up to properly support waking up from Sleep Mode.", EventLogEntryType.Information, False)
 
                         MsgBox("System Restore Point Creator has set your Windows Power Plan up to properly support waking up from Sleep Mode." & vbCrLf & vbCrLf & "NOTE!" & vbCrLf & "This does not guarantee that your system will wake from sleep, your system's hardware must be able to support this functionality. Support for this functionality depends upon your system's motherboard and system drivers.", MsgBoxStyle.Information, "System Restore Point Creator")
                     Else
-                        If boolShowNoChangesNeededMessage = True Then MsgBox("No changes to power plan settings were required.", MsgBoxStyle.Information, "System Restore Point Creator")
+                        If boolShowNoChangesNeededMessage Then MsgBox("No changes to power plan settings were required.", MsgBoxStyle.Information, "System Restore Point Creator")
                     End If
                 Else
                     MsgBox("This system doesn't appear to have a valid active power plan in place.", MsgBoxStyle.Critical, "System Restore Point Creator")

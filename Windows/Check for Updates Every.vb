@@ -6,7 +6,7 @@
             Dim shortDays As Short
             txtDays.Text = txtDays.Text.Trim
 
-            If Short.TryParse(txtDays.Text, shortDays) = True Then
+            If Short.TryParse(txtDays.Text, shortDays) Then
                 My.Settings.checkForUpdatesEveryInDays = shortDays
 
                 If shortDays = 1 Then

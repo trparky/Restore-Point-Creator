@@ -67,7 +67,7 @@ Public Class Form1
             ' AND "Create Custom Named System Restore Point" doesn't exist, then we know that we have to rename the
             ' "Create Custom Named System Restore" to "Create Custom Named System Restore Point".
             Try
-                If (registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore", False) Is Nothing) = False And (registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point", False) Is Nothing) = True Then
+                If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore", False) IsNot Nothing And registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point", False) Is Nothing Then
                     'debug.writeline("renaming registry key")
                     Functions.registryStuff.renameRegistrySubKey(registryRootKeyWeAreWorkingWith, "CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore", "CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point")
                 End If
@@ -82,7 +82,7 @@ Public Class Form1
 
                     If valueInRegistry IsNot Nothing Then
                         ' We check if the current Registry path is different than the current process's EXE path.
-                        If valueInRegistry.caseInsensitiveContains(Application.ExecutablePath) = False Then
+                        If Not valueInRegistry.caseInsensitiveContains(Application.ExecutablePath) Then
                             ' OK, it doesn't match the current process's EXE path.
 
                             ' We parse out the EXE's path out of the combined path with the argument.
@@ -90,7 +90,7 @@ Public Class Form1
 
                             If matches IsNot Nothing Then
                                 ' Now we make sure that the file exists.
-                                If IO.File.Exists(matches.Groups(1).Value.Replace(Chr(34), "").Trim) = False Then
+                                If Not IO.File.Exists(matches.Groups(1).Value.Replace(Chr(34), "").Trim) Then
                                     '  OK, it doesn't.  The entries in the Registry are invalid, now let's fix them.
                                     registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint\Command", True)
 
@@ -116,7 +116,7 @@ Public Class Form1
 
                     If valueInRegistry IsNot Nothing Then
                         ' We check if the current Registry path is different than the current process's EXE path.
-                        If valueInRegistry.caseInsensitiveContains(Application.ExecutablePath) = False Then
+                        If Not valueInRegistry.caseInsensitiveContains(Application.ExecutablePath) Then
                             ' OK, it doesn't match the current process's EXE path.
 
                             ' We parse out the EXE's path out of the combined path with the argument.
@@ -124,7 +124,7 @@ Public Class Form1
 
                             If matches IsNot Nothing Then
                                 ' Now we make sure that the file exists.
-                                If IO.File.Exists(matches.Groups(1).Value.Replace(Chr(34), "").Trim) = False Then
+                                If Not IO.File.Exists(matches.Groups(1).Value.Replace(Chr(34), "").Trim) Then
                                     ' OK, it doesn't.  The entries in the Registry are invalid, now let's fix them.
                                     registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point\Command", True)
 
@@ -152,7 +152,7 @@ Public Class Form1
 
                     If valueInRegistry IsNot Nothing Then
                         ' We check if the current Registry path is different than the current process's EXE path.
-                        If valueInRegistry.caseInsensitiveContains(Application.ExecutablePath) = False Then
+                        If Not valueInRegistry.caseInsensitiveContains(Application.ExecutablePath) Then
                             ' OK, it doesn't match the current process's EXE path.
 
                             ' We parse out the EXE's path out of the combined path with the argument.
@@ -160,7 +160,7 @@ Public Class Form1
 
                             If matches IsNot Nothing Then
                                 ' Now we make sure that the file exists.
-                                If IO.File.Exists(matches.Groups(1).Value.Replace(Chr(34), "").Trim) = False Then
+                                If Not IO.File.Exists(matches.Groups(1).Value.Replace(Chr(34), "").Trim) Then
                                     ' OK, it doesn't.  The entries in the Registry are invalid, now let's fix them.
                                     registryKey = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator\Command", True)
 
@@ -203,21 +203,21 @@ Public Class Form1
 
                 If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint") IsNot Nothing Then
                     iconPath = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint").GetValue("icon", "nothing")
-                    If iconPath.caseInsensitiveContains(Application.ExecutablePath) = False Then
+                    If Not iconPath.caseInsensitiveContains(Application.ExecutablePath) Then
                         registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create System Restore Checkpoint", True).SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
                     End If
                 End If
 
                 If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point") IsNot Nothing Then
                     iconPath = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point").GetValue("icon", "nothing")
-                    If iconPath.caseInsensitiveContains(Application.ExecutablePath) = False Then
+                    If Not iconPath.caseInsensitiveContains(Application.ExecutablePath) Then
                         registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Create Custom Named System Restore Point", True).SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
                     End If
                 End If
 
                 If registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator") IsNot Nothing Then
                     iconPath = registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator").GetValue("icon", "nothing")
-                    If iconPath.caseInsensitiveContains(Application.ExecutablePath) = False Then
+                    If Not iconPath.caseInsensitiveContains(Application.ExecutablePath) Then
                         registryRootKeyWeAreWorkingWith.OpenSubKey("CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\Shell\Launch Restore Point Creator", True).SetValue("icon", String.Format("{0}{1}{0}", Chr(34), Application.ExecutablePath))
                     End If
                 End If
@@ -231,7 +231,7 @@ Public Class Form1
     End Sub
 
     Private Sub checkScheduledTaskEXEPathsSubRoutine(ByRef taskService As TaskScheduler.TaskService, ByRef task As TaskScheduler.Task, commandLineArgument As String)
-        If Functions.support.areWeInSafeMode() = True Then Exit Sub
+        If Functions.support.areWeInSafeMode() Then Exit Sub
 
         Try
             Dim actions As TaskScheduler.ActionCollection = task.Definition.Actions
@@ -242,7 +242,7 @@ Public Class Form1
                     execActionPath = DirectCast(action, TaskScheduler.ExecAction).Path.Replace("""", "")
 
                     ' We check if the current task ExecAction path is different than the current process's EXE path.
-                    If execActionPath.Equals(Application.ExecutablePath, StringComparison.OrdinalIgnoreCase) = False Then
+                    If Not execActionPath.Equals(Application.ExecutablePath, StringComparison.OrdinalIgnoreCase) Then
                         task.Definition.Actions.Remove(action)
                         actions.Add(New TaskScheduler.ExecAction(Application.ExecutablePath, commandLineArgument))
                         task.RegisterChanges()
@@ -263,8 +263,8 @@ Public Class Form1
     End Sub
 
     Private Sub checkScheduledTaskEXEPaths()
-        If Functions.support.areWeInSafeMode() = True Then Exit Sub
-        If Debugger.IsAttached = True Then Exit Sub
+        If Functions.support.areWeInSafeMode() Then Exit Sub
+        If Debugger.IsAttached Then Exit Sub
 
         Try
             Dim taskService As New TaskScheduler.TaskService
@@ -308,7 +308,7 @@ Public Class Form1
                 defaultCustomRestorePointName = Registry.LocalMachine.OpenSubKey(globalVariables.registryValues.strKey).GetValue("Default Custom Restore Point Name", "").ToString.Trim
             End If
 
-            If String.IsNullOrWhiteSpace(defaultCustomRestorePointName.Trim) = False And Functions.support.areWeInSafeMode() = False Then btnCreateRestorePointNameWithDefaultName.Visible = True
+            If Not String.IsNullOrWhiteSpace(defaultCustomRestorePointName.Trim) And Not Functions.support.areWeInSafeMode() Then btnCreateRestorePointNameWithDefaultName.Visible = True
 
             If My.Settings.updateChannel.Equals(globalVariables.updateChannels.stable, StringComparison.OrdinalIgnoreCase) Then
                 toolStripStableChannel.Checked = True
@@ -336,7 +336,7 @@ Public Class Form1
                 OnlyGiveMeReleaseCandidates.Checked = My.Settings.onlyGiveMeRCs
             End If
 
-            If globalVariables.version.boolDebugBuild = True Then
+            If globalVariables.version.boolDebugBuild Then
                 SwitchToDebugBuildToolStripMenuItem.Visible = False
                 lineBeforeDebugMenuItem.Visible = False
             End If
@@ -346,7 +346,7 @@ Public Class Form1
             ConfirmRestorePointDeletionsInBatchesToolStripMenuItem.Checked = My.Settings.multiConfirmRestorePointDeletions
 
             ' This code converts the old way of saving the user feedback type preference to the new way of saving the user feedback preference.
-            If String.IsNullOrEmpty(My.Settings.notificationType) = False Then
+            If Not String.IsNullOrEmpty(My.Settings.notificationType) Then
                 If My.Settings.notificationType = globalVariables.notificationTypeBalloon Then
                     My.Settings.notificationType2 = enums.userFeedbackType.balloon
                 ElseIf My.Settings.notificationType = globalVariables.notificationTypeMessageBox Then
@@ -384,7 +384,7 @@ Public Class Form1
             AskBeforeCreatingRestorePointToolStripMenuItem.Checked = My.Settings.askBeforeCreatingRestorePoint
             WriteRestoreSpaceInfoToApplicationLogFileUponCreatingARestorePointToolStripMenuItem.Checked = Functions.registryStuff.getBooleanValueFromRegistry("Write Restore Space Info to Application Log", True)
 
-            If My.Settings.CheckForUpdates = True Then
+            If My.Settings.CheckForUpdates Then
                 If My.Settings.checkForUpdatesEveryInDays = 7 Then
                     toolStripCheckEveryWeek.Checked = True
                 ElseIf My.Settings.checkForUpdatesEveryInDays = 14 Then
@@ -399,7 +399,7 @@ Public Class Form1
                 ConfigureAutomaticUpdatesToolStripMenuItem.Visible = False
             End If
 
-            If globalVariables.KeepXAmountOfRestorePoints = True Then
+            If globalVariables.KeepXAmountOfRestorePoints Then
                 KeepXAmountOfRestorePointsToolStripMenuItem.Checked = True
                 KeepXAmountOfRestorePointsToolStripMenuItem.Text &= " (" & globalVariables.KeepXAmountofRestorePointsValue & ")"
             End If
@@ -426,7 +426,7 @@ Public Class Form1
                 registryObject.Dispose()
             End If
 
-            If My.Settings.maxDaysManualDelete = -1 = False Then
+            If My.Settings.maxDaysManualDelete <> -1 Then
                 toolStripDeleteOldRestorePoints.Text = If(My.Settings.maxDaysManualDelete = 1, "Delete Restore Points older than 1 Day", "Delete Restore Points older than " & My.Settings.maxDaysManualDelete & " Days")
             End If
 
@@ -466,12 +466,12 @@ Public Class Form1
 
             Dim boolDidWeAlreadyLaunchTheCheckForUpdatesRoutine As Boolean = False
 
-            If boolUpdateAtNextRunTime = True Or My.Settings.boolFirstRun = True Then
+            If boolUpdateAtNextRunTime Or My.Settings.boolFirstRun Then
                 boolDidWeAlreadyLaunchTheCheckForUpdatesRoutine = True
                 Threading.ThreadPool.QueueUserWorkItem(Sub() formLoadCheckForUpdatesRoutine(True))
             End If
 
-            If My.Settings.CheckForUpdates = True And boolDidWeAlreadyLaunchTheCheckForUpdatesRoutine = False Then
+            If My.Settings.CheckForUpdates And Not boolDidWeAlreadyLaunchTheCheckForUpdatesRoutine Then
                 toolStripAutomaticallyCheckForUpdates.Checked = True
                 Threading.ThreadPool.QueueUserWorkItem(Sub() formLoadCheckForUpdatesRoutine())
             End If
@@ -487,7 +487,7 @@ Public Class Form1
         'Debug.WriteLine("We are running on Windows 8.x or Windows 10")
         ' Yep, we are.  Let the changes commence.
 
-        If Environment.Is64BitOperatingSystem = False Then
+        If Not Environment.Is64BitOperatingSystem Then
             ' Checks to see if the Registry Subkey exists, that way we don't have a Null Reference Exception.
             If Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore") IsNot Nothing Then
                 ' OK, the Registry Subkey exists, now to create the Registry value that we need to create.
@@ -498,7 +498,7 @@ Public Class Form1
                 Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion", True).CreateSubKey("SystemRestore")
                 Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore", True).SetValue("SystemRestorePointCreationFrequency", 0, RegistryValueKind.DWord)
             End If
-        ElseIf Environment.Is64BitOperatingSystem = True Then
+        ElseIf Environment.Is64BitOperatingSystem Then
             ' Checks to see if the Registry Subkey exists, that way we don't have a Null Reference Exception.
             If RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64).OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore") IsNot Nothing Then
                 ' OK, it exists.  Now let's set the setting.
@@ -670,7 +670,7 @@ Public Class Form1
                 Dim valueInRegistry As String = registryKey.GetValue(Application.ExecutablePath.ToLower, "Nothing")
 
                 ' Now we check to see if the value isn't equal to "Nothing" and if it contains the word "HIGHDPIAWARE".
-                If valueInRegistry.Equals("Nothing") = False And valueInRegistry.caseInsensitiveContains("HIGHDPIAWARE") = True Then
+                If Not valueInRegistry.Equals("Nothing") And valueInRegistry.caseInsensitiveContains("HIGHDPIAWARE") Then
                     InterfaceTooBigToolStripMenuItem.Checked = True
                 End If
 
@@ -752,12 +752,12 @@ Public Class Form1
         Dim pathInStartMenu As String = IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs\Restore Point Creator")
 
         ' Checks to see if this application's executable is in a safe place, in this case... Program Files.
-        If Application.ExecutablePath.caseInsensitiveContains("program files") = True Then
+        If Application.ExecutablePath.caseInsensitiveContains("program files") Then
             ' Checks to see if a program folder exists.
-            If IO.Directory.Exists(pathInStartMenu) = True Then
+            If IO.Directory.Exists(pathInStartMenu) Then
                 Dim pathOfShortcutWeAreGoingToMake As String = IO.Path.Combine(pathInStartMenu, "Restore Point Creator Event Log Viewer.lnk")
 
-                If IO.File.Exists(pathOfShortcutWeAreGoingToMake) = False Then
+                If Not IO.File.Exists(pathOfShortcutWeAreGoingToMake) Then
                     Functions.support.createShortcut(pathOfShortcutWeAreGoingToMake, Application.ExecutablePath, Application.ExecutablePath, "Restore Point Creator Event Log Viewer", globalVariables.commandLineSwitches.viewEventLog)
                 End If
             End If
@@ -767,7 +767,7 @@ Public Class Form1
     Private Sub deleteRPLifeIntervalValue()
         Dim registryKey As RegistryKey
 
-        If Environment.Is64BitOperatingSystem = False Then
+        If Not Environment.Is64BitOperatingSystem Then
             registryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore", True)
 
             If registryKey IsNot Nothing Then
@@ -807,27 +807,27 @@ Public Class Form1
     End Sub
 
     Private Sub newFileDeleterThreadSub()
-        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+        If globalVariables.boolExtendedLoggingDuringUpdating Then
             Functions.eventLogFunctions.writeToApplicationLogFile("New File Deleter thread sleeping for 5 seconds for processes to close out before continuing.", EventLogEntryType.Information, False)
         End If
 
         Threading.Thread.Sleep(5000)
         Dim strFoundFile As String = New IO.FileInfo(Application.ExecutablePath & ".new.exe").Name
 
-        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+        If globalVariables.boolExtendedLoggingDuringUpdating Then
             Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Found file named {0}{1}{0}. Now searching for any processes that have parent executables files of {0}{1}{0}.", Chr(34), strFoundFile), EventLogEntryType.Information, False)
         End If
 
         Functions.support.searchForProcessAndKillIt(Application.ExecutablePath & ".new.exe", True)
 
-        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+        If globalVariables.boolExtendedLoggingDuringUpdating Then
             Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Now attempting to delete {0}{1}{0}.", Chr(34), strFoundFile), EventLogEntryType.Information, False)
         End If
 
         Try
             IO.File.Delete(Application.ExecutablePath & ".new.exe")
 
-            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+            If globalVariables.boolExtendedLoggingDuringUpdating Then
                 Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Deletion of {0}{1}{0} was successful.", Chr(34), strFoundFile), EventLogEntryType.Information, False)
             End If
         Catch ex As Exception
@@ -835,7 +835,7 @@ Public Class Form1
             deleteAtReboot.addItem(Application.ExecutablePath & ".new.exe")
             deleteAtReboot.dispose(True)
 
-            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+            If globalVariables.boolExtendedLoggingDuringUpdating Then
                 Functions.eventLogFunctions.writeToApplicationLogFile(String.Format("Deletion of {0}{1}{0} was unsuccessful, scheduling it to be deleted at next system reboot.", Chr(34), strFoundFile), EventLogEntryType.Information, False)
             End If
         End Try
@@ -860,7 +860,7 @@ Public Class Form1
 
     Private Sub showDonationNotice()
         Try
-            If boolShowDonationMessage = True Then
+            If boolShowDonationMessage Then
                 Dim randomNumberGenerator As New Random()
 
                 If randomNumberGenerator.Next(0, 5) = randomNumberGenerator.Next(0, 5) Then
@@ -886,7 +886,7 @@ Public Class Form1
         Try
             Dim memoryStream As New IO.MemoryStream()
 
-            If Functions.http.downloadFile(globalVariables.webURLs.updateBranch.debug.strProgramZIP, memoryStream) = False Then
+            If Not Functions.http.downloadFile(globalVariables.webURLs.updateBranch.debug.strProgramZIP, memoryStream) Then
                 closePleaseWaitPanel()
                 MsgBox("There was an error while downloading required files, please check the Event Log for more details.", MsgBoxStyle.Critical, strMessageBoxTitle)
 
@@ -897,7 +897,7 @@ Public Class Form1
                 Exit Sub
             End If
 
-            If Functions.checksum.verifyChecksum(globalVariables.webURLs.updateBranch.debug.strProgramZIPSHA2, memoryStream, True) = False Then
+            If Not Functions.checksum.verifyChecksum(globalVariables.webURLs.updateBranch.debug.strProgramZIPSHA2, memoryStream, True) Then
                 memoryStream.Close()
                 memoryStream.Dispose()
                 memoryStream = Nothing
@@ -922,7 +922,7 @@ Public Class Form1
             memoryStream.Position = 0
             Dim zipFileObject As New IO.Compression.ZipArchive(memoryStream, IO.Compression.ZipArchiveMode.Read)
 
-            If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.programFileNameInZIP, strNewApplicationFileNameFullName) = False Then
+            If Not Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.programFileNameInZIP, strNewApplicationFileNameFullName) Then
                 MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, strMessageBoxTitle)
 
                 zipFileObject.Dispose()
@@ -932,7 +932,7 @@ Public Class Form1
                 Exit Sub
             End If
 
-            If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.pdbFileNameInZIP, globalVariables.pdbFileNameInZIP & ".new") = False Then
+            If Not Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.pdbFileNameInZIP, globalVariables.pdbFileNameInZIP & ".new") Then
                 MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, strMessageBoxTitle)
 
                 zipFileObject.Dispose()
@@ -947,7 +947,7 @@ Public Class Form1
             memoryStream.Dispose()
             memoryStream = Nothing
 
-            If IO.File.Exists(strNewApplicationFileNameFullName) = True Then
+            If IO.File.Exists(strNewApplicationFileNameFullName) Then
                 Process.Start(New ProcessStartInfo With {
                     .FileName = strNewApplicationFileNameFullName,
                     .Arguments = "-updatewithoutuninstallinfoupdate",
@@ -963,7 +963,7 @@ Public Class Form1
     End Sub
 
     Public Sub doTheGrayingOfTheRestorePointNameTextBox()
-        If txtRestorePointDescription.Text.caseInsensitiveContains(strTypeYourRestorePointName) = True Then
+        If txtRestorePointDescription.Text.caseInsensitiveContains(strTypeYourRestorePointName) Then
             txtRestorePointDescription.ForeColor = Color.DimGray
             btnCreate.Enabled = False
         ElseIf String.IsNullOrEmpty(txtRestorePointDescription.Text.Trim) Then
@@ -1047,7 +1047,7 @@ Public Class Form1
                         If toolStripLogRestorePointDeletions.Checked Then
                             numberOfOldRestorePointsDeleted += 1
 
-                            If String.IsNullOrEmpty(systemRestorePoint("CreationTime").ToString.Trim) = False Then
+                            If Not String.IsNullOrEmpty(systemRestorePoint("CreationTime").ToString.Trim) Then
                                 dateTime = Functions.restorePointStuff.parseSystemRestorePointCreationDate(systemRestorePoint("CreationTime").ToString)
 
                                 If toolStripLogRestorePointDeletions.Checked Then
@@ -1095,7 +1095,7 @@ Public Class Form1
                 End If
             End If
 
-            If Functions.support.areWeInSafeMode() = False Then
+            If Not Functions.support.areWeInSafeMode() Then
                 btnCreateSystemCheckpoint.Enabled = True
                 btnCreate.Enabled = True
                 txtRestorePointDescription.Enabled = True
@@ -1150,7 +1150,7 @@ Public Class Form1
         toolStripLogRestorePointDeletions.Enabled = True
 
         btnRefreshRestorePoints.Enabled = True
-        If Functions.support.areWeInSafeMode() = False Then btnCreateSystemCheckpoint.Enabled = True
+        If Not Functions.support.areWeInSafeMode() Then btnCreateSystemCheckpoint.Enabled = True
 
         stripRefresh.Enabled = True
         restorePointListContextMenu.Enabled = True
@@ -1158,7 +1158,7 @@ Public Class Form1
 
     Private Sub giveFeedbackAfterCreatingRestorePoint(result As Integer)
         If result = Functions.APIs.errorCodes.ERROR_SUCCESS Then
-            If Me.ShowMessageBoxAfterSuccessfulCreationOfRestorePointToolStripMenuItem.Checked = True Then
+            If Me.ShowMessageBoxAfterSuccessfulCreationOfRestorePointToolStripMenuItem.Checked Then
                 giveFeedbackToUser("System Restore Point Created Successfully.", userFeedbackType.typeInfo)
             End If
         ElseIf result = Functions.APIs.errorCodes.ERROR_DISK_FULL Then
@@ -1223,7 +1223,7 @@ Public Class Form1
 
             If My.Settings.debug Then Functions.eventLogFunctions.writeToApplicationLogFile("EXTENDED DEBUG MESSAGE" & vbCrLf & "System Restore has caught up.", EventLogEntryType.Information, False)
 
-            If globalVariables.KeepXAmountOfRestorePoints = True Then
+            If globalVariables.KeepXAmountOfRestorePoints Then
                 Functions.wmi.doDeletingOfXNumberOfRestorePoints(globalVariables.KeepXAmountofRestorePointsValue)
             End If
 
@@ -1257,7 +1257,7 @@ Public Class Form1
     Private Sub downloadAndDoTheUpdate(Optional boolOverrideUserUpdateChannelPreferences As Boolean = False)
         Functions.eventLogFunctions.writeToApplicationLogFile("Beginning Application Update Procedure.", EventLogEntryType.Information, False)
 
-        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+        If globalVariables.boolExtendedLoggingDuringUpdating Then
             Functions.eventLogFunctions.writeToApplicationLogFile("Extended logging enabled for application update procedure.", EventLogEntryType.Information, False)
         End If
 
@@ -1270,19 +1270,19 @@ Public Class Form1
         ' This checks to see if the boolOverrideUserUpdateChannelPreferences variable is set to True AND if the update channel is NOT set to stable.
         If boolOverrideUserUpdateChannelPreferences And Not updateChannel.Equals(globalVariables.updateChannels.stable, StringComparison.OrdinalIgnoreCase) Then
             ' Yes, these conditions are met so we need to do some stuff. In this case we need to override the user's update channel preference to the stable branch.
-            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+            If globalVariables.boolExtendedLoggingDuringUpdating Then
                 Functions.eventLogFunctions.writeToApplicationLogFile("Forcing the update channel to the stable channel for this update session.", EventLogEntryType.Information, False)
             End If
 
             updateChannel = globalVariables.updateChannels.stable ' We override the update channel to stable.
 
-            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+            If globalVariables.boolExtendedLoggingDuringUpdating Then
                 Functions.eventLogFunctions.writeToApplicationLogFile("Setting extractPDB flag to True.", EventLogEntryType.Information, False)
             End If
 
             extractPDB = True
 
-            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+            If globalVariables.boolExtendedLoggingDuringUpdating Then
                 Functions.eventLogFunctions.writeToApplicationLogFile("Setting overrideURLPaths flag to True.", EventLogEntryType.Information, False)
             End If
 
@@ -1290,7 +1290,7 @@ Public Class Form1
         End If
 
         If updateChannel.Equals(globalVariables.updateChannels.stable, StringComparison.OrdinalIgnoreCase) Then
-            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+            If globalVariables.boolExtendedLoggingDuringUpdating Then
                 Functions.eventLogFunctions.writeToApplicationLogFile("Downloading compressed application ZIP package into system RAM.", EventLogEntryType.Information, False)
             End If
 
@@ -1300,7 +1300,7 @@ Public Class Form1
             ' We check to see if the boolOverrideUserUpdateChannelPreferences and overrideURLPaths variables are set to True.
             If boolOverrideUserUpdateChannelPreferences And overrideURLPaths Then
                 ' Yes, they are.
-                If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                If globalVariables.boolExtendedLoggingDuringUpdating Then
                     Functions.eventLogFunctions.writeToApplicationLogFile("Overriding URL paths for download in this update session.", EventLogEntryType.Information, False)
                 End If
 
@@ -1309,7 +1309,7 @@ Public Class Form1
                 urlToZipFileSHA2 = globalVariables.webURLs.updateBranch.debug.strProgramZIPSHA2
             End If
 
-            If Functions.http.downloadFile(urlToZipFile, memoryStream) = False Then
+            If Not Functions.http.downloadFile(urlToZipFile, memoryStream) Then
                 memoryStream.Close()
                 memoryStream.Dispose()
                 memoryStream = Nothing
@@ -1318,11 +1318,11 @@ Public Class Form1
                 Exit Sub
             End If
 
-            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+            If globalVariables.boolExtendedLoggingDuringUpdating Then
                 Functions.eventLogFunctions.writeToApplicationLogFile("Compressed application ZIP package download complete. Now verifying compressed application ZIP package integrity.", EventLogEntryType.Information, False)
             End If
 
-            If Functions.checksum.verifyChecksum(urlToZipFileSHA2, memoryStream, True) = False Then
+            If Not Functions.checksum.verifyChecksum(urlToZipFileSHA2, memoryStream, True) Then
                 Functions.eventLogFunctions.writeToApplicationLogFile("There was an error in the download of the program's ZIP file, checksums don't match. Update process aborted.", EventLogEntryType.Error, False)
 
                 memoryStream.Close()
@@ -1333,15 +1333,15 @@ Public Class Form1
                 Exit Sub
             End If
 
-            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+            If globalVariables.boolExtendedLoggingDuringUpdating Then
                 Functions.eventLogFunctions.writeToApplicationLogFile("Compressed application ZIP package integrity check passed.", EventLogEntryType.Information, False)
             End If
         ElseIf updateChannel = globalVariables.updateChannels.beta Or updateChannel = globalVariables.updateChannels.tom Then
-            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+            If globalVariables.boolExtendedLoggingDuringUpdating Then
                 Functions.eventLogFunctions.writeToApplicationLogFile("Downloading compressed application ZIP package into system RAM.", EventLogEntryType.Information, False)
             End If
 
-            If Functions.http.downloadFile(globalVariables.webURLs.updateBranch.beta.strProgramZIP, memoryStream) = False Then
+            If Not Functions.http.downloadFile(globalVariables.webURLs.updateBranch.beta.strProgramZIP, memoryStream) Then
                 memoryStream.Close()
                 memoryStream.Dispose()
                 memoryStream = Nothing
@@ -1350,11 +1350,11 @@ Public Class Form1
                 Exit Sub
             End If
 
-            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+            If globalVariables.boolExtendedLoggingDuringUpdating Then
                 Functions.eventLogFunctions.writeToApplicationLogFile("Compressed application ZIP package download complete. Now verifying compressed application ZIP package integrity.", EventLogEntryType.Information, False)
             End If
 
-            If Functions.checksum.verifyChecksum(globalVariables.webURLs.updateBranch.beta.strProgramZIPSHA2, memoryStream, True) = False Then
+            If Not Functions.checksum.verifyChecksum(globalVariables.webURLs.updateBranch.beta.strProgramZIPSHA2, memoryStream, True) Then
                 Functions.eventLogFunctions.writeToApplicationLogFile("There was an error in the download of the program's ZIP file, checksums don't match. Update process aborted.", EventLogEntryType.Error, False)
 
                 memoryStream.Close()
@@ -1365,7 +1365,7 @@ Public Class Form1
                 Exit Sub
             End If
 
-            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+            If globalVariables.boolExtendedLoggingDuringUpdating Then
                 Functions.eventLogFunctions.writeToApplicationLogFile("Compressed application ZIP package integrity check passed.", EventLogEntryType.Information, False)
                 Functions.eventLogFunctions.writeToApplicationLogFile("Setting extractPDB flag to True.", EventLogEntryType.Information, False)
             End If
@@ -1373,7 +1373,7 @@ Public Class Form1
             extractPDB = True
         End If
 
-        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+        If globalVariables.boolExtendedLoggingDuringUpdating Then
             Functions.eventLogFunctions.writeToApplicationLogFile("Download and verification of files required for update complete. Starting application update and extraction process.", EventLogEntryType.Information, False)
         End If
 
@@ -1391,25 +1391,25 @@ Public Class Form1
             End Try
         End If
 
-        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+        If globalVariables.boolExtendedLoggingDuringUpdating Then
             Functions.eventLogFunctions.writeToApplicationLogFile("Setting position for the IO.MemoryStream() back to the beginning of the stream to ready it for file extraction.", EventLogEntryType.Information, False)
         End If
 
         memoryStream.Position = 0
 
-        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+        If globalVariables.boolExtendedLoggingDuringUpdating Then
             Functions.eventLogFunctions.writeToApplicationLogFile("Opening ZIP file package in system RAM for file extractions.", EventLogEntryType.Information, False)
         End If
 
         Dim zipFileObject As New IO.Compression.ZipArchive(memoryStream, IO.Compression.ZipArchiveMode.Read) ' Create a new ZIPFile Object.
 
-        If extractPDB = True Then
-            If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.pdbFileNameInZIP, globalVariables.pdbFileNameInZIP & ".new") = False Then
+        If extractPDB Then
+            If Not Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.pdbFileNameInZIP, globalVariables.pdbFileNameInZIP & ".new") Then
                 ' This code executes only if the file extraction from the ZIP file fails.
                 Functions.eventLogFunctions.writeToApplicationLogFile("There was an issue extracting data from the downloaded ZIP file.", EventLogEntryType.Error, False)
                 MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, strMessageBoxTitle) ' Gives some feedback.
 
-                If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+                If globalVariables.boolExtendedLoggingDuringUpdating Then
                     Functions.eventLogFunctions.writeToApplicationLogFile("Closing out ZIP File Object and freeing up memory.", EventLogEntryType.Information, False)
                 End If
 
@@ -1424,12 +1424,12 @@ Public Class Form1
             End If
         End If
 
-        If Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.programFileNameInZIP, strNewApplicationFileNameFullName) = False Then
+        If Not Functions.support.extractUpdatedFileFromZIPPackage(zipFileObject, globalVariables.programFileNameInZIP, strNewApplicationFileNameFullName) Then
             ' This code executes only if the file extraction from the ZIP file fails.
             Functions.eventLogFunctions.writeToApplicationLogFile("There was an issue extracting data from the downloaded ZIP file.", EventLogEntryType.Error, False)
             MsgBox("There was an issue extracting data from the downloaded ZIP file.", MsgBoxStyle.Critical, strMessageBoxTitle) ' Gives some feedback.
 
-            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+            If globalVariables.boolExtendedLoggingDuringUpdating Then
                 Functions.eventLogFunctions.writeToApplicationLogFile("Closing out ZIP File Object and freeing up memory.", EventLogEntryType.Information, False)
             End If
 
@@ -1443,7 +1443,7 @@ Public Class Form1
             Exit Sub ' Exits the routine
         End If
 
-        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+        If globalVariables.boolExtendedLoggingDuringUpdating Then
             Functions.eventLogFunctions.writeToApplicationLogFile("Closing out ZIP File Object and freeing up memory.", EventLogEntryType.Information, False)
         End If
 
@@ -1452,12 +1452,12 @@ Public Class Form1
         memoryStream.Dispose()
         memoryStream = Nothing
 
-        If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+        If globalVariables.boolExtendedLoggingDuringUpdating Then
             Functions.eventLogFunctions.writeToApplicationLogFile("Making sure new executable file exists.", EventLogEntryType.Information, False)
         End If
 
-        If IO.File.Exists(strNewApplicationFileNameFullName) = True Then
-            If globalVariables.boolExtendedLoggingDuringUpdating = True Then
+        If IO.File.Exists(strNewApplicationFileNameFullName) Then
+            If globalVariables.boolExtendedLoggingDuringUpdating Then
                 Functions.eventLogFunctions.writeToApplicationLogFile("New executable exists, executing it in update mode.", EventLogEntryType.Information, False)
             End If
 
@@ -1505,7 +1505,7 @@ Public Class Form1
         My.Settings.Save() ' And save the settings to disk.
 
         ' First we check to see if we have an Internet connection because if we don't then why even bother trying to check for updates.
-        If Functions.http.checkForInternetConnection() = False Then
+        If Not Functions.http.checkForInternetConnection() Then
             toolStripCheckForUpdates.Enabled = True ' Re-Enable the toolStripCheckForUpdates button.
             MsgBox("No Internet connection detected.", MsgBoxStyle.Information, strMessageBoxTitle) ' Tell the user that we don't have an Internet connection.
         Else
@@ -1535,7 +1535,7 @@ Public Class Form1
 
         ' And let's get the info from my web site.
         Try
-            If httpHelper.getWebData(globalVariables.webURLs.core.strProgramUpdateChecker, xmlData) = False Then
+            If Not httpHelper.getWebData(globalVariables.webURLs.core.strProgramUpdateChecker, xmlData) Then
                 ' Something went wrong, checking for updates failed. Let's tell the user that and abort the routine.
                 MsgBox("There was an error checking for a software update; update check aborted.", MsgBoxStyle.Information, strMessageBoxTitle)
                 Exit Sub
@@ -1632,18 +1632,18 @@ Public Class Form1
     Private Sub formLoadCheckForUpdatesRoutine(Optional forceRunOfUpdate As Boolean = False)
         ' This checks to see if automatic checking for updates is enabled or not, if so this routine runs. There's also
         ' a way to force this routine to run and that is by passing a True value for the forceRunOfUpdate variable.
-        If My.Settings.CheckForUpdates = True Or forceRunOfUpdate = True Then
+        If My.Settings.CheckForUpdates = True Or forceRunOfUpdate Then
             toolStripAutomaticallyCheckForUpdates.Checked = My.Settings.CheckForUpdates ' This puts a checkbox for the toolStripAutomaticallyCheckForUpdates checkbox.
 
             Dim longDateDiff As Long = Math.Abs(DateDiff(DateInterval.Day, Now, My.Settings.lastUpdateTime)) ' This determinds the amount of days since the last update check.
 
             ' This checks to see if the number of executions of the program has exceeded 50 times or if the days since last update is greater than the user specified days interval for update checking. It also has the ability to bypass this check by setting the forceRunOfUpdate variable to True.
-            If My.Settings.ProgramExecutionsSinceLastUpdateCheck >= 50 Or longDateDiff >= My.Settings.checkForUpdatesEveryInDays Or forceRunOfUpdate = True Then
+            If My.Settings.ProgramExecutionsSinceLastUpdateCheck >= 50 Or longDateDiff >= My.Settings.checkForUpdatesEveryInDays Or forceRunOfUpdate Then
                 My.Settings.ProgramExecutionsSinceLastUpdateCheck = 0 ' We reset the number of program executions since last update to 0.
                 My.Settings.Save() ' And save the settings to disk.
 
                 ' First we check to see if we have an Internet connection because if we don't then why even bother trying to check for updates.
-                If Functions.http.checkForInternetConnection() = False Then
+                If Not Functions.http.checkForInternetConnection() Then
                     MsgBox("No Internet connection detected.", MsgBoxStyle.Information, strMessageBoxTitle) ' Tell the user that we don't have an Internet connection.
                     Exit Sub ' And exit this routine.
                 Else
@@ -1691,7 +1691,7 @@ Public Class Form1
 
                 If restorePointsOnSystemManagementObjectCollection IsNot Nothing Then
                     ' Checks to see if there are any System Restore Points to be listed.
-                    If (restorePointsOnSystemManagementObjectCollection.Count = 0) = False Then
+                    If restorePointsOnSystemManagementObjectCollection.Count <> 0 Then
                         'Dim index As Integer = 0
 
                         ' Loops through systemRestorePoints.
@@ -1714,7 +1714,7 @@ Public Class Form1
                                 listViewItem.SubItems.Add(restorePointDetails("Description").ToString)
                                 listViewItem.strName = restorePointDetails("Description").ToString
 
-                                If String.IsNullOrEmpty(restorePointDetails("CreationTime").ToString.Trim) = False Then
+                                If Not String.IsNullOrEmpty(restorePointDetails("CreationTime").ToString.Trim) Then
                                     listViewItem.dateCreated = Functions.restorePointStuff.parseSystemRestorePointCreationDate(restorePointDetails("CreationTime"))
                                     listViewItem.strCreatedDate = String.Format("{0} {1}", listViewItem.dateCreated.ToShortDateString, listViewItem.dateCreated.ToLongTimeString)
 
@@ -1993,9 +1993,9 @@ Public Class Form1
     End Sub
 
     Private Sub txtRestorePointDescription_TextChanged(sender As Object, e As EventArgs) Handles txtRestorePointDescription.TextChanged
-        If txtRestorePointDescription.Text.caseInsensitiveContains(strTypeYourRestorePointName) = False And Not String.IsNullOrEmpty(txtRestorePointDescription.Text.Trim) And Functions.support.areWeInSafeMode() = False Then
+        If Not txtRestorePointDescription.Text.caseInsensitiveContains(strTypeYourRestorePointName) And Not String.IsNullOrEmpty(txtRestorePointDescription.Text.Trim) And Not Functions.support.areWeInSafeMode() Then
             btnCreate.Enabled = True
-        ElseIf txtRestorePointDescription.Text.caseInsensitiveContains(strTypeYourRestorePointName) = True Then
+        ElseIf txtRestorePointDescription.Text.caseInsensitiveContains(strTypeYourRestorePointName) Then
             doTheGrayingOfTheRestorePointNameTextBox()
         End If
     End Sub
@@ -2051,7 +2051,7 @@ Public Class Form1
             btnRestoreToRestorePoint.Enabled = True
             stripRestore.Enabled = True
 
-            If Functions.support.areWeInSafeMode = False Then
+            If Not Functions.support.areWeInSafeMode Then
                 stripRestoreSafeMode.Enabled = True
                 btnRestoreToRestorePointSafeMode.Enabled = True
             End If
@@ -2075,7 +2075,7 @@ Public Class Form1
             btnRestoreToRestorePoint.Enabled = True
             stripRestore.Enabled = True
 
-            If Functions.support.areWeInSafeMode = False Then
+            If Not Functions.support.areWeInSafeMode Then
                 stripRestoreSafeMode.Enabled = True
                 btnRestoreToRestorePointSafeMode.Enabled = True
             End If
@@ -2092,7 +2092,7 @@ Public Class Form1
             stripDelete.Enabled = False
         End If
 
-        If AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked = False Then
+        If Not AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked Then
             If systemRestorePointsList.SelectedItems.Cast(Of myListViewItemTypes.restorePointEntryItem).ToList().FirstOrDefault(Function(item As myListViewItemTypes.restorePointEntryItem) item.intID = newestSystemRestoreID) IsNot Nothing Then
                 btnDeleteRestorePoint.Enabled = False
                 stripDelete.Enabled = False
@@ -2105,7 +2105,7 @@ Public Class Form1
         My.Settings.mainWindowPosition = Me.Location
         saveRestorePointListColumnOrder()
 
-        If globalVariables.boolLogLoadsAndExits = True Then Functions.eventLogFunctions.writeToApplicationLogFile("The user " & Environment.UserName & " closed the program.", EventLogEntryType.Information, False)
+        If globalVariables.boolLogLoadsAndExits Then Functions.eventLogFunctions.writeToApplicationLogFile("The user " & Environment.UserName & " closed the program.", EventLogEntryType.Information, False)
     End Sub
 
     Private Sub Form1_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
@@ -2240,9 +2240,9 @@ Public Class Form1
         End If
 
         Try
-            If globalVariables.boolLogLoadsAndExits = True Then Functions.eventLogFunctions.writeToApplicationLogFile("The user " & Environment.UserName & " started the program.", EventLogEntryType.Information, False)
+            If globalVariables.boolLogLoadsAndExits Then Functions.eventLogFunctions.writeToApplicationLogFile("The user " & Environment.UserName & " started the program.", EventLogEntryType.Information, False)
 
-            If IO.File.Exists("updater.exe") = True Then Threading.ThreadPool.QueueUserWorkItem(AddressOf updaterDeleterThreadSub)
+            If IO.File.Exists("updater.exe") Then Threading.ThreadPool.QueueUserWorkItem(AddressOf updaterDeleterThreadSub)
 
             interfaceTooSmallSettingCheckFormLoadSubRoutine()
 
@@ -2259,7 +2259,7 @@ Public Class Form1
                 Functions.eventLogFunctions.writeCrashToApplicationLogFile(ex)
             End Try
 
-            If Functions.osVersionInfo.isThisWindows10() = True Then
+            If Functions.osVersionInfo.isThisWindows10() Then
                 BalloonToolStripMenuItem.Text = "Balloon/Action Center Notification"
             End If
 
@@ -2288,9 +2288,9 @@ Public Class Form1
             loadRestorePointListColumnOrder()
             applySavedSorting()
 
-            If IO.File.Exists(Application.ExecutablePath & ".new.exe") = True Then Threading.ThreadPool.QueueUserWorkItem(AddressOf newFileDeleterThreadSub)
+            If IO.File.Exists(Application.ExecutablePath & ".new.exe") Then Threading.ThreadPool.QueueUserWorkItem(AddressOf newFileDeleterThreadSub)
 
-            If Functions.support.areWeInSafeMode() = True Then
+            If Functions.support.areWeInSafeMode() Then
                 toolStripScheduleRestorePoints.Enabled = False
                 btnRestoreToRestorePointSafeMode.Enabled = False
                 stripRestoreSafeMode.Enabled = False
@@ -2306,7 +2306,7 @@ Public Class Form1
                 RemoveSafeModeBootOptionToolStripMenuItem.Visible = False
             End If
 
-            If My.Settings.checkSystemDrivesForFullShadowStorage = True Then
+            If My.Settings.checkSystemDrivesForFullShadowStorage Then
                 Threading.ThreadPool.QueueUserWorkItem(AddressOf checkRestorePointSpaceThreadSub)
             End If
 
@@ -2388,7 +2388,7 @@ Public Class Form1
     End Sub
 
     Private Sub systemRestorePointsList_ColumnWidthChanged(sender As Object, e As ColumnWidthChangedEventArgs) Handles systemRestorePointsList.ColumnWidthChanged
-        If boolDoneLoading = True Then
+        If boolDoneLoading Then
             My.Settings.column1Size = ColumnHeader1.Width
             My.Settings.column2Size = ColumnHeader2.Width
             My.Settings.column3Size = ColumnHeader3.Width
@@ -2538,7 +2538,7 @@ Public Class Form1
     End Sub
 
     Private Sub ExtendedLoggingForScheduledTasks_Click(sender As Object, e As EventArgs) Handles ExtendedLoggingForScheduledTasks.Click
-        If ExtendedLoggingForScheduledTasks.Checked = True Then
+        If ExtendedLoggingForScheduledTasks.Checked Then
             savePreferenceToRegistry("Extended Logging For Scheduled Tasks", "True")
         Else
             savePreferenceToRegistry("Extended Logging For Scheduled Tasks", "False")
@@ -2548,21 +2548,21 @@ Public Class Form1
     Private Sub FixRuntimeTasksToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles FixRuntimeTasksToolStripMenuItem.Click
         Dim task As TaskScheduler.Task = Nothing
 
-        If Functions.taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Restore Point)", task) = True Then
+        If Functions.taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Restore Point)", task) Then
             Functions.taskStuff.deleteTask(task)
             task.Dispose()
 
             Functions.taskStuff.addRunTimeTask("Restore Point Creator -- Run with no UAC (Create Restore Point)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, globalVariables.commandLineSwitches.createRestorePoint)
         End If
 
-        If Functions.taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Custom Restore Point)", task) = True Then
+        If Functions.taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC (Create Custom Restore Point)", task) Then
             Functions.taskStuff.deleteTask(task)
             task.Dispose()
 
             Functions.taskStuff.addRunTimeTask("Restore Point Creator -- Run with no UAC (Create Custom Restore Point)", "Runs Restore Point Creator with no UAC prompt.", Application.ExecutablePath, globalVariables.commandLineSwitches.createCustomRestorePoint)
         End If
 
-        If Functions.taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC", task) = True Then
+        If Functions.taskStuff.doesRunTimeTaskExist("Restore Point Creator -- Run with no UAC", task) Then
             Functions.taskStuff.deleteTask(task)
             task.Dispose()
 
@@ -2585,7 +2585,7 @@ Public Class Form1
     Private Sub EnableExtendedLoggingToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles EnableExtendedLoggingToolStripMenuItem.Click
         globalVariables.boolExtendedLoggingDuringUpdating = EnableExtendedLoggingToolStripMenuItem.Checked
 
-        If EnableExtendedLoggingToolStripMenuItem.Checked = True Then
+        If EnableExtendedLoggingToolStripMenuItem.Checked Then
             savePreferenceToRegistry("Enable Extended Logging During Updating", "True")
         Else
             savePreferenceToRegistry("Enable Extended Logging During Updating", "False")
@@ -2635,7 +2635,7 @@ Public Class Form1
         importBackupDialog.FileName = Nothing
 
         If importBackupDialog.ShowDialog() = DialogResult.OK Then
-            If IO.File.Exists(importBackupDialog.FileName) = True Then
+            If IO.File.Exists(importBackupDialog.FileName) Then
                 If New IO.FileInfo(importBackupDialog.FileName).Extension.Equals(".resbakx", StringComparison.OrdinalIgnoreCase) Then
                     Functions.importExportSettings.importSettingsFromXMLFile(importBackupDialog.FileName, strMessageBoxTitle)
                 Else
@@ -2673,7 +2673,7 @@ Public Class Form1
     End Sub
 
     Private Sub UseSSLToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles UseSSLToolStripMenuItem.Click
-        If UseSSLToolStripMenuItem.Checked = False Then
+        If Not UseSSLToolStripMenuItem.Checked Then
             Dim msgBoxResult As MsgBoxResult = MsgBox("It's recommended to have SSL enabled so that downloads and data that's sent to my web site is secure. Please reconsider this." & vbCrLf & vbCrLf & "Are you sure you want to disable SSL?", MsgBoxStyle.Question + vbYesNo, "Are you sure?")
 
             If msgBoxResult = MsgBoxResult.Yes Then
@@ -2714,7 +2714,7 @@ Public Class Form1
     Private Sub LogProgramLoadsAndExitsToEventLogToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles LogProgramLoadsAndExitsToEventLogToolStripMenuItem.Click
         globalVariables.boolLogLoadsAndExits = LogProgramLoadsAndExitsToEventLogToolStripMenuItem.Checked
 
-        If globalVariables.boolLogLoadsAndExits = True Then
+        If globalVariables.boolLogLoadsAndExits Then
             savePreferenceToRegistry("Log Program Loads And Exits to Event Log", "True")
         Else
             savePreferenceToRegistry("Log Program Loads And Exits to Event Log", "False")
@@ -2777,7 +2777,7 @@ Public Class Form1
     End Sub
 
     Private Sub SwitchToDebugBuildToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SwitchToDebugBuildToolStripMenuItem.Click
-        If globalVariables.version.boolDebugBuild = True Then
+        If globalVariables.version.boolDebugBuild Then
             Exit Sub
         End If
 
@@ -2807,7 +2807,7 @@ Public Class Form1
 
         Dim registryKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers", True)
 
-        If InterfaceTooBigToolStripMenuItem.Checked = True Then
+        If InterfaceTooBigToolStripMenuItem.Checked Then
             registryKey.SetValue(Process.GetCurrentProcess.MainModule.FileName.ToLower, "~ HIGHDPIAWARE", RegistryValueKind.String)
             registryKey.Close()
             registryKey = Nothing
@@ -3013,7 +3013,7 @@ Public Class Form1
             boolRegistryShowDonationMessageValue = True
         End If
 
-        If boolRegistryShowDonationMessageValue = False Then
+        If Not boolRegistryShowDonationMessageValue Then
             MsgBox("It appears that you have already donated to the developer of this program.  You don't have to donate again but if you want to, I won't argue with you.", MsgBoxStyle.Information, strMessageBoxTitle)
         End If
 
@@ -3021,7 +3021,7 @@ Public Class Form1
     End Sub
 
     Private Sub toolStripCloseAfterRestorePointIsCreated_Click(sender As Object, e As EventArgs) Handles toolStripCloseAfterRestorePointIsCreated.Click
-        If toolStripCloseAfterRestorePointIsCreated.Checked = True Then
+        If toolStripCloseAfterRestorePointIsCreated.Checked Then
             My.Settings.closeAfterCreatingRestorePoint = True
         Else
             My.Settings.closeAfterCreatingRestorePoint = False
@@ -3074,7 +3074,7 @@ Public Class Form1
         My.Settings.updateChannel = globalVariables.updateChannels.stable
         My.Settings.Save()
 
-        If IO.File.Exists(globalVariables.pdbFileNameInZIP) = True Then
+        If IO.File.Exists(globalVariables.pdbFileNameInZIP) Then
             Try
                 IO.File.Delete(globalVariables.pdbFileNameInZIP)
             Catch ex As Exception
@@ -3113,7 +3113,7 @@ Public Class Form1
     End Sub
 
     Private Sub KeepXAmountOfRestorePointsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles KeepXAmountOfRestorePointsToolStripMenuItem.Click
-        If KeepXAmountOfRestorePointsToolStripMenuItem.Checked = True Then
+        If KeepXAmountOfRestorePointsToolStripMenuItem.Checked Then
             Dim Keep_X_Amount_of_Restore_PointsInstance = New createRestorePointAtUserLogon With {
                 .parentFormG = Me,
                 .StartPosition = FormStartPosition.CenterParent
@@ -3227,7 +3227,7 @@ Public Class Form1
         My.Settings.CheckForUpdates = toolStripAutomaticallyCheckForUpdates.Checked
         My.Settings.Save()
 
-        If My.Settings.CheckForUpdates = True Then
+        If My.Settings.CheckForUpdates Then
             ConfigureAutomaticUpdatesToolStripMenuItem.Visible = True
         Else
             ConfigureAutomaticUpdatesToolStripMenuItem.Visible = False
@@ -3277,7 +3277,7 @@ Public Class Form1
     End Sub
 
     Private Sub btnCreateRestorePointNameWithDefaultName_Click(sender As Object, e As EventArgs) Handles btnCreateRestorePointNameWithDefaultName.Click
-        If Functions.support.areWeInSafeMode() = True Then
+        If Functions.support.areWeInSafeMode() Then
             MsgBox("You are in Safe Mode, it's not recommended to make restore points in Safe Mode.", MsgBoxStyle.Information, strMessageBoxTitle)
             Exit Sub
         End If
@@ -3287,12 +3287,12 @@ Public Class Form1
     End Sub
 
     Private Sub btnCreate_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnCreate.Click
-        If Functions.support.areWeInSafeMode() = True Then
+        If Functions.support.areWeInSafeMode() Then
             MsgBox("You are in Safe Mode, it's not recommended to make restore points in Safe Mode.", MsgBoxStyle.Information, strMessageBoxTitle)
             Exit Sub
         End If
 
-        If txtRestorePointDescription.Text.caseInsensitiveContains(strTypeYourRestorePointName) = True Then
+        If txtRestorePointDescription.Text.caseInsensitiveContains(strTypeYourRestorePointName) Then
             Exit Sub
         End If
 
@@ -3302,7 +3302,7 @@ Public Class Form1
 
         Dim msgBoxResult As MsgBoxResult = MsgBoxResult.Yes
 
-        If My.Settings.askBeforeCreatingRestorePoint = True Then
+        If My.Settings.askBeforeCreatingRestorePoint Then
             msgBoxResult = MsgBox(String.Format("Are you sure you want to create a new system restore point with the name of {0}{1}{0}?", Chr(34), txtRestorePointDescription.Text), MsgBoxStyle.Question + vbYesNo, "Restore Point Creator")
         End If
 
@@ -3313,14 +3313,14 @@ Public Class Form1
     End Sub
 
     Private Sub btnCreateSystemCheckpoint_Click(ByVal sender As Object, ByVal e As EventArgs) Handles btnCreateSystemCheckpoint.Click
-        If Functions.support.areWeInSafeMode() = True Then
+        If Functions.support.areWeInSafeMode() Then
             MsgBox("You are in Safe Mode, it's not recommended to make restore points in Safe Mode.", MsgBoxStyle.Information, strMessageBoxTitle)
             Exit Sub
         End If
 
         Dim msgBoxResult As MsgBoxResult = MsgBoxResult.Yes
 
-        If My.Settings.askBeforeCreatingRestorePoint = True Then
+        If My.Settings.askBeforeCreatingRestorePoint Then
             msgBoxResult = MsgBox("Are you sure you want to create a new system restore point?", MsgBoxStyle.Question + vbYesNo, "Restore Point Creator")
         End If
 
@@ -3375,7 +3375,7 @@ Public Class Form1
         Dim boolConfirmDeletions As Boolean = toolStripConfirmDeletions.Checked
 
         For Each restorePointEntryItem As myListViewItemTypes.restorePointEntryItem In systemRestorePointsList.SelectedItems
-            If AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked = False Then
+            If Not AllowForDeletionOfAllSystemRestorePointsToolStripMenuItem.Checked Then
                 ' Checks to see if the user is trying to delete the newest System Restore Point based upon ID.
                 If restorePointEntryItem.intID = newestSystemRestoreID Then
                     systemRestorePointsList.Enabled = True

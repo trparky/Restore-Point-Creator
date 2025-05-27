@@ -19,7 +19,7 @@
     Public previousSearchType As searceType
 
     Private Sub btnSearch_Click(sender As Object, e As EventArgs) Handles btnSearch.Click
-        If chkRegEx.Checked = True And Functions.support.boolTestRegExPattern(txtSearchTerms.Text.Trim) = False Then
+        If chkRegEx.Checked And Not Functions.support.boolTestRegExPattern(txtSearchTerms.Text.Trim) Then
             MsgBox("There was an error detected in your Regular Expression pattern. Please try again.", MsgBoxStyle.Information, Me.Text)
             Exit Sub
         End If
@@ -28,11 +28,11 @@
         boolCaseInsensitive = chkCaseInsensitive.Checked
         boolUseRegEx = chkRegEx.Checked
 
-        If radAny.Checked = True Then
+        If radAny.Checked Then
             searchType = searceType.typeAny
-        ElseIf radError.Checked = True Then
+        ElseIf radError.Checked Then
             searchType = searceType.typeError
-        ElseIf radInfo.Checked = True Then
+        ElseIf radInfo.Checked Then
             searchType = searceType.typeInfo
         End If
 
@@ -42,7 +42,7 @@
     End Sub
 
     Private Sub Search_Event_Log_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        If boolButtonPushed = False Then dialogResponse = userResponse.abortSearch
+        If Not boolButtonPushed Then dialogResponse = userResponse.abortSearch
     End Sub
 
     Private Sub txtSearchTerms_KeyUp(sender As Object, e As KeyEventArgs) Handles txtSearchTerms.KeyUp

@@ -15,7 +15,7 @@
 
     Private Sub Manually_Submit_Crash_Details_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Location = Functions.support.verifyWindowLocation(My.Settings.ManuallySubmitCrashDataInstanceLocation)
-        If My.Settings.useSSL = True Then
+        If My.Settings.useSSL Then
             btnSubmitData.Image = My.Resources.lock
             ToolTip.SetToolTip(btnSubmitData, "Secured by SSL.")
         End If
@@ -28,7 +28,7 @@
     End Sub
 
     Private Sub btnClose_Click(sender As Object, e As EventArgs) Handles btnClose.Click
-        If boolSubmitted = False Then
+        If Not boolSubmitted Then
             If MsgBox("Are you sure you want to close this window? You have not submitted the crash data yet.", MsgBoxStyle.Question + MsgBoxStyle.YesNo, Me.Text) = MsgBoxResult.Yes Then
                 boolSubmitted = True
                 Me.Close()
@@ -37,7 +37,7 @@
     End Sub
 
     Private Sub Manually_Submit_Crash_Details_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        If boolSubmitted = False Then
+        If Not boolSubmitted Then
             If MsgBox("Are you sure you want to close this window? You have not submitted the crash data yet.", MsgBoxStyle.Question + MsgBoxStyle.YesNo, Me.Text) = MsgBoxResult.No Then
                 e.Cancel = True
                 Exit Sub
@@ -51,13 +51,13 @@
 
     Sub deleteFileWithCrashPrevention(strPathToFile As String)
         Try
-            If IO.File.Exists(strPathToFile) = True Then IO.File.Delete(strPathToFile)
+            If IO.File.Exists(strPathToFile) Then IO.File.Delete(strPathToFile)
         Catch ex As Exception
         End Try
     End Sub
 
     Sub deleteTempFiles()
-        If boolDoWeHaveAttachments = True Then
+        If boolDoWeHaveAttachments Then
             deleteFileWithCrashPrevention(strZIPFile)
             deleteFileWithCrashPrevention(strLogFile)
         End If
@@ -79,7 +79,7 @@
         httpHelper.addPOSTData("manually", "true")
         httpHelper.addPOSTData("autosubmitted", "false")
 
-        If chkReproducable.Checked = True Then
+        If chkReproducable.Checked Then
             httpHelper.addPOSTData("reproducable", "Yes")
         Else
             httpHelper.addPOSTData("reproducable", "No")
@@ -92,12 +92,12 @@
         End If
 
         Try
-            If chkSendLogs.Checked = True Then
+            If chkSendLogs.Checked Then
                 Dim logCount As ULong = 0
 
-                If Functions.eventLogFunctions.exportLogsToFile(strLogFile, logCount) = True Then
-                    If Functions.support.addFileToZipFile(strZIPFile, strLogFile) = True Then
-                        If IO.File.Exists(strZIPFile) = True Then
+                If Functions.eventLogFunctions.exportLogsToFile(strLogFile, logCount) Then
+                    If Functions.support.addFileToZipFile(strZIPFile, strLogFile) Then
+                        If IO.File.Exists(strZIPFile) Then
                             boolDoWeHaveAttachments = True
                             httpHelper.addFileUpload("attachment", strZIPFile, Nothing, "application/zip")
                         End If
@@ -108,13 +108,13 @@
             Dim strHTTPResponse As String = Nothing
             Dim boolHTTPResult As Boolean
 
-            If boolDoWeHaveAttachments = True Then
+            If boolDoWeHaveAttachments Then
                 boolHTTPResult = httpHelper.uploadData(globalVariables.webURLs.dataProcessors.strCrashReporter, strHTTPResponse)
             Else
                 boolHTTPResult = httpHelper.getWebData(globalVariables.webURLs.dataProcessors.strCrashReporter, strHTTPResponse)
             End If
 
-            If boolHTTPResult = True Then
+            If boolHTTPResult Then
                 closePleaseWaitPanel()
                 Debug.WriteLine(httpHelper.getHTTPResponseHeaders.ToString)
                 deleteTempFiles()
@@ -205,7 +205,7 @@
             Exit Sub
         End If
 
-        If chkSendLogs.Checked = True Then
+        If chkSendLogs.Checked Then
             openPleaseWaitPanel("Compressing and Sending Data... Please Wait.")
         End If
 
