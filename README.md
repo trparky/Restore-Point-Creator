@@ -1,3 +1,4 @@
+<img src="https://img.shields.io/badge/license-GPL-green">
 This is the open source repository for the now discontinued Restore Point Creator.
 
 If anyone wants to take over development, be my guest.
