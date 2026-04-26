@@ -474,7 +474,7 @@ Namespace Functions.startupFunctions
                     systemRestorePoint = Nothing
                 Next
 
-                If boolLogDeletedRestorePoints4 Then
+                If boolLogDeletedRestorePoints Then
                     If numberOfOldRestorePointsDeleted = 0 Then
                         eventLogFunctions.writeToApplicationLogFile("End of processing old System Restore Points.  No old System Restore Point were deleted.", EventLogEntryType.Information, False, False)
                     ElseIf numberOfOldRestorePointsDeleted = 1 Then
